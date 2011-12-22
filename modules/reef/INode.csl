@@ -1,0 +1,4 @@
+interface INode
+{
+	co.IObject createObject( in co.IComponent type );
+};
