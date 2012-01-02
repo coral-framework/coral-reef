@@ -1,4 +1,4 @@
 interface INode
 {
-	co.IObject createObject( in co.IComponent type );
+	IRemoteObjectProxy createObject( in co.IComponent type );
 };

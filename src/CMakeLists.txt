@@ -2,18 +2,18 @@
 # Build the Module
 ################################################################################
 
-CORAL_GENERATE_MODULE( _GENERATED_FILES ca lua.IState )
+CORAL_GENERATE_MODULE( _GENERATED_FILES reef lua.IState )
 
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR}/generated )
 
 FILE( GLOB _SOURCES *.cpp )
 FILE( GLOB _HEADERS *.h )
 
-ADD_LIBRARY( ca MODULE ${_HEADERS} ${_SOURCES} ${_GENERATED_FILES} )
+ADD_LIBRARY( reef MODULE ${_HEADERS} ${_SOURCES} ${_GENERATED_FILES} )
 
-CORAL_MODULE_TARGET( "ca" ca )
+CORAL_MODULE_TARGET( "reef" reef )
 
-TARGET_LINK_LIBRARIES( ca ${CORAL_LIBRARIES} )
+TARGET_LINK_LIBRARIES( reef ${CORAL_LIBRARIES} )
 
 ################################################################################
 # Source Groups
@@ -26,15 +26,15 @@ SOURCE_GROUP( "@Generated" FILES ${_GENERATED_FILES} )
 ################################################################################
 
 # install shared library
-INSTALL( TARGETS ca
-	DESTINATION "modules/ca"
-	COMPONENT "Calcium Module"
+INSTALL( TARGETS reef
+	DESTINATION "modules/reef"
+	COMPONENT "Reef Module"
 )
 
 INSTALL( FILES "${CMAKE_BINARY_DIR}/modules/ca/ca_debug.pdb"
 	DESTINATION "modules/ca"
 	CONFIGURATIONS Debug
-	COMPONENT "Calcium Module"
+	COMPONENT "Reef Module"
 	OPTIONAL
 )
 
@@ -42,5 +42,5 @@ INSTALL( FILES "${CMAKE_BINARY_DIR}/modules/ca/ca_debug.pdb"
 INSTALL( DIRECTORY ${CMAKE_SOURCE_DIR}/modules/ca
 	DESTINATION "modules"
 	CONFIGURATIONS Release RelWithDebInfo
-	COMPONENT "Calcium Module"
+	COMPONENT "Reef Module"
 )
