@@ -1,0 +1,8 @@
+interface IToto
+{
+	int32 number;
+	
+	int32 numberGet();
+	
+	void printHello();
+};

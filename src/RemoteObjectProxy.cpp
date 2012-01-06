@@ -1,41 +1,35 @@
 /*
- * Component implementation template for 'reef.RemoteObjectProxy'.
+ * Component implementation template for 'reef.RemoteServiceProxy'.
  */
 
-#include "RemoteObjectProxy_Base.h"
+#include "RemoteServiceProxy_Base.h"
+#include "Message.h"
 
 namespace reef {
 
-class RemoteObjectProxy : public RemoteObjectProxy_Base
+class RemoteServiceProxy : public RemoteServiceProxy_Base
 {
 public:
-	RemoteObjectProxy()
+	RemoteServiceProxy()
 	{
 		// empty constructor
 	}
 
-	virtual ~RemoteObjectProxy()
+	virtual ~RemoteServiceProxy()
 	{
 		// empty destructor
 	}
 
-	// ------ reef.IRemoteObjectProxy Methods ------ //
-
-	const std::string& getMethods()
+	void setServiceId( co::int32 id )
 	{
-		static std::string dummy;
-		return dummy;
-	}
-
-	void setRemoteObjectId( co::int32 id )
-	{
-		// TODO: implement this method.
+		serviceId = id;
 	}
 
 private:
-	// member variables
+
+	co::int32 serviceId;
 };
 
-CORAL_EXPORT_COMPONENT( RemoteObjectProxy, RemoteObjectProxy );
+CORAL_EXPORT_COMPONENT( RemoteServiceProxy, RemoteServiceProxy );
 
 } // namespace reef

@@ -1,4 +1,0 @@
-component RemoteObjectProxy
-{
-	provides IRemoteObjectProxy proxy;
-};

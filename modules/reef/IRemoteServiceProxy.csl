@@ -1,0 +1,4 @@
+interface IRemoteServiceProxy
+{
+	void setServiceId( in int32 id );
+};

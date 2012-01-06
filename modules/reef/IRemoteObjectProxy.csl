@@ -1,7 +1,0 @@
-interface IRemoteObjectProxy
-{
-	void setRemoteObjectId( in int32 id );
-	
-	// test method
-	string getMethods();
-};

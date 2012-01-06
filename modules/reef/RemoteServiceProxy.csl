@@ -1,0 +1,4 @@
+component RemoteServiceProxy
+{
+	provides IRemoteServiceProxy proxy;
+};

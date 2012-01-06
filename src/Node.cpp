@@ -3,9 +3,9 @@
  */
 
 #include "Node_Base.h"
+#include "reef/IRemoteServiceProxy.h"
 #include <co/IComponent.h>
 #include <co/RefPtr.h>
-#include <reef/IRemoteObjectProxy.h>
 
 namespace reef {
 
@@ -24,9 +24,9 @@ public:
 
 	// ------ reef.INode Methods ------ //
 
-	reef::IRemoteObjectProxy* createObject( co::IComponent* type )
+	reef::IRemoteServiceProxy* createObject( co::IComponent* type )
 	{
-		static co::RefPtr<reef::IRemoteObjectProxy> dummy;
+		static co::RefPtr<reef::IRemoteServiceProxy> dummy;
 		return dummy.get();
 	}
 

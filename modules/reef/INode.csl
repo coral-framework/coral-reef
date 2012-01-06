@@ -1,4 +1,8 @@
+/*
+	This service is responsible for instantiating components in remote servers, and creating proxies that are responsible
+	for the communication between local components and the remote component.
+*/
 interface INode
 {
-	IRemoteObjectProxy createObject( in co.IComponent type );
+	IRemoteServiceProxy createObject( in co.IComponent type );
 };
