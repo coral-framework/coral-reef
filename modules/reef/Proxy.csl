@@ -1,0 +1,4 @@
+component Proxy
+{
+	provides IProxy proxy;
+};

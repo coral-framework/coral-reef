@@ -1,5 +1,0 @@
-interface ILocalServiceProxy
-{
-	// The id of the IRemoteObjectProxy connected to this interface
-	void setServiceId( in int32 id );
-};

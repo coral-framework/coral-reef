@@ -4,5 +4,5 @@
 */
 interface INode
 {
-	IRemoteServiceProxy createObject( in co.IComponent type );
+	IProxy createObject( in co.IComponent type );
 };
