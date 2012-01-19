@@ -8,38 +8,33 @@
 
 namespace reef {
 
-	Proxy::Proxy()
-	{
-		// empty constructor
-	}
-	
-    Proxy::Proxy( reef::Node* node, co::int32 channel ) :
-		_node( node ), _channel( channel )
-	{
-	}
+Proxy::Proxy()
+{
+    // empty constructor
+}
 
-	Proxy::~Proxy()
-	{
-		if( _node ) 
-        {
-            _node->onProxyDestruction( _channel );
-        }
-	}
-    
-    void Proxy::callMethodById( co::int32 id )
+Proxy::Proxy( reef::Node* node, co::int32 remoteNodeIndex, co::int32 proxyId ) :
+     _node( node ), _rmtNodeId( remoteNodeIndex ),  _myLocalId( proxyId )
+{
+}
+
+Proxy::~Proxy()
+{
+    if( _node ) 
     {
-        
+        _node->onProxyDestruction( _rmtNodeId, _myLocalId );
     }
-    
-	void Proxy::callMethodByName( const std::string& name )
-    {
-        
-    }
+}
 
-	void Proxy::receiveMsg( Message* msg )
-	{
-	}
+void Proxy::callMethodById( co::int32 id )
+{
+    _node->callAsynchMethod( _rmtNodeId, _myLocalId, id, co::Range<const co::Any>() );
+}
 
-    CORAL_EXPORT_COMPONENT( Proxy, Proxy );
+void Proxy::receiveMsg( Message* msg )
+{
+}
+
+CORAL_EXPORT_COMPONENT( Proxy, Proxy );
     
 } // namespace reef

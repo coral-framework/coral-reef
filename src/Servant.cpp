@@ -13,8 +13,8 @@
 
 namespace reef {
 
-Servant::Servant( co::IService* master, reef::Node* node, co::int32 channel ) : 
-	 _master( master ), _channel( channel ), _node( node )
+Servant::Servant( co::IService* master, reef::Node* localNode, co::int32 rmtNodeId, co::int32 rmtProxyId ) : 
+	 _master( master ), _localNode( localNode ), _rmtNodeId( rmtNodeId ), _rmtProxyId( rmtProxyId )
 {
 	// empty constructor
 }
@@ -24,26 +24,27 @@ Servant::~Servant()
 	// empty destructor
 }
 
-void Servant::receiveMsg( Message& msg )
+void Servant::receiveMsg( Message* msg )
 {
-	void* data = NULL;
-	memcpy( data, msg.buffer, msg.bytes );
-
 	// for now only member requests will be attended
     co::IInterface* reqInterface = _master->getInterface();
 	co::IMember* reqMember;
 
-	if( ((char*)data)[0] == 's' )
+	if( msg->type == 's' )
 	{
-		std::string memberName(((char*)data) + 1); 
-		printf( "Member called %s requested\n", ((char*)data) + 1  );
+        std::string memberName(  static_cast<char*>( msg->data ) );
+		printf( "Member called %s requested\n", memberName.c_str() );
 		reqMember = reqInterface->getMember( memberName );
 	}
-	else if( ((char*)data)[0] == 'n' )
+	else if( msg->type == 'n' )
 	{
-		int* numericData = (int*)( ((char*)data) + 1 );
-		reqMember = reqInterface->getMembers()[numericData[0]];
+        co::int32 memberId = *static_cast<co::int32*>( msg->data );
+		reqMember = reqInterface->getMembers()[memberId];
 	}
+    else
+    {
+        return;
+    }
 
 	co::MemberKind kind = reqMember->getKind();
 	

@@ -17,14 +17,12 @@ class Proxy : public Proxy_Base
 public:
 	Proxy();
     
-    // receives the node it belongs, the index of the rmt node that has the real object, and its own id
+    // receives the node it belongs, the local index of the rmt node that has the real object, and its own local id
 	Proxy( reef::Node* node, co::int32 remoteNodeIndex, co::int32 proxyId );
 
 	virtual ~Proxy();
 	
     void callMethodById( co::int32 id );
-    
-	void callMethodByName( const std::string& name );
     
 	void receiveMsg( Message* msg );
     
@@ -35,7 +33,7 @@ public:
     
     inline co::int32 getMyId()
     {
-        return _myId;
+        return _myLocalId;
     }
 
 private:
@@ -46,7 +44,7 @@ private:
     co::int32 _rmtNodeId;
     
     // _myId + this node's Id will be this proxy's identifier for the remote node 
-	co::int32 _myId;
+	co::int32 _myLocalId;
 
 };
 

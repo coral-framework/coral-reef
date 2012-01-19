@@ -4,5 +4,11 @@
 */
 interface INode
 {
-	IProxy createObject( in co.IComponent type );
+	// Checks if there are any msgs from remote nodes to process
+	void processMsgs( in int32 numMsgsToProccess );
+	
+	/* Provided the remote node local id in this node, instantiates an object of 'type'in the remote node. */
+	IProxy createObject( in int32 rmtNodeLocalId, in string componentName, in int32 facetId );
+	
+	//IProxy seekService( in int32 rmtNodeLocalId, in co.IInterface type );
 };

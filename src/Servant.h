@@ -7,22 +7,23 @@
 namespace reef {
 
 class Node;
-class Message;    
+struct Message;    
 
 class Servant
 {
 public:
-	Servant( co::IService* master, reef::Node* node, co::int32 channel );
+	Servant( co::IService* master, reef::Node* localNode, co::int32 rmtNodeId, co::int32 rmtProxyId );
 
 	virtual ~Servant();
 
-	void receiveMsg( Message& msg );
+	void receiveMsg( Message* msg );
 
 private:
 	// member variables
 	co::RefPtr<co::IService> _master;
-	co::int32 _channel;
-	reef::Node* _node;
+	reef::Node* _localNode;
+	co::int32 _rmtNodeId;
+	co::int32 _rmtProxyId;
 };
 
 } // namespace reef
