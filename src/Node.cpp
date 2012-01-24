@@ -31,7 +31,8 @@ reef::IProxy* Node::createObject( co::int32 rmtNodeId, const std::string& compon
     
     Message msg;
     msg.senderType = 2; //create object
-    memcpy( msg.data, static_cast<const void*>( componentName.c_str() ), ( componentName.size() + 1 ) * sizeof( char ) );
+    msg.data.resize( ( componentName.length() + 1 ) * sizeof( char ) );
+    memcpy( &msg.data[0], static_cast<const void*>( componentName.c_str() ), ( componentName.size() + 1 ) * sizeof( char ) );
     msg.bytes = componentName.size() + 1;
     msg.senderId = facetId;
 

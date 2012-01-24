@@ -10,7 +10,7 @@ namespace reef
 struct Message
 {
     char type;
-    void* data;
+    std::vector<co::uint8> data;
 	size_t bytes;
     co::int32 senderType; // Proxy = 0, Servant = 1 or Node = 2;
     co::int32 senderId;
