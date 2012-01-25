@@ -20,7 +20,7 @@ int Network::sendMsg( int rmtNodeId, Message& msg )
     Message* heapMsg = new Message();
     heapMsg->type = msg.type;
     heapMsg->bytes = msg.bytes;
-    memcpy( heapMsg->data, msg.data, msg.bytes );
+    //memcpy( heapMsg->data, msg.data, msg.bytes );
     
     // "send it"
     s_dummyMsgList.push_back( heapMsg );

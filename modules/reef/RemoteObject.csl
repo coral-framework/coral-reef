@@ -1,0 +1,4 @@
+component RemoteObject
+{
+	provides co.IDynamicServiceProvider proxy;
+};

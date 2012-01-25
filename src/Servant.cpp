@@ -32,14 +32,14 @@ void Servant::receiveMsg( Message* msg )
 
 	if( msg->type == 's' )
 	{
-        std::string memberName(  static_cast<char*>( msg->data ) );
-		printf( "Member called %s requested\n", memberName.c_str() );
-		reqMember = reqInterface->getMember( memberName );
+        //std::string memberName(  static_cast<char*>( msg->data ) );
+//		printf( "Member called %s requested\n", memberName.c_str() );
+//		reqMember = reqInterface->getMember( memberName );
 	}
 	else if( msg->type == 'n' )
 	{
-        co::int32 memberId = *static_cast<co::int32*>( msg->data );
-		reqMember = reqInterface->getMembers()[memberId];
+        //co::int32 memberId = *static_cast<co::int32*>( msg->data );
+		//reqMember = reqInterface->getMembers()[memberId];
 	}
     else
     {

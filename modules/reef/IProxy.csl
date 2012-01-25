@@ -1,4 +1,0 @@
-interface IProxy
-{
-	void callMethodById( in int32 id );
-};
