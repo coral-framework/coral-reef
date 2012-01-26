@@ -1,14 +1,15 @@
 /*
-	This service is responsible for instantiating components in remote servers, and creating proxies that are responsible
-	for the communication between local components and the remote component.
+	This service is responsible for managing components in remote locations. Remote components are proxies 
+	for components which are not locally instancied and their real actual memory representation exists only
+	in other location (remote machine).
 */
 interface INode
 {
-	// Checks if there are any msgs from remote nodes to process
-	void processMsgs( in int32 numMsgsToProccess );
-	
-	/* Provided the remote node local id in this node, instantiates an object of 'type'in the remote node. */
-	IProxy createObject( in int32 rmtNodeLocalId, in string componentName, in int32 facetId );
-	
-	//IProxy seekService( in int32 rmtNodeLocalId, in co.IInterface type );
+	/*!
+		Creates a new remote instance for a component of type named \a componentTypeName
+		at \a specified address.
+		\throws exception para conexao
+		\throws exception para tipo inexistente no destino.
+	 */
+	IObject newRemoteInstance( in string componentTypeName, in Address address );
 };
