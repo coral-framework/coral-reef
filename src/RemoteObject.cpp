@@ -5,17 +5,16 @@
 #include <co/IMethod.h>
 #include <co/IReflector.h>
 
-static void printServiceInfo( co::IService* service, const char* msg )
-{
-    printf( "Service name: %s %s\n", service->getInterface()->getFullName().c_str(), msg );
-    fflush( stdout );
-}
-
 namespace reef {
 
-RemoteObject::RemoteObject() : _numFacets( 0 ), _componentType( 0 )
+RemoteObject::RemoteObject()
 {
-    // empty constructor
+    // empty
+}
+    
+RemoteObject::RemoteObject( co::IComponent* component, Channel* channel ) : _numFacets( 0 )
+{
+    setComponent( component );
 }
 
 RemoteObject::~RemoteObject()
@@ -35,10 +34,6 @@ void RemoteObject::setComponent( co::IComponent* component )
 	_facets = new co::IService*[numFacets];
 	for( int i = 0; i < numFacets; ++i )
 	{
-		/*
-         To avoid having exceptions raised here by getReflector(), we should
-         check all interface reflectors before instantiating the component.
-		 */
 		assert( _numFacets == i );
 		facets[i]->getType()->getReflector()->newDynamicProxy( this );
 		assert( _numFacets == i + 1 );
@@ -72,24 +67,19 @@ void RemoteObject::setServiceAt( co::IPort* receptacle, co::IService* instance )
 co::IPort* RemoteObject::dynamicGetFacet( co::int32 dynFacetId )
 {
     co::IService* service = _facets[dynFacetId];
-    printServiceInfo( service, "Dynamic Get Facet!" );
     return service->getFacet();
 }
 
 const co::Any& RemoteObject::dynamicGetField( co::int32 dynFacetId, co::IField* field )
 {
-    co::IService* service = _facets[dynFacetId];
-    printServiceInfo( service, "Dynamic Get FIELD!" );
-    static co::Any dummy;
-    return dummy;
+    _channel->getField( dynFacetId, field, _resultBuffer );
+    return _resultBuffer;
 }
 
 const co::Any& RemoteObject::dynamicInvoke( co::int32 dynFacetId, co::IMethod* method, co::Range<co::Any const> args )
 {
-    co::IService* service = _facets[dynFacetId];
-    printServiceInfo( service, "Dynamic INVOKE!" );
-    static co::Any dummy;
-    return dummy;
+    _channel->sendCall( dynFacetId, method, args );
+    return _resultBuffer;
 }
 
 co::int32 RemoteObject::dynamicRegisterService( co::IService* dynamicServiceProxy )
@@ -100,8 +90,7 @@ co::int32 RemoteObject::dynamicRegisterService( co::IService* dynamicServiceProx
 
 void RemoteObject::dynamicSetField( co::int32 dynFacetId, co::IField* field, const co::Any& value )
 {
-    co::IService* service = _facets[dynFacetId];
-    printServiceInfo( service, "Dynamic Set FIELD!" );
+    _channel->setField( dynFacetId, field, value );
 }
 
 CORAL_EXPORT_COMPONENT( RemoteObject, RemoteObject );

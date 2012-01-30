@@ -2,6 +2,8 @@
 #define __REMOTEOBJECT_H__
 
 #include "RemoteObject_Base.h"
+#include "Channel.h"
+
 #include <reef/INode.h>
 
 namespace reef
@@ -11,6 +13,7 @@ class RemoteObject : public RemoteObject_Base
 {
 public:
     RemoteObject();
+    RemoteObject( co::IComponent* component, Channel* channel );
     virtual ~RemoteObject();
     
     void setComponent( co::IComponent* component );
@@ -25,8 +28,11 @@ public:
     void dynamicSetField( co::int32 dynFacetId, co::IField* field, const co::Any& value );
 
 private:
+    Channel* _channel;
+    
     INode* _owner;
     int _numFacets;
+    co::Any _resultBuffer;
     co::IService** _facets;
     co::IComponent* _componentType;
 };
