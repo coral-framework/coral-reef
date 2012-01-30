@@ -1,0 +1,4 @@
+component ClientNode
+{
+	provides IClientNode client;
+};

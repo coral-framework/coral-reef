@@ -1,4 +1,0 @@
-component Node
-{
-	provides INode node;
-};

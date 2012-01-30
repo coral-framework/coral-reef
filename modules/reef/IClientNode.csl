@@ -3,13 +3,13 @@
 	for components which are not locally instancied and their real actual memory representation exists only
 	in other location (remote machine).
 */
-interface INode
+interface IClientNode
 {
 	/*!
 		Creates a new remote instance for a component of type named \a componentTypeName
 		at \a specified address.
-		\throws exception para conexao
+		\throws exception para falha de conexao/address
 		\throws exception para tipo inexistente no destino.
 	 */
-	IObject newRemoteInstance( in string componentTypeName, in Address address );
+	co.IObject newRemoteInstance( in string componentTypeName, in string address );
 };
