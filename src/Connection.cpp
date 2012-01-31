@@ -4,7 +4,7 @@ namespace reef {
     
 Connection::Connection( const std::string& type, const std::string& address )
 {
-    // empty
+    _address = address; 
 }
 
 Connection::~Connection()

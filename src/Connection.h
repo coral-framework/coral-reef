@@ -15,6 +15,11 @@ public:
     ~Connection();
     void send( const Message& message );
     void receive( Message& message );
+    
+    const std::string& getAddress() { return _address; }
+    
+private:
+    std::string _address;
 };
 
 } // namespace reef

@@ -1,11 +1,16 @@
 #include "Channel.h"
 
+namespace
+{
+    const std::string MSG_NEW_REMOTE_INSTANCE = "nri ";
+}
+
 namespace reef 
 {
-
-Channel::Channel( int instanceId )
+    
+Channel::Channel( Connection* connection )
 {
-    _instanceId = instanceId;
+    setConnection( connection );
 }
 
 Channel::~Channel()
@@ -17,6 +22,18 @@ void Channel::setConnection( Connection* connection )
 {
     _connection = connection;
 }
+    
+int Channel::establish( const std::string& remoteTypeName )
+{
+    
+    _connection->send( MSG_NEW_REMOTE_INSTANCE + remoteTypeName );
+    std::string result;
+    _connection->receive( result );
+    
+    // convert to int
+    return 0;
+ }                       
+
 
 void Channel::sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args )
 {
