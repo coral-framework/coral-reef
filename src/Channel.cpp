@@ -2,7 +2,10 @@
 
 namespace
 {
-    const std::string MSG_NEW_REMOTE_INSTANCE = "nri ";
+    const std::string MSG_NEW_REMOTE_INSTANCE   = "nri ";
+    const std::string MSG_SEND_CALL             = "sca";
+    const std::string MSG_CALL                  = "mca";
+    const std::string MSG_GET_FIELD             = "gfl";
 }
 
 namespace reef 
@@ -25,15 +28,22 @@ void Channel::setConnection( Connection* connection )
     
 int Channel::establish( const std::string& remoteTypeName )
 {
+    _stream.clear();
+    _stream << _channelId << ":" << MSG_NEW_REMOTE_INSTANCE;
+
+    _connection->send( _stream.str() );
     
-    _connection->send( MSG_NEW_REMOTE_INSTANCE + remoteTypeName );
     std::string result;
     _connection->receive( result );
     
+    _stream.clear();
+   
     // convert to int
-    return 0;
+    _stream << result;
+    _stream >> _channelId;
+    
+    return _channelId;
  }                       
-
 
 void Channel::sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args )
 {

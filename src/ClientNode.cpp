@@ -1,7 +1,7 @@
 #include "ClientNode_Base.h"
 #include "RemoteObject.h"
-#include "Connection.h"
 #include "Channel.h"
+#include "network/Connection.h"
 
 #include <co/IObject.h>
 
@@ -49,7 +49,12 @@ public:
         Connection* connection = 0;
         if( connectionSlot == -1 )
         {
-            connection = new Connection( "CON_TYPE", address );
+            connection = new Connection( "CON_TYPE" );
+            if( !connection->establish( address ) )
+            {
+                // TODO: throw exception?
+            }
+            
             _connections.push_back( connection );
         }
         else

@@ -7,9 +7,12 @@ CORAL_GENERATE_MODULE( _GENERATED_FILES reef lua.IState )
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR}/generated )
 
 FILE( GLOB _SOURCES *.cpp )
+FILE( GLOB _NETWORK_SOURCES network/*.cpp )
+FILE( GLOB _NETWORK_HEADERS network/*.h )
 FILE( GLOB _HEADERS *.h )
 
-ADD_LIBRARY( reef MODULE ${_HEADERS} ${_SOURCES} ${_GENERATED_FILES} )
+
+ADD_LIBRARY( reef MODULE ${_HEADERS} ${_SOURCES} ${_NETWORK_SOURCES} ${_NETWORK_HEADERS} ${_GENERATED_FILES} )
 
 CORAL_MODULE_TARGET( "reef" reef )
 
@@ -20,6 +23,7 @@ TARGET_LINK_LIBRARIES( reef ${CORAL_LIBRARIES} )
 ################################################################################
 
 SOURCE_GROUP( "@Generated" FILES ${_GENERATED_FILES} )
+SOURCE_GROUP( "Network" FILES ${_NETWORK_SOURCES} ${_NETWORK_HEADERS} )
 
 ################################################################################
 # Install Rules
