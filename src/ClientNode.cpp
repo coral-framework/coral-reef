@@ -25,7 +25,7 @@ public:
     co::IObject* newRemoteInstance( const std::string& componentTypeName, const std::string& address )
     {
         Connection* connection = getOrCreateConnection( address );
-        Channel* objChannel = new Channel( connection );
+        Channel* objChannel = new InputChannel( connection );
         objChannel->establish( componentTypeName );
         
         co::IComponent* componentType = co::cast<co::IComponent>( co::getType( componentTypeName ) );
@@ -70,9 +70,6 @@ private:
 
     Channels _channels;
     RemoteConnections _connections;
-    
-    typedef std::map<int,int> SwitchBoard;
-    SwitchBoard _switchBoard;
 };
 
 CORAL_EXPORT_COMPONENT( ClientNode, ClientNode );
