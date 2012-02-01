@@ -15,79 +15,71 @@ namespace reef
 class Channel
 {
 public:
-    Channel( Connection* connection );
+    Channel();
     virtual ~Channel();
     
-    void setConnection( Connection* connection );
     int getId() { return _channelId; }
     
-    /*
-        Establishes a new communication channel to a new remote instance specified by 
-        \a remoteTypeName. A new instance of \a remoteTypeName will be created at 
-        server side and bounded to this channel. The unique id of the remote instance 
-        will be retrieved.
-     
-        This method makes this channel permanently bound to the new remote instance
-        and retrieves -1 if it had already been established.
-     */
-    virtual int establish( const std::string& remoteTypeName ) = 0;
+    // Creates a new instance and retrieves its unique id.
+    virtual int newInstance( const std::string& typeName ) = 0;
     
     virtual void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args ) = 0;
     virtual void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result ) = 0;
     virtual void getField( co::int32 serviceId, co::IField* field, co::Any& result ) = 0;
     virtual void setField( co::int32 serviceId, co::IField* field, const co::Any& value ) = 0;
-    
-    // Template method:
-    // Handles the message and translate it into an event actual (sendCall, call..)
-    // Returns false if the message destination is not this channel or the message is malformed.
-    bool handleMessage( const std::string& message );
-    
-public:
-    // Checks whether the given string is a well formed message
-    static bool isMessageValid( const std::string& message );
+
+    // Writes a raw message into channel.
+    virtual void write( const std::string& rawMessage ) = 0;
     
 protected:
-    // channleId is same as remote instance id
     int _channelId;
-    Connection* _connection;
-    std::stringstream _stream;
 };
-    
+
+// A channel that converts events into raw messages
 class InputChannel : public Channel
 {
 public:
     InputChannel( Connection* connection );
     ~InputChannel();
     
-    int establish( const std::string& remoteTypeName );
+    int newInstance( const std::string& typeName );
     void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args );
     void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result );
     void getField( co::int32 serviceId, co::IField* field, co::Any& result );
     void setField( co::int32 serviceId, co::IField* field, const co::Any& value );
+    
+    void write( const std::string& rawMessage );
+    
+protected:
+    Connection* _connection;
+    std::stringstream _sstream;
 };
 
 class OutputChannelDelegate
 {
 public:
-    virtual void onChannelEstablished( Channel* channel, const std::string& typeName );
+    virtual void onNewInstance( Channel* channel, const std::string& typeName );
     virtual void onSendCall( Channel* channel, co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args ) = 0;
     virtual void onCall( Channel* channel, co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result ) = 0;
     virtual void onGetField( Channel* channel, co::int32 serviceId, co::IField* field, co::Any& result ) = 0;
     virtual void onSetField( Channel* channel, co::int32 serviceId, co::IField* field, const co::Any& value ) = 0;
 };
-    
+
+// A channel that converts raw message writes into events that can be delegated
 class OutputChannel : public Channel
 {
 public:
-    OutputChannel( Connection* connection, OutputChannelDelegate* delegate );
+    OutputChannel( OutputChannelDelegate* delegate );
     ~OutputChannel();
     
-    int establish( const std::string& remoteTypeName ) = 0;
+    int newInstance( const std::string& typeName );
     
-    void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args ) = 0;
-    void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result ) = 0;
-    void getField( co::int32 serviceId, co::IField* field, co::Any& result ) = 0;
-    void setField( co::int32 serviceId, co::IField* field, const co::Any& value ) = 0;
+    void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args );
+    void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result );
+    void getField( co::int32 serviceId, co::IField* field, co::Any& result );
+    void setField( co::int32 serviceId, co::IField* field, const co::Any& value );
+    
+    void write( const std::string& rawMessage );
     
 private:
     OutputChannelDelegate* _delegate;

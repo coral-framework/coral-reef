@@ -1,25 +1,20 @@
 #include "Channel.h"
 
-namespace reef 
-{
-   
 enum EventType
 {
-    Type_Call       = 0,
-    Type_SendCall   = 1,
-    Type_GetField   = 2,
-    Type_SetField   = 3
+    Type_NewInstance    = 0,
+    Type_Call           = 1,
+    Type_SendCall       = 2,
+    Type_GetField       = 3,
+    Type_SetField       = 4
 };
-    
-static EventType extractEventType( const std::stringstream& stream, const std::string& message )
+
+namespace reef 
 {
-    // TODO: extract event type
-    return Type_Call;
-}
     
-Channel::Channel( Connection* connection ) : _channelId( -1 )
+Channel::Channel() : _channelId( -1 )
 {
-    setConnection( connection );
+    // empty
 }
 
 Channel::~Channel()
@@ -27,107 +22,70 @@ Channel::~Channel()
     // empty
 }
 
-void Channel::setConnection( Connection* connection )
-{
-    _connection = connection;
-}
-    
-bool Channel::handleMessage( const std::string& message )
-{
-    _stream.clear();
-    
-    _stream << message;
-    
-    int id;
-    _stream >> id;
-    if( id != _channelId )
-        return false;
-    
-    // the message destination is this channel
-    EventType type = extractEventType( _stream, message );
-    switch( type )
-    {
-        // TODO: parameters for events
-        case Type_Call:
-            // call()
-        case Type_SendCall:
-            // sendCall()
-        case Type_GetField:
-            // getField()
-        case Type_SetField: break;
-            // setField()
-    }
-    
-    return true;
-}
-    
-    // Checks whether the given string is a well formed message
-static bool isMessageValid( const std::string& message )    
-{
-    // TODO: check whether its a valid protocol message
-    return true;
-}
-
 // InputChannel
-InputChannel::InputChannel( Connection* connection ) : Channel( connection )
-{
-    // empty
+InputChannel::InputChannel( Connection* connection )
+{   
+    _connection = connection;
 }
     
 InputChannel::~InputChannel()
 {
     // empty
-}
+}            
 
-int InputChannel::establish( const std::string& remoteTypeName )
+int InputChannel::newInstance( const std::string& typeName )
 {
-    if( _channelId != -1 )
-        return -1;
-    
-    _stream.clear();
-   // _stream << _channelId << " " << MSG_NEW_REMOTE_INSTANCE;
-
-    _connection->send( _stream.str() );
+    _sstream.clear();
+    _sstream << Type_NewInstance << "," << typeName;
+    write( _sstream.str() );
     
     std::string result;
     _connection->receive( result );
     
-    _stream.clear();
-   
-    // convert to int
-    _stream << result;
-    _stream >> _channelId;
+    _sstream.clear();
+    _sstream << result;
     
-    return _channelId;
-}                       
+    int a = -1;
+    _sstream >> a;
+    
+    return a;
+}
 
 void InputChannel::sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args )
 {
     // translate arguments (google protocol buffers?)
     // send to current connection
+    write( "1" );
 }
 
 void InputChannel::call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result )
 {
     // translate arguments (google protocol buffers?)
     // send to current connection
+    write( "2" );
 }
 
 void InputChannel::getField( co::int32 serviceId, co::IField* field, co::Any& result )
 {
     // translate arguments (google protocol buffers?)
     // send to current connection
+    write( "3" );
 }
 
 void InputChannel::setField( co::int32 serviceId, co::IField* field, const co::Any& value )
 {
     // translate arguments (google protocol buffers?)
     // send to current connection
+    write( "4" );
+}
+    
+void InputChannel::write( const std::string& message )
+{
+    _connection->send( message );
 }
     
 // OutputChannel
-    
-OutputChannel::OutputChannel( Connection* connection, OutputChannelDelegate* delegate ) : Channel( connection )
+OutputChannel::OutputChannel( OutputChannelDelegate* delegate )
 {
     _delegate = delegate;
 }
@@ -137,9 +95,9 @@ OutputChannel::~OutputChannel()
     // empty
 }
 
-int OutputChannel::establish( const std::string& remoteTypeName )
+int OutputChannel::newInstance( const std::string& typeName )
 {
-    _delegate->onChannelEstablished( this, remoteTypeName );
+    _delegate->onNewInstance( this, typeName );
 }
 
 void OutputChannel::sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args )

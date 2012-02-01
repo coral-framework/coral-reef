@@ -15,6 +15,7 @@ RemoteObject::RemoteObject()
 RemoteObject::RemoteObject( co::IComponent* component, Channel* channel ) : _numFacets( 0 )
 {
     setComponent( component );
+    channel->newInstance( component->getFullName() );
 }
 
 RemoteObject::~RemoteObject()
