@@ -16,7 +16,7 @@ ADD_LIBRARY( reef MODULE ${_HEADERS} ${_SOURCES} ${_NETWORK_SOURCES} ${_NETWORK_
 
 CORAL_MODULE_TARGET( "reef" reef )
 
-TARGET_LINK_LIBRARIES( reef ${CORAL_LIBRARIES} )
+TARGET_LINK_LIBRARIES( reef ${CORAL_LIBRARIES} ${ZMQ_LIBRARIES} )
 
 ################################################################################
 # Source Groups

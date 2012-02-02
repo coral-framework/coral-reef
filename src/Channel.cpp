@@ -119,5 +119,10 @@ void OutputChannel::setField( co::int32 serviceId, co::IField* field, const co::
 {
     _delegate->onSetField( this, serviceId, field, value );
 }
+    
+void OutputChannel::write( const std::string& rawMessage )
+{
+    // TODO: translate message and call event methods (call, sendCall, getField...)
+}
 
 } // namespace reef

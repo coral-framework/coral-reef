@@ -14,10 +14,11 @@ PROJECT( REEF )
 FILE( TO_CMAKE_PATH "$ENV{CORAL_ROOT}" CORAL_ROOT )
 
 # Add Coral's CMake dir to the CMAKE_MODULE_PATH
-SET( CMAKE_MODULE_PATH ${CORAL_ROOT}/cmake ${CMAKE_MODULE_PATH} )
+SET( CMAKE_MODULE_PATH ${CORAL_ROOT}/cmake ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH} )
 
 # Load Coral's CMake package
 FIND_PACKAGE( Coral REQUIRED )
+FIND_PACKAGE( zmq REQUIRED )
 
 # Configure the coral path
 SET( CORAL_PATH
@@ -26,7 +27,7 @@ SET( CORAL_PATH
 	"${CMAKE_SOURCE_DIR}/modules"
 )
 
-INCLUDE_DIRECTORIES( ${CORAL_INCLUDE_DIRS} )
+INCLUDE_DIRECTORIES( ${CORAL_INCLUDE_DIRS} ${ZMQ_INCLUDE_DIRS} )
 
 ################################################################################
 # Installation
