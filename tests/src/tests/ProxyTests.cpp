@@ -1,15 +1,15 @@
 #include <gtest/gtest.h>
 
-#include <RemoteObject.h>
+#include <reef/IServerNode.h>
+
+#include <co/Coral.h>
 #include <co/IObject.h>
-#include <co/RefPtr.h>
-#include <toto/IToto.h>
+#include <Network/ConnectionServer.h>
 
 TEST( ProxyTests, methodCalling )
 {
-    co::RefPtr<reef::RemoteObject> totoObj( new reef::RemoteObject() );
-    co::IComponent* componentType = co::cast<co::IComponent>( co::getType( "toto.Toto" ) );
-    totoObj->setComponent( componentType );
-    toto::IToto* toto = totoObj->getService<toto::IToto>();
-    toto->printHello();
+    co::IObject* obj = co::newInstance( "reef.ServerNode" );
+    reef::IServerNode* server = obj->getService<reef::IServerNode>();
+    
+    server->start( "tcp://*:5555" );
 }

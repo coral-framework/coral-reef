@@ -1,26 +1,13 @@
 #include "ConnectionServer.h"
 
+#include <stdio.h>
+
 namespace reef
 {
 
 ConnectionServer::ConnectionServer( const std::string& bindAddress )
 {
-    
-}
-
-bool ConnectionServer::startListening()
-{
-    return false;
-}
-
-void ConnectionServer::stopListeneing()
-{
-    
-}
-    
-Connection* ConnectionServer::waitForConnection()
-{
-    return 0;
+    _address = bindAddress;
 }
     
 } // namespace reef

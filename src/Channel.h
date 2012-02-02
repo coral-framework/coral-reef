@@ -15,6 +15,17 @@ namespace reef
 class Channel
 {
 public:
+    struct MessageInfo
+    {
+        int destination;
+        std::string message;
+    };
+    
+public:
+    // routes the message (0 is for node, > 0 is for a channel, -1 is invalid message)
+    static MessageInfo getInfo( const std::string& message );
+    
+public:
     Channel();
     virtual ~Channel();
     
@@ -58,11 +69,11 @@ protected:
 class OutputChannelDelegate
 {
 public:
-    virtual void onNewInstance( Channel* channel, const std::string& typeName );
-    virtual void onSendCall( Channel* channel, co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args ) = 0;
-    virtual void onCall( Channel* channel, co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result ) = 0;
-    virtual void onGetField( Channel* channel, co::int32 serviceId, co::IField* field, co::Any& result ) = 0;
-    virtual void onSetField( Channel* channel, co::int32 serviceId, co::IField* field, const co::Any& value ) = 0;
+    virtual void onNewInstance( Channel* channel, const std::string& typeName ) {;}
+    virtual void onSendCall( Channel* channel, co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args ) {;}
+    virtual void onCall( Channel* channel, co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result ) {;}
+    virtual void onGetField( Channel* channel, co::int32 serviceId, co::IField* field, co::Any& result ) {;}
+    virtual void onSetField( Channel* channel, co::int32 serviceId, co::IField* field, const co::Any& value ) {;}
 };
 
 // A channel that converts raw message writes into events that can be delegated

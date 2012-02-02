@@ -2,15 +2,17 @@
 #define _REEF_CONNECTION_H_
 
 #include <string>
+#include <zmq.hpp>
 
 namespace reef
 {
     
 class Connection
 {
-typedef std::string Message;
-    
 public:
+    
+    typedef std::string Message;
+    
     Connection( const std::string& type );
     ~Connection();
     
@@ -20,7 +22,7 @@ public:
         Retrieves false if this connection is aready established.
         \throws TODO: exception para problema de conexao.
      */
-    bool establish( const std::string& address );
+    bool bind( const std::string& address );
     void close();
     
     void send( const Message& message );
@@ -33,6 +35,8 @@ public:
     
 private:
     std::string _address;
+    zmq::context_t _context;
+    zmq::socket_t _socket;
 };
 
 } // namespace reef

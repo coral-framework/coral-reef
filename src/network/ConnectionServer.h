@@ -4,6 +4,9 @@
 #include <string>
 #include "Connection.h"
 
+#include <zmq.hpp>
+#include <string>
+
 namespace reef {
     
 // Manages incomming connections
@@ -12,11 +15,11 @@ class ConnectionServer
 public:
     ConnectionServer( const std::string& bindAddress );
     
-    bool startListening();
-    void stopListeneing();
-    
     //! Waits until a new connection establishes
     Connection* waitForConnection();
+    
+private:
+    std::string _address;
 };
 
 } // namespace reef

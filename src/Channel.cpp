@@ -9,8 +9,21 @@ enum EventType
     Type_SetField       = 4
 };
 
+static std::stringstream stream;
+
 namespace reef 
 {
+    
+Channel::MessageInfo Channel::getInfo( const std::string& message )
+{
+    MessageInfo mi;
+    stream.clear();
+    stream << message;
+    
+    stream >> mi.destination;
+    stream >> mi.message;
+    return mi;
+}
     
 Channel::Channel() : _channelId( -1 )
 {
@@ -35,20 +48,7 @@ InputChannel::~InputChannel()
 
 int InputChannel::newInstance( const std::string& typeName )
 {
-    _sstream.clear();
-    _sstream << Type_NewInstance << "," << typeName;
-    write( _sstream.str() );
-    
-    std::string result;
-    _connection->receive( result );
-    
-    _sstream.clear();
-    _sstream << result;
-    
-    int a = -1;
-    _sstream >> a;
-    
-    return a;
+    return 0;
 }
 
 void InputChannel::sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args )
@@ -122,7 +122,12 @@ void OutputChannel::setField( co::int32 serviceId, co::IField* field, const co::
     
 void OutputChannel::write( const std::string& rawMessage )
 {
-    // TODO: translate message and call event methods (call, sendCall, getField...)
+    co::Range<co::Any const> r();   
+    if( rawMessage == "newInstance" )
+        newInstance( "toto.Toto" );
+    
+    if( rawMessage == "call" )
+        sendCall( 0, 0, co::Range<co::Any const>() );
 }
 
 } // namespace reef

@@ -1,5 +1,6 @@
 #include "Toto_Base.h"
 
+#include <iostream>
 #include <stdio.h>
 
 namespace toto{
@@ -33,8 +34,8 @@ public:
 	
 	void printHello()
 	{
-		printf( "Hello from Toto" );
-	}
+		std::cerr << "HELLO WORLD!";
+    }
 	
 private:
 

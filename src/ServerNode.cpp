@@ -1,20 +1,23 @@
 #include "ServerNode_Base.h"
 
 #include "Channel.h"
+#include "Servant.h"
 
 #include "network/Connection.h"
 #include "network/ConnectionServer.h"
 
+#include <iostream>
 #include <map>
 
 namespace reef {
     
-class ServerNode : public ServerNode_Base
+class ServerNode : public ServerNode_Base, public OutputChannelDelegate
 {
 public:
-    ServerNode()
+    ServerNode() : _server( 0 )
     {
         // empty constructor
+        _channels.push_back( new OutputChannel( this ) );
     }
     
     virtual ~ServerNode()
@@ -24,55 +27,47 @@ public:
     
     void start( const std::string& address )
     {
-        // TODO: implement this method.
+         if( !_server )
+             _server = new ConnectionServer( address );
+        
+        Connection* c = new Connection( "" );
+        c->bind( address );
+        while( true )
+        {
+            Connection::Message msg;
+            c->receive( msg );
+            
+            std::cerr << "Received " << msg << std::endl;
+            fflush( stderr );
+            
+            Channel::MessageInfo mi = Channel::getInfo( msg );
+            std::cerr << "Desgination: " << mi.destination;
+            std::cin.getline(str, 100, '|')
+            _channels[mi.destination]->write( mi.message );
+        }
     }
     
     void stop()
     {
         // TODO: implement this method.
     }
-    
-    void loop()
+       
+    // OutputChannelDelegate
+    void onNewInstance( Channel* channel, const std::string& typeName ) 
     {
-        
-    }
-    
-    void establishNewChannel( const std::string& localTypeName, Connection* connection )
-    {
-//        Channel* c = new InpuChannel( connection );    
-//        
-//        int channelId = _channels.size();
-//        _channels.push_back( c );
-//        c->setId( channelId );
-        
-    }
-    
-    // a new channel has been established into the given connection
-    void onChannelEstablished( Channel* channel, Connection* connection )
-    {
-        
-    }
-    
-    void onNewConnection( Connection* connection )
-    {
-        _connections.push_back( connection );
-    }
-    
-    void onConnectionClosed( Connection* connection )
-    {
-        
+        Servant* servant = new Servant( typeName );
+        Channel* newChannel = new OutputChannel( servant );
+        _channels.push_back( newChannel );
     }
     
 private:
+    ConnectionServer* _server;
+    
     typedef std::vector<Channel*> Channels;
     typedef std::vector<Connection*> RemoteConnections;
     
     Channels _channels;
     RemoteConnections _connections;
-    
-    // map from connection -> channels
-    typedef std::map<int,std::vector<int>> SwitchBoard;
-    SwitchBoard _switchBoard;
 };
 
 CORAL_EXPORT_COMPONENT( ServerNode, ServerNode );
