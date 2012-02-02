@@ -34,15 +34,15 @@ public:
         c->bind( address );
         while( true )
         {
-            Connection::Message msg;
+            std::string msg;
             c->receive( msg );
             
             std::cerr << "Received " << msg << std::endl;
             fflush( stderr );
             
-            Channel::MessageInfo mi = Channel::getInfo( msg );
-            std::cerr << "Desgination: " << mi.destination;
-            std::cin.getline(str, 100, '|')
+            Channel::MessageInfo mi = Channel::getDestination( msg );
+            std::cerr << "Desgination: " << mi.destination << std::endl;
+            fflush( stderr );
             _channels[mi.destination]->write( mi.message );
         }
     }
@@ -63,10 +63,8 @@ public:
 private:
     ConnectionServer* _server;
     
-    typedef std::vector<Channel*> Channels;
     typedef std::vector<Connection*> RemoteConnections;
     
-    Channels _channels;
     RemoteConnections _connections;
 };
 

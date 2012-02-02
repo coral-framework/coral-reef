@@ -24,6 +24,11 @@ Channel::MessageInfo Channel::getInfo( const std::string& message )
     stream >> mi.message;
     return mi;
 }
+
+    int Channel::getMsgDest( std::string& msg )
+    {
+        
+    }
     
 Channel::Channel() : _channelId( -1 )
 {
@@ -46,9 +51,9 @@ InputChannel::~InputChannel()
     // empty
 }            
 
-int InputChannel::newInstance( const std::string& typeName )
+void InputChannel::newInstance( const std::string& typeName )
 {
-    return 0;
+    return;
 }
 
 void InputChannel::sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args )
@@ -95,7 +100,7 @@ OutputChannel::~OutputChannel()
     // empty
 }
 
-int OutputChannel::newInstance( const std::string& typeName )
+void OutputChannel::newInstance( const std::string& typeName )
 {
     _delegate->onNewInstance( this, typeName );
 }
@@ -123,10 +128,10 @@ void OutputChannel::setField( co::int32 serviceId, co::IField* field, const co::
 void OutputChannel::write( const std::string& rawMessage )
 {
     co::Range<co::Any const> r();   
-    if( rawMessage == "newInstance" )
+    if( rawMessage == "NI" )
         newInstance( "toto.Toto" );
     
-    if( rawMessage == "call" )
+    if( rawMessage == "CM" )
         sendCall( 0, 0, co::Range<co::Any const>() );
 }
 

@@ -15,24 +15,15 @@ namespace reef
 class Channel
 {
 public:
-    struct MessageInfo
-    {
-        int destination;
-        std::string message;
-    };
-    
-public:
-    // routes the message (0 is for node, > 0 is for a channel, -1 is invalid message)
-    static MessageInfo getInfo( const std::string& message );
-    
-public:
     Channel();
     virtual ~Channel();
     
     int getId() { return _channelId; }
     
+    int getMsgDest( std::string& msg );
+    
     // Creates a new instance and retrieves its unique id.
-    virtual int newInstance( const std::string& typeName ) = 0;
+    virtual void newInstance( const std::string& typeName ) = 0;
     
     virtual void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args ) = 0;
     virtual void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result ) = 0;
@@ -44,6 +35,17 @@ public:
     
 protected:
     int _channelId;
+    
+    struct MessageInfo
+    {
+        int destination;
+        std::string message;
+    };
+
+    static Channel* _channels;
+    
+    // routes the message (0 is for node, > 0 is for a channel, -1 is invalid message)
+    static MessageInfo getInfo( const std::string& message );
 };
 
 // A channel that converts events into raw messages
@@ -53,7 +55,7 @@ public:
     InputChannel( Connection* connection );
     ~InputChannel();
     
-    int newInstance( const std::string& typeName );
+    void newInstance( const std::string& typeName );
     void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args );
     void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result );
     void getField( co::int32 serviceId, co::IField* field, co::Any& result );
@@ -83,7 +85,7 @@ public:
     OutputChannel( OutputChannelDelegate* delegate );
     ~OutputChannel();
     
-    int newInstance( const std::string& typeName );
+    void newInstance( const std::string& typeName );
     
     void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args );
     void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result );

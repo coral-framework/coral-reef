@@ -11,8 +11,6 @@ class Connection
 {
 public:
     
-    typedef std::string Message;
-    
     Connection( const std::string& type );
     ~Connection();
     
@@ -25,11 +23,11 @@ public:
     bool bind( const std::string& address );
     void close();
     
-    void send( const Message& message );
+    void send( const std::string& msgData );
     
     // Waits \a timeout milisseconds for a message to come.
     // Default is timeout = 0 which is infinity wait time.
-    void receive( Message& message, int timeout = 0 );
+    void receive( std::string& msg, int timeout = 0 );
     
     const std::string& getAddress() { return _address; }
     
