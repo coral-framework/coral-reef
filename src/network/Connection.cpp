@@ -2,10 +2,12 @@
 
 #include <string.h>
 
+#include <algorithm>
+
 namespace reef {
     
-    Connection::Connection( const std::string& type ) 
-    : _context( 1 ), _socket( _context, ZMQ_PULL )
+Connection::Connection( const std::string& type ) 
+    : _context( 1 ), _socket( _context, ZMQ_REP )
 {
     // empty
 }
@@ -17,7 +19,13 @@ Connection::~Connection()
 
 bool Connection::bind( const std::string& address )
 {
-    _socket.bind ( address.c_str() );
+    _socket.bind( address.c_str() );
+    return true;
+}
+    
+bool Connection::connect( const std::string& address )
+{
+    _socket.connect( address.c_str() );
     return true;
 }
     
@@ -26,19 +34,18 @@ void Connection::close()
     _socket.close();
 }
     
-void Connection::send( const std::string& msgData )
+void Connection::send( const void* data, unsigned int size )
 {
-    zmq::message_t msg ( msgData.size() );
-    memcpy( msg.data(), msgData.c_str(), msgData.size() * sizeof( char ) );
+    zmq::message_t msg ( size );
+    memcpy( msg.data(), data, size );
     _socket.send( msg );
 }
 
-    void Connection::receive( std::string& msgData, int timeout )
+void Connection::receive( void* data, unsigned int size, int timeout )
 {
     zmq::message_t msg;
     _socket.recv( &msg );
-    
-    msgData.assign( reinterpret_cast<char*>( msg.data() ), msg.size() );
+    memcpy( data, msg.data(), std::min<int>( size, msg.size() ) );
 }
     
 } // namespace reef

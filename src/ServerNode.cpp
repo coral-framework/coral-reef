@@ -14,11 +14,9 @@ namespace reef {
 class ServerNode : public ServerNode_Base, public OutputChannelDelegate
 {
 public:
-    ServerNode() : _server( 0 )
+    ServerNode()
     {
         // empty constructor
-        _channels.push_back( new OutputChannel( this ) );
-        _channels[0]->setId( 0 );
     }
     
     virtual ~ServerNode()
@@ -28,21 +26,22 @@ public:
     
     void start( const std::string& address )
     {
-         if( !_server )
-             _server = new ConnectionServer( address );
+        _mainConnection = new Connection( "" );
+        _mainConnection->bind( address );
         
-        Connection* c = new Connection( "" );
-        c->bind( address );
+        _channels.push_back( new OutputChannel( _mainConnection, this ) );
+        _channels[0]->setId( 0 );
+        
         while( true )
         {
-            std::string msg;
-            c->receive( msg );
+            char message[4];
+            _mainConnection->receive( reinterpret_cast<char*>( message ), 4 );
             
-            std::cerr << "Received " << msg << std::endl;
+            std::cerr << "Received " << message << std::endl;
             fflush( stderr );
             
             // Route the message to the proper channel
-            Channel::route( msg, _channels );
+            Channel::route( message, 4, _channels );
         }
     }
     
@@ -52,15 +51,17 @@ public:
     }
        
     // OutputChannelDelegate
-    void onNewInstance( Channel* channel, const std::string& typeName ) 
+    int onNewInstance( Channel* channel, const std::string& typeName ) 
     {
-        Channel* newChannel = new OutputChannel( new Servant( typeName ) );
+        Channel* newChannel = new OutputChannel( _mainConnection, new Servant( typeName ) );
         newChannel->setId( _channels.size() );
         _channels.push_back( newChannel );
+        
+        return newChannel->getId();
     }
     
 private:
-    ConnectionServer* _server;
+    Connection* _mainConnection;
     
     typedef std::vector<Channel*> Channels;
     typedef std::vector<Connection*> RemoteConnections;

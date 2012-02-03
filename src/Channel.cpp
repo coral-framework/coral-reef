@@ -3,17 +3,17 @@
 namespace reef 
 {
     
-void Channel::route( std::string& msg, const std::vector<Channel*>& channels )
+void Channel::route( const void* data, unsigned int size, const std::vector<Channel*>& channels )
 {
-    const unsigned char* ptr = reinterpret_cast<const unsigned char*>( msg.c_str() );
+    const unsigned char* ptr = reinterpret_cast<const unsigned char*>( data );
      
     int dest = static_cast<int>( ptr[0] );
     assert( dest >= 0 && dest < channels.size() );
     
-   channels[dest]->write( msg );
+   channels[dest]->write( data, size );
 }
     
-Channel::Channel() : _channelId( -1 )
+Channel::Channel( Connection* connection ) : _channelId( -1 ), _connection( connection )
 {
     // empty
 }
@@ -24,7 +24,7 @@ Channel::~Channel()
 }
 
 // InputChannel
-InputChannel::InputChannel( Connection* connection )
+    InputChannel::InputChannel( Connection* connection ) : Channel( connection )
 {   
     _connection = connection;
 }
@@ -34,9 +34,25 @@ InputChannel::~InputChannel()
     // empty
 }            
 
-void InputChannel::newInstance( const std::string& typeName )
+int InputChannel::newInstance( const std::string& typeName )
 {
+    assert( _channelId == - 1 );
     
+    // translate arguments (google protocol buffers?)
+    // send to current connection
+    unsigned char msg[4];
+    msg[0] = static_cast<unsigned char>( 0 /* server id */ );
+    msg[1] = static_cast<unsigned char>( 0 );
+    msg[2] = static_cast<unsigned char>( 0 );
+    msg[3] = static_cast<unsigned char>( 0 );
+    
+    write( msg, 4 );
+    
+    _connection->receive( reinterpret_cast<unsigned char*>( msg ), 4 );
+    unsigned char id = msg[0];
+    _channelId = static_cast<int>( id );
+    
+    return _channelId;
 }
 
 void InputChannel::sendCall( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args )
@@ -49,9 +65,10 @@ void InputChannel::sendCall( co::int32 serviceId, co::int32 methodIndex, co::Ran
     msg[2] = static_cast<unsigned char>( serviceId );
     msg[3] = static_cast<unsigned char>( methodIndex );
     
-    std::string s;
-    s.assign( reinterpret_cast<char*>( msg ), 4 );
-    write( s );
+    write( msg, 4 );
+
+    _connection->receive( reinterpret_cast<unsigned char*>( msg ), 4 );
+    unsigned char id = msg[0];
 }
 
 void InputChannel::call( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args, co::Any& result )
@@ -64,32 +81,32 @@ void InputChannel::call( co::int32 serviceId, co::int32 methodIndex, co::Range<c
     msg[2] = static_cast<unsigned char>( serviceId );
     msg[3] = static_cast<unsigned char>( methodIndex );
     
-    std::string s;
-    s.assign( reinterpret_cast<char*>( msg ), 4 );
-    write( s );
+    write( msg, 4 );
+    
+    _connection->receive( reinterpret_cast<unsigned char*>( msg ), 4 );
+    unsigned char id = msg[0];
 }
 
 void InputChannel::getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result )
 {
     // translate arguments (google protocol buffers?)
     // send to current connection
-    write( "3" );
 }
 
 void InputChannel::setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value )
 {
     // translate arguments (google protocol buffers?)
     // send to current connection
-    write( "4" );
 }
     
-void InputChannel::write( const std::string& message )
+void InputChannel::write( const void* rawMessage, unsigned int size )
 {
-    _connection->send( message );
+    _connection->send( rawMessage, size );
 }
     
 // OutputChannel
-OutputChannel::OutputChannel( OutputChannelDelegate* delegate )
+OutputChannel::OutputChannel( Connection* connection, OutputChannelDelegate* delegate )
+    : Channel( connection ) 
 {
     _delegate = delegate;
 }
@@ -99,9 +116,9 @@ OutputChannel::~OutputChannel()
     // empty
 }
 
-void OutputChannel::newInstance( const std::string& typeName )
+int OutputChannel::newInstance( const std::string& typeName )
 {
-    _delegate->onNewInstance( this, typeName );
+    return _delegate->onNewInstance( this, typeName );
 }
 
 void OutputChannel::sendCall( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args )
@@ -124,16 +141,23 @@ void OutputChannel::setField( co::int32 serviceId, co::int32 fieldIndex, const c
     _delegate->onSetField( this, serviceId, fieldIndex, value );
 }
     
-void OutputChannel::write( const std::string& rawMessage )
+void OutputChannel::write( const void* data, unsigned int size )
 {
-    const unsigned char* ptr = reinterpret_cast<const unsigned char*>( rawMessage.c_str() );
+    const unsigned char* ptr = reinterpret_cast<const unsigned char*>( data );
     
     int eventType = static_cast<int>( ptr[1] );
     
     co::Range<co::Any const> r();   
     if( eventType == 0  )
     {
-        newInstance( "toto.Toto" );
+        int ret = newInstance( "toto.Toto" );
+        
+        unsigned char msg[4];
+        msg[0] = static_cast<unsigned char>( ret );
+        msg[1] = static_cast<unsigned char>( 0  );
+        msg[2] = static_cast<unsigned char>( 0 );
+        msg[3] = static_cast<unsigned char>( 0 );
+        _connection->send( reinterpret_cast<char*>( msg ), 4 );
     
     }
     else if( eventType == 1 )

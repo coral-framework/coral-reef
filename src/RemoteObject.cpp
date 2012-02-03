@@ -16,6 +16,7 @@ RemoteObject::RemoteObject( co::IComponent* component, Channel* channel ) : _num
 {
     setComponent( component );
     channel->newInstance( component->getFullName() );
+    _channel = channel;
 }
 
 RemoteObject::~RemoteObject()
@@ -25,8 +26,6 @@ RemoteObject::~RemoteObject()
     
 void RemoteObject::setComponent( co::IComponent* component )
 {    
-    assert( _componentType == 0 && _numFacets == 0 );
-    
 	_componentType = component;
     
 	// create proxy interfaces for our facets

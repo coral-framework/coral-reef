@@ -26,6 +26,14 @@ int main( int argc, char** argv )
 	co::getSystem()->setup();
 
 //	int res = RUN_ALL_TESTS();
+    
+//    co::IObject* obj = co::newInstance( "reef.ClientNode" );
+//    reef::IClientNode* client = obj->getService<reef::IClientNode>();
+//    
+//    co::IObject* toto = client->newRemoteInstance( "toto.Toto", "tcp://10.0.24.151:4020" );
+//    toto::IToto* totoService = toto->getService<toto::IToto>();
+//    totoService->printHello();
+
   
     co::IObject* obj = co::newInstance( "reef.ServerNode" );
     reef::IServerNode* server = obj->getService<reef::IServerNode>();

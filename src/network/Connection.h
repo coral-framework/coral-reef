@@ -15,19 +15,19 @@ public:
     ~Connection();
     
     /*
-        Tries to establish the connection to another connection 
-        at remote server located at \a address.
-        Retrieves false if this connection is aready established.
-        \throws TODO: exception para problema de conexao.
+        TODO: document
      */
     bool bind( const std::string& address );
+    
+    bool connect( const std::string& address );
+    
     void close();
     
-    void send( const std::string& msgData );
+    void send( const void* data, unsigned int size );
     
     // Waits \a timeout milisseconds for a message to come.
     // Default is timeout = 0 which is infinity wait time.
-    void receive( std::string& msg, int timeout = 0 );
+    void receive( void* data, unsigned int size, int timeout = 0 );
     
     const std::string& getAddress() { return _address; }
     

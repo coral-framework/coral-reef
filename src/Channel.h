@@ -16,17 +16,17 @@ class Channel
 {
 public:
     // Routes the given message to the proper channel using message destination identifier.
-    static void route( std::string& msg, const std::vector<Channel*>& channels );
+    static void route( const void* data, unsigned int size, const std::vector<Channel*>& channels );
     
 public:
-    Channel();
+    Channel( Connection* connection );
     virtual ~Channel();
     
     void setId( int id ) { _channelId = id; }
     int getId() { return _channelId; }
        
     // Creates a new instance and retrieves its unique id.
-    virtual void newInstance( const std::string& typeName ) = 0;
+    virtual int newInstance( const std::string& typeName ) = 0;
     
     virtual void sendCall( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args ) = 0;
     virtual void call( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args, co::Any& result ) = 0;
@@ -34,10 +34,11 @@ public:
     virtual void setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value ) = 0;
 
     // Writes a raw message into channel.
-    virtual void write( const std::string& rawMessage ) = 0;
+    virtual void write( const void* rawMessage, unsigned int size ) = 0;
     
 protected:
     int _channelId;
+    Connection* _connection;
 };
 
 // A channel that converts events into raw messages
@@ -47,22 +48,19 @@ public:
     InputChannel( Connection* connection );
     ~InputChannel();
     
-    void newInstance( const std::string& typeName );
+    int newInstance( const std::string& typeName );
     void sendCall( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args );
     void call( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args, co::Any& result );
     void getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result );
     void setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value );
     
-    void write( const std::string& rawMessage );
-    
-protected:
-    Connection* _connection;
+    void write( const void* rawMessage, unsigned int size );
 };
 
 class OutputChannelDelegate
 {
 public:
-    virtual void onNewInstance( Channel* channel, const std::string& typeName ) {;}
+    virtual int onNewInstance( Channel* channel, const std::string& typeName ) { return -1; }
     virtual void onSendCall( Channel* channel, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args ) {;}
     virtual void onCall( Channel* channel, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args, co::Any& result ) {;}
     virtual void onGetField( Channel* channel, co::int32 serviceId, co::int32 fieldIndex, co::Any& result ) {;}
@@ -73,17 +71,17 @@ public:
 class OutputChannel : public Channel
 {
 public:
-    OutputChannel( OutputChannelDelegate* delegate );
+    OutputChannel( Connection* connection, OutputChannelDelegate* delegate );
     ~OutputChannel();
     
-    void newInstance( const std::string& typeName );
+    int newInstance( const std::string& typeName );
     
     void sendCall( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args );
     void call( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args, co::Any& result );
     void getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result );
     void setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value );
     
-    void write( const std::string& rawMessage );
+    void write( const void* rawMessage, unsigned int size );
     
 private:
     OutputChannelDelegate* _delegate;
