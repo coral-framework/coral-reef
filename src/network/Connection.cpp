@@ -26,7 +26,7 @@ void Connection::close()
     _socket.close();
 }
     
-    void Connection::send( const std::string& msgData )
+void Connection::send( const std::string& msgData )
 {
     zmq::message_t msg ( msgData.size() );
     memcpy( msg.data(), msgData.c_str(), msgData.size() * sizeof( char ) );
@@ -38,7 +38,7 @@ void Connection::close()
     zmq::message_t msg;
     _socket.recv( &msg );
     
-    msgData = reinterpret_cast<char*>( msg.data() );
+    msgData.assign( reinterpret_cast<char*>( msg.data() ), msg.size() );
 }
     
 } // namespace reef

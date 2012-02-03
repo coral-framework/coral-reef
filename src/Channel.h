@@ -22,15 +22,16 @@ public:
     Channel();
     virtual ~Channel();
     
+    void setId( int id ) { _channelId = id; }
     int getId() { return _channelId; }
        
     // Creates a new instance and retrieves its unique id.
     virtual void newInstance( const std::string& typeName ) = 0;
     
-    virtual void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args ) = 0;
-    virtual void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result ) = 0;
-    virtual void getField( co::int32 serviceId, co::IField* field, co::Any& result ) = 0;
-    virtual void setField( co::int32 serviceId, co::IField* field, const co::Any& value ) = 0;
+    virtual void sendCall( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args ) = 0;
+    virtual void call( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args, co::Any& result ) = 0;
+    virtual void getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result ) = 0;
+    virtual void setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value ) = 0;
 
     // Writes a raw message into channel.
     virtual void write( const std::string& rawMessage ) = 0;
@@ -47,26 +48,25 @@ public:
     ~InputChannel();
     
     void newInstance( const std::string& typeName );
-    void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args );
-    void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result );
-    void getField( co::int32 serviceId, co::IField* field, co::Any& result );
-    void setField( co::int32 serviceId, co::IField* field, const co::Any& value );
+    void sendCall( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args );
+    void call( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args, co::Any& result );
+    void getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result );
+    void setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value );
     
     void write( const std::string& rawMessage );
     
 protected:
     Connection* _connection;
-    std::stringstream _sstream;
 };
 
 class OutputChannelDelegate
 {
 public:
     virtual void onNewInstance( Channel* channel, const std::string& typeName ) {;}
-    virtual void onSendCall( Channel* channel, co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args ) {;}
-    virtual void onCall( Channel* channel, co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result ) {;}
-    virtual void onGetField( Channel* channel, co::int32 serviceId, co::IField* field, co::Any& result ) {;}
-    virtual void onSetField( Channel* channel, co::int32 serviceId, co::IField* field, const co::Any& value ) {;}
+    virtual void onSendCall( Channel* channel, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args ) {;}
+    virtual void onCall( Channel* channel, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args, co::Any& result ) {;}
+    virtual void onGetField( Channel* channel, co::int32 serviceId, co::int32 fieldIndex, co::Any& result ) {;}
+    virtual void onSetField( Channel* channel, co::int32 serviceId, co::int32 fieldIndex, const co::Any& value ) {;}
 };
 
 // A channel that converts raw message writes into events that can be delegated
@@ -78,10 +78,10 @@ public:
     
     void newInstance( const std::string& typeName );
     
-    void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args );
-    void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result );
-    void getField( co::int32 serviceId, co::IField* field, co::Any& result );
-    void setField( co::int32 serviceId, co::IField* field, const co::Any& value );
+    void sendCall( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args );
+    void call( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args, co::Any& result );
+    void getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result );
+    void setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value );
     
     void write( const std::string& rawMessage );
     

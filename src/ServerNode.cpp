@@ -18,6 +18,7 @@ public:
     {
         // empty constructor
         _channels.push_back( new OutputChannel( this ) );
+        _channels[0]->setId( 0 );
     }
     
     virtual ~ServerNode()
@@ -53,11 +54,9 @@ public:
     // OutputChannelDelegate
     void onNewInstance( Channel* channel, const std::string& typeName ) 
     {
-        Servant* servant = new Servant( typeName );
-        Channel* newChannel = new OutputChannel( servant );
+        Channel* newChannel = new OutputChannel( new Servant( typeName ) );
+        newChannel->setId( _channels.size() );
         _channels.push_back( newChannel );
-        
-        std::cout << "Creating instance and new channel at index: " << _channels.size() + 1 ;
     }
     
 private:

@@ -34,7 +34,17 @@ public:
 	
 	void printHello()
 	{
-		std::cerr << "HELLO WORLD!";
+		std::cerr << "HELLO WORLD!" << std::endl;
+    }
+    
+    void printWelcome()
+    {
+        std::cerr << "WELCOME!" << std::endl;
+    }
+	
+	void printMethod3()
+    {
+        std::cerr << "THIS IS METHOD3!" << std::endl;
     }
 	
 private:

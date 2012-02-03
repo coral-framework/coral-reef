@@ -5,4 +5,8 @@ interface IToto
 	int32 numberGet();
 	
 	void printHello();
+	
+	void printWelcome();
+	
+	void printMethod3();
 };
