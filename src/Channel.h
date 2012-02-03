@@ -15,13 +15,15 @@ namespace reef
 class Channel
 {
 public:
+    // Routes the given message to the proper channel using message destination identifier.
+    static void route( std::string& msg, const std::vector<Channel*>& channels );
+    
+public:
     Channel();
     virtual ~Channel();
     
     int getId() { return _channelId; }
-    
-    int getMsgDest( std::string& msg );
-    
+       
     // Creates a new instance and retrieves its unique id.
     virtual void newInstance( const std::string& typeName ) = 0;
     
@@ -35,17 +37,6 @@ public:
     
 protected:
     int _channelId;
-    
-    struct MessageInfo
-    {
-        int destination;
-        std::string message;
-    };
-
-    static Channel* _channels;
-    
-    // routes the message (0 is for node, > 0 is for a channel, -1 is invalid message)
-    static MessageInfo getInfo( const std::string& message );
 };
 
 // A channel that converts events into raw messages

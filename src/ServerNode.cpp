@@ -40,10 +40,8 @@ public:
             std::cerr << "Received " << msg << std::endl;
             fflush( stderr );
             
-            Channel::MessageInfo mi = Channel::getDestination( msg );
-            std::cerr << "Desgination: " << mi.destination << std::endl;
-            fflush( stderr );
-            _channels[mi.destination]->write( mi.message );
+            // Route the message to the proper channel
+            Channel::route( msg, _channels );
         }
     }
     
@@ -58,13 +56,17 @@ public:
         Servant* servant = new Servant( typeName );
         Channel* newChannel = new OutputChannel( servant );
         _channels.push_back( newChannel );
+        
+        std::cout << "Creating instance and new channel at index: " << _channels.size() + 1 ;
     }
     
 private:
     ConnectionServer* _server;
     
+    typedef std::vector<Channel*> Channels;
     typedef std::vector<Connection*> RemoteConnections;
     
+    Channels _channels;
     RemoteConnections _connections;
 };
 

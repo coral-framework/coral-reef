@@ -1,34 +1,28 @@
 #include "Channel.h"
 
-enum EventType
-{
-    Type_NewInstance    = 0,
-    Type_Call           = 1,
-    Type_SendCall       = 2,
-    Type_GetField       = 3,
-    Type_SetField       = 4
-};
+#include <iostream>
 
 static std::stringstream stream;
 
 namespace reef 
 {
     
-Channel::MessageInfo Channel::getInfo( const std::string& message )
+void Channel::route( std::string& msg, const std::vector<Channel*>& channels )
 {
-    MessageInfo mi;
     stream.clear();
-    stream << message;
-    
-    stream >> mi.destination;
-    stream >> mi.message;
-    return mi;
-}
+    stream << msg;
 
-    int Channel::getMsgDest( std::string& msg )
-    {
-        
-    }
+    int dest = -1;
+    std::string msgBody;
+    stream >> dest;
+    stream >> msgBody;
+    
+    std::cout << "Routing message '" << msgBody << "' to channel '" << dest << "'" << std::endl;
+    
+    assert( dest >= 0 && dest < channels.size() );
+    
+    channels[dest]->write( msgBody );
+}
     
 Channel::Channel() : _channelId( -1 )
 {
@@ -53,7 +47,7 @@ InputChannel::~InputChannel()
 
 void InputChannel::newInstance( const std::string& typeName )
 {
-    return;
+
 }
 
 void InputChannel::sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args )

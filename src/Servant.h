@@ -17,7 +17,7 @@ class Servant : public OutputChannelDelegate
 public:
     Servant( const std::string& type );
     
-    void onSendCall( Channel* channel, co::int32 facetId, co::int32 methodId, co::Range<co::Any const> args );
+    void onSendCall( Channel* channel, co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args );
     void onCall( Channel* channel, co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result );
     void onGetField( Channel* channel, co::int32 serviceId, co::IField* field, co::Any& result );
     void onSetField( Channel* channel, co::int32 serviceId, co::IField* field, const co::Any& value );

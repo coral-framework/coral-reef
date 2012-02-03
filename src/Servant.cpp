@@ -15,11 +15,11 @@ Servant::Servant( const std::string& type )
     _object = co::newInstance( type );
 }
     
-void Servant::onSendCall( Channel* channel, co::int32 facetId, co::int32 methodId, co::Range<co::Any const> args )
+void Servant::onSendCall( Channel* channel, co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args )
 {
     co::Range<co::IPort* const> ports = _object->getComponent()->getFacets();
     
-    co::IPort* port = ports[facetId];
+    co::IPort* port = ports[serviceId];
     assert( port->getIsFacet() );
     
     co::Any ret;
