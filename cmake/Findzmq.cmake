@@ -13,7 +13,7 @@ find_path( ZMQ_INCLUDE_DIR zmq.h
 )
 
 find_library( ZMQ_LIBRARY
-		  NAMES zmq
+		  NAMES zmq libzmq
 		  PATHS ${ZMQ_BASE_DIR}/lib
 )
 		
