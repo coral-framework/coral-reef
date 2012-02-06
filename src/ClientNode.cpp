@@ -25,7 +25,7 @@ public:
     co::IObject* newRemoteInstance( const std::string& componentTypeName, const std::string& address )
     {
         Connection* connection = new Connection( "CON_TYPE" );
-        connection->bind( address );
+        connection->connect( address );
     
         co::IComponent* componentType = co::cast<co::IComponent>( co::getType( componentTypeName ) );
         return new reef::RemoteObject( componentType, new InputChannel( connection ) );

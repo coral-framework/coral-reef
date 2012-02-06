@@ -9,6 +9,9 @@
 //#include <gtest/gtest.h>
 
 #include <reef/IServerNode.h>
+#include <reef/IClientNode.h>
+
+#include <toto/IToto.h>
 
 #include <co/Coral.h>
 #include <co/IObject.h>
@@ -27,18 +30,18 @@ int main( int argc, char** argv )
 
 //	int res = RUN_ALL_TESTS();
     
-//    co::IObject* obj = co::newInstance( "reef.ClientNode" );
-//    reef::IClientNode* client = obj->getService<reef::IClientNode>();
-//    
-//    co::IObject* toto = client->newRemoteInstance( "toto.Toto", "tcp://10.0.24.151:4020" );
-//    toto::IToto* totoService = toto->getService<toto::IToto>();
-//    totoService->printHello();
+    co::IObject* obj = co::newInstance( "reef.ClientNode" );
+    reef::IClientNode* client = obj->getService<reef::IClientNode>();
+    
+    co::IObject* toto = client->newRemoteInstance( "toto.Toto", "tcp://10.0.24.151:4020" );
+    toto::IToto* totoService = toto->getService<toto::IToto>();
+    totoService->printHello();
 
   
-    co::IObject* obj = co::newInstance( "reef.ServerNode" );
-    reef::IServerNode* server = obj->getService<reef::IServerNode>();
-    
-    server->start( "tcp://*:4020" );
+//    co::IObject* obj = co::newInstance( "reef.ServerNode" );
+//    reef::IServerNode* server = obj->getService<reef::IServerNode>();
+//    
+//    server->start( "tcp://*:4020" );
 
 	co::shutdown();
 

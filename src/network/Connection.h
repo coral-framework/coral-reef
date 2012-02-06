@@ -23,11 +23,15 @@ public:
     
     void close();
     
-    void send( const void* data, unsigned int size );
+    /* 
+        Sends a byte array contained into a string.
+        As data is handled as a byte array, '\0' is not a string delimiter.
+     */
+    void send( const std::string& data );
     
     // Waits \a timeout milisseconds for a message to come.
     // Default is timeout = 0 which is infinity wait time.
-    void receive( void* data, unsigned int size, int timeout = 0 );
+    void receive( std::string& data, int timeout = 0 );
     
     const std::string& getAddress() { return _address; }
     

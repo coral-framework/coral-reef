@@ -1,0 +1,57 @@
+message DataArgument
+{
+	required int32 dummy = 1;
+}
+
+message CallEvent
+{
+	required bool hasReturn = 1;
+	required uint32 serviceIndex = 2;
+	required uint32 methodIndex = 3;
+	repeated DataArgument arguments = 4;
+}
+
+message FieldEvent
+{
+	required bool isSetField = 1;
+	required uint32 serviceIndex = 2;
+	required uint32 fieldIndex = 3;
+	required DataArgument value = 4;
+}
+
+message ReturnEvent
+{
+	repeated DataArgument arguments = 1;
+}
+
+message CreateEvent
+{
+	required string componentTypeName = 1;
+}
+
+message CreateResult
+{
+	required int32 virtualAddress = 1;
+}
+
+message Event 
+{
+	required uint32 eventType = 1;
+	enum EventType
+	{
+		TYPE_CREATE = 0;
+		TYPE_CREATE_RESULT = 1;
+		TYPE_CALL = 2;
+		TYPE_CALL_RETURN = 3;
+		TYPE_FIELD = 4;
+	}
+	
+	required uint32 destination = 2;
+	
+	optional CreateEvent createEvent = 3;
+	optional CreateResult createResult = 4;
+	optional CallEvent callEvent = 5;
+	optional ReturnEvent callReturn = 6;
+	optional FieldEvent fieldEvent = 7;
+}
+

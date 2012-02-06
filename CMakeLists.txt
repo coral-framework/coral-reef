@@ -19,6 +19,7 @@ SET( CMAKE_MODULE_PATH ${CORAL_ROOT}/cmake ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MOD
 # Load Coral's CMake package
 FIND_PACKAGE( Coral REQUIRED )
 FIND_PACKAGE( zmq REQUIRED )
+FIND_PACKAGE( Protobuf REQUIRED )
 
 # Configure the coral path
 SET( CORAL_PATH
@@ -27,7 +28,7 @@ SET( CORAL_PATH
 	"${CMAKE_SOURCE_DIR}/modules"
 )
 
-INCLUDE_DIRECTORIES( ${CORAL_INCLUDE_DIRS} ${ZMQ_INCLUDE_DIRS} )
+INCLUDE_DIRECTORIES( ${CORAL_INCLUDE_DIRS} ${ZMQ_INCLUDE_DIRS} ${PROTOBUF_INCLUDE_DIRS} )
 
 ################################################################################
 # Installation

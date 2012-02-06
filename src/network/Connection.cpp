@@ -7,7 +7,7 @@
 namespace reef {
     
 Connection::Connection( const std::string& type ) 
-    : _context( 1 ), _socket( _context, ZMQ_REP )
+    : _context( 1 ), _socket( _context, ZMQ_REQ )
 {
     // empty
 }
@@ -34,18 +34,19 @@ void Connection::close()
     _socket.close();
 }
     
-void Connection::send( const void* data, unsigned int size )
+void Connection::send( const std::string& data )
 {
-    zmq::message_t msg ( size );
-    memcpy( msg.data(), data, size );
+    zmq::message_t msg( data.size() );
+    memcpy( msg.data(), data.data(), data.size() );
     _socket.send( msg );
 }
 
-void Connection::receive( void* data, unsigned int size, int timeout )
+void Connection::receive( std::string& data, int timeout )
 {
     zmq::message_t msg;
     _socket.recv( &msg );
-    memcpy( data, msg.data(), std::min<int>( size, msg.size() ) );
+    data.resize( msg.size() );
+    memcpy( &data[0], msg.data(), msg.size() );
 }
     
 } // namespace reef

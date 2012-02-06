@@ -1,16 +1,18 @@
 #include "Channel.h"
+#include "Event.pb.h"
 
 namespace reef 
 {
     
-void Channel::route( const void* data, unsigned int size, const std::vector<Channel*>& channels )
+void Channel::route( const std::string& data, const std::vector<Channel*>& channels )
 {
-    const unsigned char* ptr = reinterpret_cast<const unsigned char*>( data );
-     
-    int dest = static_cast<int>( ptr[0] );
+    Event event;
+    event.ParseFromString( data );
+
+    int dest = event.destination();
     assert( dest >= 0 && dest < channels.size() );
     
-   channels[dest]->write( data, size );
+    channels[dest]->write( &event );
 }
     
 Channel::Channel( Connection* connection ) : _channelId( -1 ), _connection( connection )
@@ -38,70 +40,112 @@ int InputChannel::newInstance( const std::string& typeName )
 {
     assert( _channelId == - 1 );
     
-    // translate arguments (google protocol buffers?)
-    // send to current connection
-    unsigned char msg[4];
-    msg[0] = static_cast<unsigned char>( 0 /* server id */ );
-    msg[1] = static_cast<unsigned char>( 0 );
-    msg[2] = static_cast<unsigned char>( 0 );
-    msg[3] = static_cast<unsigned char>( 0 );
+    Event event;
+    event.set_destination( 0 ); // 0 is always the node channel
+    event.set_eventtype( Event::TYPE_CREATE );
     
-    write( msg, 4 );
+    CreateEvent* ce = event.mutable_createevent();
+    ce->set_componenttypename( typeName );
     
-    _connection->receive( reinterpret_cast<unsigned char*>( msg ), 4 );
-    unsigned char id = msg[0];
-    _channelId = static_cast<int>( id );
+    write( &event );
+    
+    std::string input;
+    _connection->receive( input );
+    
+    event.ParseFromString( input );
+    assert( event.eventtype() == Event::TYPE_CREATE_RESULT );
+ 
+    _channelId = event.createresult().virtualaddress();
     
     return _channelId;
 }
+    
+static CallEvent* makeCallEvent( bool hasReturn, Event& owner, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args )
+{
+    CallEvent* ce = owner.mutable_callevent();
+    ce->set_hasreturn( hasReturn );
+    ce->set_serviceindex( serviceId );
+    ce->set_methodindex( methodIndex );
 
+    // TODO: serialize parameters
+    return ce;
+}
+                                
 void InputChannel::sendCall( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args )
 {
-    // translate arguments (google protocol buffers?)
-    // send to current connection
-    unsigned char msg[4];
-    msg[0] = static_cast<unsigned char>( _channelId );
-    msg[1] = static_cast<unsigned char>( 0 /* send call event id */ );
-    msg[2] = static_cast<unsigned char>( serviceId );
-    msg[3] = static_cast<unsigned char>( methodIndex );
+    Event event;
+    event.set_destination( _channelId ); // 0 is always the node channel
+    event.set_eventtype( Event::TYPE_CALL );
     
-    write( msg, 4 );
-
-    _connection->receive( reinterpret_cast<unsigned char*>( msg ), 4 );
-    unsigned char id = msg[0];
+    // make a call without returns
+    makeCallEvent( false, event, serviceId, methodIndex, args );
+    write( &event );
 }
 
 void InputChannel::call( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args, co::Any& result )
 {
-    // translate arguments (google protocol buffers?)
-    // send to current connection
-    unsigned char msg[4];
-    msg[0] = static_cast<unsigned char>( _channelId );
-    msg[1] = static_cast<unsigned char>( 1 /* send call event id */ );
-    msg[2] = static_cast<unsigned char>( serviceId );
-    msg[3] = static_cast<unsigned char>( methodIndex );
+    Event event;
+    event.set_destination( _channelId ); // 0 is always the node channel
+    event.set_eventtype( Event::TYPE_CALL );
     
-    write( msg, 4 );
+    // signalize that a return is expected
+    makeCallEvent( true, event, serviceId, methodIndex, args );
     
-    _connection->receive( reinterpret_cast<unsigned char*>( msg ), 4 );
-    unsigned char id = msg[0];
+    write( &event );
+    
+    // wait for the return
+    std::string input;
+    _connection->receive( input );
+    
+    event.ParseFromString( input );
+    assert( event.eventtype() == Event::TYPE_CALL_RETURN );
+    
+    // TODO: set returned value into result variable
 }
 
 void InputChannel::getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result )
 {
-    // translate arguments (google protocol buffers?)
-    // send to current connection
+    Event event;
+    event.set_destination( _channelId ); // 0 is always the node channel
+    event.set_eventtype( Event::TYPE_FIELD );
+    
+    FieldEvent* fe = event.mutable_fieldevent();
+    fe->set_issetfield( false ); // it is a get field event
+    fe->set_serviceindex( serviceId );
+    fe->set_fieldindex( fieldIndex );
+    
+    write( &event );
+    
+    // wait for the field value
+    std::string input;
+    _connection->receive( input );
+    
+    event.ParseFromString( input );
+    assert( event.eventtype() == Event::TYPE_FIELD );
+    
+    // TODO: set the returned field value into result variable
 }
 
 void InputChannel::setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value )
 {
-    // translate arguments (google protocol buffers?)
-    // send to current connection
+    Event event;
+    event.set_destination( _channelId ); // 0 is always the node channel
+    event.set_eventtype( Event::TYPE_FIELD );
+    
+    FieldEvent* fe = event.mutable_fieldevent();
+    fe->set_issetfield( true ); // it is a set field event
+    fe->set_serviceindex( serviceId );
+    fe->set_fieldindex( fieldIndex );
+    
+    write( &event );
 }
     
-void InputChannel::write( const void* rawMessage, unsigned int size )
+void InputChannel::write( const Event* event )
 {
-    _connection->send( rawMessage, size );
+    std::string output;
+    event->SerializeToString( &output );
+    
+    _connection->send( output );
 }
     
 // OutputChannel
@@ -141,33 +185,57 @@ void OutputChannel::setField( co::int32 serviceId, co::int32 fieldIndex, const c
     _delegate->onSetField( this, serviceId, fieldIndex, value );
 }
     
-void OutputChannel::write( const void* data, unsigned int size )
-{
-    const unsigned char* ptr = reinterpret_cast<const unsigned char*>( data );
+void OutputChannel::write( const Event* event )
+{    
+    co::Range<co::Any const> dummy;
+
+    Event::EventType type = static_cast<Event::EventType>( event->eventtype() );
     
-    int eventType = static_cast<int>( ptr[1] );
-    
-    co::Range<co::Any const> r();   
-    if( eventType == 0  )
-    {
-        int ret = newInstance( "toto.Toto" );
-        
-        unsigned char msg[4];
-        msg[0] = static_cast<unsigned char>( ret );
-        msg[1] = static_cast<unsigned char>( 0  );
-        msg[2] = static_cast<unsigned char>( 0 );
-        msg[3] = static_cast<unsigned char>( 0 );
-        _connection->send( reinterpret_cast<char*>( msg ), 4 );
-    
-    }
-    else if( eventType == 1 )
-    {
-        // first argument to CM is serviceId, second is methodId
-        int serviceId = static_cast<int>( ptr[2] );
-        int methodId =  static_cast<int>( ptr[3] );
-        
-        assert( serviceId >= 0 && methodId >= 0 );
-        sendCall( serviceId, methodId, co::Range<co::Any const>() );
+    switch ( type ) {
+        case Event::TYPE_CREATE:
+        {
+            const CreateEvent& createEvent = event->createevent();
+            int virtualAddress = newInstance( createEvent.componenttypename() );
+
+            Event resultEvent;
+            resultEvent.set_eventtype( Event::TYPE_CREATE_RESULT );
+            resultEvent.set_destination( virtualAddress ); // destination makes no much sense here since is 
+                                                           // answer is always deterministic
+            
+            // send back the recently created virtual address
+            CreateResult* cr = resultEvent.mutable_createresult();
+            cr->set_virtualaddress( virtualAddress );
+            
+            std::string output;
+            resultEvent.SerializeToString( &output );
+            _connection->send( output );
+            
+            break;
+        } 
+        case Event::TYPE_CALL:
+        {
+            const CallEvent& callEvent = event->callevent();
+            co::int32 serviceId = callEvent.serviceindex();
+            co::int32 methodIndex = callEvent.methodindex();
+            
+            // TODO: handle call arguments (translate to co::Any)
+            // const DataArgument& argument = call.arguments( 0 );
+            
+            if( callEvent.hasreturn() )
+            {
+                co::Any result;
+                call( serviceId, methodIndex, dummy, result );
+                
+                // TODO: handle return
+            }
+            else
+            {
+                sendCall( serviceId, methodIndex, dummy );
+            }
+            break;
+        }
+        default:
+            break;
     }
 }
 

@@ -34,14 +34,14 @@ public:
         
         while( true )
         {
-            char message[4];
-            _mainConnection->receive( reinterpret_cast<char*>( message ), 4 );
+            std::string message;
+            _mainConnection->receive( message );
             
             std::cerr << "Received " << message << std::endl;
             fflush( stderr );
             
             // Route the message to the proper channel
-            Channel::route( message, 4, _channels );
+            Channel::route( message, _channels );
         }
     }
     

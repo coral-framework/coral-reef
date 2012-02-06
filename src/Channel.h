@@ -8,6 +8,8 @@
 
 #include <sstream>
 
+class Event;
+
 namespace reef 
 {
 
@@ -16,7 +18,7 @@ class Channel
 {
 public:
     // Routes the given message to the proper channel using message destination identifier.
-    static void route( const void* data, unsigned int size, const std::vector<Channel*>& channels );
+    static void route( const std::string& data, const std::vector<Channel*>& channels );
     
 public:
     Channel( Connection* connection );
@@ -33,8 +35,8 @@ public:
     virtual void getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result ) = 0;
     virtual void setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value ) = 0;
 
-    // Writes a raw message into channel.
-    virtual void write( const void* rawMessage, unsigned int size ) = 0;
+    // Writes a raw event into channel.
+    virtual void write( const Event* event ) = 0;
     
 protected:
     int _channelId;
@@ -54,7 +56,9 @@ public:
     void getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result );
     void setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value );
     
-    void write( const void* rawMessage, unsigned int size );
+    // Writes an event into a input channel by serializing it and 
+    // sending it over the network
+    void write( const Event* event );
 };
 
 class OutputChannelDelegate
@@ -81,7 +85,9 @@ public:
     void getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result );
     void setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value );
     
-    void write( const void* rawMessage, unsigned int size );
+    // Writes an event into an output channel. It will translate the event into a call
+    // of one of the above methods (sendCall, call, getField, setField... )
+    void write( const Event* event );
     
 private:
     OutputChannelDelegate* _delegate;
