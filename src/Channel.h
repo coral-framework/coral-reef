@@ -8,10 +8,12 @@
 
 #include <sstream>
 
-class Event;
+
 
 namespace reef 
 {
+
+class Event;
 
 //! Template abstract class.
 class Channel
@@ -36,7 +38,7 @@ public:
     virtual void setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value ) = 0;
 
     // Writes a raw event into channel.
-    virtual void write( const Event* event ) = 0;
+    virtual void write( const reef::Event* event ) = 0;
     
 protected:
     int _channelId;
@@ -57,7 +59,7 @@ public:
     void setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value );
     
     // Writes an event into this input channel. The given event will be serialized over network.
-    void write( const Event* event );
+    void write( const reef::Event* event );
 };
 
 class OutputChannelDelegate
@@ -86,7 +88,7 @@ public:
     
     // Writes an event into an output channel. It will translate the event into a call
     // of one of the above methods (sendCall, call, getField, setField... )
-    void write( const Event* event );
+    void write( const reef::Event* event );
     
 private:
     OutputChannelDelegate* _delegate;

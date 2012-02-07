@@ -44,7 +44,7 @@ int InputChannel::newInstance( const std::string& typeName )
     event.set_destination( 0 ); // 0 is always the node channel
     event.set_eventtype( Event::TYPE_CREATE );
     
-    CreateEvent* ce = event.mutable_createevent();
+	EventCreate* ce = event.mutable_eventcreate();
     ce->set_componenttypename( typeName );
     
     write( &event );
@@ -55,14 +55,14 @@ int InputChannel::newInstance( const std::string& typeName )
     event.ParseFromString( input );
     assert( event.eventtype() == Event::TYPE_CREATE_RESULT );
  
-    _channelId = event.createresult().virtualaddress();
+    _channelId = event.resultcreate().virtualaddress();
     
     return _channelId;
 }
     
-static CallEvent* makeCallEvent( bool hasReturn, Event& owner, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args )
+static EventCall* makeEventCall( bool hasReturn, Event& owner, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args )
 {
-    CallEvent* ce = owner.mutable_callevent();
+    EventCall* ce = owner.mutable_eventcall();
     ce->set_hasreturn( hasReturn );
     ce->set_serviceindex( serviceId );
     ce->set_methodindex( methodIndex );
@@ -78,7 +78,7 @@ void InputChannel::sendCall( co::int32 serviceId, co::int32 methodIndex, co::Ran
     event.set_eventtype( Event::TYPE_CALL );
     
     // make a call without returns
-    makeCallEvent( false, event, serviceId, methodIndex, args );
+    makeEventCall( false, event, serviceId, methodIndex, args );
     write( &event );
 }
 
@@ -89,7 +89,7 @@ void InputChannel::call( co::int32 serviceId, co::int32 methodIndex, co::Range<c
     event.set_eventtype( Event::TYPE_CALL );
     
     // signalize that a return is expected
-    makeCallEvent( true, event, serviceId, methodIndex, args );
+    makeEventCall( true, event, serviceId, methodIndex, args );
     
     write( &event );
     
@@ -109,7 +109,7 @@ void InputChannel::getField( co::int32 serviceId, co::int32 fieldIndex, co::Any&
     event.set_destination( _channelId ); // 0 is always the node channel
     event.set_eventtype( Event::TYPE_FIELD );
     
-    FieldEvent* fe = event.mutable_fieldevent();
+    EventField* fe = event.mutable_eventfield();
     fe->set_issetfield( false ); // it is a get field event
     fe->set_serviceindex( serviceId );
     fe->set_fieldindex( fieldIndex );
@@ -132,7 +132,7 @@ void InputChannel::setField( co::int32 serviceId, co::int32 fieldIndex, const co
     event.set_destination( _channelId ); // 0 is always the node channel
     event.set_eventtype( Event::TYPE_FIELD );
     
-    FieldEvent* fe = event.mutable_fieldevent();
+    EventField* fe = event.mutable_eventfield();
     fe->set_issetfield( true ); // it is a set field event
     fe->set_serviceindex( serviceId );
     fe->set_fieldindex( fieldIndex );
@@ -140,7 +140,7 @@ void InputChannel::setField( co::int32 serviceId, co::int32 fieldIndex, const co
     write( &event );
 }
     
-void InputChannel::write( const Event* event )
+void InputChannel::write( const reef::Event* event )
 {
     std::string output;
     event->SerializeToString( &output );
@@ -185,7 +185,7 @@ void OutputChannel::setField( co::int32 serviceId, co::int32 fieldIndex, const c
     _delegate->onSetField( this, serviceId, fieldIndex, value );
 }
     
-void OutputChannel::write( const Event* event )
+void OutputChannel::write( const reef::Event* event )
 {    
     co::Range<co::Any const> dummy;
 
@@ -194,8 +194,8 @@ void OutputChannel::write( const Event* event )
     switch ( type ) {
         case Event::TYPE_CREATE:
         {
-            const CreateEvent& createEvent = event->createevent();
-            int virtualAddress = newInstance( createEvent.componenttypename() );
+            const EventCreate& EventCreate = event->eventcreate();
+            int virtualAddress = newInstance( EventCreate.componenttypename() );
 
             Event resultEvent;
             resultEvent.set_eventtype( Event::TYPE_CREATE_RESULT );
@@ -203,7 +203,7 @@ void OutputChannel::write( const Event* event )
                                                            // answer is always deterministic
             
             // send back the recently created virtual address
-            CreateResult* cr = resultEvent.mutable_createresult();
+            ResultCreate* cr = resultEvent.mutable_resultcreate();
             cr->set_virtualaddress( virtualAddress );
             
             std::string output;
@@ -214,14 +214,14 @@ void OutputChannel::write( const Event* event )
         } 
         case Event::TYPE_CALL:
         {
-            const CallEvent& callEvent = event->callevent();
-            co::int32 serviceId = callEvent.serviceindex();
-            co::int32 methodIndex = callEvent.methodindex();
+            const EventCall& EventCall = event->eventcall();
+            co::int32 serviceId = EventCall.serviceindex();
+            co::int32 methodIndex = EventCall.methodindex();
             
             // TODO: handle call arguments (translate to co::Any)
             // const DataArgument& argument = call.arguments( 0 );
             
-            if( callEvent.hasreturn() )
+            if( EventCall.hasreturn() )
             {
                 co::Any result;
                 call( serviceId, methodIndex, dummy, result );

@@ -13,26 +13,28 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 
+namespace reef {
+
 namespace {
 
 const ::google::protobuf::Descriptor* DataArgument_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   DataArgument_reflection_ = NULL;
-const ::google::protobuf::Descriptor* CallEvent_descriptor_ = NULL;
+const ::google::protobuf::Descriptor* EventCall_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  CallEvent_reflection_ = NULL;
-const ::google::protobuf::Descriptor* FieldEvent_descriptor_ = NULL;
+  EventCall_reflection_ = NULL;
+const ::google::protobuf::Descriptor* EventField_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  FieldEvent_reflection_ = NULL;
-const ::google::protobuf::Descriptor* ReturnEvent_descriptor_ = NULL;
+  EventField_reflection_ = NULL;
+const ::google::protobuf::Descriptor* EventReturn_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  ReturnEvent_reflection_ = NULL;
-const ::google::protobuf::Descriptor* CreateEvent_descriptor_ = NULL;
+  EventReturn_reflection_ = NULL;
+const ::google::protobuf::Descriptor* EventCreate_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  CreateEvent_reflection_ = NULL;
-const ::google::protobuf::Descriptor* CreateResult_descriptor_ = NULL;
+  EventCreate_reflection_ = NULL;
+const ::google::protobuf::Descriptor* ResultCreate_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  CreateResult_reflection_ = NULL;
+  ResultCreate_reflection_ = NULL;
 const ::google::protobuf::Descriptor* Event_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   Event_reflection_ = NULL;
@@ -62,96 +64,96 @@ void protobuf_AssignDesc_Event_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(DataArgument));
-  CallEvent_descriptor_ = file->message_type(1);
-  static const int CallEvent_offsets_[4] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CallEvent, hasreturn_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CallEvent, serviceindex_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CallEvent, methodindex_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CallEvent, arguments_),
+  EventCall_descriptor_ = file->message_type(1);
+  static const int EventCall_offsets_[4] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EventCall, hasreturn_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EventCall, serviceindex_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EventCall, methodindex_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EventCall, arguments_),
   };
-  CallEvent_reflection_ =
+  EventCall_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
-      CallEvent_descriptor_,
-      CallEvent::default_instance_,
-      CallEvent_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CallEvent, _has_bits_[0]),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CallEvent, _unknown_fields_),
+      EventCall_descriptor_,
+      EventCall::default_instance_,
+      EventCall_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EventCall, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EventCall, _unknown_fields_),
       -1,
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
-      sizeof(CallEvent));
-  FieldEvent_descriptor_ = file->message_type(2);
-  static const int FieldEvent_offsets_[4] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FieldEvent, issetfield_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FieldEvent, serviceindex_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FieldEvent, fieldindex_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FieldEvent, value_),
+      sizeof(EventCall));
+  EventField_descriptor_ = file->message_type(2);
+  static const int EventField_offsets_[4] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EventField, issetfield_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EventField, serviceindex_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EventField, fieldindex_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EventField, value_),
   };
-  FieldEvent_reflection_ =
+  EventField_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
-      FieldEvent_descriptor_,
-      FieldEvent::default_instance_,
-      FieldEvent_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FieldEvent, _has_bits_[0]),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FieldEvent, _unknown_fields_),
+      EventField_descriptor_,
+      EventField::default_instance_,
+      EventField_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EventField, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EventField, _unknown_fields_),
       -1,
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
-      sizeof(FieldEvent));
-  ReturnEvent_descriptor_ = file->message_type(3);
-  static const int ReturnEvent_offsets_[1] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReturnEvent, arguments_),
+      sizeof(EventField));
+  EventReturn_descriptor_ = file->message_type(3);
+  static const int EventReturn_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EventReturn, arguments_),
   };
-  ReturnEvent_reflection_ =
+  EventReturn_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
-      ReturnEvent_descriptor_,
-      ReturnEvent::default_instance_,
-      ReturnEvent_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReturnEvent, _has_bits_[0]),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReturnEvent, _unknown_fields_),
+      EventReturn_descriptor_,
+      EventReturn::default_instance_,
+      EventReturn_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EventReturn, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EventReturn, _unknown_fields_),
       -1,
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
-      sizeof(ReturnEvent));
-  CreateEvent_descriptor_ = file->message_type(4);
-  static const int CreateEvent_offsets_[1] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CreateEvent, componenttypename_),
+      sizeof(EventReturn));
+  EventCreate_descriptor_ = file->message_type(4);
+  static const int EventCreate_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EventCreate, componenttypename_),
   };
-  CreateEvent_reflection_ =
+  EventCreate_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
-      CreateEvent_descriptor_,
-      CreateEvent::default_instance_,
-      CreateEvent_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CreateEvent, _has_bits_[0]),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CreateEvent, _unknown_fields_),
+      EventCreate_descriptor_,
+      EventCreate::default_instance_,
+      EventCreate_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EventCreate, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EventCreate, _unknown_fields_),
       -1,
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
-      sizeof(CreateEvent));
-  CreateResult_descriptor_ = file->message_type(5);
-  static const int CreateResult_offsets_[1] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CreateResult, virtualaddress_),
+      sizeof(EventCreate));
+  ResultCreate_descriptor_ = file->message_type(5);
+  static const int ResultCreate_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ResultCreate, virtualaddress_),
   };
-  CreateResult_reflection_ =
+  ResultCreate_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
-      CreateResult_descriptor_,
-      CreateResult::default_instance_,
-      CreateResult_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CreateResult, _has_bits_[0]),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CreateResult, _unknown_fields_),
+      ResultCreate_descriptor_,
+      ResultCreate::default_instance_,
+      ResultCreate_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ResultCreate, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ResultCreate, _unknown_fields_),
       -1,
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
-      sizeof(CreateResult));
+      sizeof(ResultCreate));
   Event_descriptor_ = file->message_type(6);
   static const int Event_offsets_[7] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Event, eventtype_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Event, destination_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Event, createevent_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Event, createresult_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Event, callevent_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Event, callreturn_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Event, fieldevent_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Event, eventcreate_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Event, resultcreate_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Event, eventcall_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Event, eventreturn_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Event, eventfield_),
   };
   Event_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -180,15 +182,15 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     DataArgument_descriptor_, &DataArgument::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    CallEvent_descriptor_, &CallEvent::default_instance());
+    EventCall_descriptor_, &EventCall::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    FieldEvent_descriptor_, &FieldEvent::default_instance());
+    EventField_descriptor_, &EventField::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    ReturnEvent_descriptor_, &ReturnEvent::default_instance());
+    EventReturn_descriptor_, &EventReturn::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    CreateEvent_descriptor_, &CreateEvent::default_instance());
+    EventCreate_descriptor_, &EventCreate::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    CreateResult_descriptor_, &CreateResult::default_instance());
+    ResultCreate_descriptor_, &ResultCreate::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     Event_descriptor_, &Event::default_instance());
 }
@@ -198,16 +200,16 @@ void protobuf_RegisterTypes(const ::std::string&) {
 void protobuf_ShutdownFile_Event_2eproto() {
   delete DataArgument::default_instance_;
   delete DataArgument_reflection_;
-  delete CallEvent::default_instance_;
-  delete CallEvent_reflection_;
-  delete FieldEvent::default_instance_;
-  delete FieldEvent_reflection_;
-  delete ReturnEvent::default_instance_;
-  delete ReturnEvent_reflection_;
-  delete CreateEvent::default_instance_;
-  delete CreateEvent_reflection_;
-  delete CreateResult::default_instance_;
-  delete CreateResult_reflection_;
+  delete EventCall::default_instance_;
+  delete EventCall_reflection_;
+  delete EventField::default_instance_;
+  delete EventField_reflection_;
+  delete EventReturn::default_instance_;
+  delete EventReturn_reflection_;
+  delete EventCreate::default_instance_;
+  delete EventCreate_reflection_;
+  delete ResultCreate::default_instance_;
+  delete ResultCreate_reflection_;
   delete Event::default_instance_;
   delete Event_reflection_;
 }
@@ -219,39 +221,41 @@ void protobuf_AddDesc_Event_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\013Event.proto\"\035\n\014DataArgument\022\r\n\005dummy\030\001"
-    " \002(\005\"k\n\tCallEvent\022\021\n\thasReturn\030\001 \002(\010\022\024\n\014"
-    "serviceIndex\030\002 \002(\r\022\023\n\013methodIndex\030\003 \002(\r\022"
-    " \n\targuments\030\004 \003(\0132\r.DataArgument\"h\n\nFie"
-    "ldEvent\022\022\n\nisSetField\030\001 \002(\010\022\024\n\014serviceIn"
-    "dex\030\002 \002(\r\022\022\n\nfieldIndex\030\003 \002(\r\022\034\n\005value\030\004"
-    " \002(\0132\r.DataArgument\"/\n\013ReturnEvent\022 \n\tar"
-    "guments\030\001 \003(\0132\r.DataArgument\"(\n\013CreateEv"
-    "ent\022\031\n\021componentTypeName\030\001 \002(\t\"&\n\014Create"
-    "Result\022\026\n\016virtualAddress\030\001 \002(\005\"\304\002\n\005Event"
-    "\022\021\n\teventType\030\001 \002(\r\022\023\n\013destination\030\002 \002(\r"
-    "\022!\n\013createEvent\030\003 \001(\0132\014.CreateEvent\022#\n\014c"
-    "reateResult\030\004 \001(\0132\r.CreateResult\022\035\n\tcall"
-    "Event\030\005 \001(\0132\n.CallEvent\022 \n\ncallReturn\030\006 "
-    "\001(\0132\014.ReturnEvent\022\037\n\nfieldEvent\030\007 \001(\0132\013."
-    "FieldEvent\"i\n\tEventType\022\017\n\013TYPE_CREATE\020\000"
-    "\022\026\n\022TYPE_CREATE_RESULT\020\001\022\r\n\tTYPE_CALL\020\002\022"
-    "\024\n\020TYPE_CALL_RETURN\020\003\022\016\n\nTYPE_FIELD\020\004", 717);
+    "\n\013Event.proto\022\004reef\"\035\n\014DataArgument\022\r\n\005d"
+    "ummy\030\001 \002(\005\"p\n\tEventCall\022\021\n\thasReturn\030\001 \002"
+    "(\010\022\024\n\014serviceIndex\030\002 \002(\r\022\023\n\013methodIndex\030"
+    "\003 \002(\r\022%\n\targuments\030\004 \003(\0132\022.reef.DataArgu"
+    "ment\"m\n\nEventField\022\022\n\nisSetField\030\001 \002(\010\022\024"
+    "\n\014serviceIndex\030\002 \002(\r\022\022\n\nfieldIndex\030\003 \002(\r"
+    "\022!\n\005value\030\004 \002(\0132\022.reef.DataArgument\"4\n\013E"
+    "ventReturn\022%\n\targuments\030\001 \003(\0132\022.reef.Dat"
+    "aArgument\"(\n\013EventCreate\022\031\n\021componentTyp"
+    "eName\030\001 \002(\t\"&\n\014ResultCreate\022\026\n\016virtualAd"
+    "dress\030\001 \002(\005\"\336\002\n\005Event\022\021\n\teventType\030\001 \002(\r"
+    "\022\023\n\013destination\030\002 \002(\r\022&\n\013eventCreate\030\003 \001"
+    "(\0132\021.reef.EventCreate\022(\n\014resultCreate\030\004 "
+    "\001(\0132\022.reef.ResultCreate\022\"\n\teventCall\030\005 \001"
+    "(\0132\017.reef.EventCall\022&\n\013eventReturn\030\006 \001(\013"
+    "2\021.reef.EventReturn\022$\n\neventField\030\007 \001(\0132"
+    "\020.reef.EventField\"i\n\tEventType\022\017\n\013TYPE_C"
+    "REATE\020\000\022\026\n\022TYPE_CREATE_RESULT\020\001\022\r\n\tTYPE_"
+    "CALL\020\002\022\024\n\020TYPE_CALL_RETURN\020\003\022\016\n\nTYPE_FIE"
+    "LD\020\004", 764);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "Event.proto", &protobuf_RegisterTypes);
   DataArgument::default_instance_ = new DataArgument();
-  CallEvent::default_instance_ = new CallEvent();
-  FieldEvent::default_instance_ = new FieldEvent();
-  ReturnEvent::default_instance_ = new ReturnEvent();
-  CreateEvent::default_instance_ = new CreateEvent();
-  CreateResult::default_instance_ = new CreateResult();
+  EventCall::default_instance_ = new EventCall();
+  EventField::default_instance_ = new EventField();
+  EventReturn::default_instance_ = new EventReturn();
+  EventCreate::default_instance_ = new EventCreate();
+  ResultCreate::default_instance_ = new ResultCreate();
   Event::default_instance_ = new Event();
   DataArgument::default_instance_->InitAsDefaultInstance();
-  CallEvent::default_instance_->InitAsDefaultInstance();
-  FieldEvent::default_instance_->InitAsDefaultInstance();
-  ReturnEvent::default_instance_->InitAsDefaultInstance();
-  CreateEvent::default_instance_->InitAsDefaultInstance();
-  CreateResult::default_instance_->InitAsDefaultInstance();
+  EventCall::default_instance_->InitAsDefaultInstance();
+  EventField::default_instance_->InitAsDefaultInstance();
+  EventReturn::default_instance_->InitAsDefaultInstance();
+  EventCreate::default_instance_->InitAsDefaultInstance();
+  ResultCreate::default_instance_->InitAsDefaultInstance();
   Event::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_Event_2eproto);
 }
@@ -475,27 +479,27 @@ void DataArgument::Swap(DataArgument* other) {
 // ===================================================================
 
 #ifndef _MSC_VER
-const int CallEvent::kHasReturnFieldNumber;
-const int CallEvent::kServiceIndexFieldNumber;
-const int CallEvent::kMethodIndexFieldNumber;
-const int CallEvent::kArgumentsFieldNumber;
+const int EventCall::kHasReturnFieldNumber;
+const int EventCall::kServiceIndexFieldNumber;
+const int EventCall::kMethodIndexFieldNumber;
+const int EventCall::kArgumentsFieldNumber;
 #endif  // !_MSC_VER
 
-CallEvent::CallEvent()
+EventCall::EventCall()
   : ::google::protobuf::Message() {
   SharedCtor();
 }
 
-void CallEvent::InitAsDefaultInstance() {
+void EventCall::InitAsDefaultInstance() {
 }
 
-CallEvent::CallEvent(const CallEvent& from)
+EventCall::EventCall(const EventCall& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
 }
 
-void CallEvent::SharedCtor() {
+void EventCall::SharedCtor() {
   _cached_size_ = 0;
   hasreturn_ = false;
   serviceindex_ = 0u;
@@ -503,36 +507,36 @@ void CallEvent::SharedCtor() {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
-CallEvent::~CallEvent() {
+EventCall::~EventCall() {
   SharedDtor();
 }
 
-void CallEvent::SharedDtor() {
+void EventCall::SharedDtor() {
   if (this != default_instance_) {
   }
 }
 
-void CallEvent::SetCachedSize(int size) const {
+void EventCall::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
 }
-const ::google::protobuf::Descriptor* CallEvent::descriptor() {
+const ::google::protobuf::Descriptor* EventCall::descriptor() {
   protobuf_AssignDescriptorsOnce();
-  return CallEvent_descriptor_;
+  return EventCall_descriptor_;
 }
 
-const CallEvent& CallEvent::default_instance() {
+const EventCall& EventCall::default_instance() {
   if (default_instance_ == NULL) protobuf_AddDesc_Event_2eproto();  return *default_instance_;
 }
 
-CallEvent* CallEvent::default_instance_ = NULL;
+EventCall* EventCall::default_instance_ = NULL;
 
-CallEvent* CallEvent::New() const {
-  return new CallEvent;
+EventCall* EventCall::New() const {
+  return new EventCall;
 }
 
-void CallEvent::Clear() {
+void EventCall::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     hasreturn_ = false;
     serviceindex_ = 0u;
@@ -543,7 +547,7 @@ void CallEvent::Clear() {
   mutable_unknown_fields()->Clear();
 }
 
-bool CallEvent::MergePartialFromCodedStream(
+bool EventCall::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!(EXPRESSION)) return false
   ::google::protobuf::uint32 tag;
@@ -596,7 +600,7 @@ bool CallEvent::MergePartialFromCodedStream(
         break;
       }
       
-      // repeated .DataArgument arguments = 4;
+      // repeated .reef.DataArgument arguments = 4;
       case 4: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
@@ -627,7 +631,7 @@ bool CallEvent::MergePartialFromCodedStream(
 #undef DO_
 }
 
-void CallEvent::SerializeWithCachedSizes(
+void EventCall::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // required bool hasReturn = 1;
   if (has_hasreturn()) {
@@ -644,7 +648,7 @@ void CallEvent::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(3, this->methodindex(), output);
   }
   
-  // repeated .DataArgument arguments = 4;
+  // repeated .reef.DataArgument arguments = 4;
   for (int i = 0; i < this->arguments_size(); i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       4, this->arguments(i), output);
@@ -656,7 +660,7 @@ void CallEvent::SerializeWithCachedSizes(
   }
 }
 
-::google::protobuf::uint8* CallEvent::SerializeWithCachedSizesToArray(
+::google::protobuf::uint8* EventCall::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // required bool hasReturn = 1;
   if (has_hasreturn()) {
@@ -673,7 +677,7 @@ void CallEvent::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(3, this->methodindex(), target);
   }
   
-  // repeated .DataArgument arguments = 4;
+  // repeated .reef.DataArgument arguments = 4;
   for (int i = 0; i < this->arguments_size(); i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
@@ -687,7 +691,7 @@ void CallEvent::SerializeWithCachedSizes(
   return target;
 }
 
-int CallEvent::ByteSize() const {
+int EventCall::ByteSize() const {
   int total_size = 0;
   
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
@@ -711,7 +715,7 @@ int CallEvent::ByteSize() const {
     }
     
   }
-  // repeated .DataArgument arguments = 4;
+  // repeated .reef.DataArgument arguments = 4;
   total_size += 1 * this->arguments_size();
   for (int i = 0; i < this->arguments_size(); i++) {
     total_size +=
@@ -730,10 +734,10 @@ int CallEvent::ByteSize() const {
   return total_size;
 }
 
-void CallEvent::MergeFrom(const ::google::protobuf::Message& from) {
+void EventCall::MergeFrom(const ::google::protobuf::Message& from) {
   GOOGLE_CHECK_NE(&from, this);
-  const CallEvent* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const CallEvent*>(
+  const EventCall* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const EventCall*>(
       &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
@@ -742,7 +746,7 @@ void CallEvent::MergeFrom(const ::google::protobuf::Message& from) {
   }
 }
 
-void CallEvent::MergeFrom(const CallEvent& from) {
+void EventCall::MergeFrom(const EventCall& from) {
   GOOGLE_CHECK_NE(&from, this);
   arguments_.MergeFrom(from.arguments_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
@@ -759,19 +763,19 @@ void CallEvent::MergeFrom(const CallEvent& from) {
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
-void CallEvent::CopyFrom(const ::google::protobuf::Message& from) {
+void EventCall::CopyFrom(const ::google::protobuf::Message& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void CallEvent::CopyFrom(const CallEvent& from) {
+void EventCall::CopyFrom(const EventCall& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool CallEvent::IsInitialized() const {
+bool EventCall::IsInitialized() const {
   if ((_has_bits_[0] & 0x00000007) != 0x00000007) return false;
   
   for (int i = 0; i < arguments_size(); i++) {
@@ -780,7 +784,7 @@ bool CallEvent::IsInitialized() const {
   return true;
 }
 
-void CallEvent::Swap(CallEvent* other) {
+void EventCall::Swap(EventCall* other) {
   if (other != this) {
     std::swap(hasreturn_, other->hasreturn_);
     std::swap(serviceindex_, other->serviceindex_);
@@ -792,11 +796,11 @@ void CallEvent::Swap(CallEvent* other) {
   }
 }
 
-::google::protobuf::Metadata CallEvent::GetMetadata() const {
+::google::protobuf::Metadata EventCall::GetMetadata() const {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::Metadata metadata;
-  metadata.descriptor = CallEvent_descriptor_;
-  metadata.reflection = CallEvent_reflection_;
+  metadata.descriptor = EventCall_descriptor_;
+  metadata.reflection = EventCall_reflection_;
   return metadata;
 }
 
@@ -804,28 +808,28 @@ void CallEvent::Swap(CallEvent* other) {
 // ===================================================================
 
 #ifndef _MSC_VER
-const int FieldEvent::kIsSetFieldFieldNumber;
-const int FieldEvent::kServiceIndexFieldNumber;
-const int FieldEvent::kFieldIndexFieldNumber;
-const int FieldEvent::kValueFieldNumber;
+const int EventField::kIsSetFieldFieldNumber;
+const int EventField::kServiceIndexFieldNumber;
+const int EventField::kFieldIndexFieldNumber;
+const int EventField::kValueFieldNumber;
 #endif  // !_MSC_VER
 
-FieldEvent::FieldEvent()
+EventField::EventField()
   : ::google::protobuf::Message() {
   SharedCtor();
 }
 
-void FieldEvent::InitAsDefaultInstance() {
-  value_ = const_cast< ::DataArgument*>(&::DataArgument::default_instance());
+void EventField::InitAsDefaultInstance() {
+  value_ = const_cast< ::reef::DataArgument*>(&::reef::DataArgument::default_instance());
 }
 
-FieldEvent::FieldEvent(const FieldEvent& from)
+EventField::EventField(const EventField& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
 }
 
-void FieldEvent::SharedCtor() {
+void EventField::SharedCtor() {
   _cached_size_ = 0;
   issetfield_ = false;
   serviceindex_ = 0u;
@@ -834,50 +838,50 @@ void FieldEvent::SharedCtor() {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
-FieldEvent::~FieldEvent() {
+EventField::~EventField() {
   SharedDtor();
 }
 
-void FieldEvent::SharedDtor() {
+void EventField::SharedDtor() {
   if (this != default_instance_) {
     delete value_;
   }
 }
 
-void FieldEvent::SetCachedSize(int size) const {
+void EventField::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
 }
-const ::google::protobuf::Descriptor* FieldEvent::descriptor() {
+const ::google::protobuf::Descriptor* EventField::descriptor() {
   protobuf_AssignDescriptorsOnce();
-  return FieldEvent_descriptor_;
+  return EventField_descriptor_;
 }
 
-const FieldEvent& FieldEvent::default_instance() {
+const EventField& EventField::default_instance() {
   if (default_instance_ == NULL) protobuf_AddDesc_Event_2eproto();  return *default_instance_;
 }
 
-FieldEvent* FieldEvent::default_instance_ = NULL;
+EventField* EventField::default_instance_ = NULL;
 
-FieldEvent* FieldEvent::New() const {
-  return new FieldEvent;
+EventField* EventField::New() const {
+  return new EventField;
 }
 
-void FieldEvent::Clear() {
+void EventField::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     issetfield_ = false;
     serviceindex_ = 0u;
     fieldindex_ = 0u;
     if (has_value()) {
-      if (value_ != NULL) value_->::DataArgument::Clear();
+      if (value_ != NULL) value_->::reef::DataArgument::Clear();
     }
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
 
-bool FieldEvent::MergePartialFromCodedStream(
+bool EventField::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!(EXPRESSION)) return false
   ::google::protobuf::uint32 tag;
@@ -930,7 +934,7 @@ bool FieldEvent::MergePartialFromCodedStream(
         break;
       }
       
-      // required .DataArgument value = 4;
+      // required .reef.DataArgument value = 4;
       case 4: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
@@ -960,7 +964,7 @@ bool FieldEvent::MergePartialFromCodedStream(
 #undef DO_
 }
 
-void FieldEvent::SerializeWithCachedSizes(
+void EventField::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // required bool isSetField = 1;
   if (has_issetfield()) {
@@ -977,7 +981,7 @@ void FieldEvent::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(3, this->fieldindex(), output);
   }
   
-  // required .DataArgument value = 4;
+  // required .reef.DataArgument value = 4;
   if (has_value()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       4, this->value(), output);
@@ -989,7 +993,7 @@ void FieldEvent::SerializeWithCachedSizes(
   }
 }
 
-::google::protobuf::uint8* FieldEvent::SerializeWithCachedSizesToArray(
+::google::protobuf::uint8* EventField::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // required bool isSetField = 1;
   if (has_issetfield()) {
@@ -1006,7 +1010,7 @@ void FieldEvent::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(3, this->fieldindex(), target);
   }
   
-  // required .DataArgument value = 4;
+  // required .reef.DataArgument value = 4;
   if (has_value()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
@@ -1020,7 +1024,7 @@ void FieldEvent::SerializeWithCachedSizes(
   return target;
 }
 
-int FieldEvent::ByteSize() const {
+int EventField::ByteSize() const {
   int total_size = 0;
   
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
@@ -1043,7 +1047,7 @@ int FieldEvent::ByteSize() const {
           this->fieldindex());
     }
     
-    // required .DataArgument value = 4;
+    // required .reef.DataArgument value = 4;
     if (has_value()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
@@ -1062,10 +1066,10 @@ int FieldEvent::ByteSize() const {
   return total_size;
 }
 
-void FieldEvent::MergeFrom(const ::google::protobuf::Message& from) {
+void EventField::MergeFrom(const ::google::protobuf::Message& from) {
   GOOGLE_CHECK_NE(&from, this);
-  const FieldEvent* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const FieldEvent*>(
+  const EventField* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const EventField*>(
       &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
@@ -1074,7 +1078,7 @@ void FieldEvent::MergeFrom(const ::google::protobuf::Message& from) {
   }
 }
 
-void FieldEvent::MergeFrom(const FieldEvent& from) {
+void EventField::MergeFrom(const EventField& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_issetfield()) {
@@ -1087,25 +1091,25 @@ void FieldEvent::MergeFrom(const FieldEvent& from) {
       set_fieldindex(from.fieldindex());
     }
     if (from.has_value()) {
-      mutable_value()->::DataArgument::MergeFrom(from.value());
+      mutable_value()->::reef::DataArgument::MergeFrom(from.value());
     }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
-void FieldEvent::CopyFrom(const ::google::protobuf::Message& from) {
+void EventField::CopyFrom(const ::google::protobuf::Message& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void FieldEvent::CopyFrom(const FieldEvent& from) {
+void EventField::CopyFrom(const EventField& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool FieldEvent::IsInitialized() const {
+bool EventField::IsInitialized() const {
   if ((_has_bits_[0] & 0x0000000f) != 0x0000000f) return false;
   
   if (has_value()) {
@@ -1114,7 +1118,7 @@ bool FieldEvent::IsInitialized() const {
   return true;
 }
 
-void FieldEvent::Swap(FieldEvent* other) {
+void EventField::Swap(EventField* other) {
   if (other != this) {
     std::swap(issetfield_, other->issetfield_);
     std::swap(serviceindex_, other->serviceindex_);
@@ -1126,11 +1130,11 @@ void FieldEvent::Swap(FieldEvent* other) {
   }
 }
 
-::google::protobuf::Metadata FieldEvent::GetMetadata() const {
+::google::protobuf::Metadata EventField::GetMetadata() const {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::Metadata metadata;
-  metadata.descriptor = FieldEvent_descriptor_;
-  metadata.reflection = FieldEvent_reflection_;
+  metadata.descriptor = EventField_descriptor_;
+  metadata.reflection = EventField_reflection_;
   return metadata;
 }
 
@@ -1138,70 +1142,70 @@ void FieldEvent::Swap(FieldEvent* other) {
 // ===================================================================
 
 #ifndef _MSC_VER
-const int ReturnEvent::kArgumentsFieldNumber;
+const int EventReturn::kArgumentsFieldNumber;
 #endif  // !_MSC_VER
 
-ReturnEvent::ReturnEvent()
+EventReturn::EventReturn()
   : ::google::protobuf::Message() {
   SharedCtor();
 }
 
-void ReturnEvent::InitAsDefaultInstance() {
+void EventReturn::InitAsDefaultInstance() {
 }
 
-ReturnEvent::ReturnEvent(const ReturnEvent& from)
+EventReturn::EventReturn(const EventReturn& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
 }
 
-void ReturnEvent::SharedCtor() {
+void EventReturn::SharedCtor() {
   _cached_size_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
-ReturnEvent::~ReturnEvent() {
+EventReturn::~EventReturn() {
   SharedDtor();
 }
 
-void ReturnEvent::SharedDtor() {
+void EventReturn::SharedDtor() {
   if (this != default_instance_) {
   }
 }
 
-void ReturnEvent::SetCachedSize(int size) const {
+void EventReturn::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
 }
-const ::google::protobuf::Descriptor* ReturnEvent::descriptor() {
+const ::google::protobuf::Descriptor* EventReturn::descriptor() {
   protobuf_AssignDescriptorsOnce();
-  return ReturnEvent_descriptor_;
+  return EventReturn_descriptor_;
 }
 
-const ReturnEvent& ReturnEvent::default_instance() {
+const EventReturn& EventReturn::default_instance() {
   if (default_instance_ == NULL) protobuf_AddDesc_Event_2eproto();  return *default_instance_;
 }
 
-ReturnEvent* ReturnEvent::default_instance_ = NULL;
+EventReturn* EventReturn::default_instance_ = NULL;
 
-ReturnEvent* ReturnEvent::New() const {
-  return new ReturnEvent;
+EventReturn* EventReturn::New() const {
+  return new EventReturn;
 }
 
-void ReturnEvent::Clear() {
+void EventReturn::Clear() {
   arguments_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
 
-bool ReturnEvent::MergePartialFromCodedStream(
+bool EventReturn::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!(EXPRESSION)) return false
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // repeated .DataArgument arguments = 1;
+      // repeated .reef.DataArgument arguments = 1;
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
@@ -1232,9 +1236,9 @@ bool ReturnEvent::MergePartialFromCodedStream(
 #undef DO_
 }
 
-void ReturnEvent::SerializeWithCachedSizes(
+void EventReturn::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // repeated .DataArgument arguments = 1;
+  // repeated .reef.DataArgument arguments = 1;
   for (int i = 0; i < this->arguments_size(); i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       1, this->arguments(i), output);
@@ -1246,9 +1250,9 @@ void ReturnEvent::SerializeWithCachedSizes(
   }
 }
 
-::google::protobuf::uint8* ReturnEvent::SerializeWithCachedSizesToArray(
+::google::protobuf::uint8* EventReturn::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // repeated .DataArgument arguments = 1;
+  // repeated .reef.DataArgument arguments = 1;
   for (int i = 0; i < this->arguments_size(); i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
@@ -1262,10 +1266,10 @@ void ReturnEvent::SerializeWithCachedSizes(
   return target;
 }
 
-int ReturnEvent::ByteSize() const {
+int EventReturn::ByteSize() const {
   int total_size = 0;
   
-  // repeated .DataArgument arguments = 1;
+  // repeated .reef.DataArgument arguments = 1;
   total_size += 1 * this->arguments_size();
   for (int i = 0; i < this->arguments_size(); i++) {
     total_size +=
@@ -1284,10 +1288,10 @@ int ReturnEvent::ByteSize() const {
   return total_size;
 }
 
-void ReturnEvent::MergeFrom(const ::google::protobuf::Message& from) {
+void EventReturn::MergeFrom(const ::google::protobuf::Message& from) {
   GOOGLE_CHECK_NE(&from, this);
-  const ReturnEvent* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const ReturnEvent*>(
+  const EventReturn* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const EventReturn*>(
       &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
@@ -1296,25 +1300,25 @@ void ReturnEvent::MergeFrom(const ::google::protobuf::Message& from) {
   }
 }
 
-void ReturnEvent::MergeFrom(const ReturnEvent& from) {
+void EventReturn::MergeFrom(const EventReturn& from) {
   GOOGLE_CHECK_NE(&from, this);
   arguments_.MergeFrom(from.arguments_);
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
-void ReturnEvent::CopyFrom(const ::google::protobuf::Message& from) {
+void EventReturn::CopyFrom(const ::google::protobuf::Message& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void ReturnEvent::CopyFrom(const ReturnEvent& from) {
+void EventReturn::CopyFrom(const EventReturn& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool ReturnEvent::IsInitialized() const {
+bool EventReturn::IsInitialized() const {
   
   for (int i = 0; i < arguments_size(); i++) {
     if (!this->arguments(i).IsInitialized()) return false;
@@ -1322,7 +1326,7 @@ bool ReturnEvent::IsInitialized() const {
   return true;
 }
 
-void ReturnEvent::Swap(ReturnEvent* other) {
+void EventReturn::Swap(EventReturn* other) {
   if (other != this) {
     arguments_.Swap(&other->arguments_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
@@ -1331,11 +1335,11 @@ void ReturnEvent::Swap(ReturnEvent* other) {
   }
 }
 
-::google::protobuf::Metadata ReturnEvent::GetMetadata() const {
+::google::protobuf::Metadata EventReturn::GetMetadata() const {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::Metadata metadata;
-  metadata.descriptor = ReturnEvent_descriptor_;
-  metadata.reflection = ReturnEvent_reflection_;
+  metadata.descriptor = EventReturn_descriptor_;
+  metadata.reflection = EventReturn_reflection_;
   return metadata;
 }
 
@@ -1343,34 +1347,34 @@ void ReturnEvent::Swap(ReturnEvent* other) {
 // ===================================================================
 
 #ifndef _MSC_VER
-const int CreateEvent::kComponentTypeNameFieldNumber;
+const int EventCreate::kComponentTypeNameFieldNumber;
 #endif  // !_MSC_VER
 
-CreateEvent::CreateEvent()
+EventCreate::EventCreate()
   : ::google::protobuf::Message() {
   SharedCtor();
 }
 
-void CreateEvent::InitAsDefaultInstance() {
+void EventCreate::InitAsDefaultInstance() {
 }
 
-CreateEvent::CreateEvent(const CreateEvent& from)
+EventCreate::EventCreate(const EventCreate& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
 }
 
-void CreateEvent::SharedCtor() {
+void EventCreate::SharedCtor() {
   _cached_size_ = 0;
   componenttypename_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
-CreateEvent::~CreateEvent() {
+EventCreate::~EventCreate() {
   SharedDtor();
 }
 
-void CreateEvent::SharedDtor() {
+void EventCreate::SharedDtor() {
   if (componenttypename_ != &::google::protobuf::internal::kEmptyString) {
     delete componenttypename_;
   }
@@ -1378,27 +1382,27 @@ void CreateEvent::SharedDtor() {
   }
 }
 
-void CreateEvent::SetCachedSize(int size) const {
+void EventCreate::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
 }
-const ::google::protobuf::Descriptor* CreateEvent::descriptor() {
+const ::google::protobuf::Descriptor* EventCreate::descriptor() {
   protobuf_AssignDescriptorsOnce();
-  return CreateEvent_descriptor_;
+  return EventCreate_descriptor_;
 }
 
-const CreateEvent& CreateEvent::default_instance() {
+const EventCreate& EventCreate::default_instance() {
   if (default_instance_ == NULL) protobuf_AddDesc_Event_2eproto();  return *default_instance_;
 }
 
-CreateEvent* CreateEvent::default_instance_ = NULL;
+EventCreate* EventCreate::default_instance_ = NULL;
 
-CreateEvent* CreateEvent::New() const {
-  return new CreateEvent;
+EventCreate* EventCreate::New() const {
+  return new EventCreate;
 }
 
-void CreateEvent::Clear() {
+void EventCreate::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (has_componenttypename()) {
       if (componenttypename_ != &::google::protobuf::internal::kEmptyString) {
@@ -1410,7 +1414,7 @@ void CreateEvent::Clear() {
   mutable_unknown_fields()->Clear();
 }
 
-bool CreateEvent::MergePartialFromCodedStream(
+bool EventCreate::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!(EXPRESSION)) return false
   ::google::protobuf::uint32 tag;
@@ -1448,7 +1452,7 @@ bool CreateEvent::MergePartialFromCodedStream(
 #undef DO_
 }
 
-void CreateEvent::SerializeWithCachedSizes(
+void EventCreate::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // required string componentTypeName = 1;
   if (has_componenttypename()) {
@@ -1465,7 +1469,7 @@ void CreateEvent::SerializeWithCachedSizes(
   }
 }
 
-::google::protobuf::uint8* CreateEvent::SerializeWithCachedSizesToArray(
+::google::protobuf::uint8* EventCreate::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // required string componentTypeName = 1;
   if (has_componenttypename()) {
@@ -1484,7 +1488,7 @@ void CreateEvent::SerializeWithCachedSizes(
   return target;
 }
 
-int CreateEvent::ByteSize() const {
+int EventCreate::ByteSize() const {
   int total_size = 0;
   
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
@@ -1507,10 +1511,10 @@ int CreateEvent::ByteSize() const {
   return total_size;
 }
 
-void CreateEvent::MergeFrom(const ::google::protobuf::Message& from) {
+void EventCreate::MergeFrom(const ::google::protobuf::Message& from) {
   GOOGLE_CHECK_NE(&from, this);
-  const CreateEvent* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const CreateEvent*>(
+  const EventCreate* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const EventCreate*>(
       &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
@@ -1519,7 +1523,7 @@ void CreateEvent::MergeFrom(const ::google::protobuf::Message& from) {
   }
 }
 
-void CreateEvent::MergeFrom(const CreateEvent& from) {
+void EventCreate::MergeFrom(const EventCreate& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_componenttypename()) {
@@ -1529,25 +1533,25 @@ void CreateEvent::MergeFrom(const CreateEvent& from) {
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
-void CreateEvent::CopyFrom(const ::google::protobuf::Message& from) {
+void EventCreate::CopyFrom(const ::google::protobuf::Message& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void CreateEvent::CopyFrom(const CreateEvent& from) {
+void EventCreate::CopyFrom(const EventCreate& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool CreateEvent::IsInitialized() const {
+bool EventCreate::IsInitialized() const {
   if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
   
   return true;
 }
 
-void CreateEvent::Swap(CreateEvent* other) {
+void EventCreate::Swap(EventCreate* other) {
   if (other != this) {
     std::swap(componenttypename_, other->componenttypename_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
@@ -1556,11 +1560,11 @@ void CreateEvent::Swap(CreateEvent* other) {
   }
 }
 
-::google::protobuf::Metadata CreateEvent::GetMetadata() const {
+::google::protobuf::Metadata EventCreate::GetMetadata() const {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::Metadata metadata;
-  metadata.descriptor = CreateEvent_descriptor_;
-  metadata.reflection = CreateEvent_reflection_;
+  metadata.descriptor = EventCreate_descriptor_;
+  metadata.reflection = EventCreate_reflection_;
   return metadata;
 }
 
@@ -1568,59 +1572,59 @@ void CreateEvent::Swap(CreateEvent* other) {
 // ===================================================================
 
 #ifndef _MSC_VER
-const int CreateResult::kVirtualAddressFieldNumber;
+const int ResultCreate::kVirtualAddressFieldNumber;
 #endif  // !_MSC_VER
 
-CreateResult::CreateResult()
+ResultCreate::ResultCreate()
   : ::google::protobuf::Message() {
   SharedCtor();
 }
 
-void CreateResult::InitAsDefaultInstance() {
+void ResultCreate::InitAsDefaultInstance() {
 }
 
-CreateResult::CreateResult(const CreateResult& from)
+ResultCreate::ResultCreate(const ResultCreate& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
 }
 
-void CreateResult::SharedCtor() {
+void ResultCreate::SharedCtor() {
   _cached_size_ = 0;
   virtualaddress_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
-CreateResult::~CreateResult() {
+ResultCreate::~ResultCreate() {
   SharedDtor();
 }
 
-void CreateResult::SharedDtor() {
+void ResultCreate::SharedDtor() {
   if (this != default_instance_) {
   }
 }
 
-void CreateResult::SetCachedSize(int size) const {
+void ResultCreate::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
 }
-const ::google::protobuf::Descriptor* CreateResult::descriptor() {
+const ::google::protobuf::Descriptor* ResultCreate::descriptor() {
   protobuf_AssignDescriptorsOnce();
-  return CreateResult_descriptor_;
+  return ResultCreate_descriptor_;
 }
 
-const CreateResult& CreateResult::default_instance() {
+const ResultCreate& ResultCreate::default_instance() {
   if (default_instance_ == NULL) protobuf_AddDesc_Event_2eproto();  return *default_instance_;
 }
 
-CreateResult* CreateResult::default_instance_ = NULL;
+ResultCreate* ResultCreate::default_instance_ = NULL;
 
-CreateResult* CreateResult::New() const {
-  return new CreateResult;
+ResultCreate* ResultCreate::New() const {
+  return new ResultCreate;
 }
 
-void CreateResult::Clear() {
+void ResultCreate::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     virtualaddress_ = 0;
   }
@@ -1628,7 +1632,7 @@ void CreateResult::Clear() {
   mutable_unknown_fields()->Clear();
 }
 
-bool CreateResult::MergePartialFromCodedStream(
+bool ResultCreate::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!(EXPRESSION)) return false
   ::google::protobuf::uint32 tag;
@@ -1665,7 +1669,7 @@ bool CreateResult::MergePartialFromCodedStream(
 #undef DO_
 }
 
-void CreateResult::SerializeWithCachedSizes(
+void ResultCreate::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // required int32 virtualAddress = 1;
   if (has_virtualaddress()) {
@@ -1678,7 +1682,7 @@ void CreateResult::SerializeWithCachedSizes(
   }
 }
 
-::google::protobuf::uint8* CreateResult::SerializeWithCachedSizesToArray(
+::google::protobuf::uint8* ResultCreate::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // required int32 virtualAddress = 1;
   if (has_virtualaddress()) {
@@ -1692,7 +1696,7 @@ void CreateResult::SerializeWithCachedSizes(
   return target;
 }
 
-int CreateResult::ByteSize() const {
+int ResultCreate::ByteSize() const {
   int total_size = 0;
   
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
@@ -1715,10 +1719,10 @@ int CreateResult::ByteSize() const {
   return total_size;
 }
 
-void CreateResult::MergeFrom(const ::google::protobuf::Message& from) {
+void ResultCreate::MergeFrom(const ::google::protobuf::Message& from) {
   GOOGLE_CHECK_NE(&from, this);
-  const CreateResult* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const CreateResult*>(
+  const ResultCreate* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const ResultCreate*>(
       &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
@@ -1727,7 +1731,7 @@ void CreateResult::MergeFrom(const ::google::protobuf::Message& from) {
   }
 }
 
-void CreateResult::MergeFrom(const CreateResult& from) {
+void ResultCreate::MergeFrom(const ResultCreate& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_virtualaddress()) {
@@ -1737,25 +1741,25 @@ void CreateResult::MergeFrom(const CreateResult& from) {
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
-void CreateResult::CopyFrom(const ::google::protobuf::Message& from) {
+void ResultCreate::CopyFrom(const ::google::protobuf::Message& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void CreateResult::CopyFrom(const CreateResult& from) {
+void ResultCreate::CopyFrom(const ResultCreate& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool CreateResult::IsInitialized() const {
+bool ResultCreate::IsInitialized() const {
   if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
   
   return true;
 }
 
-void CreateResult::Swap(CreateResult* other) {
+void ResultCreate::Swap(ResultCreate* other) {
   if (other != this) {
     std::swap(virtualaddress_, other->virtualaddress_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
@@ -1764,11 +1768,11 @@ void CreateResult::Swap(CreateResult* other) {
   }
 }
 
-::google::protobuf::Metadata CreateResult::GetMetadata() const {
+::google::protobuf::Metadata ResultCreate::GetMetadata() const {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::Metadata metadata;
-  metadata.descriptor = CreateResult_descriptor_;
-  metadata.reflection = CreateResult_reflection_;
+  metadata.descriptor = ResultCreate_descriptor_;
+  metadata.reflection = ResultCreate_reflection_;
   return metadata;
 }
 
@@ -1805,11 +1809,11 @@ const int Event::EventType_ARRAYSIZE;
 #ifndef _MSC_VER
 const int Event::kEventTypeFieldNumber;
 const int Event::kDestinationFieldNumber;
-const int Event::kCreateEventFieldNumber;
-const int Event::kCreateResultFieldNumber;
-const int Event::kCallEventFieldNumber;
-const int Event::kCallReturnFieldNumber;
-const int Event::kFieldEventFieldNumber;
+const int Event::kEventCreateFieldNumber;
+const int Event::kResultCreateFieldNumber;
+const int Event::kEventCallFieldNumber;
+const int Event::kEventReturnFieldNumber;
+const int Event::kEventFieldFieldNumber;
 #endif  // !_MSC_VER
 
 Event::Event()
@@ -1818,11 +1822,11 @@ Event::Event()
 }
 
 void Event::InitAsDefaultInstance() {
-  createevent_ = const_cast< ::CreateEvent*>(&::CreateEvent::default_instance());
-  createresult_ = const_cast< ::CreateResult*>(&::CreateResult::default_instance());
-  callevent_ = const_cast< ::CallEvent*>(&::CallEvent::default_instance());
-  callreturn_ = const_cast< ::ReturnEvent*>(&::ReturnEvent::default_instance());
-  fieldevent_ = const_cast< ::FieldEvent*>(&::FieldEvent::default_instance());
+  eventcreate_ = const_cast< ::reef::EventCreate*>(&::reef::EventCreate::default_instance());
+  resultcreate_ = const_cast< ::reef::ResultCreate*>(&::reef::ResultCreate::default_instance());
+  eventcall_ = const_cast< ::reef::EventCall*>(&::reef::EventCall::default_instance());
+  eventreturn_ = const_cast< ::reef::EventReturn*>(&::reef::EventReturn::default_instance());
+  eventfield_ = const_cast< ::reef::EventField*>(&::reef::EventField::default_instance());
 }
 
 Event::Event(const Event& from)
@@ -1835,11 +1839,11 @@ void Event::SharedCtor() {
   _cached_size_ = 0;
   eventtype_ = 0u;
   destination_ = 0u;
-  createevent_ = NULL;
-  createresult_ = NULL;
-  callevent_ = NULL;
-  callreturn_ = NULL;
-  fieldevent_ = NULL;
+  eventcreate_ = NULL;
+  resultcreate_ = NULL;
+  eventcall_ = NULL;
+  eventreturn_ = NULL;
+  eventfield_ = NULL;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1849,11 +1853,11 @@ Event::~Event() {
 
 void Event::SharedDtor() {
   if (this != default_instance_) {
-    delete createevent_;
-    delete createresult_;
-    delete callevent_;
-    delete callreturn_;
-    delete fieldevent_;
+    delete eventcreate_;
+    delete resultcreate_;
+    delete eventcall_;
+    delete eventreturn_;
+    delete eventfield_;
   }
 }
 
@@ -1881,20 +1885,20 @@ void Event::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     eventtype_ = 0u;
     destination_ = 0u;
-    if (has_createevent()) {
-      if (createevent_ != NULL) createevent_->::CreateEvent::Clear();
+    if (has_eventcreate()) {
+      if (eventcreate_ != NULL) eventcreate_->::reef::EventCreate::Clear();
     }
-    if (has_createresult()) {
-      if (createresult_ != NULL) createresult_->::CreateResult::Clear();
+    if (has_resultcreate()) {
+      if (resultcreate_ != NULL) resultcreate_->::reef::ResultCreate::Clear();
     }
-    if (has_callevent()) {
-      if (callevent_ != NULL) callevent_->::CallEvent::Clear();
+    if (has_eventcall()) {
+      if (eventcall_ != NULL) eventcall_->::reef::EventCall::Clear();
     }
-    if (has_callreturn()) {
-      if (callreturn_ != NULL) callreturn_->::ReturnEvent::Clear();
+    if (has_eventreturn()) {
+      if (eventreturn_ != NULL) eventreturn_->::reef::EventReturn::Clear();
     }
-    if (has_fieldevent()) {
-      if (fieldevent_ != NULL) fieldevent_->::FieldEvent::Clear();
+    if (has_eventfield()) {
+      if (eventfield_ != NULL) eventfield_->::reef::EventField::Clear();
     }
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -1934,73 +1938,73 @@ bool Event::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(26)) goto parse_createEvent;
+        if (input->ExpectTag(26)) goto parse_eventCreate;
         break;
       }
       
-      // optional .CreateEvent createEvent = 3;
+      // optional .reef.EventCreate eventCreate = 3;
       case 3: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-         parse_createEvent:
+         parse_eventCreate:
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
-               input, mutable_createevent()));
+               input, mutable_eventcreate()));
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(34)) goto parse_createResult;
+        if (input->ExpectTag(34)) goto parse_resultCreate;
         break;
       }
       
-      // optional .CreateResult createResult = 4;
+      // optional .reef.ResultCreate resultCreate = 4;
       case 4: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-         parse_createResult:
+         parse_resultCreate:
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
-               input, mutable_createresult()));
+               input, mutable_resultcreate()));
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(42)) goto parse_callEvent;
+        if (input->ExpectTag(42)) goto parse_eventCall;
         break;
       }
       
-      // optional .CallEvent callEvent = 5;
+      // optional .reef.EventCall eventCall = 5;
       case 5: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-         parse_callEvent:
+         parse_eventCall:
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
-               input, mutable_callevent()));
+               input, mutable_eventcall()));
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(50)) goto parse_callReturn;
+        if (input->ExpectTag(50)) goto parse_eventReturn;
         break;
       }
       
-      // optional .ReturnEvent callReturn = 6;
+      // optional .reef.EventReturn eventReturn = 6;
       case 6: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-         parse_callReturn:
+         parse_eventReturn:
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
-               input, mutable_callreturn()));
+               input, mutable_eventreturn()));
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(58)) goto parse_fieldEvent;
+        if (input->ExpectTag(58)) goto parse_eventField;
         break;
       }
       
-      // optional .FieldEvent fieldEvent = 7;
+      // optional .reef.EventField eventField = 7;
       case 7: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-         parse_fieldEvent:
+         parse_eventField:
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
-               input, mutable_fieldevent()));
+               input, mutable_eventfield()));
         } else {
           goto handle_uninterpreted;
         }
@@ -2036,34 +2040,34 @@ void Event::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(2, this->destination(), output);
   }
   
-  // optional .CreateEvent createEvent = 3;
-  if (has_createevent()) {
+  // optional .reef.EventCreate eventCreate = 3;
+  if (has_eventcreate()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3, this->createevent(), output);
+      3, this->eventcreate(), output);
   }
   
-  // optional .CreateResult createResult = 4;
-  if (has_createresult()) {
+  // optional .reef.ResultCreate resultCreate = 4;
+  if (has_resultcreate()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      4, this->createresult(), output);
+      4, this->resultcreate(), output);
   }
   
-  // optional .CallEvent callEvent = 5;
-  if (has_callevent()) {
+  // optional .reef.EventCall eventCall = 5;
+  if (has_eventcall()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      5, this->callevent(), output);
+      5, this->eventcall(), output);
   }
   
-  // optional .ReturnEvent callReturn = 6;
-  if (has_callreturn()) {
+  // optional .reef.EventReturn eventReturn = 6;
+  if (has_eventreturn()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      6, this->callreturn(), output);
+      6, this->eventreturn(), output);
   }
   
-  // optional .FieldEvent fieldEvent = 7;
-  if (has_fieldevent()) {
+  // optional .reef.EventField eventField = 7;
+  if (has_eventfield()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      7, this->fieldevent(), output);
+      7, this->eventfield(), output);
   }
   
   if (!unknown_fields().empty()) {
@@ -2084,39 +2088,39 @@ void Event::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(2, this->destination(), target);
   }
   
-  // optional .CreateEvent createEvent = 3;
-  if (has_createevent()) {
+  // optional .reef.EventCreate eventCreate = 3;
+  if (has_eventcreate()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
-        3, this->createevent(), target);
+        3, this->eventcreate(), target);
   }
   
-  // optional .CreateResult createResult = 4;
-  if (has_createresult()) {
+  // optional .reef.ResultCreate resultCreate = 4;
+  if (has_resultcreate()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
-        4, this->createresult(), target);
+        4, this->resultcreate(), target);
   }
   
-  // optional .CallEvent callEvent = 5;
-  if (has_callevent()) {
+  // optional .reef.EventCall eventCall = 5;
+  if (has_eventcall()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
-        5, this->callevent(), target);
+        5, this->eventcall(), target);
   }
   
-  // optional .ReturnEvent callReturn = 6;
-  if (has_callreturn()) {
+  // optional .reef.EventReturn eventReturn = 6;
+  if (has_eventreturn()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
-        6, this->callreturn(), target);
+        6, this->eventreturn(), target);
   }
   
-  // optional .FieldEvent fieldEvent = 7;
-  if (has_fieldevent()) {
+  // optional .reef.EventField eventField = 7;
+  if (has_eventfield()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
-        7, this->fieldevent(), target);
+        7, this->eventfield(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -2144,39 +2148,39 @@ int Event::ByteSize() const {
           this->destination());
     }
     
-    // optional .CreateEvent createEvent = 3;
-    if (has_createevent()) {
+    // optional .reef.EventCreate eventCreate = 3;
+    if (has_eventcreate()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-          this->createevent());
+          this->eventcreate());
     }
     
-    // optional .CreateResult createResult = 4;
-    if (has_createresult()) {
+    // optional .reef.ResultCreate resultCreate = 4;
+    if (has_resultcreate()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-          this->createresult());
+          this->resultcreate());
     }
     
-    // optional .CallEvent callEvent = 5;
-    if (has_callevent()) {
+    // optional .reef.EventCall eventCall = 5;
+    if (has_eventcall()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-          this->callevent());
+          this->eventcall());
     }
     
-    // optional .ReturnEvent callReturn = 6;
-    if (has_callreturn()) {
+    // optional .reef.EventReturn eventReturn = 6;
+    if (has_eventreturn()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-          this->callreturn());
+          this->eventreturn());
     }
     
-    // optional .FieldEvent fieldEvent = 7;
-    if (has_fieldevent()) {
+    // optional .reef.EventField eventField = 7;
+    if (has_eventfield()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-          this->fieldevent());
+          this->eventfield());
     }
     
   }
@@ -2212,20 +2216,20 @@ void Event::MergeFrom(const Event& from) {
     if (from.has_destination()) {
       set_destination(from.destination());
     }
-    if (from.has_createevent()) {
-      mutable_createevent()->::CreateEvent::MergeFrom(from.createevent());
+    if (from.has_eventcreate()) {
+      mutable_eventcreate()->::reef::EventCreate::MergeFrom(from.eventcreate());
     }
-    if (from.has_createresult()) {
-      mutable_createresult()->::CreateResult::MergeFrom(from.createresult());
+    if (from.has_resultcreate()) {
+      mutable_resultcreate()->::reef::ResultCreate::MergeFrom(from.resultcreate());
     }
-    if (from.has_callevent()) {
-      mutable_callevent()->::CallEvent::MergeFrom(from.callevent());
+    if (from.has_eventcall()) {
+      mutable_eventcall()->::reef::EventCall::MergeFrom(from.eventcall());
     }
-    if (from.has_callreturn()) {
-      mutable_callreturn()->::ReturnEvent::MergeFrom(from.callreturn());
+    if (from.has_eventreturn()) {
+      mutable_eventreturn()->::reef::EventReturn::MergeFrom(from.eventreturn());
     }
-    if (from.has_fieldevent()) {
-      mutable_fieldevent()->::FieldEvent::MergeFrom(from.fieldevent());
+    if (from.has_eventfield()) {
+      mutable_eventfield()->::reef::EventField::MergeFrom(from.eventfield());
     }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
@@ -2246,20 +2250,20 @@ void Event::CopyFrom(const Event& from) {
 bool Event::IsInitialized() const {
   if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
   
-  if (has_createevent()) {
-    if (!this->createevent().IsInitialized()) return false;
+  if (has_eventcreate()) {
+    if (!this->eventcreate().IsInitialized()) return false;
   }
-  if (has_createresult()) {
-    if (!this->createresult().IsInitialized()) return false;
+  if (has_resultcreate()) {
+    if (!this->resultcreate().IsInitialized()) return false;
   }
-  if (has_callevent()) {
-    if (!this->callevent().IsInitialized()) return false;
+  if (has_eventcall()) {
+    if (!this->eventcall().IsInitialized()) return false;
   }
-  if (has_callreturn()) {
-    if (!this->callreturn().IsInitialized()) return false;
+  if (has_eventreturn()) {
+    if (!this->eventreturn().IsInitialized()) return false;
   }
-  if (has_fieldevent()) {
-    if (!this->fieldevent().IsInitialized()) return false;
+  if (has_eventfield()) {
+    if (!this->eventfield().IsInitialized()) return false;
   }
   return true;
 }
@@ -2268,11 +2272,11 @@ void Event::Swap(Event* other) {
   if (other != this) {
     std::swap(eventtype_, other->eventtype_);
     std::swap(destination_, other->destination_);
-    std::swap(createevent_, other->createevent_);
-    std::swap(createresult_, other->createresult_);
-    std::swap(callevent_, other->callevent_);
-    std::swap(callreturn_, other->callreturn_);
-    std::swap(fieldevent_, other->fieldevent_);
+    std::swap(eventcreate_, other->eventcreate_);
+    std::swap(resultcreate_, other->resultcreate_);
+    std::swap(eventcall_, other->eventcall_);
+    std::swap(eventreturn_, other->eventreturn_);
+    std::swap(eventfield_, other->eventfield_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
@@ -2289,5 +2293,7 @@ void Event::Swap(Event* other) {
 
 
 // @@protoc_insertion_point(namespace_scope)
+
+}  // namespace reef
 
 // @@protoc_insertion_point(global_scope)

@@ -25,17 +25,19 @@
 #include <google/protobuf/generated_message_reflection.h>
 // @@protoc_insertion_point(includes)
 
+namespace reef {
+
 // Internal implementation detail -- do not call these.
 void  protobuf_AddDesc_Event_2eproto();
 void protobuf_AssignDesc_Event_2eproto();
 void protobuf_ShutdownFile_Event_2eproto();
 
 class DataArgument;
-class CallEvent;
-class FieldEvent;
-class ReturnEvent;
-class CreateEvent;
-class CreateResult;
+class EventCall;
+class EventField;
+class EventReturn;
+class EventCreate;
+class ResultCreate;
 class Event;
 
 enum Event_EventType {
@@ -123,7 +125,7 @@ class DataArgument : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 dummy() const;
   inline void set_dummy(::google::protobuf::int32 value);
   
-  // @@protoc_insertion_point(class_scope:DataArgument)
+  // @@protoc_insertion_point(class_scope:reef.DataArgument)
  private:
   inline void set_has_dummy();
   inline void clear_has_dummy();
@@ -144,14 +146,14 @@ class DataArgument : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
-class CallEvent : public ::google::protobuf::Message {
+class EventCall : public ::google::protobuf::Message {
  public:
-  CallEvent();
-  virtual ~CallEvent();
+  EventCall();
+  virtual ~EventCall();
   
-  CallEvent(const CallEvent& from);
+  EventCall(const EventCall& from);
   
-  inline CallEvent& operator=(const CallEvent& from) {
+  inline EventCall& operator=(const EventCall& from) {
     CopyFrom(from);
     return *this;
   }
@@ -165,17 +167,17 @@ class CallEvent : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const CallEvent& default_instance();
+  static const EventCall& default_instance();
   
-  void Swap(CallEvent* other);
+  void Swap(EventCall* other);
   
   // implements Message ----------------------------------------------
   
-  CallEvent* New() const;
+  EventCall* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const CallEvent& from);
-  void MergeFrom(const CallEvent& from);
+  void CopyFrom(const EventCall& from);
+  void MergeFrom(const EventCall& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -219,19 +221,19 @@ class CallEvent : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 methodindex() const;
   inline void set_methodindex(::google::protobuf::uint32 value);
   
-  // repeated .DataArgument arguments = 4;
+  // repeated .reef.DataArgument arguments = 4;
   inline int arguments_size() const;
   inline void clear_arguments();
   static const int kArgumentsFieldNumber = 4;
-  inline const ::DataArgument& arguments(int index) const;
-  inline ::DataArgument* mutable_arguments(int index);
-  inline ::DataArgument* add_arguments();
-  inline const ::google::protobuf::RepeatedPtrField< ::DataArgument >&
+  inline const ::reef::DataArgument& arguments(int index) const;
+  inline ::reef::DataArgument* mutable_arguments(int index);
+  inline ::reef::DataArgument* add_arguments();
+  inline const ::google::protobuf::RepeatedPtrField< ::reef::DataArgument >&
       arguments() const;
-  inline ::google::protobuf::RepeatedPtrField< ::DataArgument >*
+  inline ::google::protobuf::RepeatedPtrField< ::reef::DataArgument >*
       mutable_arguments();
   
-  // @@protoc_insertion_point(class_scope:CallEvent)
+  // @@protoc_insertion_point(class_scope:reef.EventCall)
  private:
   inline void set_has_hasreturn();
   inline void clear_has_hasreturn();
@@ -244,7 +246,7 @@ class CallEvent : public ::google::protobuf::Message {
   
   bool hasreturn_;
   ::google::protobuf::uint32 serviceindex_;
-  ::google::protobuf::RepeatedPtrField< ::DataArgument > arguments_;
+  ::google::protobuf::RepeatedPtrField< ::reef::DataArgument > arguments_;
   ::google::protobuf::uint32 methodindex_;
   
   mutable int _cached_size_;
@@ -255,18 +257,18 @@ class CallEvent : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_Event_2eproto();
   
   void InitAsDefaultInstance();
-  static CallEvent* default_instance_;
+  static EventCall* default_instance_;
 };
 // -------------------------------------------------------------------
 
-class FieldEvent : public ::google::protobuf::Message {
+class EventField : public ::google::protobuf::Message {
  public:
-  FieldEvent();
-  virtual ~FieldEvent();
+  EventField();
+  virtual ~EventField();
   
-  FieldEvent(const FieldEvent& from);
+  EventField(const EventField& from);
   
-  inline FieldEvent& operator=(const FieldEvent& from) {
+  inline EventField& operator=(const EventField& from) {
     CopyFrom(from);
     return *this;
   }
@@ -280,17 +282,17 @@ class FieldEvent : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const FieldEvent& default_instance();
+  static const EventField& default_instance();
   
-  void Swap(FieldEvent* other);
+  void Swap(EventField* other);
   
   // implements Message ----------------------------------------------
   
-  FieldEvent* New() const;
+  EventField* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const FieldEvent& from);
-  void MergeFrom(const FieldEvent& from);
+  void CopyFrom(const EventField& from);
+  void MergeFrom(const EventField& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -334,15 +336,15 @@ class FieldEvent : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 fieldindex() const;
   inline void set_fieldindex(::google::protobuf::uint32 value);
   
-  // required .DataArgument value = 4;
+  // required .reef.DataArgument value = 4;
   inline bool has_value() const;
   inline void clear_value();
   static const int kValueFieldNumber = 4;
-  inline const ::DataArgument& value() const;
-  inline ::DataArgument* mutable_value();
-  inline ::DataArgument* release_value();
+  inline const ::reef::DataArgument& value() const;
+  inline ::reef::DataArgument* mutable_value();
+  inline ::reef::DataArgument* release_value();
   
-  // @@protoc_insertion_point(class_scope:FieldEvent)
+  // @@protoc_insertion_point(class_scope:reef.EventField)
  private:
   inline void set_has_issetfield();
   inline void clear_has_issetfield();
@@ -357,7 +359,7 @@ class FieldEvent : public ::google::protobuf::Message {
   
   bool issetfield_;
   ::google::protobuf::uint32 serviceindex_;
-  ::DataArgument* value_;
+  ::reef::DataArgument* value_;
   ::google::protobuf::uint32 fieldindex_;
   
   mutable int _cached_size_;
@@ -368,18 +370,18 @@ class FieldEvent : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_Event_2eproto();
   
   void InitAsDefaultInstance();
-  static FieldEvent* default_instance_;
+  static EventField* default_instance_;
 };
 // -------------------------------------------------------------------
 
-class ReturnEvent : public ::google::protobuf::Message {
+class EventReturn : public ::google::protobuf::Message {
  public:
-  ReturnEvent();
-  virtual ~ReturnEvent();
+  EventReturn();
+  virtual ~EventReturn();
   
-  ReturnEvent(const ReturnEvent& from);
+  EventReturn(const EventReturn& from);
   
-  inline ReturnEvent& operator=(const ReturnEvent& from) {
+  inline EventReturn& operator=(const EventReturn& from) {
     CopyFrom(from);
     return *this;
   }
@@ -393,17 +395,17 @@ class ReturnEvent : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const ReturnEvent& default_instance();
+  static const EventReturn& default_instance();
   
-  void Swap(ReturnEvent* other);
+  void Swap(EventReturn* other);
   
   // implements Message ----------------------------------------------
   
-  ReturnEvent* New() const;
+  EventReturn* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const ReturnEvent& from);
-  void MergeFrom(const ReturnEvent& from);
+  void CopyFrom(const EventReturn& from);
+  void MergeFrom(const EventReturn& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -426,24 +428,24 @@ class ReturnEvent : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // repeated .DataArgument arguments = 1;
+  // repeated .reef.DataArgument arguments = 1;
   inline int arguments_size() const;
   inline void clear_arguments();
   static const int kArgumentsFieldNumber = 1;
-  inline const ::DataArgument& arguments(int index) const;
-  inline ::DataArgument* mutable_arguments(int index);
-  inline ::DataArgument* add_arguments();
-  inline const ::google::protobuf::RepeatedPtrField< ::DataArgument >&
+  inline const ::reef::DataArgument& arguments(int index) const;
+  inline ::reef::DataArgument* mutable_arguments(int index);
+  inline ::reef::DataArgument* add_arguments();
+  inline const ::google::protobuf::RepeatedPtrField< ::reef::DataArgument >&
       arguments() const;
-  inline ::google::protobuf::RepeatedPtrField< ::DataArgument >*
+  inline ::google::protobuf::RepeatedPtrField< ::reef::DataArgument >*
       mutable_arguments();
   
-  // @@protoc_insertion_point(class_scope:ReturnEvent)
+  // @@protoc_insertion_point(class_scope:reef.EventReturn)
  private:
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
-  ::google::protobuf::RepeatedPtrField< ::DataArgument > arguments_;
+  ::google::protobuf::RepeatedPtrField< ::reef::DataArgument > arguments_;
   
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
@@ -453,18 +455,18 @@ class ReturnEvent : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_Event_2eproto();
   
   void InitAsDefaultInstance();
-  static ReturnEvent* default_instance_;
+  static EventReturn* default_instance_;
 };
 // -------------------------------------------------------------------
 
-class CreateEvent : public ::google::protobuf::Message {
+class EventCreate : public ::google::protobuf::Message {
  public:
-  CreateEvent();
-  virtual ~CreateEvent();
+  EventCreate();
+  virtual ~EventCreate();
   
-  CreateEvent(const CreateEvent& from);
+  EventCreate(const EventCreate& from);
   
-  inline CreateEvent& operator=(const CreateEvent& from) {
+  inline EventCreate& operator=(const EventCreate& from) {
     CopyFrom(from);
     return *this;
   }
@@ -478,17 +480,17 @@ class CreateEvent : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const CreateEvent& default_instance();
+  static const EventCreate& default_instance();
   
-  void Swap(CreateEvent* other);
+  void Swap(EventCreate* other);
   
   // implements Message ----------------------------------------------
   
-  CreateEvent* New() const;
+  EventCreate* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const CreateEvent& from);
-  void MergeFrom(const CreateEvent& from);
+  void CopyFrom(const EventCreate& from);
+  void MergeFrom(const EventCreate& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -522,7 +524,7 @@ class CreateEvent : public ::google::protobuf::Message {
   inline ::std::string* mutable_componenttypename();
   inline ::std::string* release_componenttypename();
   
-  // @@protoc_insertion_point(class_scope:CreateEvent)
+  // @@protoc_insertion_point(class_scope:reef.EventCreate)
  private:
   inline void set_has_componenttypename();
   inline void clear_has_componenttypename();
@@ -539,18 +541,18 @@ class CreateEvent : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_Event_2eproto();
   
   void InitAsDefaultInstance();
-  static CreateEvent* default_instance_;
+  static EventCreate* default_instance_;
 };
 // -------------------------------------------------------------------
 
-class CreateResult : public ::google::protobuf::Message {
+class ResultCreate : public ::google::protobuf::Message {
  public:
-  CreateResult();
-  virtual ~CreateResult();
+  ResultCreate();
+  virtual ~ResultCreate();
   
-  CreateResult(const CreateResult& from);
+  ResultCreate(const ResultCreate& from);
   
-  inline CreateResult& operator=(const CreateResult& from) {
+  inline ResultCreate& operator=(const ResultCreate& from) {
     CopyFrom(from);
     return *this;
   }
@@ -564,17 +566,17 @@ class CreateResult : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const CreateResult& default_instance();
+  static const ResultCreate& default_instance();
   
-  void Swap(CreateResult* other);
+  void Swap(ResultCreate* other);
   
   // implements Message ----------------------------------------------
   
-  CreateResult* New() const;
+  ResultCreate* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const CreateResult& from);
-  void MergeFrom(const CreateResult& from);
+  void CopyFrom(const ResultCreate& from);
+  void MergeFrom(const ResultCreate& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -604,7 +606,7 @@ class CreateResult : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 virtualaddress() const;
   inline void set_virtualaddress(::google::protobuf::int32 value);
   
-  // @@protoc_insertion_point(class_scope:CreateResult)
+  // @@protoc_insertion_point(class_scope:reef.ResultCreate)
  private:
   inline void set_has_virtualaddress();
   inline void clear_has_virtualaddress();
@@ -621,7 +623,7 @@ class CreateResult : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_Event_2eproto();
   
   void InitAsDefaultInstance();
-  static CreateResult* default_instance_;
+  static ResultCreate* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -720,72 +722,72 @@ class Event : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 destination() const;
   inline void set_destination(::google::protobuf::uint32 value);
   
-  // optional .CreateEvent createEvent = 3;
-  inline bool has_createevent() const;
-  inline void clear_createevent();
-  static const int kCreateEventFieldNumber = 3;
-  inline const ::CreateEvent& createevent() const;
-  inline ::CreateEvent* mutable_createevent();
-  inline ::CreateEvent* release_createevent();
+  // optional .reef.EventCreate eventCreate = 3;
+  inline bool has_eventcreate() const;
+  inline void clear_eventcreate();
+  static const int kEventCreateFieldNumber = 3;
+  inline const ::reef::EventCreate& eventcreate() const;
+  inline ::reef::EventCreate* mutable_eventcreate();
+  inline ::reef::EventCreate* release_eventcreate();
   
-  // optional .CreateResult createResult = 4;
-  inline bool has_createresult() const;
-  inline void clear_createresult();
-  static const int kCreateResultFieldNumber = 4;
-  inline const ::CreateResult& createresult() const;
-  inline ::CreateResult* mutable_createresult();
-  inline ::CreateResult* release_createresult();
+  // optional .reef.ResultCreate resultCreate = 4;
+  inline bool has_resultcreate() const;
+  inline void clear_resultcreate();
+  static const int kResultCreateFieldNumber = 4;
+  inline const ::reef::ResultCreate& resultcreate() const;
+  inline ::reef::ResultCreate* mutable_resultcreate();
+  inline ::reef::ResultCreate* release_resultcreate();
   
-  // optional .CallEvent callEvent = 5;
-  inline bool has_callevent() const;
-  inline void clear_callevent();
-  static const int kCallEventFieldNumber = 5;
-  inline const ::CallEvent& callevent() const;
-  inline ::CallEvent* mutable_callevent();
-  inline ::CallEvent* release_callevent();
+  // optional .reef.EventCall eventCall = 5;
+  inline bool has_eventcall() const;
+  inline void clear_eventcall();
+  static const int kEventCallFieldNumber = 5;
+  inline const ::reef::EventCall& eventcall() const;
+  inline ::reef::EventCall* mutable_eventcall();
+  inline ::reef::EventCall* release_eventcall();
   
-  // optional .ReturnEvent callReturn = 6;
-  inline bool has_callreturn() const;
-  inline void clear_callreturn();
-  static const int kCallReturnFieldNumber = 6;
-  inline const ::ReturnEvent& callreturn() const;
-  inline ::ReturnEvent* mutable_callreturn();
-  inline ::ReturnEvent* release_callreturn();
+  // optional .reef.EventReturn eventReturn = 6;
+  inline bool has_eventreturn() const;
+  inline void clear_eventreturn();
+  static const int kEventReturnFieldNumber = 6;
+  inline const ::reef::EventReturn& eventreturn() const;
+  inline ::reef::EventReturn* mutable_eventreturn();
+  inline ::reef::EventReturn* release_eventreturn();
   
-  // optional .FieldEvent fieldEvent = 7;
-  inline bool has_fieldevent() const;
-  inline void clear_fieldevent();
-  static const int kFieldEventFieldNumber = 7;
-  inline const ::FieldEvent& fieldevent() const;
-  inline ::FieldEvent* mutable_fieldevent();
-  inline ::FieldEvent* release_fieldevent();
+  // optional .reef.EventField eventField = 7;
+  inline bool has_eventfield() const;
+  inline void clear_eventfield();
+  static const int kEventFieldFieldNumber = 7;
+  inline const ::reef::EventField& eventfield() const;
+  inline ::reef::EventField* mutable_eventfield();
+  inline ::reef::EventField* release_eventfield();
   
-  // @@protoc_insertion_point(class_scope:Event)
+  // @@protoc_insertion_point(class_scope:reef.Event)
  private:
   inline void set_has_eventtype();
   inline void clear_has_eventtype();
   inline void set_has_destination();
   inline void clear_has_destination();
-  inline void set_has_createevent();
-  inline void clear_has_createevent();
-  inline void set_has_createresult();
-  inline void clear_has_createresult();
-  inline void set_has_callevent();
-  inline void clear_has_callevent();
-  inline void set_has_callreturn();
-  inline void clear_has_callreturn();
-  inline void set_has_fieldevent();
-  inline void clear_has_fieldevent();
+  inline void set_has_eventcreate();
+  inline void clear_has_eventcreate();
+  inline void set_has_resultcreate();
+  inline void clear_has_resultcreate();
+  inline void set_has_eventcall();
+  inline void clear_has_eventcall();
+  inline void set_has_eventreturn();
+  inline void clear_has_eventreturn();
+  inline void set_has_eventfield();
+  inline void clear_has_eventfield();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint32 eventtype_;
   ::google::protobuf::uint32 destination_;
-  ::CreateEvent* createevent_;
-  ::CreateResult* createresult_;
-  ::CallEvent* callevent_;
-  ::ReturnEvent* callreturn_;
-  ::FieldEvent* fieldevent_;
+  ::reef::EventCreate* eventcreate_;
+  ::reef::ResultCreate* resultcreate_;
+  ::reef::EventCall* eventcall_;
+  ::reef::EventReturn* eventreturn_;
+  ::reef::EventField* eventfield_;
   
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(7 + 31) / 32];
@@ -828,279 +830,279 @@ inline void DataArgument::set_dummy(::google::protobuf::int32 value) {
 
 // -------------------------------------------------------------------
 
-// CallEvent
+// EventCall
 
 // required bool hasReturn = 1;
-inline bool CallEvent::has_hasreturn() const {
+inline bool EventCall::has_hasreturn() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void CallEvent::set_has_hasreturn() {
+inline void EventCall::set_has_hasreturn() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void CallEvent::clear_has_hasreturn() {
+inline void EventCall::clear_has_hasreturn() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void CallEvent::clear_hasreturn() {
+inline void EventCall::clear_hasreturn() {
   hasreturn_ = false;
   clear_has_hasreturn();
 }
-inline bool CallEvent::hasreturn() const {
+inline bool EventCall::hasreturn() const {
   return hasreturn_;
 }
-inline void CallEvent::set_hasreturn(bool value) {
+inline void EventCall::set_hasreturn(bool value) {
   set_has_hasreturn();
   hasreturn_ = value;
 }
 
 // required uint32 serviceIndex = 2;
-inline bool CallEvent::has_serviceindex() const {
+inline bool EventCall::has_serviceindex() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void CallEvent::set_has_serviceindex() {
+inline void EventCall::set_has_serviceindex() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void CallEvent::clear_has_serviceindex() {
+inline void EventCall::clear_has_serviceindex() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void CallEvent::clear_serviceindex() {
+inline void EventCall::clear_serviceindex() {
   serviceindex_ = 0u;
   clear_has_serviceindex();
 }
-inline ::google::protobuf::uint32 CallEvent::serviceindex() const {
+inline ::google::protobuf::uint32 EventCall::serviceindex() const {
   return serviceindex_;
 }
-inline void CallEvent::set_serviceindex(::google::protobuf::uint32 value) {
+inline void EventCall::set_serviceindex(::google::protobuf::uint32 value) {
   set_has_serviceindex();
   serviceindex_ = value;
 }
 
 // required uint32 methodIndex = 3;
-inline bool CallEvent::has_methodindex() const {
+inline bool EventCall::has_methodindex() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void CallEvent::set_has_methodindex() {
+inline void EventCall::set_has_methodindex() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void CallEvent::clear_has_methodindex() {
+inline void EventCall::clear_has_methodindex() {
   _has_bits_[0] &= ~0x00000004u;
 }
-inline void CallEvent::clear_methodindex() {
+inline void EventCall::clear_methodindex() {
   methodindex_ = 0u;
   clear_has_methodindex();
 }
-inline ::google::protobuf::uint32 CallEvent::methodindex() const {
+inline ::google::protobuf::uint32 EventCall::methodindex() const {
   return methodindex_;
 }
-inline void CallEvent::set_methodindex(::google::protobuf::uint32 value) {
+inline void EventCall::set_methodindex(::google::protobuf::uint32 value) {
   set_has_methodindex();
   methodindex_ = value;
 }
 
-// repeated .DataArgument arguments = 4;
-inline int CallEvent::arguments_size() const {
+// repeated .reef.DataArgument arguments = 4;
+inline int EventCall::arguments_size() const {
   return arguments_.size();
 }
-inline void CallEvent::clear_arguments() {
+inline void EventCall::clear_arguments() {
   arguments_.Clear();
 }
-inline const ::DataArgument& CallEvent::arguments(int index) const {
+inline const ::reef::DataArgument& EventCall::arguments(int index) const {
   return arguments_.Get(index);
 }
-inline ::DataArgument* CallEvent::mutable_arguments(int index) {
+inline ::reef::DataArgument* EventCall::mutable_arguments(int index) {
   return arguments_.Mutable(index);
 }
-inline ::DataArgument* CallEvent::add_arguments() {
+inline ::reef::DataArgument* EventCall::add_arguments() {
   return arguments_.Add();
 }
-inline const ::google::protobuf::RepeatedPtrField< ::DataArgument >&
-CallEvent::arguments() const {
+inline const ::google::protobuf::RepeatedPtrField< ::reef::DataArgument >&
+EventCall::arguments() const {
   return arguments_;
 }
-inline ::google::protobuf::RepeatedPtrField< ::DataArgument >*
-CallEvent::mutable_arguments() {
+inline ::google::protobuf::RepeatedPtrField< ::reef::DataArgument >*
+EventCall::mutable_arguments() {
   return &arguments_;
 }
 
 // -------------------------------------------------------------------
 
-// FieldEvent
+// EventField
 
 // required bool isSetField = 1;
-inline bool FieldEvent::has_issetfield() const {
+inline bool EventField::has_issetfield() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void FieldEvent::set_has_issetfield() {
+inline void EventField::set_has_issetfield() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void FieldEvent::clear_has_issetfield() {
+inline void EventField::clear_has_issetfield() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void FieldEvent::clear_issetfield() {
+inline void EventField::clear_issetfield() {
   issetfield_ = false;
   clear_has_issetfield();
 }
-inline bool FieldEvent::issetfield() const {
+inline bool EventField::issetfield() const {
   return issetfield_;
 }
-inline void FieldEvent::set_issetfield(bool value) {
+inline void EventField::set_issetfield(bool value) {
   set_has_issetfield();
   issetfield_ = value;
 }
 
 // required uint32 serviceIndex = 2;
-inline bool FieldEvent::has_serviceindex() const {
+inline bool EventField::has_serviceindex() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void FieldEvent::set_has_serviceindex() {
+inline void EventField::set_has_serviceindex() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void FieldEvent::clear_has_serviceindex() {
+inline void EventField::clear_has_serviceindex() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void FieldEvent::clear_serviceindex() {
+inline void EventField::clear_serviceindex() {
   serviceindex_ = 0u;
   clear_has_serviceindex();
 }
-inline ::google::protobuf::uint32 FieldEvent::serviceindex() const {
+inline ::google::protobuf::uint32 EventField::serviceindex() const {
   return serviceindex_;
 }
-inline void FieldEvent::set_serviceindex(::google::protobuf::uint32 value) {
+inline void EventField::set_serviceindex(::google::protobuf::uint32 value) {
   set_has_serviceindex();
   serviceindex_ = value;
 }
 
 // required uint32 fieldIndex = 3;
-inline bool FieldEvent::has_fieldindex() const {
+inline bool EventField::has_fieldindex() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void FieldEvent::set_has_fieldindex() {
+inline void EventField::set_has_fieldindex() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void FieldEvent::clear_has_fieldindex() {
+inline void EventField::clear_has_fieldindex() {
   _has_bits_[0] &= ~0x00000004u;
 }
-inline void FieldEvent::clear_fieldindex() {
+inline void EventField::clear_fieldindex() {
   fieldindex_ = 0u;
   clear_has_fieldindex();
 }
-inline ::google::protobuf::uint32 FieldEvent::fieldindex() const {
+inline ::google::protobuf::uint32 EventField::fieldindex() const {
   return fieldindex_;
 }
-inline void FieldEvent::set_fieldindex(::google::protobuf::uint32 value) {
+inline void EventField::set_fieldindex(::google::protobuf::uint32 value) {
   set_has_fieldindex();
   fieldindex_ = value;
 }
 
-// required .DataArgument value = 4;
-inline bool FieldEvent::has_value() const {
+// required .reef.DataArgument value = 4;
+inline bool EventField::has_value() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
-inline void FieldEvent::set_has_value() {
+inline void EventField::set_has_value() {
   _has_bits_[0] |= 0x00000008u;
 }
-inline void FieldEvent::clear_has_value() {
+inline void EventField::clear_has_value() {
   _has_bits_[0] &= ~0x00000008u;
 }
-inline void FieldEvent::clear_value() {
-  if (value_ != NULL) value_->::DataArgument::Clear();
+inline void EventField::clear_value() {
+  if (value_ != NULL) value_->::reef::DataArgument::Clear();
   clear_has_value();
 }
-inline const ::DataArgument& FieldEvent::value() const {
+inline const ::reef::DataArgument& EventField::value() const {
   return value_ != NULL ? *value_ : *default_instance_->value_;
 }
-inline ::DataArgument* FieldEvent::mutable_value() {
+inline ::reef::DataArgument* EventField::mutable_value() {
   set_has_value();
-  if (value_ == NULL) value_ = new ::DataArgument;
+  if (value_ == NULL) value_ = new ::reef::DataArgument;
   return value_;
 }
-inline ::DataArgument* FieldEvent::release_value() {
+inline ::reef::DataArgument* EventField::release_value() {
   clear_has_value();
-  ::DataArgument* temp = value_;
+  ::reef::DataArgument* temp = value_;
   value_ = NULL;
   return temp;
 }
 
 // -------------------------------------------------------------------
 
-// ReturnEvent
+// EventReturn
 
-// repeated .DataArgument arguments = 1;
-inline int ReturnEvent::arguments_size() const {
+// repeated .reef.DataArgument arguments = 1;
+inline int EventReturn::arguments_size() const {
   return arguments_.size();
 }
-inline void ReturnEvent::clear_arguments() {
+inline void EventReturn::clear_arguments() {
   arguments_.Clear();
 }
-inline const ::DataArgument& ReturnEvent::arguments(int index) const {
+inline const ::reef::DataArgument& EventReturn::arguments(int index) const {
   return arguments_.Get(index);
 }
-inline ::DataArgument* ReturnEvent::mutable_arguments(int index) {
+inline ::reef::DataArgument* EventReturn::mutable_arguments(int index) {
   return arguments_.Mutable(index);
 }
-inline ::DataArgument* ReturnEvent::add_arguments() {
+inline ::reef::DataArgument* EventReturn::add_arguments() {
   return arguments_.Add();
 }
-inline const ::google::protobuf::RepeatedPtrField< ::DataArgument >&
-ReturnEvent::arguments() const {
+inline const ::google::protobuf::RepeatedPtrField< ::reef::DataArgument >&
+EventReturn::arguments() const {
   return arguments_;
 }
-inline ::google::protobuf::RepeatedPtrField< ::DataArgument >*
-ReturnEvent::mutable_arguments() {
+inline ::google::protobuf::RepeatedPtrField< ::reef::DataArgument >*
+EventReturn::mutable_arguments() {
   return &arguments_;
 }
 
 // -------------------------------------------------------------------
 
-// CreateEvent
+// EventCreate
 
 // required string componentTypeName = 1;
-inline bool CreateEvent::has_componenttypename() const {
+inline bool EventCreate::has_componenttypename() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void CreateEvent::set_has_componenttypename() {
+inline void EventCreate::set_has_componenttypename() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void CreateEvent::clear_has_componenttypename() {
+inline void EventCreate::clear_has_componenttypename() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void CreateEvent::clear_componenttypename() {
+inline void EventCreate::clear_componenttypename() {
   if (componenttypename_ != &::google::protobuf::internal::kEmptyString) {
     componenttypename_->clear();
   }
   clear_has_componenttypename();
 }
-inline const ::std::string& CreateEvent::componenttypename() const {
+inline const ::std::string& EventCreate::componenttypename() const {
   return *componenttypename_;
 }
-inline void CreateEvent::set_componenttypename(const ::std::string& value) {
+inline void EventCreate::set_componenttypename(const ::std::string& value) {
   set_has_componenttypename();
   if (componenttypename_ == &::google::protobuf::internal::kEmptyString) {
     componenttypename_ = new ::std::string;
   }
   componenttypename_->assign(value);
 }
-inline void CreateEvent::set_componenttypename(const char* value) {
+inline void EventCreate::set_componenttypename(const char* value) {
   set_has_componenttypename();
   if (componenttypename_ == &::google::protobuf::internal::kEmptyString) {
     componenttypename_ = new ::std::string;
   }
   componenttypename_->assign(value);
 }
-inline void CreateEvent::set_componenttypename(const char* value, size_t size) {
+inline void EventCreate::set_componenttypename(const char* value, size_t size) {
   set_has_componenttypename();
   if (componenttypename_ == &::google::protobuf::internal::kEmptyString) {
     componenttypename_ = new ::std::string;
   }
   componenttypename_->assign(reinterpret_cast<const char*>(value), size);
 }
-inline ::std::string* CreateEvent::mutable_componenttypename() {
+inline ::std::string* EventCreate::mutable_componenttypename() {
   set_has_componenttypename();
   if (componenttypename_ == &::google::protobuf::internal::kEmptyString) {
     componenttypename_ = new ::std::string;
   }
   return componenttypename_;
 }
-inline ::std::string* CreateEvent::release_componenttypename() {
+inline ::std::string* EventCreate::release_componenttypename() {
   clear_has_componenttypename();
   if (componenttypename_ == &::google::protobuf::internal::kEmptyString) {
     return NULL;
@@ -1113,26 +1115,26 @@ inline ::std::string* CreateEvent::release_componenttypename() {
 
 // -------------------------------------------------------------------
 
-// CreateResult
+// ResultCreate
 
 // required int32 virtualAddress = 1;
-inline bool CreateResult::has_virtualaddress() const {
+inline bool ResultCreate::has_virtualaddress() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void CreateResult::set_has_virtualaddress() {
+inline void ResultCreate::set_has_virtualaddress() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void CreateResult::clear_has_virtualaddress() {
+inline void ResultCreate::clear_has_virtualaddress() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void CreateResult::clear_virtualaddress() {
+inline void ResultCreate::clear_virtualaddress() {
   virtualaddress_ = 0;
   clear_has_virtualaddress();
 }
-inline ::google::protobuf::int32 CreateResult::virtualaddress() const {
+inline ::google::protobuf::int32 ResultCreate::virtualaddress() const {
   return virtualaddress_;
 }
-inline void CreateResult::set_virtualaddress(::google::protobuf::int32 value) {
+inline void ResultCreate::set_virtualaddress(::google::protobuf::int32 value) {
   set_has_virtualaddress();
   virtualaddress_ = value;
 }
@@ -1185,161 +1187,163 @@ inline void Event::set_destination(::google::protobuf::uint32 value) {
   destination_ = value;
 }
 
-// optional .CreateEvent createEvent = 3;
-inline bool Event::has_createevent() const {
+// optional .reef.EventCreate eventCreate = 3;
+inline bool Event::has_eventcreate() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void Event::set_has_createevent() {
+inline void Event::set_has_eventcreate() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void Event::clear_has_createevent() {
+inline void Event::clear_has_eventcreate() {
   _has_bits_[0] &= ~0x00000004u;
 }
-inline void Event::clear_createevent() {
-  if (createevent_ != NULL) createevent_->::CreateEvent::Clear();
-  clear_has_createevent();
+inline void Event::clear_eventcreate() {
+  if (eventcreate_ != NULL) eventcreate_->::reef::EventCreate::Clear();
+  clear_has_eventcreate();
 }
-inline const ::CreateEvent& Event::createevent() const {
-  return createevent_ != NULL ? *createevent_ : *default_instance_->createevent_;
+inline const ::reef::EventCreate& Event::eventcreate() const {
+  return eventcreate_ != NULL ? *eventcreate_ : *default_instance_->eventcreate_;
 }
-inline ::CreateEvent* Event::mutable_createevent() {
-  set_has_createevent();
-  if (createevent_ == NULL) createevent_ = new ::CreateEvent;
-  return createevent_;
+inline ::reef::EventCreate* Event::mutable_eventcreate() {
+  set_has_eventcreate();
+  if (eventcreate_ == NULL) eventcreate_ = new ::reef::EventCreate;
+  return eventcreate_;
 }
-inline ::CreateEvent* Event::release_createevent() {
-  clear_has_createevent();
-  ::CreateEvent* temp = createevent_;
-  createevent_ = NULL;
+inline ::reef::EventCreate* Event::release_eventcreate() {
+  clear_has_eventcreate();
+  ::reef::EventCreate* temp = eventcreate_;
+  eventcreate_ = NULL;
   return temp;
 }
 
-// optional .CreateResult createResult = 4;
-inline bool Event::has_createresult() const {
+// optional .reef.ResultCreate resultCreate = 4;
+inline bool Event::has_resultcreate() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
-inline void Event::set_has_createresult() {
+inline void Event::set_has_resultcreate() {
   _has_bits_[0] |= 0x00000008u;
 }
-inline void Event::clear_has_createresult() {
+inline void Event::clear_has_resultcreate() {
   _has_bits_[0] &= ~0x00000008u;
 }
-inline void Event::clear_createresult() {
-  if (createresult_ != NULL) createresult_->::CreateResult::Clear();
-  clear_has_createresult();
+inline void Event::clear_resultcreate() {
+  if (resultcreate_ != NULL) resultcreate_->::reef::ResultCreate::Clear();
+  clear_has_resultcreate();
 }
-inline const ::CreateResult& Event::createresult() const {
-  return createresult_ != NULL ? *createresult_ : *default_instance_->createresult_;
+inline const ::reef::ResultCreate& Event::resultcreate() const {
+  return resultcreate_ != NULL ? *resultcreate_ : *default_instance_->resultcreate_;
 }
-inline ::CreateResult* Event::mutable_createresult() {
-  set_has_createresult();
-  if (createresult_ == NULL) createresult_ = new ::CreateResult;
-  return createresult_;
+inline ::reef::ResultCreate* Event::mutable_resultcreate() {
+  set_has_resultcreate();
+  if (resultcreate_ == NULL) resultcreate_ = new ::reef::ResultCreate;
+  return resultcreate_;
 }
-inline ::CreateResult* Event::release_createresult() {
-  clear_has_createresult();
-  ::CreateResult* temp = createresult_;
-  createresult_ = NULL;
+inline ::reef::ResultCreate* Event::release_resultcreate() {
+  clear_has_resultcreate();
+  ::reef::ResultCreate* temp = resultcreate_;
+  resultcreate_ = NULL;
   return temp;
 }
 
-// optional .CallEvent callEvent = 5;
-inline bool Event::has_callevent() const {
+// optional .reef.EventCall eventCall = 5;
+inline bool Event::has_eventcall() const {
   return (_has_bits_[0] & 0x00000010u) != 0;
 }
-inline void Event::set_has_callevent() {
+inline void Event::set_has_eventcall() {
   _has_bits_[0] |= 0x00000010u;
 }
-inline void Event::clear_has_callevent() {
+inline void Event::clear_has_eventcall() {
   _has_bits_[0] &= ~0x00000010u;
 }
-inline void Event::clear_callevent() {
-  if (callevent_ != NULL) callevent_->::CallEvent::Clear();
-  clear_has_callevent();
+inline void Event::clear_eventcall() {
+  if (eventcall_ != NULL) eventcall_->::reef::EventCall::Clear();
+  clear_has_eventcall();
 }
-inline const ::CallEvent& Event::callevent() const {
-  return callevent_ != NULL ? *callevent_ : *default_instance_->callevent_;
+inline const ::reef::EventCall& Event::eventcall() const {
+  return eventcall_ != NULL ? *eventcall_ : *default_instance_->eventcall_;
 }
-inline ::CallEvent* Event::mutable_callevent() {
-  set_has_callevent();
-  if (callevent_ == NULL) callevent_ = new ::CallEvent;
-  return callevent_;
+inline ::reef::EventCall* Event::mutable_eventcall() {
+  set_has_eventcall();
+  if (eventcall_ == NULL) eventcall_ = new ::reef::EventCall;
+  return eventcall_;
 }
-inline ::CallEvent* Event::release_callevent() {
-  clear_has_callevent();
-  ::CallEvent* temp = callevent_;
-  callevent_ = NULL;
+inline ::reef::EventCall* Event::release_eventcall() {
+  clear_has_eventcall();
+  ::reef::EventCall* temp = eventcall_;
+  eventcall_ = NULL;
   return temp;
 }
 
-// optional .ReturnEvent callReturn = 6;
-inline bool Event::has_callreturn() const {
+// optional .reef.EventReturn eventReturn = 6;
+inline bool Event::has_eventreturn() const {
   return (_has_bits_[0] & 0x00000020u) != 0;
 }
-inline void Event::set_has_callreturn() {
+inline void Event::set_has_eventreturn() {
   _has_bits_[0] |= 0x00000020u;
 }
-inline void Event::clear_has_callreturn() {
+inline void Event::clear_has_eventreturn() {
   _has_bits_[0] &= ~0x00000020u;
 }
-inline void Event::clear_callreturn() {
-  if (callreturn_ != NULL) callreturn_->::ReturnEvent::Clear();
-  clear_has_callreturn();
+inline void Event::clear_eventreturn() {
+  if (eventreturn_ != NULL) eventreturn_->::reef::EventReturn::Clear();
+  clear_has_eventreturn();
 }
-inline const ::ReturnEvent& Event::callreturn() const {
-  return callreturn_ != NULL ? *callreturn_ : *default_instance_->callreturn_;
+inline const ::reef::EventReturn& Event::eventreturn() const {
+  return eventreturn_ != NULL ? *eventreturn_ : *default_instance_->eventreturn_;
 }
-inline ::ReturnEvent* Event::mutable_callreturn() {
-  set_has_callreturn();
-  if (callreturn_ == NULL) callreturn_ = new ::ReturnEvent;
-  return callreturn_;
+inline ::reef::EventReturn* Event::mutable_eventreturn() {
+  set_has_eventreturn();
+  if (eventreturn_ == NULL) eventreturn_ = new ::reef::EventReturn;
+  return eventreturn_;
 }
-inline ::ReturnEvent* Event::release_callreturn() {
-  clear_has_callreturn();
-  ::ReturnEvent* temp = callreturn_;
-  callreturn_ = NULL;
+inline ::reef::EventReturn* Event::release_eventreturn() {
+  clear_has_eventreturn();
+  ::reef::EventReturn* temp = eventreturn_;
+  eventreturn_ = NULL;
   return temp;
 }
 
-// optional .FieldEvent fieldEvent = 7;
-inline bool Event::has_fieldevent() const {
+// optional .reef.EventField eventField = 7;
+inline bool Event::has_eventfield() const {
   return (_has_bits_[0] & 0x00000040u) != 0;
 }
-inline void Event::set_has_fieldevent() {
+inline void Event::set_has_eventfield() {
   _has_bits_[0] |= 0x00000040u;
 }
-inline void Event::clear_has_fieldevent() {
+inline void Event::clear_has_eventfield() {
   _has_bits_[0] &= ~0x00000040u;
 }
-inline void Event::clear_fieldevent() {
-  if (fieldevent_ != NULL) fieldevent_->::FieldEvent::Clear();
-  clear_has_fieldevent();
+inline void Event::clear_eventfield() {
+  if (eventfield_ != NULL) eventfield_->::reef::EventField::Clear();
+  clear_has_eventfield();
 }
-inline const ::FieldEvent& Event::fieldevent() const {
-  return fieldevent_ != NULL ? *fieldevent_ : *default_instance_->fieldevent_;
+inline const ::reef::EventField& Event::eventfield() const {
+  return eventfield_ != NULL ? *eventfield_ : *default_instance_->eventfield_;
 }
-inline ::FieldEvent* Event::mutable_fieldevent() {
-  set_has_fieldevent();
-  if (fieldevent_ == NULL) fieldevent_ = new ::FieldEvent;
-  return fieldevent_;
+inline ::reef::EventField* Event::mutable_eventfield() {
+  set_has_eventfield();
+  if (eventfield_ == NULL) eventfield_ = new ::reef::EventField;
+  return eventfield_;
 }
-inline ::FieldEvent* Event::release_fieldevent() {
-  clear_has_fieldevent();
-  ::FieldEvent* temp = fieldevent_;
-  fieldevent_ = NULL;
+inline ::reef::EventField* Event::release_eventfield() {
+  clear_has_eventfield();
+  ::reef::EventField* temp = eventfield_;
+  eventfield_ = NULL;
   return temp;
 }
 
 
 // @@protoc_insertion_point(namespace_scope)
 
+}  // namespace reef
+
 #ifndef SWIG
 namespace google {
 namespace protobuf {
 
 template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::Event_EventType>() {
-  return ::Event_EventType_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor< ::reef::Event_EventType>() {
+  return ::reef::Event_EventType_descriptor();
 }
 
 }  // namespace google

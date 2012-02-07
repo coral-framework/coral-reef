@@ -1,9 +1,11 @@
+package reef;
+
 message DataArgument
 {
 	required int32 dummy = 1;
 }
 
-message CallEvent
+message EventCall
 {
 	required bool hasReturn = 1;
 	required uint32 serviceIndex = 2;
@@ -11,7 +13,7 @@ message CallEvent
 	repeated DataArgument arguments = 4;
 }
 
-message FieldEvent
+message EventField
 {
 	required bool isSetField = 1;
 	required uint32 serviceIndex = 2;
@@ -19,17 +21,17 @@ message FieldEvent
 	required DataArgument value = 4;
 }
 
-message ReturnEvent
+message EventReturn
 {
 	repeated DataArgument arguments = 1;
 }
 
-message CreateEvent
+message EventCreate
 {
 	required string componentTypeName = 1;
 }
 
-message CreateResult
+message ResultCreate
 {
 	required int32 virtualAddress = 1;
 }
@@ -48,10 +50,10 @@ message Event
 	
 	required uint32 destination = 2;
 	
-	optional CreateEvent createEvent = 3;
-	optional CreateResult createResult = 4;
-	optional CallEvent callEvent = 5;
-	optional ReturnEvent callReturn = 6;
-	optional FieldEvent fieldEvent = 7;
+	optional EventCreate eventCreate = 3;
+	optional ResultCreate resultCreate = 4;
+	optional EventCall eventCall = 5;
+	optional EventReturn eventReturn = 6;
+	optional EventField eventField = 7;
 }
 
