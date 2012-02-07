@@ -43,7 +43,7 @@ protected:
     Connection* _connection;
 };
 
-// A channel that converts events into raw messages
+// A channel that converts events into raw messages over network connections
 class InputChannel : public Channel
 {
 public:
@@ -56,8 +56,7 @@ public:
     void getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result );
     void setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value );
     
-    // Writes an event into a input channel by serializing it and 
-    // sending it over the network
+    // Writes an event into this input channel. The given event will be serialized over network.
     void write( const Event* event );
 };
 
