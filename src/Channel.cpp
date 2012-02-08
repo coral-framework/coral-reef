@@ -1,30 +1,58 @@
 #include "Channel.h"
-#include "Event.pb.h"
+#include "Message.pb.h"
 
 #include <iostream>
 
 namespace reef 
 {
     
-static void printEvent( Event* event )
+static void printChannelMessage( Message* message )
 {
-    std::cout << "EVENT INFO:" << std::endl;
-    std::cout << "Destination:" << event->destination() << std::endl;
+    std::cout << "MESSAGE INFO:" << std::endl;
+    std::cout << "Destination:" << message->destination() << std::endl;
     
-    std::cout << event->eventtype() << std::endl;
+    std::cout << message->type() << std::endl;
+}
+    
+    
+static Message_Call* makeCallMessage( int destination, bool hasReturn, Message& owner, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args )
+{
+    owner.set_destination( destination );
+    owner.set_type( Message::TYPE_CALL );
+    
+    Message_Call* mc = owner.mutable_msgcall();
+    mc->set_hasreturn( hasReturn );
+    mc->set_serviceindex( serviceId );
+    mc->set_methodindex( methodIndex );
+    
+    // TODO: serialize parameters
+    return mc;
+}
+    
+static Message_Field* makeFieldMessage( int destination, bool isSet, Message& owner, co::int32 serviceId, co::int32 fieldIndex )
+{
+    owner.set_destination( destination ); // 0 is always the node channel
+    owner.set_type( Message::TYPE_FIELD );
+    
+    Message_Field* mf = owner.mutable_msgfield();
+    mf->set_issetfield( isSet ); // it is a get field event
+    mf->set_serviceindex( serviceId );
+    mf->set_fieldindex( fieldIndex );
+    
+    return mf;
 }
     
 void Channel::route( const std::string& data, const std::vector<Channel*>& channels )
 {
-    Event event;
-    event.ParseFromString( data );
+    Message message;
+    message.ParseFromString( data );
     
-    printEvent( &event );
+    printChannelMessage( &message );
 
-    int dest = event.destination();
+    int dest = message.destination();
     assert( dest >= 0 && dest < channels.size() );
     
-    channels[dest]->write( &event );
+    channels[dest]->write( &message );
 }
     
 Channel::Channel( Connection* connection ) : _channelId( -1 ), _connection( connection )
@@ -38,7 +66,7 @@ Channel::~Channel()
 }
 
 // InputChannel
-    InputChannel::InputChannel( Connection* connection ) : Channel( connection )
+InputChannel::InputChannel( Connection* connection ) : Channel( connection )
 {   
     _connection = connection;
 }
@@ -52,110 +80,88 @@ int InputChannel::newInstance( const std::string& typeName )
 {
     assert( _channelId == - 1 );
     
-    Event event;
-    event.set_destination( 0 ); // 0 is always the node channel
-    event.set_eventtype( Event::TYPE_CREATE );
+    Message message;
+    message.set_destination( 0 ); // 0 is always the node channel
+    message.set_type( Message::TYPE_NEW );
     
-	EventCreate* ce = event.mutable_eventcreate();
-    ce->set_componenttypename( typeName );
+	Message_New* msgNew = message.mutable_msgnew();
+    msgNew->set_componenttypename( typeName );
     
-    write( &event );
+    write( &message );
     
     std::string input;
     _connection->receive( input );
     
-    event.ParseFromString( input );
-    assert( event.eventtype() == Event::TYPE_CREATE_RESULT );
+    VirtualAddress va;
+    va.ParseFromString( input );
+    
+    int virtualAddress = va.address();
+    assert( virtualAddress > 0 );
  
-    _channelId = event.resultcreate().virtualaddress();
+    _channelId = va.address();
     
     return _channelId;
-}
-    
-static EventCall* makeEventCall( bool hasReturn, Event& owner, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args )
-{
-    EventCall* ce = owner.mutable_eventcall();
-    ce->set_hasreturn( hasReturn );
-    ce->set_serviceindex( serviceId );
-    ce->set_methodindex( methodIndex );
-
-    // TODO: serialize parameters
-    return ce;
 }
                                 
 void InputChannel::sendCall( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args )
 {
-    Event event;
-    event.set_destination( _channelId ); // 0 is always the node channel
-    event.set_eventtype( Event::TYPE_CALL );
-    
     // make a call without returns
-    makeEventCall( false, event, serviceId, methodIndex, args );
-    write( &event );
+    Message message;
+    makeCallMessage( _channelId, false, message, serviceId, methodIndex, args );
+    write( &message );
 }
 
 void InputChannel::call( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args, co::Any& result )
 {
-    Event event;
-    event.set_destination( _channelId ); // 0 is always the node channel
-    event.set_eventtype( Event::TYPE_CALL );
+    // make a call with returns
+    Message message;
+    makeCallMessage( _channelId, true, message, serviceId, methodIndex, args );
     
-    // signalize that a return is expected
-    makeEventCall( true, event, serviceId, methodIndex, args );
-    
-    write( &event );
+    write( &message );
     
     // wait for the return
     std::string input;
     _connection->receive( input );
     
-    event.ParseFromString( input );
-    assert( event.eventtype() == Event::TYPE_CALL_RETURN );
+    ReturnData ret;
+    ret.ParseFromString( input );
     
-    // TODO: set returned value into result variable
+    // TODO: properly set returned value into result variable and set all out values from args list
+    result.set( static_cast<co::int32>( ret.arguments( 0 ).dummy() ) );
 }
 
 void InputChannel::getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result )
 {
-    Event event;
-    event.set_destination( _channelId ); // 0 is always the node channel
-    event.set_eventtype( Event::TYPE_FIELD );
-    
-    EventField* fe = event.mutable_eventfield();
-    fe->set_issetfield( false ); // it is a get field event
-    fe->set_serviceindex( serviceId );
-    fe->set_fieldindex( fieldIndex );
-    
-    write( &event );
+    Message message;
+    makeFieldMessage( _channelId, false, message, serviceId, fieldIndex );
+
+    write( &message );
     
     // wait for the field value
     std::string input;
     _connection->receive( input );
     
-    event.ParseFromString( input );
-    assert( event.eventtype() == Event::TYPE_FIELD );
+    DataType fieldValue;
+    fieldValue.ParseFromString( input );
     
-    // TODO: set the returned field value into result variable
+    // TODO: properly set the returned field value into result variable
+    result.set( fieldValue.dummy() );
 }
 
 void InputChannel::setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value )
 {
-    Event event;
-    event.set_destination( _channelId ); // 0 is always the node channel
-    event.set_eventtype( Event::TYPE_FIELD );
+    Message message;
+    Message_Field* mf = makeFieldMessage( _channelId, true, message, serviceId, fieldIndex );
+    // TODO: properly set field value
+    mf->mutable_value()->set_dummy( value.get<int>() );
     
-    EventField* fe = event.mutable_eventfield();
-    fe->set_issetfield( true ); // it is a set field event
-    fe->set_serviceindex( serviceId );
-    fe->set_fieldindex( fieldIndex );
-    
-    write( &event );
+    write( &message );
 }
     
-void InputChannel::write( const reef::Event* event )
+void InputChannel::write( const Message* message )
 {
     std::string output;
-    event->SerializeToString( &output );
+    message->SerializeToString( &output );
     
     _connection->send( output );
 }
@@ -197,43 +203,37 @@ void OutputChannel::setField( co::int32 serviceId, co::int32 fieldIndex, const c
     _delegate->onSetField( this, serviceId, fieldIndex, value );
 }
     
-void OutputChannel::write( const reef::Event* event )
+void OutputChannel::write( const Message* message )
 {    
     co::Range<co::Any const> dummy;
 
-    Event::EventType type = static_cast<Event::EventType>( event->eventtype() );
+    Message::Type type = message->type();
     
     switch ( type ) {
-        case Event::TYPE_CREATE:
+        case Message::TYPE_NEW:
         {
-            const EventCreate& EventCreate = event->eventcreate();
-            int virtualAddress = newInstance( EventCreate.componenttypename() );
+            const Message_New& msgNew = message->msgnew();
+            int virtualAddress = newInstance( msgNew.componenttypename() );
 
-            Event resultEvent;
-            resultEvent.set_eventtype( Event::TYPE_CREATE_RESULT );
-            resultEvent.set_destination( virtualAddress ); // destination makes no much sense here since is 
-                                                           // answer is always deterministic
-            
-            // send back the recently created virtual address
-            ResultCreate* cr = resultEvent.mutable_resultcreate();
-            cr->set_virtualaddress( virtualAddress );
+            VirtualAddress va;
+            va.set_address( virtualAddress );
             
             std::string output;
-            resultEvent.SerializeToString( &output );
+            va.SerializeToString( &output );
             _connection->send( output );
             
             break;
         } 
-        case Event::TYPE_CALL:
+        case Message::TYPE_CALL:
         {
-            const EventCall& EventCall = event->eventcall();
-            co::int32 serviceId = EventCall.serviceindex();
-            co::int32 methodIndex = EventCall.methodindex();
+            const Message_Call& callMsg = message->msgcall();
+            co::int32 serviceId = callMsg.serviceindex();
+            co::int32 methodIndex = callMsg.methodindex();
             
             // TODO: handle call arguments (translate to co::Any)
             // const DataArgument& argument = call.arguments( 0 );
             
-            if( EventCall.hasreturn() )
+            if( callMsg.hasreturn() )
             {
                 co::Any result;
                 call( serviceId, methodIndex, dummy, result );

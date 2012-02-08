@@ -1,0 +1,58 @@
+package reef;
+
+// Data types (information transfer):
+message DataType
+{
+	required int32 dummy = 1;
+}
+
+message ReturnData
+{
+	repeated DataType arguments = 1;
+}
+
+message VirtualAddress
+{
+	required int32 address = 1;
+}
+
+// Commands (triggers actions into destination nodes)
+message Message_Call
+{
+	required bool hasReturn = 1; // whether this call message demands a return
+	required uint32 serviceIndex = 2;
+	required uint32 methodIndex = 3;
+	repeated DataType arguments = 4;
+}
+
+message Message_Field
+{
+	required bool isSetField = 1; // whether this message is to set or get a field
+	required uint32 serviceIndex = 2;
+	required uint32 fieldIndex = 3;
+	required DataType value = 4;
+}
+
+message Message_New
+{
+	required string componentTypeName = 1;
+}
+
+message Message 
+{
+	enum Type
+	{
+		TYPE_NEW = 0;
+		TYPE_FIELD = 1;
+		TYPE_CALL = 2;
+	}
+	
+	required Type type = 1;
+	
+	required uint32 destination = 2;
+	
+	optional Message_New msgNew = 3;
+	optional Message_Field msgField = 4;
+	optional Message_Call msgCall = 5;
+}
+
