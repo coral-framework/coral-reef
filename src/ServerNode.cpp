@@ -26,7 +26,7 @@ public:
     
     void start( const std::string& address )
     {
-        _mainConnection = new Connection( "" );
+        _mainConnection = new Connection( "REP" );
         _mainConnection->bind( address );
         
         _channels.push_back( new OutputChannel( _mainConnection, this ) );

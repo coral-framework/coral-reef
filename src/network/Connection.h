@@ -38,7 +38,7 @@ public:
 private:
     std::string _address;
     zmq::context_t _context;
-    zmq::socket_t _socket;
+    zmq::socket_t* _socket;
 };
 
 } // namespace reef

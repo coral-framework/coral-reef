@@ -109,6 +109,9 @@ void InputChannel::sendCall( co::int32 serviceId, co::int32 methodIndex, co::Ran
     Message message;
     makeCallMessage( _channelId, false, message, serviceId, methodIndex, args );
     write( &message );
+    
+    std::string input;
+    _connection->receive( input );
 }
 
 void InputChannel::call( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args, co::Any& result )
@@ -164,6 +167,9 @@ void InputChannel::write( const Message* message )
     message->SerializeToString( &output );
     
     _connection->send( output );
+    
+    std::string input;
+    _connection->receive( input );
 }
     
 // OutputChannel
@@ -244,6 +250,9 @@ void OutputChannel::write( const Message* message )
             {
                 sendCall( serviceId, methodIndex, dummy );
             }
+            
+            _connection->send( "NOREP" );
+            
             break;
         }
         default:
