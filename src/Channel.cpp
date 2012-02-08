@@ -1,13 +1,25 @@
 #include "Channel.h"
 #include "Event.pb.h"
 
+#include <iostream>
+
 namespace reef 
 {
+    
+static void printEvent( Event* event )
+{
+    std::cout << "EVENT INFO:" << std::endl;
+    std::cout << "Destination:" << event->destination() << std::endl;
+    
+    std::cout << event->eventtype() << std::endl;
+}
     
 void Channel::route( const std::string& data, const std::vector<Channel*>& channels )
 {
     Event event;
     event.ParseFromString( data );
+    
+    printEvent( &event );
 
     int dest = event.destination();
     assert( dest >= 0 && dest < channels.size() );

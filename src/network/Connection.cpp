@@ -7,7 +7,7 @@
 namespace reef {
     
 Connection::Connection( const std::string& type ) 
-    : _context( 1 ), _socket( _context, ZMQ_REP )
+    : _context( 1 ), _socket( _context, ZMQ_REQ )
 {
     // empty
 }

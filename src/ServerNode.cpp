@@ -37,9 +37,6 @@ public:
             std::string message;
             _mainConnection->receive( message );
             
-            std::cerr << "Received " << message << std::endl;
-            fflush( stderr );
-            
             // Route the message to the proper channel
             Channel::route( message, _channels );
         }

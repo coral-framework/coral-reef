@@ -30,16 +30,16 @@ int main( int argc, char** argv )
 
 //	int res = RUN_ALL_TESTS();
     
-    co::IObject* obj = co::newInstance( "reef.ServerNode" );
-    reef::IServerNode* server = obj->getService<reef::IServerNode>();
+//    co::IObject* obj = co::newInstance( "reef.ServerNode" );
+//    reef::IServerNode* server = obj->getService<reef::IServerNode>();
+//    
+//    server->start( "tcp://*:4020" );
     
-    server->start( "tcp://*:4020" );
-    
-//    co::IObject* obj = co::newInstance( "reef.ClientNode" );
-//    reef::IClientNode* client = obj->getService<reef::IClientNode>();
-//    co::IObject* toto = client->newRemoteInstance( "toto.Toto", "tcp://localhost:4020" );
-//    toto::IToto* totoService = toto->getService<toto::IToto>();
-//    totoService->printHello();
+    co::IObject* obj = co::newInstance( "reef.ClientNode" );
+    reef::IClientNode* client = obj->getService<reef::IClientNode>();
+    co::IObject* toto = client->newRemoteInstance( "toto.Toto", "tcp://localhost:4020" );
+    toto::IToto* totoService = toto->getService<toto::IToto>();
+    totoService->printHello();
 
 	co::shutdown();
 

@@ -3,6 +3,7 @@
 #include <co/IPort.h>
 #include <co/IReflector.h>
 #include <co/IMethod.h>
+#include <co/IMember.h>
 
 #include <string>
 #include <iostream>
@@ -26,10 +27,13 @@ void Servant::onSendCall( Channel* channel, co::int32 serviceId, co::int32 metho
     co::IService* service = _object->getService( "toto" );
 
     co::IInterface* itf = service->getInterface();
-    co::IMethod* met = itf->getMethods()[methodIndex];
+    co::IMember* member = itf->getMembers()[methodIndex];
+    assert( member->getKind() == co::MemberKind::MK_METHOD );
+    
+    co::IMethod* method = co::cast<co::IMethod>( member );
 
     co::IReflector* ref = itf->getReflector();
-    ref->invoke( service, met, args, ret );
+    ref->invoke( service, method, args, ret );
 }
     
 void Servant::onCall( Channel* channel, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args, co::Any& result )

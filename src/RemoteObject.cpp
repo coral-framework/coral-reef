@@ -38,7 +38,6 @@ void RemoteObject::setComponent( co::IComponent* component )
 		facets[i]->getType()->getReflector()->newDynamicProxy( this );
 		assert( _numFacets == i + 1 );
 	}
- 
 }
 
 co::IComponent* RemoteObject::getComponent()
