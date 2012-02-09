@@ -70,13 +70,25 @@ void Binder::close()
 bool Binder::receive( std::string& data )
 {
     // check if there is a message and save its sender
-    if( _socket.recv( &_lastSender, ZMQ_NOBLOCK ) == EAGAIN )
+    if( _socket.recv( &_lastSender, ZMQ_NOBLOCK ) )
+	{
+		// get the actual message
+		zmq::message_t msg;
+		_socket.recv( &msg );
+		data.resize( msg.size() );
+		memcpy( &data[0], msg.data(), msg.size() );
+		return true;
+	}
+	else if( zmq_errno() == EAGAIN )
+	{
 		return false;
-
-	// get the actual message
-	zmq::message_t msg;
-    data.resize( msg.size() );
-    memcpy( &data[0], msg.data(), msg.size() );
+	}
+	else
+	{
+		//TODO: exception
+		assert( false );
+		return false;
+	}
 }
 
 void Binder::reply( const std::string& data )

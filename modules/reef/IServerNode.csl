@@ -2,4 +2,6 @@ interface IServerNode
 {
 	void start( in string address );
 	void stop();
+	
+	void update();
 };
