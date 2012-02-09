@@ -4,7 +4,6 @@
 
 #include <co/Coral.h>
 #include <co/IObject.h>
-#include <Network/ConnectionServer.h>
 
 TEST( ProxyTests, methodCalling )
 {

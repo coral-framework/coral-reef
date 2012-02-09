@@ -4,7 +4,6 @@
 #include "Servant.h"
 
 #include "network/Connection.h"
-#include "network/ConnectionServer.h"
 
 #include <iostream>
 #include <map>

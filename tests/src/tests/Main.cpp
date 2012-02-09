@@ -15,7 +15,6 @@
 
 #include <co/Coral.h>
 #include <co/IObject.h>
-#include <Network/ConnectionServer.h>
 
 int main( int argc, char** argv )
 {
