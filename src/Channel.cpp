@@ -55,7 +55,7 @@ void Channel::route( const std::string& data, const std::vector<Channel*>& chann
     channels[dest]->write( &message );
 }
     
-Channel::Channel( Connection* connection ) : _channelId( -1 ), _connection( connection )
+Channel::Channel() : _channelId( -1 )
 {
     // empty
 }
@@ -66,9 +66,8 @@ Channel::~Channel()
 }
 
 // InputChannel
-InputChannel::InputChannel( Connection* connection ) : Channel( connection )
+InputChannel::InputChannel( Connecter* connecter ) : _connecter( connecter )
 {   
-    _connection = connection;
 }
     
 InputChannel::~InputChannel()
@@ -90,7 +89,7 @@ int InputChannel::newInstance( const std::string& typeName )
     write( &message );
     
     std::string input;
-    _connection->receive( input );
+    _connecter->receiveReply( input );
     
     VirtualAddress va;
     va.ParseFromString( input );
@@ -109,9 +108,6 @@ void InputChannel::sendCall( co::int32 serviceId, co::int32 methodIndex, co::Ran
     Message message;
     makeCallMessage( _channelId, false, message, serviceId, methodIndex, args );
     write( &message );
-    
-    std::string input;
-    _connection->receive( input );
 }
 
 void InputChannel::call( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args, co::Any& result )
@@ -124,7 +120,7 @@ void InputChannel::call( co::int32 serviceId, co::int32 methodIndex, co::Range<c
     
     // wait for the return
     std::string input;
-    _connection->receive( input );
+    _connecter->receiveReply( input );
     
     ReturnData ret;
     ret.ParseFromString( input );
@@ -142,7 +138,7 @@ void InputChannel::getField( co::int32 serviceId, co::int32 fieldIndex, co::Any&
     
     // wait for the field value
     std::string input;
-    _connection->receive( input );
+    _connecter->receiveReply( input );
     
     DataType fieldValue;
     fieldValue.ParseFromString( input );
@@ -166,19 +162,16 @@ void InputChannel::write( const Message* message )
     std::string output;
     message->SerializeToString( &output );
     
-    _connection->send( output );
-    
-    std::string input;
-    _connection->receive( input );
+    _connecter->send( output );
 }
-    
+
 // OutputChannel
-OutputChannel::OutputChannel( Connection* connection, OutputChannelDelegate* delegate )
-    : Channel( connection ) 
+OutputChannel::OutputChannel( Binder* binder, OutputChannelDelegate* delegate )
+    : _binder( binder ) 
 {
     _delegate = delegate;
 }
-    
+
 OutputChannel::~OutputChannel()
 {
     // empty
@@ -226,7 +219,7 @@ void OutputChannel::write( const Message* message )
             
             std::string output;
             va.SerializeToString( &output );
-            _connection->send( output );
+            _binder->reply( output );
             
             break;
         } 
@@ -250,9 +243,6 @@ void OutputChannel::write( const Message* message )
             {
                 sendCall( serviceId, methodIndex, dummy );
             }
-            
-            _connection->send( "NOREP" );
-            
             break;
         }
         default:

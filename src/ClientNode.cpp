@@ -24,7 +24,7 @@ public:
     
     co::IObject* newRemoteInstance( const std::string& componentTypeName, const std::string& address )
     {
-        Connection* connection = new Connection( "REQ" );
+        Connecter* connection = new Connecter();
         connection->connect( address );
     
         co::IComponent* componentType = co::cast<co::IComponent>( co::getType( componentTypeName ) );

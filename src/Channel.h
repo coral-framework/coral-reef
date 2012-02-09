@@ -21,7 +21,7 @@ public:
     static void route( const std::string& data, const std::vector<Channel*>& channels );
     
 public:
-    Channel( Connection* connection );
+    Channel();
     virtual ~Channel();
     
     void setId( int id ) { _channelId = id; }
@@ -40,14 +40,13 @@ public:
     
 protected:
     int _channelId;
-    Connection* _connection;
 };
 
 // A channel that converts events into raw messages over network connections
 class InputChannel : public Channel
 {
 public:
-    InputChannel( Connection* connection );
+    InputChannel( Connecter* connecter );
     ~InputChannel();
     
     int newInstance( const std::string& typeName );
@@ -56,8 +55,12 @@ public:
     void getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result );
     void setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value );
     
+protected:
     // Writes an event into this input channel. The given event will be serialized over network.
     void write( const Message* message );
+
+protected:
+	Connecter* _connecter;
 };
 
 class OutputChannelDelegate
@@ -74,7 +77,7 @@ public:
 class OutputChannel : public Channel
 {
 public:
-    OutputChannel( Connection* connection, OutputChannelDelegate* delegate );
+    OutputChannel( Binder* binder, OutputChannelDelegate* delegate );
     ~OutputChannel();
     
     int newInstance( const std::string& typeName );
@@ -89,6 +92,7 @@ public:
     void write( const Message* message );
     
 private:
+	Binder* _binder;
     OutputChannelDelegate* _delegate;
 };
     

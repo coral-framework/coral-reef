@@ -26,22 +26,24 @@ public:
     
     void start( const std::string& address )
     {
-        _mainConnection = new Connection( "REP" );
-        _mainConnection->bind( address );
+        _binder = new Binder();
+        _binder->bind( address );
         
-        _channels.push_back( new OutputChannel( _mainConnection, this ) );
+        _channels.push_back( new OutputChannel( _binder, this ) );
         _channels[0]->setId( 0 );
-        
-        while( true )
-        {
-            std::string message;
-            _mainConnection->receive( message );
-            
-            // Route the message to the proper channel
-            Channel::route( message, _channels );
-        }
     }
     
+	void update()
+	{
+		std::string message;
+        
+		if( _binder->receive( message ) )    
+		{
+			// Route the message to the proper channel
+			Channel::route( message, _channels );
+		}
+	}
+
     void stop()
     {
         // TODO: implement this method.
@@ -50,7 +52,7 @@ public:
     // OutputChannelDelegate
     int onNewInstance( Channel* channel, const std::string& typeName ) 
     {
-        Channel* newChannel = new OutputChannel( _mainConnection, new Servant( typeName ) );
+        Channel* newChannel = new OutputChannel( _binder, new Servant( typeName ) );
         newChannel->setId( _channels.size() );
         _channels.push_back( newChannel );
         
@@ -58,13 +60,11 @@ public:
     }
     
 private:
-    Connection* _mainConnection;
+	Binder* _binder;
     
     typedef std::vector<Channel*> Channels;
-    typedef std::vector<Connection*> RemoteConnections;
     
     Channels _channels;
-    RemoteConnections _connections;
 };
 
 CORAL_EXPORT_COMPONENT( ServerNode, ServerNode );

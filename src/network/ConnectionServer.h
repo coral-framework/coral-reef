@@ -16,7 +16,7 @@ public:
     ConnectionServer( const std::string& bindAddress );
     
     //! Waits until a new connection establishes
-    Connection* waitForConnection();
+    Connecter* waitForConnection();
     
 private:
     std::string _address;
