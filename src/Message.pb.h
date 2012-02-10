@@ -32,8 +32,8 @@ void  protobuf_AddDesc_Message_2eproto();
 void protobuf_AssignDesc_Message_2eproto();
 void protobuf_ShutdownFile_Message_2eproto();
 
-class DataType;
-class ReturnData;
+class DataContainer;
+class Argument;
 class VirtualAddress;
 class Message_Call;
 class Message_Field;
@@ -62,14 +62,14 @@ inline bool Message_Type_Parse(
 }
 // ===================================================================
 
-class DataType : public ::google::protobuf::Message {
+class DataContainer : public ::google::protobuf::Message {
  public:
-  DataType();
-  virtual ~DataType();
+  DataContainer();
+  virtual ~DataContainer();
   
-  DataType(const DataType& from);
+  DataContainer(const DataContainer& from);
   
-  inline DataType& operator=(const DataType& from) {
+  inline DataContainer& operator=(const DataContainer& from) {
     CopyFrom(from);
     return *this;
   }
@@ -83,17 +83,17 @@ class DataType : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const DataType& default_instance();
+  static const DataContainer& default_instance();
   
-  void Swap(DataType* other);
+  void Swap(DataContainer* other);
   
   // implements Message ----------------------------------------------
   
-  DataType* New() const;
+  DataContainer* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const DataType& from);
-  void MergeFrom(const DataType& from);
+  void CopyFrom(const DataContainer& from);
+  void MergeFrom(const DataContainer& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -116,42 +116,66 @@ class DataType : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // required int32 dummy = 1;
-  inline bool has_dummy() const;
-  inline void clear_dummy();
-  static const int kDummyFieldNumber = 1;
-  inline ::google::protobuf::int32 dummy() const;
-  inline void set_dummy(::google::protobuf::int32 value);
+  // optional bool boolean = 1;
+  inline bool has_boolean() const;
+  inline void clear_boolean();
+  static const int kBooleanFieldNumber = 1;
+  inline bool boolean() const;
+  inline void set_boolean(bool value);
   
-  // @@protoc_insertion_point(class_scope:reef.DataType)
+  // optional string str = 2;
+  inline bool has_str() const;
+  inline void clear_str();
+  static const int kStrFieldNumber = 2;
+  inline const ::std::string& str() const;
+  inline void set_str(const ::std::string& value);
+  inline void set_str(const char* value);
+  inline void set_str(const char* value, size_t size);
+  inline ::std::string* mutable_str();
+  inline ::std::string* release_str();
+  
+  // optional double numeric = 3;
+  inline bool has_numeric() const;
+  inline void clear_numeric();
+  static const int kNumericFieldNumber = 3;
+  inline double numeric() const;
+  inline void set_numeric(double value);
+  
+  // @@protoc_insertion_point(class_scope:reef.DataContainer)
  private:
-  inline void set_has_dummy();
-  inline void clear_has_dummy();
+  inline void set_has_boolean();
+  inline void clear_has_boolean();
+  inline void set_has_str();
+  inline void clear_has_str();
+  inline void set_has_numeric();
+  inline void clear_has_numeric();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
-  ::google::protobuf::int32 dummy_;
+  ::std::string* str_;
+  double numeric_;
+  bool boolean_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
   
   friend void  protobuf_AddDesc_Message_2eproto();
   friend void protobuf_AssignDesc_Message_2eproto();
   friend void protobuf_ShutdownFile_Message_2eproto();
   
   void InitAsDefaultInstance();
-  static DataType* default_instance_;
+  static DataContainer* default_instance_;
 };
 // -------------------------------------------------------------------
 
-class ReturnData : public ::google::protobuf::Message {
+class Argument : public ::google::protobuf::Message {
  public:
-  ReturnData();
-  virtual ~ReturnData();
+  Argument();
+  virtual ~Argument();
   
-  ReturnData(const ReturnData& from);
+  Argument(const Argument& from);
   
-  inline ReturnData& operator=(const ReturnData& from) {
+  inline Argument& operator=(const Argument& from) {
     CopyFrom(from);
     return *this;
   }
@@ -165,17 +189,17 @@ class ReturnData : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const ReturnData& default_instance();
+  static const Argument& default_instance();
   
-  void Swap(ReturnData* other);
+  void Swap(Argument* other);
   
   // implements Message ----------------------------------------------
   
-  ReturnData* New() const;
+  Argument* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const ReturnData& from);
-  void MergeFrom(const ReturnData& from);
+  void CopyFrom(const Argument& from);
+  void MergeFrom(const Argument& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -198,24 +222,24 @@ class ReturnData : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // repeated .reef.DataType arguments = 1;
-  inline int arguments_size() const;
-  inline void clear_arguments();
-  static const int kArgumentsFieldNumber = 1;
-  inline const ::reef::DataType& arguments(int index) const;
-  inline ::reef::DataType* mutable_arguments(int index);
-  inline ::reef::DataType* add_arguments();
-  inline const ::google::protobuf::RepeatedPtrField< ::reef::DataType >&
-      arguments() const;
-  inline ::google::protobuf::RepeatedPtrField< ::reef::DataType >*
-      mutable_arguments();
+  // repeated .reef.DataContainer data = 1;
+  inline int data_size() const;
+  inline void clear_data();
+  static const int kDataFieldNumber = 1;
+  inline const ::reef::DataContainer& data(int index) const;
+  inline ::reef::DataContainer* mutable_data(int index);
+  inline ::reef::DataContainer* add_data();
+  inline const ::google::protobuf::RepeatedPtrField< ::reef::DataContainer >&
+      data() const;
+  inline ::google::protobuf::RepeatedPtrField< ::reef::DataContainer >*
+      mutable_data();
   
-  // @@protoc_insertion_point(class_scope:reef.ReturnData)
+  // @@protoc_insertion_point(class_scope:reef.Argument)
  private:
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
-  ::google::protobuf::RepeatedPtrField< ::reef::DataType > arguments_;
+  ::google::protobuf::RepeatedPtrField< ::reef::DataContainer > data_;
   
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
@@ -225,7 +249,7 @@ class ReturnData : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_Message_2eproto();
   
   void InitAsDefaultInstance();
-  static ReturnData* default_instance_;
+  static Argument* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -379,23 +403,23 @@ class Message_Call : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 serviceindex() const;
   inline void set_serviceindex(::google::protobuf::uint32 value);
   
-  // required uint32 methodIndex = 3;
-  inline bool has_methodindex() const;
-  inline void clear_methodindex();
-  static const int kMethodIndexFieldNumber = 3;
-  inline ::google::protobuf::uint32 methodindex() const;
-  inline void set_methodindex(::google::protobuf::uint32 value);
+  // required uint32 memberIndex = 3;
+  inline bool has_memberindex() const;
+  inline void clear_memberindex();
+  static const int kMemberIndexFieldNumber = 3;
+  inline ::google::protobuf::uint32 memberindex() const;
+  inline void set_memberindex(::google::protobuf::uint32 value);
   
-  // repeated .reef.DataType arguments = 4;
+  // repeated .reef.Argument arguments = 4;
   inline int arguments_size() const;
   inline void clear_arguments();
   static const int kArgumentsFieldNumber = 4;
-  inline const ::reef::DataType& arguments(int index) const;
-  inline ::reef::DataType* mutable_arguments(int index);
-  inline ::reef::DataType* add_arguments();
-  inline const ::google::protobuf::RepeatedPtrField< ::reef::DataType >&
+  inline const ::reef::Argument& arguments(int index) const;
+  inline ::reef::Argument* mutable_arguments(int index);
+  inline ::reef::Argument* add_arguments();
+  inline const ::google::protobuf::RepeatedPtrField< ::reef::Argument >&
       arguments() const;
-  inline ::google::protobuf::RepeatedPtrField< ::reef::DataType >*
+  inline ::google::protobuf::RepeatedPtrField< ::reef::Argument >*
       mutable_arguments();
   
   // @@protoc_insertion_point(class_scope:reef.Message_Call)
@@ -404,15 +428,15 @@ class Message_Call : public ::google::protobuf::Message {
   inline void clear_has_hasreturn();
   inline void set_has_serviceindex();
   inline void clear_has_serviceindex();
-  inline void set_has_methodindex();
-  inline void clear_has_methodindex();
+  inline void set_has_memberindex();
+  inline void clear_has_memberindex();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   bool hasreturn_;
   ::google::protobuf::uint32 serviceindex_;
-  ::google::protobuf::RepeatedPtrField< ::reef::DataType > arguments_;
-  ::google::protobuf::uint32 methodindex_;
+  ::google::protobuf::RepeatedPtrField< ::reef::Argument > arguments_;
+  ::google::protobuf::uint32 memberindex_;
   
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
@@ -501,13 +525,13 @@ class Message_Field : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 fieldindex() const;
   inline void set_fieldindex(::google::protobuf::uint32 value);
   
-  // required .reef.DataType value = 4;
+  // required .reef.Argument value = 4;
   inline bool has_value() const;
   inline void clear_value();
   static const int kValueFieldNumber = 4;
-  inline const ::reef::DataType& value() const;
-  inline ::reef::DataType* mutable_value();
-  inline ::reef::DataType* release_value();
+  inline const ::reef::Argument& value() const;
+  inline ::reef::Argument* mutable_value();
+  inline ::reef::Argument* release_value();
   
   // @@protoc_insertion_point(class_scope:reef.Message_Field)
  private:
@@ -524,7 +548,7 @@ class Message_Field : public ::google::protobuf::Message {
   
   bool issetfield_;
   ::google::protobuf::uint32 serviceindex_;
-  ::reef::DataType* value_;
+  ::reef::Argument* value_;
   ::google::protobuf::uint32 fieldindex_;
   
   mutable int _cached_size_;
@@ -778,57 +802,137 @@ class Message : public ::google::protobuf::Message {
 
 // ===================================================================
 
-// DataType
+// DataContainer
 
-// required int32 dummy = 1;
-inline bool DataType::has_dummy() const {
+// optional bool boolean = 1;
+inline bool DataContainer::has_boolean() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void DataType::set_has_dummy() {
+inline void DataContainer::set_has_boolean() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void DataType::clear_has_dummy() {
+inline void DataContainer::clear_has_boolean() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void DataType::clear_dummy() {
-  dummy_ = 0;
-  clear_has_dummy();
+inline void DataContainer::clear_boolean() {
+  boolean_ = false;
+  clear_has_boolean();
 }
-inline ::google::protobuf::int32 DataType::dummy() const {
-  return dummy_;
+inline bool DataContainer::boolean() const {
+  return boolean_;
 }
-inline void DataType::set_dummy(::google::protobuf::int32 value) {
-  set_has_dummy();
-  dummy_ = value;
+inline void DataContainer::set_boolean(bool value) {
+  set_has_boolean();
+  boolean_ = value;
+}
+
+// optional string str = 2;
+inline bool DataContainer::has_str() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void DataContainer::set_has_str() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void DataContainer::clear_has_str() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void DataContainer::clear_str() {
+  if (str_ != &::google::protobuf::internal::kEmptyString) {
+    str_->clear();
+  }
+  clear_has_str();
+}
+inline const ::std::string& DataContainer::str() const {
+  return *str_;
+}
+inline void DataContainer::set_str(const ::std::string& value) {
+  set_has_str();
+  if (str_ == &::google::protobuf::internal::kEmptyString) {
+    str_ = new ::std::string;
+  }
+  str_->assign(value);
+}
+inline void DataContainer::set_str(const char* value) {
+  set_has_str();
+  if (str_ == &::google::protobuf::internal::kEmptyString) {
+    str_ = new ::std::string;
+  }
+  str_->assign(value);
+}
+inline void DataContainer::set_str(const char* value, size_t size) {
+  set_has_str();
+  if (str_ == &::google::protobuf::internal::kEmptyString) {
+    str_ = new ::std::string;
+  }
+  str_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* DataContainer::mutable_str() {
+  set_has_str();
+  if (str_ == &::google::protobuf::internal::kEmptyString) {
+    str_ = new ::std::string;
+  }
+  return str_;
+}
+inline ::std::string* DataContainer::release_str() {
+  clear_has_str();
+  if (str_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = str_;
+    str_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// optional double numeric = 3;
+inline bool DataContainer::has_numeric() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void DataContainer::set_has_numeric() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void DataContainer::clear_has_numeric() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void DataContainer::clear_numeric() {
+  numeric_ = 0;
+  clear_has_numeric();
+}
+inline double DataContainer::numeric() const {
+  return numeric_;
+}
+inline void DataContainer::set_numeric(double value) {
+  set_has_numeric();
+  numeric_ = value;
 }
 
 // -------------------------------------------------------------------
 
-// ReturnData
+// Argument
 
-// repeated .reef.DataType arguments = 1;
-inline int ReturnData::arguments_size() const {
-  return arguments_.size();
+// repeated .reef.DataContainer data = 1;
+inline int Argument::data_size() const {
+  return data_.size();
 }
-inline void ReturnData::clear_arguments() {
-  arguments_.Clear();
+inline void Argument::clear_data() {
+  data_.Clear();
 }
-inline const ::reef::DataType& ReturnData::arguments(int index) const {
-  return arguments_.Get(index);
+inline const ::reef::DataContainer& Argument::data(int index) const {
+  return data_.Get(index);
 }
-inline ::reef::DataType* ReturnData::mutable_arguments(int index) {
-  return arguments_.Mutable(index);
+inline ::reef::DataContainer* Argument::mutable_data(int index) {
+  return data_.Mutable(index);
 }
-inline ::reef::DataType* ReturnData::add_arguments() {
-  return arguments_.Add();
+inline ::reef::DataContainer* Argument::add_data() {
+  return data_.Add();
 }
-inline const ::google::protobuf::RepeatedPtrField< ::reef::DataType >&
-ReturnData::arguments() const {
-  return arguments_;
+inline const ::google::protobuf::RepeatedPtrField< ::reef::DataContainer >&
+Argument::data() const {
+  return data_;
 }
-inline ::google::protobuf::RepeatedPtrField< ::reef::DataType >*
-ReturnData::mutable_arguments() {
-  return &arguments_;
+inline ::google::protobuf::RepeatedPtrField< ::reef::DataContainer >*
+Argument::mutable_data() {
+  return &data_;
 }
 
 // -------------------------------------------------------------------
@@ -905,49 +1009,49 @@ inline void Message_Call::set_serviceindex(::google::protobuf::uint32 value) {
   serviceindex_ = value;
 }
 
-// required uint32 methodIndex = 3;
-inline bool Message_Call::has_methodindex() const {
+// required uint32 memberIndex = 3;
+inline bool Message_Call::has_memberindex() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void Message_Call::set_has_methodindex() {
+inline void Message_Call::set_has_memberindex() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void Message_Call::clear_has_methodindex() {
+inline void Message_Call::clear_has_memberindex() {
   _has_bits_[0] &= ~0x00000004u;
 }
-inline void Message_Call::clear_methodindex() {
-  methodindex_ = 0u;
-  clear_has_methodindex();
+inline void Message_Call::clear_memberindex() {
+  memberindex_ = 0u;
+  clear_has_memberindex();
 }
-inline ::google::protobuf::uint32 Message_Call::methodindex() const {
-  return methodindex_;
+inline ::google::protobuf::uint32 Message_Call::memberindex() const {
+  return memberindex_;
 }
-inline void Message_Call::set_methodindex(::google::protobuf::uint32 value) {
-  set_has_methodindex();
-  methodindex_ = value;
+inline void Message_Call::set_memberindex(::google::protobuf::uint32 value) {
+  set_has_memberindex();
+  memberindex_ = value;
 }
 
-// repeated .reef.DataType arguments = 4;
+// repeated .reef.Argument arguments = 4;
 inline int Message_Call::arguments_size() const {
   return arguments_.size();
 }
 inline void Message_Call::clear_arguments() {
   arguments_.Clear();
 }
-inline const ::reef::DataType& Message_Call::arguments(int index) const {
+inline const ::reef::Argument& Message_Call::arguments(int index) const {
   return arguments_.Get(index);
 }
-inline ::reef::DataType* Message_Call::mutable_arguments(int index) {
+inline ::reef::Argument* Message_Call::mutable_arguments(int index) {
   return arguments_.Mutable(index);
 }
-inline ::reef::DataType* Message_Call::add_arguments() {
+inline ::reef::Argument* Message_Call::add_arguments() {
   return arguments_.Add();
 }
-inline const ::google::protobuf::RepeatedPtrField< ::reef::DataType >&
+inline const ::google::protobuf::RepeatedPtrField< ::reef::Argument >&
 Message_Call::arguments() const {
   return arguments_;
 }
-inline ::google::protobuf::RepeatedPtrField< ::reef::DataType >*
+inline ::google::protobuf::RepeatedPtrField< ::reef::Argument >*
 Message_Call::mutable_arguments() {
   return &arguments_;
 }
@@ -1022,7 +1126,7 @@ inline void Message_Field::set_fieldindex(::google::protobuf::uint32 value) {
   fieldindex_ = value;
 }
 
-// required .reef.DataType value = 4;
+// required .reef.Argument value = 4;
 inline bool Message_Field::has_value() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
@@ -1033,20 +1137,20 @@ inline void Message_Field::clear_has_value() {
   _has_bits_[0] &= ~0x00000008u;
 }
 inline void Message_Field::clear_value() {
-  if (value_ != NULL) value_->::reef::DataType::Clear();
+  if (value_ != NULL) value_->::reef::Argument::Clear();
   clear_has_value();
 }
-inline const ::reef::DataType& Message_Field::value() const {
+inline const ::reef::Argument& Message_Field::value() const {
   return value_ != NULL ? *value_ : *default_instance_->value_;
 }
-inline ::reef::DataType* Message_Field::mutable_value() {
+inline ::reef::Argument* Message_Field::mutable_value() {
   set_has_value();
-  if (value_ == NULL) value_ = new ::reef::DataType;
+  if (value_ == NULL) value_ = new ::reef::Argument;
   return value_;
 }
-inline ::reef::DataType* Message_Field::release_value() {
+inline ::reef::Argument* Message_Field::release_value() {
   clear_has_value();
-  ::reef::DataType* temp = value_;
+  ::reef::Argument* temp = value_;
   value_ = NULL;
   return temp;
 }

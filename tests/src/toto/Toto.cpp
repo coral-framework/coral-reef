@@ -23,6 +23,21 @@ public:
 	{
 	}
 	
+	void printInt( co::int32 number )
+	{
+		std::cerr << "Printing int: " << number << std::endl;
+	}
+
+	void printString( const std::string& str )
+	{
+		std::cerr << "Printing string: " << str << std::endl;
+	}
+
+	void printDouble( double number )
+	{
+		std::cerr << "Printing double: " << number << std::endl;
+	}
+
 	co::int32 getNumber()
 	{
 		return _number;

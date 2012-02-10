@@ -9,4 +9,10 @@ interface IToto
 	void printWelcome();
 	
 	void printMethod3();
+	
+	void printInt( in int32 number );
+	
+	void printString( in string str );
+	
+	void printDouble( in double number );
 };

@@ -1,4 +1,4 @@
-#include "ServerNode_Base.h"
+#include "ServerNode.h"
 
 #include "Channel.h"
 #include "Servant.h"
@@ -9,62 +9,77 @@
 #include <map>
 
 namespace reef {
-    
-class ServerNode : public ServerNode_Base, public OutputChannelDelegate
-{
-public:
-    ServerNode()
-    {
-        // empty constructor
-    }
-    
-    virtual ~ServerNode()
-    {
-        // empty destructor
-    }
-    
-    void start( const std::string& address )
-    {
-        _binder = new Binder();
-        _binder->bind( address );
-        
-        _channels.push_back( new OutputChannel( _binder, this ) );
-        _channels[0]->setId( 0 );
-    }
-    
-	void update()
-	{
-		std::string message;
-        
-		if( _binder->receive( message ) )    
-		{
-			// Route the message to the proper channel
-			Channel::route( message, _channels );
-		}
-	}
 
-    void stop()
-    {
-        // TODO: implement this method.
-    }
-       
-    // OutputChannelDelegate
-    int onNewInstance( Channel* channel, const std::string& typeName ) 
-    {
-        Channel* newChannel = new OutputChannel( _binder, new Servant( typeName ) );
-        newChannel->setId( _channels.size() );
-        _channels.push_back( newChannel );
+ServerNode::ServerNode()
+{
+    // empty constructor
+}
+    
+ServerNode::~ServerNode()
+{
+    // empty destructor
+}
+    
+void ServerNode::start( const std::string& address )
+{
+    _binder = new Binder();
+    _binder->bind( address );
         
-        return newChannel->getId();
-    }
+	OutputChannel* serverChannel = new OutputChannel( this, _binder );
+	serverChannel->setDelegate( this );
+    _channels.push_back( serverChannel );
+
+    _channels[0]->setId( 0 );
+}
     
-private:
-	Binder* _binder;
+void ServerNode::update()
+{
+	std::string message;
+        
+	if( _binder->receive( message ) )    
+	{
+		// Route the message to the proper channel
+		Channel::route( message, _channels );
+	}
+}
+
+void ServerNode::stop()
+{
+    // TODO: implement this method.
+}
+       
+// OutputChannelDelegate
+int ServerNode::onNewInstance( Channel* channel, const std::string& typeName ) 
+{
+	co::IObject* instance = co::newInstance( typeName );
+    OutputChannel* newChannel = new OutputChannel( this, _binder );
+    newChannel->setDelegate( new Servant( instance ) );
+
+	int newChannelId = _channels.size();
+	newChannel->setId( newChannelId );
+    _channels.push_back( newChannel );
+
+	registerInstance( newChannelId, instance );
+        
+    return newChannelId;
+}
+
+void ServerNode::registerInstance( co::int32 virtualAddress, co::IObject* object )
+{
+	InstanceMap::iterator it = _instanceMap.find( virtualAddress );
+	assert( it != _instanceMap.end() );
+
+	_instanceMap.insert( std::pair<int, co::IObject*>( virtualAddress, object ) );
+}
     
-    typedef std::vector<Channel*> Channels;
-    
-    Channels _channels;
-};
+co::IObject* ServerNode::mapInstance( co::int32 virtualAddress )
+{
+	InstanceMap::iterator it = _instanceMap.find( virtualAddress );
+	if( it == _instanceMap.end() )
+		return 0;
+
+	return it->second;
+}
 
 CORAL_EXPORT_COMPONENT( ServerNode, ServerNode );
     

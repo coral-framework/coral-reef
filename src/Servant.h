@@ -10,15 +10,17 @@
 
 namespace reef
 {
+
+class ServerNode;
     
 // Manages access to
 class Servant : public OutputChannelDelegate
 {
 public:
-    Servant( const std::string& type );
+    Servant( co::IObject* object );
     
-    void onSendCall( Channel* channel, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args );
-    void onCall( Channel* channel, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args, co::Any& result );
+    void onSendCall( Channel* channel, co::int32 serviceId, co::int32 memberIndex, co::Range<co::Any const> args );
+    void onCall( Channel* channel, co::int32 serviceId, co::int32 memberIndex, co::Range<co::Any const> args, co::Any& result );
     void onGetField( Channel* channel, co::int32 serviceId, co::int32 fieldIndex, co::Any& result );
     void onSetField( Channel* channel, co::int32 serviceId, co::int32 fieldIndex, const co::Any& value );
     

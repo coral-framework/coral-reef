@@ -8,15 +8,17 @@
 #include <string>
 #include <iostream>
 
+#include "ServerNode.h"
+
 namespace reef
 {
 
-Servant::Servant( const std::string& type )
+Servant::Servant( co::IObject* object )
 {
-    _object = co::newInstance( type );
+    _object = object;
 }
     
-void Servant::onSendCall( Channel* channel, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args )
+void Servant::onSendCall( Channel* channel, co::int32 serviceId, co::int32 memberIndex, co::Range<co::Any const> args )
 {
     co::Range<co::IPort* const> ports = _object->getComponent()->getFacets();
     
@@ -27,7 +29,7 @@ void Servant::onSendCall( Channel* channel, co::int32 serviceId, co::int32 metho
     co::IService* service = _object->getService( "toto" );
 
     co::IInterface* itf = service->getInterface();
-    co::IMember* member = itf->getMembers()[methodIndex];
+    co::IMember* member = itf->getMembers()[memberIndex];
     assert( member->getKind() == co::MemberKind::MK_METHOD );
     
     co::IMethod* method = co::cast<co::IMethod>( member );
@@ -36,7 +38,7 @@ void Servant::onSendCall( Channel* channel, co::int32 serviceId, co::int32 metho
     ref->invoke( service, method, args, ret );
 }
     
-void Servant::onCall( Channel* channel, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args, co::Any& result )
+void Servant::onCall( Channel* channel, co::int32 serviceId, co::int32 memberIndex, co::Range<co::Any const> args, co::Any& result )
 {
     
 }
