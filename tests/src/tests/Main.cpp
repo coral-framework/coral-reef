@@ -29,23 +29,24 @@ int main( int argc, char** argv )
 
 //	int res = RUN_ALL_TESTS();
     
-    co::IObject* obj = co::newInstance( "reef.ServerNode" );
-    reef::IServerNode* server = obj->getService<reef::IServerNode>();
-    
-    server->start( "tcp://*:4020" );
+//    co::IObject* obj = co::newInstance( "reef.ServerNode" );
+//    reef::IServerNode* server = obj->getService<reef::IServerNode>();
+//    
+//    server->start( "tcp://*:4020" );
+//
+//	while( true )
+//		server->update();
 
-	while( true )
-		server->update();
-/*
     co::IObject* obj = co::newInstance( "reef.ClientNode" );
     reef::IClientNode* client = obj->getService<reef::IClientNode>();
     co::IObject* toto = client->newRemoteInstance( "toto.Toto", "tcp://10.0.24.151:4020" );
     toto::IToto* totoService = toto->getService<toto::IToto>();
-    totoService->printHello();
-    totoService->printWelcome();
-    totoService->printMethod3();
-    totoService->printMethod3();
-	*/
+    totoService->printInt( 10267399 );
+    totoService->printString( "The the quick brown fox fox jumped over the lazy dog dog" );
+    totoService->printDouble( 0.000123321 );
+    totoService->printDouble( 12345678.987654 );
+    
+
 	co::shutdown();
 
 	return 0;

@@ -37,6 +37,30 @@ public:
 	{
 		std::cerr << "Printing double: " << number << std::endl;
 	}
+    
+    void printStringList( const std::vector<std::string>& strList )
+    {
+        for( int i = 0; i < strList.size(); ++i )
+        {
+            std::cout << "PRINT STRING ELEMENT : " << i << " : " << strList[i];
+        }
+    }
+    
+    void printNumberList( const std::vector<co::int32>& list )
+    {
+        for( int i = 0; i < list.size(); ++i )
+        {
+            std::cout << "PRINT NUMBER ELEMENT : " << i << " : " << list[i];
+        }
+    }
+    
+    void printHybridList( const std::vector<co::int32>& list, const std::vector<std::string>& strList )
+    {
+        for( int i = 0; i < list.size(); ++i )
+        {
+            std::cout << "PRINT NUMBER ELEMENT Number = " << list[i] << " : " << strList[i];
+        }
+    }
 
 	co::int32 getNumber()
 	{

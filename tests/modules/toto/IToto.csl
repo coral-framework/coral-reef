@@ -15,4 +15,12 @@ interface IToto
 	void printString( in string str );
 	
 	void printDouble( in double number );
+	
+	void printStringList( in string[] strList );
+
+    
+    void printNumberList( in string[] list );
+
+    
+    void printHybridList( in string[] list, in string[] strList );
 };
