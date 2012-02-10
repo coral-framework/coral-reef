@@ -38,27 +38,32 @@ public:
 		std::cerr << "Printing double: " << number << std::endl;
 	}
     
-    void printStringList( const std::vector<std::string>& strList )
+    void printStringList( co::Range<std::string const> strList )
     {
-        for( int i = 0; i < strList.size(); ++i )
+        for( int i = 0; strList; ++i, strList.popFirst() )
         {
-            std::cout << "PRINT STRING ELEMENT : " << i << " : " << strList[i];
+            std::cout << "PRINT STRING ELEMENT : " << i << strList.getFirst() << std::endl;
         }
     }
     
-    void printNumberList( const std::vector<co::int32>& list )
+    void printNumberList( co::Range<co::int32 const> list )
     {
-        for( int i = 0; i < list.size(); ++i )
+        for( int i = 0; list; ++i, list.popFirst() )
         {
-            std::cout << "PRINT NUMBER ELEMENT : " << i << " : " << list[i];
+            std::cout << "PRINT NUMBER ELEMENT : " << i << list.getFirst() << std::endl;
         }
     }
     
-    void printHybridList( const std::vector<co::int32>& list, const std::vector<std::string>& strList )
+    void printHybridList( co::Range<co::int32 const> list, co::Range<std::string const> strList )
     {
-        for( int i = 0; i < list.size(); ++i )
+        for( int i = 0; list; ++i, list.popFirst() )
         {
-            std::cout << "PRINT NUMBER ELEMENT Number = " << list[i] << " : " << strList[i];
+            std::cout << "PRINT NUMBER ELEMENT : " << i << list.getFirst() << std::endl;
+        }
+        
+        for( int i = 0; strList; ++i, strList.popFirst() )
+        {
+            std::cout << "PRINT STRING ELEMENT : " << i << strList.getFirst() << std::endl;
         }
     }
 

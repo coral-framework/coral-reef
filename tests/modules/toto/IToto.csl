@@ -19,8 +19,8 @@ interface IToto
 	void printStringList( in string[] strList );
 
     
-    void printNumberList( in string[] list );
+    void printNumberList( in int32[] list );
 
     
-    void printHybridList( in string[] list, in string[] strList );
+    void printHybridList( in int32[] list, in string[] strList );
 };
