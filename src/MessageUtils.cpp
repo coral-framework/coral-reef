@@ -4,9 +4,74 @@
 
 #include <iostream>
 
-
 namespace reef
 {
+    
+// Specialization for string
+template <>
+const std::string& MessageUtils::getPBContainerData<const std::string&>( const DataContainer& container )
+{
+    return container.str();
+}
+
+template <>
+bool MessageUtils::getPBContainerData<bool>( const DataContainer& container )
+{
+    return container.boolean();
+}
+
+
+template <>
+void MessageUtils::setPBContainerData<bool>( DataContainer* container, bool value ) 
+{
+    container->set_boolean( value );
+}
+
+template <>
+void MessageUtils::setPBContainerData<const std::string&>( DataContainer* container, const std::string& value ) 
+{
+    container->set_str( value );
+}
+
+template <>
+void MessageUtils::anyWithTypeToPBArg<std::string>( const co::Any& any, Argument* arg )
+{
+    // if the Any is a single value, set it directly 
+    if( any.getKind() != co::TK_ARRAY )
+    {
+        DataContainer* container = arg->add_data();
+        setPBContainerData<const std::string&>( container, any.get<const std::string&>() );
+        return;
+    }
+    
+    // if the Any is an array, iterate through the values adding to the Argument
+    const std::vector<std::string>& vec = any.get<const std::vector<std::string> &>();
+    
+    size_t size = vec.size();
+    for( int i = 0; i < size; i++ )
+    {
+        DataContainer* container = arg->add_data();
+        setPBContainerData<const std::string&>( container, vec[i] );
+    }
+}
+
+template <>
+void MessageUtils::PBArgWithTypeToAny<std::string>( const Argument& arg, co::Any& any, co::IType* elementType )
+{
+    if( !elementType )
+    {
+        any.set<const std::string&>( getPBContainerData<const std::string&>( arg.data( 0 ) ) );
+        return;
+    }
+    
+    size_t size = arg.data().size();
+    std::vector<co::uint8>& vec = any.createArray( elementType, size );
+    std::string* toCast = reinterpret_cast<std::string*>( &vec[0] );
+    for( int i = 0; i < size; i++ )
+    {
+        toCast[i] = getPBContainerData<const std::string&>( arg.data( i ) );
+    }
+}
 
 void MessageUtils::anyToPBArg( const co::Any& any, Argument* arg )
 {
