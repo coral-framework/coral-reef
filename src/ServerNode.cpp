@@ -67,7 +67,7 @@ int ServerNode::onNewInstance( Channel* channel, const std::string& typeName )
 void ServerNode::registerInstance( co::int32 virtualAddress, co::IObject* object )
 {
 	InstanceMap::iterator it = _instanceMap.find( virtualAddress );
-	assert( it != _instanceMap.end() );
+	assert( it == _instanceMap.end() );
 
 	_instanceMap.insert( std::pair<int, co::IObject*>( virtualAddress, object ) );
 }

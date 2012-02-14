@@ -8,9 +8,11 @@
 
 #include "ServerNode.h"
 
+#include "MessageUtils.h"
+
 namespace reef 
 {
-    
+
 static void printChannelMessage( Message* message )
 {
     std::cout << "MESSAGE INFO:" << std::endl;
@@ -18,117 +20,7 @@ static void printChannelMessage( Message* message )
     
     std::cout << message->type() << std::endl;
 }
-    
-static void convertCoType( const co::Any& any, DataContainer* container )
-{
-	co::TypeKind kind = any.getKind();
 
-	switch( kind )
-	{
-	case co::TK_BOOLEAN:
-		container->set_boolean( any.get<bool>() );
-		break;
-	case co::TK_INT8:
-	case co::TK_UINT8:
-	case co::TK_INT16:
-	case co::TK_UINT16:
-	case co::TK_INT32:
-	case co::TK_UINT32:
-	case co::TK_INT64:
-	case co::TK_UINT64:
-	case co::TK_FLOAT:
-	case co::TK_DOUBLE:
-		container->set_numeric( any.get<double>() );
-		break;
-	case co::TK_STRING:
-		{
-			const std::string& s = any.get<const std::string&>();
-			container->set_str( s );
-			break;
-		}
-	default:
-		assert( false );
-	}
-}
-
-static void convertDataType( const DataContainer& container, const co::TypeKind kind, co::Any& result )
-{
-	switch( kind )
-	{
-	case co::TK_BOOLEAN:
-		result.set<bool>( container.boolean() );
-	case co::TK_INT8:
-		result.set<co::int8>( static_cast<co::int8>( container.numeric() ) );
-	case co::TK_UINT8:
-		result.set<co::uint8>( static_cast<co::uint8>( container.numeric() ) );
-	case co::TK_INT16:
-		result.set<co::int16>( static_cast<co::int16>( container.numeric() ) );
-	case co::TK_UINT16:
-		result.set<co::uint16>( static_cast<co::uint16>( container.numeric() ) );
-	case co::TK_INT32:
-		result.set<co::int32>( static_cast<co::int32>( container.numeric() ) );
-	case co::TK_UINT32:
-		result.set<co::uint32>( static_cast<co::uint32>( container.numeric() ) );
-	case co::TK_INT64:
-		result.set<co::int64>( static_cast<co::int64>( container.numeric() ) );
-	case co::TK_UINT64:
-		result.set<co::uint64>( static_cast<co::uint64>( container.numeric() ) );
-	case co::TK_FLOAT:
-		result.set<float>( static_cast<float>( container.numeric() ) );
-	case co::TK_DOUBLE:
-		result.set<double>( container.numeric() );
-	case co::TK_STRING:
-		result.set<const std::string&>( container.str() );
-	default:
-		assert( false );
-	}
-}
-
-static void anyToPBArg( const co::Any& any, Argument* arg )
-{
-	DataContainer* container = arg->add_data();
-	convertCoType( any, container );
-}
-
-static void PBArgToAny( const Argument& arg, co::IParameter* descriptor, co::Any& any )
-{
-	co::TypeKind kind = descriptor->getType()->getKind();
-	convertDataType( arg.data( 0 ), kind, any ); 
-}
-
-static Message_Call* makeCallMessage( int destination, bool hasReturn, Message& owner, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args )
-{
-    owner.set_destination( destination );
-    owner.set_type( Message::TYPE_CALL );
-	
-    Message_Call* mc = owner.mutable_msgcall();
-    mc->set_hasreturn( hasReturn );
-    mc->set_serviceindex( serviceId );
-    mc->set_memberindex( methodIndex );
-    for( ; args; args.popFirst() )
-	{
-		Argument* arg = mc->add_arguments();
-		anyToPBArg( args.getFirst(), arg );
-
-	}
-    
-    // TODO: serialize parameters
-    return mc;
-}
-    
-static Message_Field* makeFieldMessage( int destination, bool isSet, Message& owner, co::int32 serviceId, co::int32 fieldIndex )
-{
-    owner.set_destination( destination ); // 0 is always the node channel
-    owner.set_type( Message::TYPE_FIELD );
-    
-    Message_Field* mf = owner.mutable_msgfield();
-    mf->set_issetfield( isSet ); // it is a get field event
-    mf->set_serviceindex( serviceId );
-    mf->set_fieldindex( fieldIndex );
-
-    return mf;
-}
-    
 void Channel::route( const std::string& data, const std::vector<Channel*>& channels )
 {
     Message message;
@@ -193,7 +85,7 @@ void InputChannel::sendCall( co::int32 serviceId, co::int32 methodIndex, co::Ran
 {
     // make a call without returns
     Message message;
-    makeCallMessage( _channelId, false, message, serviceId, methodIndex, args );
+    MessageUtils::makeCallMessage( _channelId, false, message, serviceId, methodIndex, args );
     write( &message );
 }
 
@@ -201,7 +93,7 @@ void InputChannel::call( co::int32 serviceId, co::int32 methodIndex, co::Range<c
 {
     // make a call with returns
     Message message;
-    makeCallMessage( _channelId, true, message, serviceId, methodIndex, args );
+    MessageUtils::makeCallMessage( _channelId, true, message, serviceId, methodIndex, args );
     
     write( &message );
     
@@ -215,7 +107,7 @@ void InputChannel::call( co::int32 serviceId, co::int32 methodIndex, co::Range<c
 void InputChannel::getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result )
 {
     Message message;
-    makeFieldMessage( _channelId, false, message, serviceId, fieldIndex );
+    MessageUtils::makeFieldMessage( _channelId, false, message, serviceId, fieldIndex );
 
     write( &message );
     
@@ -233,10 +125,10 @@ void InputChannel::getField( co::int32 serviceId, co::int32 fieldIndex, co::Any&
 void InputChannel::setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value )
 {
     Message message;
-    Message_Field* mf = makeFieldMessage( _channelId, true, message, serviceId, fieldIndex );
+    Message_Field* mf = MessageUtils::makeFieldMessage( _channelId, true, message, serviceId, fieldIndex );
 
 	Argument* arg = mf->mutable_value();
-	anyToPBArg( value, arg );
+	MessageUtils::anyToPBArg( value, arg );
     
     write( &message );
 }
@@ -330,14 +222,19 @@ void OutputChannel::write( const Message* message )
             else
             {
 				co::IObject* instance = _owner->mapInstance( getId() );
-				co::IMethod* method = co::cast<co::IMethod>( instance->getInterface()->getMembers()[memberIndex] );
+				co::IPort* port = instance->getComponent()->getPorts()[serviceId];
+				co::IInterface* iface = port->getType();
+
+				co::IMember* member = iface->getMembers()[memberIndex];
+				co::IMethod* method =  co::cast<co::IMethod>( member );
+
 				std::vector<co::Any> anyArgs;
 				google::protobuf::RepeatedPtrField<Argument> pbArgs = callMsg.arguments();
 				google::protobuf::RepeatedPtrField<Argument>::const_iterator it = pbArgs.begin();
 				for( co::Range<co::IParameter* const> params = method->getParameters(); params; params.popFirst() )
 				{
 					co::Any anyArg;
-					PBArgToAny( *it, params.getFirst(), anyArg );
+					MessageUtils::PBArgToAny( *it, params.getFirst(), anyArg );
 					it++;
 					anyArgs.push_back( anyArg );
 				}
