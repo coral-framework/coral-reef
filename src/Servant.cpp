@@ -19,7 +19,19 @@ Servant::Servant( co::IObject* object )
 }
     
 void Servant::onSendCall( Channel* channel, co::int32 serviceId, co::int32 memberIndex, co::Range<co::Any const> args )
-{
+{/*
+ TODO: make a test with this code
+	for( ; args; args.popFirst() )
+	{
+		co::Any any = args.getFirst();
+		co::TypeKind tp = any.getKind();
+		co::Range<const co::int32> num = any.get<co::Range<const co::int32> >();
+		for( ; num; num.popFirst() )
+		{
+			co::int32 a = num.getFirst();
+		}
+	}*/
+
     co::Range<co::IPort* const> ports = _object->getComponent()->getFacets();
     
     co::IPort* port = ports[serviceId];

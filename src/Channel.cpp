@@ -227,18 +227,20 @@ void OutputChannel::write( const Message* message )
 
 				co::IMember* member = iface->getMembers()[memberIndex];
 				co::IMethod* method =  co::cast<co::IMethod>( member );
+				co::Range<co::IParameter* const> params = method->getParameters();
 
 				std::vector<co::Any> anyArgs;
 				google::protobuf::RepeatedPtrField<Argument> pbArgs = callMsg.arguments();
 				google::protobuf::RepeatedPtrField<Argument>::const_iterator it = pbArgs.begin();
-				for( co::Range<co::IParameter* const> params = method->getParameters(); params; params.popFirst() )
+				size_t size = pbArgs.size();
+				anyArgs.resize( size );
+				for( int i = 0; i < size; i++ )
 				{
-					co::Any anyArg;
-					MessageUtils::PBArgToAny( *it, params.getFirst(), anyArg );
+					MessageUtils::PBArgToAny( *it, params.getFirst(), anyArgs[i] );
 					it++;
-					anyArgs.push_back( anyArg );
+					params.popFirst();
 				}
-				
+			
 				sendCall( serviceId, memberIndex, anyArgs );
             }
             break;

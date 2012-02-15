@@ -4,6 +4,7 @@
 #include <co/Range.h>
 #include <co/Any.h>
 #include <co/TypeKind.h>
+#include <co/Exception.h>
 #include <co/IParameter.h>
 #include "Message.pb.h"
 
@@ -41,13 +42,13 @@ private:
 		}
 
 		// if the Any is an array, iterate through the values adding to the Argument
-		std::vector<T>& vec = any.get<std::vector<T> &>();
+		const co::Range<const T> range = any.get<const co::Range<const T> >();
 
-		size_t size = vec.size();
+		size_t size = range.getSize();
 		for( int i = 0; i < size; i++ )
 		{
 			DataContainer* container = arg->add_data();
-			setPBContainerData<T>( container, vec[i] );
+			setPBContainerData<T>( container, range[i] );
 		}
 	}
     
@@ -55,7 +56,7 @@ private:
 	template <typename T>
 	inline static void setPBContainerData( DataContainer* container, T value ) 
 	{
-		container->set_numeric( value );
+		container->set_numeric( static_cast<double>( value ) );
 	}
 
 	// -------------- Protobuf to Any conversion functions ------------------//

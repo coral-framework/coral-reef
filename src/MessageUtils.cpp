@@ -45,13 +45,13 @@ void MessageUtils::anyWithTypeToPBArg<std::string>( const co::Any& any, Argument
     }
     
     // if the Any is an array, iterate through the values adding to the Argument
-    const std::vector<std::string>& vec = any.get<const std::vector<std::string> &>();
+	const co::Range<const std::string> range = any.get<const co::Range<const std::string> >();
     
-    size_t size = vec.size();
+    size_t size = range.getSize();
     for( int i = 0; i < size; i++ )
     {
         DataContainer* container = arg->add_data();
-        setPBContainerData<const std::string&>( container, vec[i] );
+        setPBContainerData<const std::string&>( container, range[i] );
     }
 }
 
@@ -84,22 +84,41 @@ void MessageUtils::anyToPBArg( const co::Any& any, Argument* arg )
 	switch( kind )
 	{
 	case co::TK_BOOLEAN:
-		anyWithTypeToPBArg<bool>( any, arg );
-		break;
+		//anyWithTypeToPBArg<bool>( any, arg );
+		
 	case co::TK_INT8:
+		anyWithTypeToPBArg<co::int8>( any, arg );
+		break;
 	case co::TK_UINT8:
+		anyWithTypeToPBArg<co::uint8>( any, arg );
+		break;
 	case co::TK_INT16:
+		anyWithTypeToPBArg<co::int16>( any, arg );
+		break;
 	case co::TK_UINT16:
+		anyWithTypeToPBArg<co::uint16>( any, arg );
+		break;
 	case co::TK_INT32:
+		anyWithTypeToPBArg<co::int32>( any, arg );
+		break;
 	case co::TK_UINT32:
+		anyWithTypeToPBArg<co::uint32>( any, arg );
+		break;
 	case co::TK_INT64:
+		anyWithTypeToPBArg<co::int64>( any, arg );
+		break;
 	case co::TK_UINT64:
+		anyWithTypeToPBArg<co::uint64>( any, arg );
+		break;
 	case co::TK_FLOAT:
+		anyWithTypeToPBArg<float>( any, arg );
+		break;
 	case co::TK_DOUBLE:
 		anyWithTypeToPBArg<double>( any, arg );
 		break;
 	case co::TK_STRING:
 		anyWithTypeToPBArg<std::string>( any, arg );
+		break;
 	default:
 		assert( false );
 	}

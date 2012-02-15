@@ -65,9 +65,9 @@ int main( int argc, char** argv )
 		stringList.push_back( "dog" );
 		stringList.push_back( "dog" );
     
-		totoService->printNumberList( numberList );
+		//totoService->printNumberList( numberList );
 		//totoService->printStringList( stringList );
-		//totoService->printHybridList( numberList, stringList );
+		totoService->printHybridList( numberList, stringList );
 	}
 	catch( std::exception& e ) 
 	{ 
