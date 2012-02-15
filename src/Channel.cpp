@@ -54,6 +54,16 @@ InputChannel::~InputChannel()
     // empty
 }            
 
+// Blocking function
+void InputChannel::fetchReturnValue( co::IType* descriptor, co::Any& returnValue )
+{
+	std::string input;
+    _connecter->receiveReply( input );
+	Argument arg;
+	arg.ParseFromString( input );
+	MessageUtils::PBArgToAny( arg, descriptor, returnValue );
+}
+
 int InputChannel::newInstance( const std::string& typeName )
 {
     assert( _channelId == - 1 );
@@ -98,8 +108,7 @@ void InputChannel::call( co::int32 serviceId, co::int32 methodIndex, co::Range<c
     write( &message );
     
     // wait for the return
-    std::string input;
-    _connecter->receiveReply( input );
+
 
     // TODO: properly set returned value into result variable and set all out values from args list
 }
@@ -107,7 +116,7 @@ void InputChannel::call( co::int32 serviceId, co::int32 methodIndex, co::Range<c
 void InputChannel::getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result )
 {
     Message message;
-    MessageUtils::makeFieldMessage( _channelId, false, message, serviceId, fieldIndex );
+    MessageUtils::makeGetFieldMessage( _channelId, message, serviceId, fieldIndex );
 
     write( &message );
     
@@ -125,10 +134,7 @@ void InputChannel::getField( co::int32 serviceId, co::int32 fieldIndex, co::Any&
 void InputChannel::setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value )
 {
     Message message;
-    Message_Field* mf = MessageUtils::makeFieldMessage( _channelId, true, message, serviceId, fieldIndex );
-
-	Argument* arg = mf->mutable_value();
-	MessageUtils::anyToPBArg( value, arg );
+    MessageUtils::makeSetFieldMessage( _channelId, message, serviceId, fieldIndex, value );
     
     write( &message );
 }
@@ -212,37 +218,42 @@ void OutputChannel::write( const Message* message )
             // TODO: handle call arguments (translate to co::Any)
             // const DataArgument& argument = call.arguments( 0 );
             
-            if( callMsg.hasreturn() )
-            {
-                //co::Any result;
-                //call( serviceId, methodIndex, dummy, result );
-                
-                // TODO: handle return
-            }
-            else
-            {
-				co::IObject* instance = _owner->mapInstance( getId() );
-				co::IPort* port = instance->getComponent()->getPorts()[serviceId];
-				co::IInterface* iface = port->getType();
+			co::IObject* instance = _owner->mapInstance( getId() );
+			co::IPort* port = instance->getComponent()->getPorts()[serviceId];
+			co::IInterface* iface = port->getType();
 
-				co::IMember* member = iface->getMembers()[memberIndex];
-				co::IMethod* method =  co::cast<co::IMethod>( member );
-				co::Range<co::IParameter* const> params = method->getParameters();
+			co::IMember* member = iface->getMembers()[memberIndex];
+			co::IMethod* method =  co::cast<co::IMethod>( member );
+			co::Range<co::IParameter* const> params = method->getParameters();
 
-				std::vector<co::Any> anyArgs;
-				google::protobuf::RepeatedPtrField<Argument> pbArgs = callMsg.arguments();
-				google::protobuf::RepeatedPtrField<Argument>::const_iterator it = pbArgs.begin();
-				size_t size = pbArgs.size();
-				anyArgs.resize( size );
-				for( int i = 0; i < size; i++ )
-				{
-					MessageUtils::PBArgToAny( *it, params.getFirst(), anyArgs[i] );
-					it++;
-					params.popFirst();
-				}
+			std::vector<co::Any> anyArgs;
+			google::protobuf::RepeatedPtrField<Argument> pbArgs = callMsg.arguments();
+			google::protobuf::RepeatedPtrField<Argument>::const_iterator it = pbArgs.begin();
+			size_t size = pbArgs.size();
+			anyArgs.resize( size );
+			for( int i = 0; i < size; i++ )
+			{
+				MessageUtils::PBArgToAny( *it, params.getFirst()->getType(), anyArgs[i] );
+				it++;
+				params.popFirst();
+			}
 			
+			if( !callMsg.hasreturn() )
+			{
 				sendCall( serviceId, memberIndex, anyArgs );
-            }
+			}
+			else
+			{
+				co::Any returnValue;
+				call( serviceId, memberIndex, anyArgs, returnValue );
+
+				Argument returnArg;
+				MessageUtils::anyToPBArg( returnValue, &returnArg );
+				std::string output;
+				returnArg.SerializeToString( &output );
+    			_binder->reply( output );
+			}
+
             break;
         }
         default:

@@ -38,16 +38,19 @@ class VirtualAddress;
 class Message_Call;
 class Message_Field;
 class Message_New;
+class Message_Return;
 class Message;
 
 enum Message_Type {
   Message_Type_TYPE_NEW = 0,
   Message_Type_TYPE_FIELD = 1,
-  Message_Type_TYPE_CALL = 2
+  Message_Type_TYPE_CALL = 2,
+  Message_Type_TYPE_RETURN = 3,
+  Message_Type_TYPE_OTHER = 4
 };
 bool Message_Type_IsValid(int value);
 const Message_Type Message_Type_Type_MIN = Message_Type_TYPE_NEW;
-const Message_Type Message_Type_Type_MAX = Message_Type_TYPE_CALL;
+const Message_Type Message_Type_Type_MAX = Message_Type_TYPE_OTHER;
 const int Message_Type_Type_ARRAYSIZE = Message_Type_Type_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* Message_Type_descriptor();
@@ -649,6 +652,89 @@ class Message_New : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
+class Message_Return : public ::google::protobuf::Message {
+ public:
+  Message_Return();
+  virtual ~Message_Return();
+  
+  Message_Return(const Message_Return& from);
+  
+  inline Message_Return& operator=(const Message_Return& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Message_Return& default_instance();
+  
+  void Swap(Message_Return* other);
+  
+  // implements Message ----------------------------------------------
+  
+  Message_Return* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const Message_Return& from);
+  void MergeFrom(const Message_Return& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // required .reef.Argument returnValue = 1;
+  inline bool has_returnvalue() const;
+  inline void clear_returnvalue();
+  static const int kReturnValueFieldNumber = 1;
+  inline const ::reef::Argument& returnvalue() const;
+  inline ::reef::Argument* mutable_returnvalue();
+  inline ::reef::Argument* release_returnvalue();
+  
+  // @@protoc_insertion_point(class_scope:reef.Message_Return)
+ private:
+  inline void set_has_returnvalue();
+  inline void clear_has_returnvalue();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::reef::Argument* returnvalue_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_Message_2eproto();
+  friend void protobuf_AssignDesc_Message_2eproto();
+  friend void protobuf_ShutdownFile_Message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static Message_Return* default_instance_;
+};
+// -------------------------------------------------------------------
+
 class Message : public ::google::protobuf::Message {
  public:
   Message();
@@ -705,6 +791,8 @@ class Message : public ::google::protobuf::Message {
   static const Type TYPE_NEW = Message_Type_TYPE_NEW;
   static const Type TYPE_FIELD = Message_Type_TYPE_FIELD;
   static const Type TYPE_CALL = Message_Type_TYPE_CALL;
+  static const Type TYPE_RETURN = Message_Type_TYPE_RETURN;
+  static const Type TYPE_OTHER = Message_Type_TYPE_OTHER;
   static inline bool Type_IsValid(int value) {
     return Message_Type_IsValid(value);
   }
@@ -766,6 +854,14 @@ class Message : public ::google::protobuf::Message {
   inline ::reef::Message_Call* mutable_msgcall();
   inline ::reef::Message_Call* release_msgcall();
   
+  // optional .reef.Message_Return msgReturn = 6;
+  inline bool has_msgreturn() const;
+  inline void clear_msgreturn();
+  static const int kMsgReturnFieldNumber = 6;
+  inline const ::reef::Message_Return& msgreturn() const;
+  inline ::reef::Message_Return* mutable_msgreturn();
+  inline ::reef::Message_Return* release_msgreturn();
+  
   // @@protoc_insertion_point(class_scope:reef.Message)
  private:
   inline void set_has_type();
@@ -778,6 +874,8 @@ class Message : public ::google::protobuf::Message {
   inline void clear_has_msgfield();
   inline void set_has_msgcall();
   inline void clear_has_msgcall();
+  inline void set_has_msgreturn();
+  inline void clear_has_msgreturn();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
@@ -786,9 +884,10 @@ class Message : public ::google::protobuf::Message {
   ::reef::Message_New* msgnew_;
   ::reef::Message_Field* msgfield_;
   ::reef::Message_Call* msgcall_;
+  ::reef::Message_Return* msgreturn_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
   
   friend void  protobuf_AddDesc_Message_2eproto();
   friend void protobuf_AssignDesc_Message_2eproto();
@@ -1219,6 +1318,39 @@ inline ::std::string* Message_New::release_componenttypename() {
 
 // -------------------------------------------------------------------
 
+// Message_Return
+
+// required .reef.Argument returnValue = 1;
+inline bool Message_Return::has_returnvalue() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void Message_Return::set_has_returnvalue() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void Message_Return::clear_has_returnvalue() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void Message_Return::clear_returnvalue() {
+  if (returnvalue_ != NULL) returnvalue_->::reef::Argument::Clear();
+  clear_has_returnvalue();
+}
+inline const ::reef::Argument& Message_Return::returnvalue() const {
+  return returnvalue_ != NULL ? *returnvalue_ : *default_instance_->returnvalue_;
+}
+inline ::reef::Argument* Message_Return::mutable_returnvalue() {
+  set_has_returnvalue();
+  if (returnvalue_ == NULL) returnvalue_ = new ::reef::Argument;
+  return returnvalue_;
+}
+inline ::reef::Argument* Message_Return::release_returnvalue() {
+  clear_has_returnvalue();
+  ::reef::Argument* temp = returnvalue_;
+  returnvalue_ = NULL;
+  return temp;
+}
+
+// -------------------------------------------------------------------
+
 // Message
 
 // required .reef.Message.Type type = 1;
@@ -1350,6 +1482,35 @@ inline ::reef::Message_Call* Message::release_msgcall() {
   clear_has_msgcall();
   ::reef::Message_Call* temp = msgcall_;
   msgcall_ = NULL;
+  return temp;
+}
+
+// optional .reef.Message_Return msgReturn = 6;
+inline bool Message::has_msgreturn() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void Message::set_has_msgreturn() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void Message::clear_has_msgreturn() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void Message::clear_msgreturn() {
+  if (msgreturn_ != NULL) msgreturn_->::reef::Message_Return::Clear();
+  clear_has_msgreturn();
+}
+inline const ::reef::Message_Return& Message::msgreturn() const {
+  return msgreturn_ != NULL ? *msgreturn_ : *default_instance_->msgreturn_;
+}
+inline ::reef::Message_Return* Message::mutable_msgreturn() {
+  set_has_msgreturn();
+  if (msgreturn_ == NULL) msgreturn_ = new ::reef::Message_Return;
+  return msgreturn_;
+}
+inline ::reef::Message_Return* Message::release_msgreturn() {
+  clear_has_msgreturn();
+  ::reef::Message_Return* temp = msgreturn_;
+  msgreturn_ = NULL;
   return temp;
 }
 

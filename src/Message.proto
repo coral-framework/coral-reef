@@ -32,12 +32,17 @@ message Message_Field
 	required bool isSetField = 1; // whether this message is to set or get a field
 	required uint32 serviceIndex = 2;
 	required uint32 fieldIndex = 3;
-	required Argument value = 4;
+	optional Argument value = 4;
 }
 
 message Message_New
 {
 	required string componentTypeName = 1;
+}
+
+message Message_Return
+{
+	required Argument returnValue = 1;
 }
 
 message Message 
@@ -47,6 +52,8 @@ message Message
 		TYPE_NEW = 0;
 		TYPE_FIELD = 1;
 		TYPE_CALL = 2;
+		TYPE_RETURN = 3;
+		TYPE_OTHER = 4;
 	}
 	
 	required Type type = 1;
@@ -56,5 +63,6 @@ message Message
 	optional Message_New msgNew = 3;
 	optional Message_Field msgField = 4;
 	optional Message_Call msgCall = 5;
+	optional Message_Return msgReturn = 6;
 }
 

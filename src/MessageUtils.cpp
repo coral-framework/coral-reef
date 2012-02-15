@@ -6,8 +6,8 @@
 
 namespace reef
 {
-    
-// Specialization for string
+
+// ------------- get and set functions specialization for string and bool ----------- //
 template <>
 const std::string& MessageUtils::getPBContainerData<const std::string&>( const DataContainer& container )
 {
@@ -19,7 +19,6 @@ bool MessageUtils::getPBContainerData<bool>( const DataContainer& container )
 {
     return container.boolean();
 }
-
 
 template <>
 void MessageUtils::setPBContainerData<bool>( DataContainer* container, bool value ) 
@@ -33,6 +32,7 @@ void MessageUtils::setPBContainerData<const std::string&>( DataContainer* contai
     container->set_str( value );
 }
 
+// ---------------- anyWithTypeToPBArg specializations for string and bool ------------ //
 template <>
 void MessageUtils::anyWithTypeToPBArg<std::string>( const co::Any& any, Argument* arg )
 {
@@ -56,6 +56,30 @@ void MessageUtils::anyWithTypeToPBArg<std::string>( const co::Any& any, Argument
 }
 
 template <>
+void MessageUtils::anyWithTypeToPBArg<bool>( const co::Any& any, Argument* arg )
+{
+	// if the Any is a single value, set it directly 
+	if( any.getKind() != co::TK_ARRAY )
+	{
+		DataContainer* container = arg->add_data();
+		setPBContainerData<bool>( container, any.get<bool>() );
+		return;
+	}
+
+	// if the Any is an array, iterate through the values adding to the Argument
+	const std::vector<bool>& vec = any.get<const std::vector<bool> &>();
+
+	size_t size = vec.size();
+	for( int i = 0; i < size; i++ )
+	{
+		DataContainer* container = arg->add_data();
+		setPBContainerData<bool>( container, vec[i] );
+	}
+}
+
+
+// ----------------- PBArgWithTypeToAny specializations for string and bool --------------- //
+template <>
 void MessageUtils::PBArgWithTypeToAny<std::string>( const Argument& arg, co::Any& any, co::IType* elementType )
 {
     if( !elementType )
@@ -73,6 +97,8 @@ void MessageUtils::PBArgWithTypeToAny<std::string>( const Argument& arg, co::Any
     }
 }
 
+// ------------------- End of template functions specializations --------------- //
+
 void MessageUtils::anyToPBArg( const co::Any& any, Argument* arg )
 {
 	std::vector<co::Any> anyVec;
@@ -84,8 +110,8 @@ void MessageUtils::anyToPBArg( const co::Any& any, Argument* arg )
 	switch( kind )
 	{
 	case co::TK_BOOLEAN:
-		//anyWithTypeToPBArg<bool>( any, arg );
-		
+		anyWithTypeToPBArg<bool>( any, arg );
+		break;
 	case co::TK_INT8:
 		anyWithTypeToPBArg<co::int8>( any, arg );
 		break;
@@ -124,15 +150,14 @@ void MessageUtils::anyToPBArg( const co::Any& any, Argument* arg )
 	}
 }
 
-void MessageUtils::PBArgToAny( const Argument& arg, co::IParameter* descriptor, co::Any& any )
+void MessageUtils::PBArgToAny( const Argument& arg, co::IType* descriptor, co::Any& any )
 {
-	co::IType* typ = descriptor->getType();
-	co::TypeKind kind = typ->getKind();
+	co::TypeKind kind = descriptor->getKind();
 	co::IType* elementType = 0; // only used for arrays
 	
 	if( kind == co::TK_ARRAY )
 	{
-		elementType = co::cast<co::IArray>( typ )->getElementType();
+		elementType = co::cast<co::IArray>( descriptor )->getElementType();
 		kind = elementType->getKind();
 	}
 
@@ -179,7 +204,7 @@ void MessageUtils::PBArgToAny( const Argument& arg, co::IParameter* descriptor, 
 	}
 }
 
-Message_Call* MessageUtils::makeCallMessage( int destination, bool hasReturn, Message& owner, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args )
+void MessageUtils::makeCallMessage( int destination, bool hasReturn, Message& owner, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args )
 {
     owner.set_destination( destination );
     owner.set_type( Message::TYPE_CALL );
@@ -193,21 +218,37 @@ Message_Call* MessageUtils::makeCallMessage( int destination, bool hasReturn, Me
 		Argument* PBArg = mc->add_arguments();
 		MessageUtils::anyToPBArg( args.getFirst(), PBArg );
 	}
-    
-    return mc;
 }
     
-Message_Field* MessageUtils::makeFieldMessage( int destination, bool isSet, Message& owner, co::int32 serviceId, co::int32 fieldIndex )
+void MessageUtils::makeSetFieldMessage( int destination, Message& owner, co::int32 serviceId, co::int32 fieldIndex, const co::Any& value )
 {
-    owner.set_destination( destination ); // 0 is always the node channel
+    owner.set_destination( destination );
     owner.set_type( Message::TYPE_FIELD );
     
     Message_Field* mf = owner.mutable_msgfield();
-    mf->set_issetfield( isSet ); // it is a get field event
     mf->set_serviceindex( serviceId );
+    mf->set_issetfield( true ); // it is a set field event
     mf->set_fieldindex( fieldIndex );
 
-    return mf;
+	anyToPBArg( value, mf->mutable_value() ); // set the argument inside the msg body
+}
+
+void MessageUtils::makeGetFieldMessage( int destination, Message& owner, co::int32 serviceId, co::int32 fieldIndex )
+{
+    owner.set_destination( destination );
+    owner.set_type( Message::TYPE_FIELD );
+    
+    Message_Field* mf = owner.mutable_msgfield();
+    mf->set_serviceindex( serviceId );
+    mf->set_issetfield( false ); // it is a get field event
+    mf->set_fieldindex( fieldIndex );
+}
+
+void MessageUtils::makeReturnMessage( Message& owner, const co::Any& returnValue )
+{
+	Message_Return* mr = owner.mutable_msgreturn();
+	
+	anyToPBArg( returnValue, mr->mutable_returnvalue() );
 }
 
 }

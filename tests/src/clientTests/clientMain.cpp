@@ -51,6 +51,11 @@ int main( int argc, char** argv )
 		numberList.push_back( 100 );
 		numberList.push_back( 101 );
     
+		std::vector<co::int32> boolList;
+		numberList.push_back( true );
+		numberList.push_back( false );
+		numberList.push_back( true );
+
 		std::vector<std::string> stringList;
 		stringList.push_back( "The" );
 		stringList.push_back( "the" );
@@ -65,8 +70,8 @@ int main( int argc, char** argv )
 		stringList.push_back( "dog" );
 		stringList.push_back( "dog" );
     
-		//totoService->printNumberList( numberList );
-		//totoService->printStringList( stringList );
+		totoService->printNumberList( numberList );
+		totoService->printStringList( stringList );
 		totoService->printHybridList( numberList, stringList );
 	}
 	catch( std::exception& e ) 

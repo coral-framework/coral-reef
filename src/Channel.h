@@ -60,6 +60,8 @@ protected:
     // Writes an event into this input channel. The given event will be serialized over network.
     void write( const Message* message );
 
+private:
+	void fetchReturnValue( co::IType* descriptor, co::Any& returnValue );
 protected:
 	Connecter* _connecter;
 };

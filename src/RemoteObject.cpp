@@ -77,7 +77,11 @@ const co::Any& RemoteObject::dynamicGetField( co::int32 dynFacetId, co::IField* 
 
 const co::Any& RemoteObject::dynamicInvoke( co::int32 dynFacetId, co::IMethod* method, co::Range<co::Any const> args )
 {
-    _channel->sendCall( dynFacetId, method->getIndex(), args );
+	if( !method->getReturnType() )
+		_channel->sendCall( dynFacetId, method->getIndex(), args );
+	else
+		_channel->call( dynFacetId, method->getIndex(), args, _resultBuffer );
+
     return _resultBuffer;
 }
 

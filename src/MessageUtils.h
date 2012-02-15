@@ -20,11 +20,15 @@ public:
 	/* Converts an Argument(Protobuf/reef) to an Any(Coral) that will be used as a parameter. 
 	\descriptor is the actual parameter that the Any will represent. Numbers, strings and arrays supported.
 	*/
-	static void PBArgToAny( const Argument& arg, co::IParameter* descriptor, co::Any& any );
+	static void PBArgToAny( const Argument& arg, co::IType* descriptor, co::Any& any );
 
-	static Message_Call* makeCallMessage( int destination, bool hasReturn, Message& owner, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args );
+	static void makeCallMessage( int destination, bool hasReturn, Message& owner, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args );
 
-	static Message_Field* makeFieldMessage( int destination, bool isSet, Message& owner, co::int32 serviceId, co::int32 fieldIndex );
+	static void makeSetFieldMessage( int destination, Message& owner, co::int32 serviceId, co::int32 fieldIndex, const co::Any& value );
+
+	static void makeGetFieldMessage( int destination, Message& owner, co::int32 serviceId, co::int32 fieldIndex );
+
+	static void makeReturnMessage(  Message& owner, const co::Any& any );
 
 private:
 
