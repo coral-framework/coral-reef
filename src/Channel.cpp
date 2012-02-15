@@ -91,19 +91,19 @@ int InputChannel::newInstance( const std::string& typeName )
     return _channelId;
 }
                                 
-void InputChannel::sendCall( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args )
+void InputChannel::sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args )
 {
     // make a call without returns
     Message message;
-    MessageUtils::makeCallMessage( _channelId, false, message, serviceId, methodIndex, args );
+    MessageUtils::makeCallMessage( _channelId, false, message, serviceId, method->getIndex(), args );
     write( &message );
 }
 
-void InputChannel::call( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args, co::Any& result )
+void InputChannel::call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result )
 {
     // make a call with returns
     Message message;
-    MessageUtils::makeCallMessage( _channelId, true, message, serviceId, methodIndex, args );
+    MessageUtils::makeCallMessage( _channelId, true, message, serviceId, method->getIndex(), args );
     
     write( &message );
     
@@ -170,14 +170,14 @@ int OutputChannel::newInstance( const std::string& typeName )
     return _delegate->onNewInstance( this, typeName );
 }
 
-void OutputChannel::sendCall( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args )
+void OutputChannel::sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args )
 {
-    _delegate->onSendCall( this, serviceId, methodIndex, args );
+    _delegate->onSendCall( this, serviceId, method, args );
 }
     
-void OutputChannel::call( co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args, co::Any& result )
+void OutputChannel::call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result )
 {
-    _delegate->onCall( this, serviceId, methodIndex, args, result );
+    _delegate->onCall( this, serviceId, method, args, result );
 }
     
 void OutputChannel::getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result )
@@ -240,12 +240,12 @@ void OutputChannel::write( const Message* message )
 			
 			if( !callMsg.hasreturn() )
 			{
-				sendCall( serviceId, memberIndex, anyArgs );
+				sendCall( serviceId, method, anyArgs );
 			}
 			else
 			{
 				co::Any returnValue;
-				call( serviceId, memberIndex, anyArgs, returnValue );
+				call( serviceId, method, anyArgs, returnValue );
 
 				Argument returnArg;
 				MessageUtils::anyToPBArg( returnValue, &returnArg );
