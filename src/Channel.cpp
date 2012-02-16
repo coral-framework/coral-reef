@@ -107,8 +107,7 @@ void InputChannel::call( co::int32 serviceId, co::IMethod* method, co::Range<co:
     
     write( &message );
     
-    // wait for the return
-
+	fetchReturnValue( method->getReturnType(), result );
 
     // TODO: properly set returned value into result variable and set all out values from args list
 }

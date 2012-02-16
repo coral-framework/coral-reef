@@ -27,15 +27,10 @@ public:
 private:
     co::RefPtr<co::IObject> _object;
 
-	struct QuickInvokeParam
-	{
-		co::IService* serv;
-		co::IReflector* refl;
-
-		QuickInvokeParam( co::IService* service, co::IReflector* reflector );
-	};
-
-	std::vector<QuickInvokeParam> _openedServices;
+	// initializes _openedService's and Reflector's index for the accessed service
+	void onServiceFirstAccess( co::int32 serviceId );
+	std::vector<co::IService*> _openedServices;
+	std::vector<co::IReflector*> _openedReflectors;
 };
 
 } // namespace reef
