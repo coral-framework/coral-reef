@@ -28,8 +28,6 @@ public:
 
 	static void makeGetFieldMessage( int destination, Message& owner, co::int32 serviceId, co::int32 fieldIndex );
 
-	static void makeReturnMessage(  Message& owner, const co::Any& any );
-
 private:
 
 	// ------------ Any to Protobuf conversion functions ----------------- //

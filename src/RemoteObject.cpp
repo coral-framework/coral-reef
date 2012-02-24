@@ -71,7 +71,7 @@ co::IPort* RemoteObject::dynamicGetFacet( co::int32 dynFacetId )
 
 const co::Any& RemoteObject::dynamicGetField( co::int32 dynFacetId, co::IField* field )
 {
-    _channel->getField( dynFacetId, field->getIndex(), _resultBuffer );
+    _channel->getField( dynFacetId, field, _resultBuffer );
     return _resultBuffer;
 }
 
@@ -93,7 +93,7 @@ co::int32 RemoteObject::dynamicRegisterService( co::IService* dynamicServiceProx
 
 void RemoteObject::dynamicSetField( co::int32 dynFacetId, co::IField* field, const co::Any& value )
 {
-    _channel->setField( dynFacetId, field->getIndex(), value );
+    _channel->setField( dynFacetId, field, value );
 }
 
 CORAL_EXPORT_COMPONENT( RemoteObject, RemoteObject );

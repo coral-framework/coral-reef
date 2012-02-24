@@ -33,8 +33,8 @@ public:
     
     virtual void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args ) = 0;
     virtual void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result ) = 0;
-    virtual void getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result ) = 0;
-    virtual void setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value ) = 0;
+    virtual void getField( co::int32 serviceId, co::IField* field, co::Any& result ) = 0;
+    virtual void setField( co::int32 serviceId, co::IField* field, const co::Any& value ) = 0;
 
     // Writes a raw event into channel.
     virtual void write( const Message* message ) = 0;
@@ -53,8 +53,8 @@ public:
     int newInstance( const std::string& typeName );
     void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args );
     void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result );
-    void getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result );
-    void setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value );
+    void getField( co::int32 serviceId, co::IField* field, co::Any& result );
+    void setField( co::int32 serviceId, co::IField* field, const co::Any& value );
     
 protected:
     // Writes an event into this input channel. The given event will be serialized over network.
@@ -72,8 +72,8 @@ public:
     virtual int onNewInstance( Channel* channel, const std::string& typeName ) { return -1; }
     virtual void onSendCall( Channel* channel, co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args ) {;}
     virtual void onCall( Channel* channel, co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result ) {;}
-    virtual void onGetField( Channel* channel, co::int32 serviceId, co::int32 fieldIndex, co::Any& result ) {;}
-    virtual void onSetField( Channel* channel, co::int32 serviceId, co::int32 fieldIndex, const co::Any& value ) {;}
+    virtual void onGetField( Channel* channel, co::int32 serviceId, co::IField* field, co::Any& result ) {;}
+    virtual void onSetField( Channel* channel, co::int32 serviceId, co::IField* field, const co::Any& value ) {;}
 };
 
 // A channel that converts raw message writes into events that can be delegated
@@ -89,14 +89,16 @@ public:
     
     void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args );
     void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result );
-    void getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result );
-    void setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value );
+    void getField( co::int32 serviceId, co::IField* field, co::Any& result );
+    void setField( co::int32 serviceId, co::IField* field, const co::Any& value );
     
     // Writes a message into an output channel. This channel will translate the message into a call
     // of one of the above methods (sendCall, call, getField, setField... )
     void write( const Message* message );
     
 private:
+    
+    
 	Binder* _binder;
 	ServerNode* _owner;
     OutputChannelDelegate* _delegate;

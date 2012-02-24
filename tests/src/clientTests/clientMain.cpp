@@ -41,38 +41,15 @@ int main( int argc, char** argv )
 		totoService->printString( "The the quick brown fox fox jumped over the lazy dog dog" );
 		totoService->printDouble( 0.000123321 );
 		totoService->printDouble( 12345678.987654 );*/
-		
-		std::vector<co::int32> numberList;
-		numberList.push_back( 0 );
-		numberList.push_back( 1 );
-		numberList.push_back( 2 );
-		numberList.push_back( 4 );
-		numberList.push_back( 8 );
-		numberList.push_back( 100 );
-		numberList.push_back( 101 );
     
-		std::vector<co::int32> boolList;
-		numberList.push_back( true );
-		numberList.push_back( false );
-		numberList.push_back( true );
-
-		std::vector<std::string> stringList;
-		stringList.push_back( "The" );
-		stringList.push_back( "the" );
-		stringList.push_back( "quick" );
-		stringList.push_back( "brown" );
-		stringList.push_back( "fox" );
-		stringList.push_back( "fox" );
-		stringList.push_back( "jumped" );
-		stringList.push_back( "over" );
-		stringList.push_back( "the" );
-		stringList.push_back( "lazy" );
-		stringList.push_back( "dog" );
-		stringList.push_back( "dog" );
-    
-		totoService->printNumberList( numberList );
-		totoService->printStringList( stringList );
-		totoService->printHybridList( numberList, stringList );
+        totoService->setNumber( 19 );
+        totoService->printMethod3();
+        co::int32 number = totoService->numberGet();
+        std::cout << number << " is the number" << std::endl;
+        totoService->setNumber( 33 );
+        totoService->printMethod3();
+        number = totoService->getNumber();
+        std::cout << number << " is the number" << std::endl;
 	}
 	catch( std::exception& e ) 
 	{ 

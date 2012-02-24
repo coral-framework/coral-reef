@@ -209,7 +209,7 @@ void MessageUtils::makeCallMessage( int destination, bool hasReturn, Message& ow
     owner.set_destination( destination );
     owner.set_type( Message::TYPE_CALL );
 	
-    Message_Call* mc = owner.mutable_msgcall();
+    Message_Member* mc = owner.mutable_msgmember();
     mc->set_hasreturn( hasReturn );
     mc->set_serviceindex( serviceId );
     mc->set_memberindex( methodIndex );
@@ -225,12 +225,13 @@ void MessageUtils::makeSetFieldMessage( int destination, Message& owner, co::int
     owner.set_destination( destination );
     owner.set_type( Message::TYPE_FIELD );
     
-    Message_Field* mf = owner.mutable_msgfield();
+    Message_Member* mf = owner.mutable_msgmember();
     mf->set_serviceindex( serviceId );
-    mf->set_issetfield( true ); // it is a set field event
-    mf->set_fieldindex( fieldIndex );
+    mf->set_hasreturn( false ); // it is a set field event
+    mf->set_memberindex( fieldIndex );
 
-	anyToPBArg( value, mf->mutable_value() ); // set the argument inside the msg body
+	Argument* PBArg = mf->add_arguments();
+    MessageUtils::anyToPBArg( value, PBArg );
 }
 
 void MessageUtils::makeGetFieldMessage( int destination, Message& owner, co::int32 serviceId, co::int32 fieldIndex )
@@ -238,17 +239,10 @@ void MessageUtils::makeGetFieldMessage( int destination, Message& owner, co::int
     owner.set_destination( destination );
     owner.set_type( Message::TYPE_FIELD );
     
-    Message_Field* mf = owner.mutable_msgfield();
+    Message_Member* mf = owner.mutable_msgmember();
     mf->set_serviceindex( serviceId );
-    mf->set_issetfield( false ); // it is a get field event
-    mf->set_fieldindex( fieldIndex );
-}
-
-void MessageUtils::makeReturnMessage( Message& owner, const co::Any& returnValue )
-{
-	Message_Return* mr = owner.mutable_msgreturn();
-	
-	anyToPBArg( returnValue, mr->mutable_returnvalue() );
+    mf->set_hasreturn( true ); // it is a get field event
+    mf->set_memberindex( fieldIndex );
 }
 
 }

@@ -96,8 +96,7 @@ public:
 	
 	void printMethod3()
     {
-        printMethodCount( _count );
-        std::cerr << "THIS IS METHOD3!" << std::endl;
+        std::cerr << "THIS IS number: " << _number << std::endl;
     }
 	
 private:

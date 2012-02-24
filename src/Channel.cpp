@@ -2,6 +2,7 @@
 #include "Message.pb.h"
 
 #include <co/IMethod.h>
+#include <co/IField.h>
 #include <co/IParameter.h>
 
 #include <iostream>
@@ -112,28 +113,20 @@ void InputChannel::call( co::int32 serviceId, co::IMethod* method, co::Range<co:
     // TODO: properly set returned value into result variable and set all out values from args list
 }
 
-void InputChannel::getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result )
+void InputChannel::getField( co::int32 serviceId, co::IField* field, co::Any& result )
 {
     Message message;
-    MessageUtils::makeGetFieldMessage( _channelId, message, serviceId, fieldIndex );
+    MessageUtils::makeGetFieldMessage( _channelId, message, serviceId, field->getIndex() );
 
     write( &message );
     
-    // wait for the field value
-    std::string input;
-    _connecter->receiveReply( input );
-    
-  /*  DataType fieldValue;
-    fieldValue.ParseFromString( input );
-    */
-    // TODO: properly set the returned field value into result variable
-   // result.set( fieldValue.dummy() );
+    fetchReturnValue( field->getType(), result );
 }
 
-void InputChannel::setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value )
+void InputChannel::setField( co::int32 serviceId, co::IField* field, const co::Any& value )
 {
     Message message;
-    MessageUtils::makeSetFieldMessage( _channelId, message, serviceId, fieldIndex, value );
+    MessageUtils::makeSetFieldMessage( _channelId, message, serviceId, field->getIndex(), value );
     
     write( &message );
 }
@@ -179,14 +172,14 @@ void OutputChannel::call( co::int32 serviceId, co::IMethod* method, co::Range<co
     _delegate->onCall( this, serviceId, method, args, result );
 }
     
-void OutputChannel::getField( co::int32 serviceId, co::int32 fieldIndex, co::Any& result )
+void OutputChannel::getField( co::int32 serviceId, co::IField* field, co::Any& result )
 {
-    _delegate->onGetField( this, serviceId, fieldIndex, result );
+    _delegate->onGetField( this, serviceId, field, result );
 }
     
-void OutputChannel::setField( co::int32 serviceId, co::int32 fieldIndex, const co::Any& value )
+void OutputChannel::setField( co::int32 serviceId, co::IField* field, const co::Any& value )
 {
-    _delegate->onSetField( this, serviceId, fieldIndex, value );
+    _delegate->onSetField( this, serviceId, field, value );
 }
     
 void OutputChannel::write( const Message* message )
@@ -207,10 +200,47 @@ void OutputChannel::write( const Message* message )
             _binder->reply( output );
             
             break;
-        } 
+        }
+        case Message::TYPE_FIELD:
+        {
+            const Message_Member& callMsg = message->msgmember();
+            co::int32 serviceId = callMsg.serviceindex();
+            co::int32 memberIndex = callMsg.memberindex();
+            
+            // TODO: handle call arguments (translate to co::Any)
+            // const DataArgument& argument = call.arguments( 0 );
+            
+			co::IObject* instance = _owner->mapInstance( getId() );
+			co::IPort* port = instance->getComponent()->getPorts()[serviceId];
+			co::IInterface* iface = port->getType();
+            
+			co::IMember* member = iface->getMembers()[memberIndex];
+			co::IField* field =  co::cast<co::IField>( member );
+            
+            if( callMsg.hasreturn() ) // getField
+            {
+                co::Any returnValue;
+				getField( serviceId, field, returnValue );
+                
+				Argument returnArg;
+				MessageUtils::anyToPBArg( returnValue, &returnArg );
+				std::string output;
+				returnArg.SerializeToString( &output );
+    			_binder->reply( output );
+            }
+            else // setField
+            {
+                co::Any value;
+                const Argument& pbArg = callMsg.arguments( 0 );
+                MessageUtils::PBArgToAny( pbArg, field->getType(), value );
+                setField( serviceId, field, value );
+            }
+            
+            break;
+        }
         case Message::TYPE_CALL:
         {
-            const Message_Call& callMsg = message->msgcall();
+            const Message_Member& callMsg = message->msgmember();
             co::int32 serviceId = callMsg.serviceindex();
             co::int32 memberIndex = callMsg.memberindex();
             

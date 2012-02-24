@@ -25,8 +25,10 @@ void Servant::onSendCall( Channel* channel, co::int32 serviceId, co::IMethod* me
 {
 	if( !_openedServices[serviceId] ) // if already used before access directly
 		onServiceFirstAccess( serviceId );
+    
+    co::Any dummy;
 		
-	_openedReflectors[serviceId]->invoke( _openedServices[serviceId], method, args, co::Any() );
+	_openedReflectors[serviceId]->invoke( _openedServices[serviceId], method, args, dummy );
 }
     
 void Servant::onCall( Channel* channel, co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result )
@@ -37,14 +39,20 @@ void Servant::onCall( Channel* channel, co::int32 serviceId, co::IMethod* method
 	_openedReflectors[serviceId]->invoke( _openedServices[serviceId], method, args, result );		
 }
     
-void Servant::onGetField( Channel* channel, co::int32 serviceId, co::int32 fieldIndex, co::Any& result )
+void Servant::onGetField( Channel* channel, co::int32 serviceId, co::IField* field, co::Any& result )
 {
+    if( !_openedServices[serviceId] ) // if already used before access directly
+		onServiceFirstAccess( serviceId );
     
+	_openedReflectors[serviceId]->getField( _openedServices[serviceId], field, result );
 }
     
-void Servant::onSetField( Channel* channel, co::int32 serviceId, co::int32 fieldIndex, const co::Any& value )
+void Servant::onSetField( Channel* channel, co::int32 serviceId, co::IField* field, const co::Any& value )
 {
+    if( !_openedServices[serviceId] ) // if already used before access directly
+		onServiceFirstAccess( serviceId );
     
+	_openedReflectors[serviceId]->setField( _openedServices[serviceId], field, value );
 }
 
 void Servant::onServiceFirstAccess( co::int32 serviceId )
