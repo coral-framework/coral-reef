@@ -25,7 +25,7 @@ void ServerNode::start( const std::string& address )
     _binder = new Binder();
     _binder->bind( address );
         
-	OutputChannel* serverChannel = new OutputChannel( this, _binder );
+	OutputChannel* serverChannel = new OutputChannel( 0, _binder );
 	serverChannel->setDelegate( this );
     _channels.push_back( serverChannel );
 

@@ -1,0 +1,38 @@
+/*
+	Simple types usage testing interface. Warning, the fields are used internally by every method.
+	In order to test, call a method, check values, then call another method.
+*/
+
+interface ISimpleTypes
+{
+	// simple types fields
+	int32 storedInt;
+	double storedDouble;
+	string storedString;
+	
+	// simple type arrays fields
+	int32[] storedIntList;
+	double[] storedDoubleList;
+	string[] storedStringList;
+	
+	// synchronous functions to test return
+	int32 getNumber4Int();
+	double getNumber4Double();
+	string getHelloString();
+	string[] getAlphabetList();
+	int32[] get10Ints();
+	
+	// synchronous functions to test parameters and return
+	int32 incrementInt( in int32 number );
+	double divide( in double dividend,  in double divisor );
+	string concatenateString( in string str1, in string str2 );
+	string[] getThirdElements( in string[] list1, in string[] list2 );
+	double[] mergeLists( in double[] list1, in double[] list2 );
+	
+	// asynchronous functions to test parameters (exactly like field setters for the fields above)
+	void setInt( in int32 number );
+	void setDouble( in double number );
+	void setString( in string str );
+	void setStrList( in string[] strList );
+	void setIntList( in int32[] intList );
+};

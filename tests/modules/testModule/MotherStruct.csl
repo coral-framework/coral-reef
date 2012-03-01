@@ -1,0 +1,6 @@
+struct MotherStruct
+{
+	int32 id;
+	string name;
+	ChildStruct child; 
+};

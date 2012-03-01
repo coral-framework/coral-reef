@@ -1,0 +1,5 @@
+interface IComplexTypes
+{
+	MotherStruct motherStruct;
+	StringNativeClass stringNativeClass;
+};

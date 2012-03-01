@@ -1,0 +1,4 @@
+interface IReferenceTypes
+{
+	int32 dummy;
+};

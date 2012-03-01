@@ -1,0 +1,6 @@
+component TestComponent
+{
+	provides IComplexTypes complex;
+	provides IReferenceTypes reference;
+	provides ISimpleTypes simple;
+};

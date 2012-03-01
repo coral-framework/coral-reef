@@ -2,7 +2,7 @@
 # Build the Module
 ################################################################################
 
-CORAL_GENERATE_MODULE( _GENERATED_FILES reef lua.IState )
+CORAL_GENERATE_MODULE( _GENERATED_FILES reef )
 
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR}/generated )
 

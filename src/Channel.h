@@ -80,7 +80,7 @@ public:
 class OutputChannel : public Channel
 {
 public:
-    OutputChannel( ServerNode* owner, Binder* binder );
+    OutputChannel( co::IObject* object, Binder* binder );
     ~OutputChannel();
 
 	void setDelegate( OutputChannelDelegate* delegate );
@@ -100,7 +100,7 @@ private:
     
     
 	Binder* _binder;
-	ServerNode* _owner;
+	co::IObject* _object;
     OutputChannelDelegate* _delegate;
 	co::int32 _delegateId;
 };

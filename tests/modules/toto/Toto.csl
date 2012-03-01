@@ -1,4 +1,0 @@
-component Toto
-{
-	provides IToto toto;
-};

@@ -27,29 +27,6 @@ SET_TARGET_PROPERTIES( serverTests PROPERTIES
 TARGET_LINK_LIBRARIES( serverTests ${CORAL_LIBRARIES} ${GTEST_LIBRARIES} ${ZMQ_LIBRARIES} ${PROTOBUF_LIBRARIES} ${PROTOBUF_LIBRARY_DEBUG} ${PROTOBUF_PROTOC_LIBRARY_DEBUG} ${PROTOBUF_PROTOC_LIBRARIES} )
 
 ################################################################################
-# Register the test
-################################################################################
-FILE( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/serverTests/output )
-ADD_TEST(
-	NAME serverTests
-	COMMAND $<TARGET_FILE:serverTests> --gtest_output=xml:../../output/Tests$<CONFIGURATION>.xml
-)
-CORAL_TEST_ENVIRONMENT( serverTests )
-
-################################################################################
-# If Valgrind is available, repeat the test checking for memory leaks
-################################################################################
-IF( VALGRIND_COMMAND )
-	ADD_TEST(
-		NAME tests_MemoryCheck
-		COMMAND ${VALGRIND_COMMAND} --leak-check=full --show-reachable=yes --num-callers=30 --dsymutil=yes
-			--log-file=${CMAKE_BINARY_DIR}/Valgrind$<CONFIGURATION>.log --error-exitcode=13
-			--suppressions=${CMAKE_SOURCE_DIR}/tests/valgrind.supp $<TARGET_FILE:tests>
-	)
-	CORAL_TEST_ENVIRONMENT( tests_MemoryCheck )
-ENDIF()
-
-################################################################################
 # Source Groups
 ################################################################################
 

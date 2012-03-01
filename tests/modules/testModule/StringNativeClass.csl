@@ -1,0 +1,22 @@
+native class StringNativeClass
+{
+	<c++
+		namespace testModule
+		{ 
+			struct StringNativeClass
+			{
+				std::string data;
+				
+				bool operator == ( const StringNativeClass& strnc ) const
+				{
+					return data == strnc.data;
+				}
+			};
+		}
+	c++>
+	
+	string value;
+	
+	// the field to be serialized
+	any state;
+};

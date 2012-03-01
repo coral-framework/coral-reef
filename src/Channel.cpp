@@ -140,11 +140,11 @@ void InputChannel::write( const Message* message )
 }
 
 // OutputChannel
-OutputChannel::OutputChannel( ServerNode* owner, Binder* binder )
+OutputChannel::OutputChannel( co::IObject* object, Binder* binder )
     : _binder( binder ) 
 {
-	_owner = owner;
-	assert( owner );
+	_object = object;
+	assert( object );
 }
 
 OutputChannel::~OutputChannel()
@@ -210,8 +210,7 @@ void OutputChannel::write( const Message* message )
             // TODO: handle call arguments (translate to co::Any)
             // const DataArgument& argument = call.arguments( 0 );
             
-			co::IObject* instance = _owner->mapInstance( getId() );
-			co::IPort* port = instance->getComponent()->getPorts()[serviceId];
+			co::IPort* port = _object->getComponent()->getPorts()[serviceId];
 			co::IInterface* iface = port->getType();
             
 			co::IMember* member = iface->getMembers()[memberIndex];
@@ -247,8 +246,7 @@ void OutputChannel::write( const Message* message )
             // TODO: handle call arguments (translate to co::Any)
             // const DataArgument& argument = call.arguments( 0 );
             
-			co::IObject* instance = _owner->mapInstance( getId() );
-			co::IPort* port = instance->getComponent()->getPorts()[serviceId];
+			co::IPort* port = _object->getComponent()->getPorts()[serviceId];
 			co::IInterface* iface = port->getType();
 
 			co::IMember* member = iface->getMembers()[memberIndex];
