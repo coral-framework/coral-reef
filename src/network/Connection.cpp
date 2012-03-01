@@ -7,7 +7,7 @@
 namespace reef {
     
 Connecter::Connecter() 
-    : _context( 1 ), _socket( _context, ZMQ_DEALER )
+    : _context( 1 ), _socket( _context, ZMQ_DEALER ), _connected( false )
 {
     // empty
 }
@@ -20,12 +20,14 @@ Connecter::~Connecter()
 bool Connecter::connect( const std::string& address )
 {
     _socket.connect( address.c_str() );
+    _connected = true;
     return true;
 }
     
 void Connecter::close()
 {
     _socket.close();
+    _connected = false;
 }
     
 void Connecter::send( const std::string& data )
@@ -45,8 +47,8 @@ bool Connecter::receiveReply( std::string& data )
 	return true;
 }
     
-Binder::Binder() 
-    : _context( 1 ), _socket( _context, ZMQ_ROUTER )
+Binder::Binder()
+    : _context( 1 ), _socket( _context, ZMQ_ROUTER ), _binded( false )
 {
     // empty
 }
@@ -59,11 +61,13 @@ Binder::~Binder()
 bool Binder::bind( const std::string& address )
 {
     _socket.bind( address.c_str() );
+    _binded = true;
     return true;
 }
 
 void Binder::close()
 {
+    _binded = false;
     _socket.close();
 }
 
