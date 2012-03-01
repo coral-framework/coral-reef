@@ -7,8 +7,6 @@
 namespace reef
 {
     
-
-
 class Connecter
 {
 public:
@@ -17,11 +15,14 @@ public:
 
 	bool connect( const std::string& address );
 	void close();
+    
+    bool isConnected() { return _connected; }
 
 	void send( const std::string& data );
 	bool receiveReply( std::string& data ); //Blocking function
 
 private:
+    bool _connected;
 	std::string _address;
 	zmq::context_t _context;
     zmq::socket_t _socket;
@@ -35,11 +36,14 @@ public:
 
 	bool bind( const std::string& address );
 	void close();
+    
+    bool isBinded() { return _binded; }
 
 	bool receive( std::string& data ); // Non-Blocking
 	void reply( const std::string& data );
 
 private:
+    bool _binded;
 	std::string _address;
 	zmq::context_t _context;
     zmq::socket_t _socket;

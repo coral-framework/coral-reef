@@ -34,8 +34,10 @@ void ServerNode::start( const std::string& address )
     
 void ServerNode::update()
 {
-	std::string message;
+    if( !_binder->isBinded() )
+        return;
         
+	std::string message;
 	if( _binder->receive( message ) )    
 	{
 		// Route the message to the proper channel
@@ -45,7 +47,8 @@ void ServerNode::update()
 
 void ServerNode::stop()
 {
-    // TODO: implement this method.
+    if( _binder )
+        _binder->close();
 }
        
 // OutputChannelDelegate
