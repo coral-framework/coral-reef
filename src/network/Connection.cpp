@@ -48,7 +48,7 @@ bool Connecter::receiveReply( std::string& data )
 }
     
 Binder::Binder()
-    : _context( 1 ), _socket( _context, ZMQ_ROUTER ), _binded( false )
+    : _context( 1 ), _socket( _context, ZMQ_ROUTER ), _bound( false )
 {
     // empty
 }
@@ -61,13 +61,13 @@ Binder::~Binder()
 bool Binder::bind( const std::string& address )
 {
     _socket.bind( address.c_str() );
-    _binded = true;
+    _bound = true;
     return true;
 }
 
 void Binder::close()
 {
-    _binded = false;
+    _bound = false;
     _socket.close();
 }
 

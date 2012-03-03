@@ -204,7 +204,7 @@ void MessageUtils::PBArgToAny( const Argument& arg, co::IType* descriptor, co::A
 	}
 }
 
-void MessageUtils::makeCallMessage( int destination, bool hasReturn, Message& owner, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args )
+void MessageUtils::makeCallMessage( co::int32 destination, bool hasReturn, Message& owner, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args )
 {
     owner.set_destination( destination );
     owner.set_type( Message::TYPE_CALL );
@@ -220,7 +220,7 @@ void MessageUtils::makeCallMessage( int destination, bool hasReturn, Message& ow
 	}
 }
     
-void MessageUtils::makeSetFieldMessage( int destination, Message& owner, co::int32 serviceId, co::int32 fieldIndex, const co::Any& value )
+void MessageUtils::makeSetFieldMessage( co::int32 destination, Message& owner, co::int32 serviceId, co::int32 fieldIndex, const co::Any& value )
 {
     owner.set_destination( destination );
     owner.set_type( Message::TYPE_FIELD );
@@ -234,7 +234,7 @@ void MessageUtils::makeSetFieldMessage( int destination, Message& owner, co::int
     MessageUtils::anyToPBArg( value, PBArg );
 }
 
-void MessageUtils::makeGetFieldMessage( int destination, Message& owner, co::int32 serviceId, co::int32 fieldIndex )
+void MessageUtils::makeGetFieldMessage( co::int32 destination, Message& owner, co::int32 serviceId, co::int32 fieldIndex )
 {
     owner.set_destination( destination );
     owner.set_type( Message::TYPE_FIELD );

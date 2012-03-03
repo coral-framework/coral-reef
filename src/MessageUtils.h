@@ -22,11 +22,11 @@ public:
 	*/
 	static void PBArgToAny( const Argument& arg, co::IType* descriptor, co::Any& any );
 
-	static void makeCallMessage( int destination, bool hasReturn, Message& owner, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args );
+	static void makeCallMessage( co::int32 destination, bool hasReturn, Message& owner, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args );
 
-	static void makeSetFieldMessage( int destination, Message& owner, co::int32 serviceId, co::int32 fieldIndex, const co::Any& value );
+	static void makeSetFieldMessage( co::int32 destination, Message& owner, co::int32 serviceId, co::int32 fieldIndex, const co::Any& value );
 
-	static void makeGetFieldMessage( int destination, Message& owner, co::int32 serviceId, co::int32 fieldIndex );
+	static void makeGetFieldMessage( co::int32 destination, Message& owner, co::int32 serviceId, co::int32 fieldIndex );
 
 private:
 

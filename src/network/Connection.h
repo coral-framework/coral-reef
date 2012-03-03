@@ -37,13 +37,13 @@ public:
 	bool bind( const std::string& address );
 	void close();
     
-    bool isBinded() { return _binded; }
+    bool isBinded() { return _bound; }
 
 	bool receive( std::string& data ); // Non-Blocking
 	void reply( const std::string& data );
 
 private:
-    bool _binded;
+    bool _bound;
 	std::string _address;
 	zmq::context_t _context;
     zmq::socket_t _socket;

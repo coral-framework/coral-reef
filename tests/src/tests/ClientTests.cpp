@@ -6,6 +6,7 @@
 #include <testModule/IComplexTypes.h>
 
 #include <RemoteObject.h>
+#include <Channel.h>
 #include "RemObjTestChannel.h"
 
 #include <co/Coral.h>
@@ -17,7 +18,7 @@
 namespace reef
 {
 
-TEST( BasicTests, rmtObjSimpleTests )
+TEST( ClientTests, remoteObjectTest )
 {
 	// fake channel to receive calls from the remote object
 	RemObjTestChannel* fakeChannel = new RemObjTestChannel();
@@ -66,6 +67,11 @@ TEST( BasicTests, rmtObjSimpleTests )
 	testModule::MotherStruct ms;
 	CTService->setMotherStruct( ms );
 	EXPECT_TRUE( fakeChannel->compareCalledValues( CTPort->getIndex(), 0, motherStructField ) );
+}
+
+TEST( BasicTests, outputChannelTest )
+{
+	
 }
 
 }

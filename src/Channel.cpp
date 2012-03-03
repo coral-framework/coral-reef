@@ -26,8 +26,6 @@ void Channel::route( const std::string& data, const std::vector<Channel*>& chann
 {
     Message message;
     message.ParseFromString( data );
-    
-    printChannelMessage( &message );
 
     int dest = message.destination();
     assert( dest >= 0 && dest < channels.size() );
