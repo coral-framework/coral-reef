@@ -4,7 +4,7 @@
 
 #include <algorithm>
 
-#include "FakeNet.h"
+#include "FakeSocket.h"
 
 namespace reef {
 
@@ -21,30 +21,27 @@ Connecter::~Connecter()
     
 bool Connecter::connect( const std::string& address )
 {
-    _socket.connect( address.c_str() );
-    _connected = true;
-    return true;
+	_address = address;
+	FakeSocket::bindOrConnectAt( address );
+	_connected = true;
+	return true;
 }
     
 void Connecter::close()
 {
-    _socket.close();
+	FakeSocket::closeAt( _address );
     _connected = false;
+	_address = "";
 }
     
 void Connecter::send( const std::string& data )
 {
-    zmq::message_t msg( data.size() );
-    memcpy( msg.data(), data.data(), data.size() );
-    _socket.send( msg );
+	FakeSocket::sendAt( data, _address );
 }
 
 bool Connecter::receiveReply( std::string& data )
 {
-    zmq::message_t msg;
-    _socket.recv( &msg );
-    data.resize( msg.size() );
-    memcpy( &data[0], msg.data(), msg.size() );
+	FakeSocket::receiveReply( data, _address );
 
 	return true;
 }
@@ -62,48 +59,27 @@ Binder::~Binder()
 
 bool Binder::bind( const std::string& address )
 {
-    _socket.bind( address.c_str() );
+	FakeSocket::bindOrConnectAt( address );
+	_address = address;
     _bound = true;
     return true;
 }
 
 void Binder::close()
 {
+	FakeSocket::closeAt( _address );
     _bound = false;
-    _socket.close();
 }
 
 bool Binder::receive( std::string& data )
 {
-    // check if there is a message and save its sender
-    if( _socket.recv( &_lastSender, ZMQ_NOBLOCK ) )
-	{
-		// get the actual message
-		zmq::message_t msg;
-		_socket.recv( &msg );
-		data.resize( msg.size() );
-		memcpy( &data[0], msg.data(), msg.size() );
-		return true;
-	}
-	else if( zmq_errno() == EAGAIN )
-	{
-		return false;
-	}
-	else
-	{
-		//TODO: exception
-		assert( false );
-		return false;
-	}
+	FakeSocket::receiveAt( data, _address );
+	return true;
 }
 
 void Binder::reply( const std::string& data )
 {
-	_socket.send( _lastSender, ZMQ_SNDMORE );
-
-    zmq::message_t msg( data.size() );
-    memcpy( msg.data(), data.data(), data.size() );
-    _socket.send( msg );
+	FakeSocket::reply( data, _address );
 }
     
 } // namespace reef
