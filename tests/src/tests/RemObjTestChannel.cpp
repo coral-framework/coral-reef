@@ -64,7 +64,7 @@ namespace reef
 		else if( kind == co::TK_DOUBLE )
 			retValue.set<double>( 1.0 );
 		else if( kind == co::TK_STRING )
-			retValue.set<std::string&>( std::string( "hello" ) );
+			retValue.set<std::string&>( _dummyStr );
 		else
 			throw new co::IllegalCastException( "Fakechannel supports only int double and string as ret values" );
 	}

@@ -41,6 +41,7 @@ private:
 	co::int32 _lastServiceId;
 	co::IMethod* _lastMethod;
 	co::IField* _lastField;
+    std::string _dummyStr;
 
 	void setLastValues( co::int32 serviceId, co::IMethod* method, co::IField* field )
 	{
