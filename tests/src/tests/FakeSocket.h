@@ -8,20 +8,21 @@ namespace reef
 {
 
 class Binder;
-class BinderQueue;
+class IServerNode;
+struct BinderQueue;
 
-class ReplyDelegate
+class MsgTarget
 {
 public:
-	virtual void replyableMsgSent() const = 0;
+	virtual void msgSent() = 0;
 };
 
 class FakeSocket
 {
 public:
-	// This is necessary as the msgs that trigger reply will block. Thus, the repDel 
+	// This is necessary as the msgs that trigger reply will block. Thus, the msgTarget 
 	// will be notified and will post the reply before the sendAt msg returns
-	static void setReplyDelegateAt( const ReplyDelegate* repDel, const std::string& address );
+	static void setMsgTarget( MsgTarget* target, const std::string& address );
 
 	static void sendAt( const std::string& msg, const std::string& binderAddress );
 

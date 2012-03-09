@@ -69,9 +69,4 @@ TEST( ClientTests, remoteObjectTest )
 	EXPECT_TRUE( fakeChannel->compareCalledValues( CTPort->getIndex(), 0, motherStructField ) );
 }
 
-TEST( BasicTests, outputChannelTest )
-{
-	
-}
-
 }

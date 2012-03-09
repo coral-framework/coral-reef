@@ -2,7 +2,7 @@
 # Common settings for all test subprojects
 ################################################################################
 
-# Add the tests 'module' dir to the CORAL_PATH
+# set the tests 'module' dir as the CORAL_PATH along with the CORAL_ROOT
 set( CORAL_PATH ${CORAL_PATH} "${CMAKE_SOURCE_DIR}/tests/modules" )
 
 # Pass the CORAL_PATH as a precompiler definition to all subprojects

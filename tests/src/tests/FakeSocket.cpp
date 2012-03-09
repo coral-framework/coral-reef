@@ -1,8 +1,6 @@
 #include "FakeSocket.h"
 #include <co/Exception.h>
 
-#include <Message.pb.h>
-
 #include <map>
 #include <queue>
 
@@ -14,7 +12,7 @@ namespace reef
 		bool hasReply;
 		std::queue<std::string> msgs;
 		int numWatchers;
-		const ReplyDelegate* repDel;
+        MsgTarget* _target;
 
 		BinderQueue() : hasReply( false ), numWatchers( 1 )
 		{
@@ -48,21 +46,17 @@ namespace reef
 			return false;
 		}
 
-		void setRepDel( const ReplyDelegate* replyDelegate )
+		void setTarget( MsgTarget* target )
 		{
-			if( !repDel )
-				throw co::Exception( "only one reply delegate must be set at a time" );
-
-			repDel = replyDelegate;
+			_target = target;
 		}
 
-		void messageRequiresReply()
+		void notifyTarget()
 		{
-			if( !repDel )
-				throw co::Exception( "A message that requires reply needs a reply delegate" );
-
-			repDel->replyableMsgSent();
-			repDel = 0;
+			if( !_target )
+				throw co::Exception( "A message sent needs a Target ServerNode" );
+            
+            _target->msgSent();
 		}
 	};
 
@@ -71,31 +65,18 @@ namespace reef
 	----------------------------------------------------------*/
 	static std::map<std::string, BinderQueue*> _bound;
 
-    void FakeSocket::setReplyDelegateAt( const ReplyDelegate* repDel, const std::string& address )
+    void FakeSocket::setMsgTarget( MsgTarget* target, const std::string& address )
 	{
 		BinderQueue* bq = getQueueAt( address );
-		bq->setRepDel( repDel );
+		bq->setTarget( target );
 	}
 
 	void FakeSocket::sendAt( const std::string& msg, const std::string& binderAddress )
 	{
 		BinderQueue* bq = getQueueAt( binderAddress );
 		bq->insertMsg( msg );
-
-		// if the message requires a reply, the replyDelegate must be warned
-		Message message;
-		message.ParseFromString( msg );
-		Message::Type type = message.type();
-
-		if( type == Message::TYPE_NEW )
-			bq->messageRequiresReply();
-		else
-		{
-			const Message_Member& callMsg = message.msgmember();
-			if( callMsg.hasreturn() )
-				bq->messageRequiresReply();
-		}
-	}
+        bq->notifyTarget();
+    }
 
 	void FakeSocket::receiveAt( std::string& msg, const std::string& binderAddress )
 	{
