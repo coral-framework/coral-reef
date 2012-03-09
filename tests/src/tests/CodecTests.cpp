@@ -1,4 +1,4 @@
-/*#include <gtest/gtest.h>
+#include <gtest/gtest.h>
 
 #include <Message.pb.h>
 #include <MessageUtils.h>
@@ -182,4 +182,4 @@ TEST( CodecTests, simpleTypesTest )
 	EXPECT_TRUE( checkFieldMessage( &setfield_2_3_4_iArr, Message::TYPE_FIELD, 2,3,4, storedIntListField, iArr_arg[0] ) );
 }
 
-}*/
+}

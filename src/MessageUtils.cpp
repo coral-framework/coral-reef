@@ -84,7 +84,8 @@ void MessageUtils::PBArgWithTypeToAny<std::string>( const Argument& arg, co::Any
 {
     if( !elementType )
     {
-        any.set<const std::string&>( getPBContainerData<const std::string&>( arg.data( 0 ) ) );
+        std::string& anyString = any.createString();
+        anyString = getPBContainerData<const std::string&>( arg.data( 0 ) );
         return;
     }
     
