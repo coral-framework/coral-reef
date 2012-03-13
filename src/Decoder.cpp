@@ -1,6 +1,6 @@
 #include "Decoder.h"
 
-#include "Servant.h"
+#include "Channel.h"
 #include "Message.pb.h"
 
 #include <co/IMethod.h>
@@ -27,7 +27,7 @@ Decoder::~Decoder()
     // empty
 }
 
-void Decoder::routeAndDeliver( const std::string& data, const std::vector<Servant*>& channels )
+void Decoder::routeAndDeliver( const std::string& data, const std::vector<Channel*>& channels )
 {
     Message message;
     message.ParseFromString( data );
@@ -37,7 +37,15 @@ void Decoder::routeAndDeliver( const std::string& data, const std::vector<Servan
     deliver( &message, channels[dest] );
 }
     
-void Decoder::deliver( Message* msg, Servant* destination )
+void Decoder::deliver( const std::string& data, Channel* destination )
+{   
+    Message message;
+    message.ParseFromString( data );
+    
+    deliver( &message, destination );
+}
+    
+void Decoder::deliver( Message* msg, Channel* destination )
 {
     Message::Type type = msg->type();
     _destination = destination;

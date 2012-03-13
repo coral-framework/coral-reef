@@ -1,7 +1,7 @@
 #ifndef _REEF_SERVANT_H_
 #define _REEF_SERVANT_H_
 
-#include "IChannel.h"
+#include "Channel.h"
 
 #include <co/Any.h>
 #include <co/RefPtr.h>
@@ -15,7 +15,7 @@ namespace reef
 class ServerNode;
     
 // Server-side implementation of IChannel. Delivers the appropriate calls to the Objects
-class Servant : public IChannel
+class Servant : public Channel
 {
 public:
     Servant( co::IObject* object );
@@ -30,14 +30,8 @@ public:
     void getField( co::int32 serviceId, co::IField* field, co::Any& result );
     void setField( co::int32 serviceId, co::IField* field, const co::Any& value );
     
-    co::IComponent* getComponent()
-    {
-        return _component;
-    }
-    
 private:
     co::RefPtr<co::IObject> _object;
-    co::IComponent* _component;
     
     ServerNode* _serverNode;
 

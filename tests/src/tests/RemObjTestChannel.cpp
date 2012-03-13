@@ -50,11 +50,6 @@ namespace reef
 		setLastValues( serviceId, 0, field );
 	}
 
-    // Writes a raw event into channel.
-    void RemObjTestChannel::write( const Message* message )
-	{
-	}
-
 	void RemObjTestChannel::setReturnValue( co::IType* descriptor, co::Any& retValue )
 	{
 		co::TypeKind kind = descriptor->getKind();

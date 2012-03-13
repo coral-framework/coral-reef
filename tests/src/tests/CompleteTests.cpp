@@ -3,6 +3,8 @@
 #include "FakeSocket.h"
 #include "network/Connection.h"
 #include "Channel.h"
+#include "Encoder.h"
+#include "Decoder.h"
 #include <RemoteObject.h>
 #include <Message.pb.h>
 #include "Servant.h"
@@ -21,24 +23,27 @@
 namespace reef
 {
     
-class FakeDelegate : public DecoderChannel
+class FakeServant : public Channel
 {
 public:
+    FakeServant()
+    {
+    }
     
     // DecoderChannel Methods
-    int onNewInstance( Channel* channel, const std::string& typeName ) 
+    int newInstance( const std::string& typeName ) 
     { 
         _lastTypeName = typeName;
         return _instanceIdToReturn;
     }
     
-    virtual void onSendCall( Channel* channel, co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args ) 
+    void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args ) 
     {
         _lastServiceId = serviceId;
         _lastMethod = method;
         co::assign( args, _lastArguments );
     }
-    virtual void onCall( Channel* channel, co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result ) 
+    void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result ) 
     {
         _lastServiceId = serviceId;
         _lastMethod = method;
@@ -46,14 +51,14 @@ public:
         result.set<co::int32>( _returnValue );
     }
     
-    virtual void onGetField( Channel* channel, co::int32 serviceId, co::IField* field, co::Any& result ) 
+    void getField( co::int32 serviceId, co::IField* field, co::Any& result ) 
     {
         _lastServiceId = serviceId;
         _lastField = field;
         result.set<co::int32>( _returnValue ); 
     }
     
-    virtual void onSetField( Channel* channel, co::int32 serviceId, co::IField* field, const co::Any& value ) 
+    void setField( co::int32 serviceId, co::IField* field, const co::Any& value ) 
     {
         _lastServiceId = serviceId;
         _lastField = field;
@@ -93,16 +98,15 @@ class BinderMsgTarget : public MsgTarget
 public:
     // register the binder. Its receive function will be called whenever
     // a msg is sent to FakeSocket, and the msg will be passed to Channel
-    BinderMsgTarget( Binder* binder, Decoder* Decoder ) : 
-    _Decoder( Decoder ), _binder( binder )
-    {}
+    BinderMsgTarget( Binder* binder, Channel* channel ) : 
+        _binder( binder ), _decoder( _binder ), _channel( channel )
+    { 
+    }
     
     void msgSent()
     {
         _binder->receive( _receivedMessage );
-        Message msg;
-        msg.ParseFromString( _receivedMessage );
-        _Decoder->write( &msg );
+        _decoder.deliver( _receivedMessage, _channel );
     }
     
     const std::string& getReceivedMessage()
@@ -112,13 +116,14 @@ public:
     
 private:
     std::string _receivedMessage;
-    Decoder* _Decoder;
     Binder* _binder;
+    Decoder _decoder;
+    Channel* _channel;
 };
 
 TEST( CompleteTests, ChannelToChannelTest )
 {
-    FakeDelegate fd;
+    FakeServant fd;
     fd._instanceIdToReturn = 5;
     
     Binder* b1 = new Binder();
@@ -131,19 +136,15 @@ TEST( CompleteTests, ChannelToChannelTest )
     co::IObject* dummyObj = co::newInstance( "testModule.TestComponent" );
     co::IInterface* dummySmplItf = dummyObj->getService<testModule::ISimpleTypes>()->getInterface();
     
-    Decoder* oc = new Decoder( dummyObj, b1 ); // use the same object for the server!
-    oc->setDelegate( static_cast<DecoderChannel*>( &fd ) );
-    oc->setId( 2 );
-    BinderMsgTarget msgTarget( b1, oc );
+    fd.setComponent( dummyComponent );
+    BinderMsgTarget msgTarget( b1, &fd );
     FakeSocket::setMsgTarget( static_cast<MsgTarget*>( &msgTarget ), "addr1" );
     
     Encoder* ic = new Encoder( c1 );
-    ic->setId( -1 );
     
     co::IObject* dummyRemoteObj = new RemoteObject( dummyComponent, ic );
     testModule::ISimpleTypes* st = dummyRemoteObj->getService<testModule::ISimpleTypes>();
     
-    ic->setId( -1 );
     EXPECT_EQ( ic->newInstance( "test1" ), 5 );
     EXPECT_EQ( fd._lastTypeName, std::string( "test1" ) );
     
@@ -179,9 +180,6 @@ TEST( CompleteTests, ChannelToChannelTest )
     
 TEST( CompleteTests, ProxyToServantTest )
 {
-    FakeDelegate fd;
-    fd._instanceIdToReturn = 5;
-    
     Binder* b1 = new Binder();
     b1->bind( "addr1" );
     Connecter* c1 = new Connecter();
@@ -190,21 +188,21 @@ TEST( CompleteTests, ProxyToServantTest )
     co::IComponent* dummyComponent = co::cast<co::IComponent>( co::getType( "testModule.TestComponent" ) );
     co::IObject* dummyObj = co::newInstance( "testModule.TestComponent" );
     
-    Decoder* oc = new Decoder( dummyObj, b1 ); // Fake delegate to simulate newInstance creation
-    oc->setDelegate( static_cast<DecoderChannel*>( &fd ) );
-    BinderMsgTarget msgTarget( b1, oc );
-    FakeSocket::setMsgTarget( static_cast<MsgTarget*>( &msgTarget ), "addr1" );
+    // now that newInstance was called, set the appropriate servant
+    FakeServant fakeServant;
+    
+    BinderMsgTarget fakeMsgTarget( b1, &fakeServant );
+    FakeSocket::setMsgTarget( static_cast<MsgTarget*>( &fakeMsgTarget ), "addr1" );
     
     Encoder* ic = new Encoder( c1 );
-    ic->setId( -1 ); // there is an assertion in newInstance for id == -1
-    
+
     // newInstance will be called
     co::IObject* dummyRemoteObj = new RemoteObject( dummyComponent, ic );
     testModule::ISimpleTypes* st = dummyRemoteObj->getService<testModule::ISimpleTypes>();
     
-    // now that newInstance was called, set the appropriate servant
-    Servant* servant = new Servant( dummyObj );
-    oc->setDelegate( static_cast<DecoderChannel*>( servant ) );
+    Servant servant( dummyObj );
+    BinderMsgTarget msgtarget( b1, &servant );
+    FakeSocket::setMsgTarget( static_cast<MsgTarget*>( &msgtarget ), "addr1" );
     
     st->setDouble( 0.1 );
     EXPECT_EQ( st->getStoredDouble(), 0.1 );

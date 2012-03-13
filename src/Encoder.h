@@ -1,7 +1,7 @@
 #ifndef _REEF_ENCODER_H_
 #define _REEF_ENCODER_H_
 
-#include "IChannel.h"
+#include "Channel.h"
 
 #include <co/Any.h>
 #include <co/Range.h>
@@ -15,7 +15,7 @@ class Message;
 /*
     Client-side Channel. Receives the calls from the RemoteObject, encodes and sends to Server
  */
-class Encoder : public IChannel
+class Encoder : public Channel
 {
 public:
     Encoder( Connecter* connecter );

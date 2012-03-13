@@ -4,6 +4,7 @@
 namespace reef {
 
 class Binder;
+class Channel;
 class Servant;
 class Decoder;
     
@@ -31,7 +32,7 @@ private:
 	Binder* _binder;
     Decoder* _decoder;
 
-    typedef std::vector<Servant*> Channels;
+    typedef std::vector<Channel*> Channels;
     
     Channels _channels;
 	typedef std::map<co::int32,co::IObject*> InstanceMap;

@@ -20,11 +20,7 @@ public:
 
     void setField( co::int32 serviceId, co::IField* field, const co::Any& value );
 
-    // Writes a raw event into channel.
-    void write( const Message* message );
-
-	// ---------- Methods for testing only ------------ //
-
+    // ---------- Methods for testing only ------------ //
 	void getCalledValues( co::int32& serviceId, co::IMethod*& method, co::IField*& field )
 	{
 		serviceId = _lastServiceId;

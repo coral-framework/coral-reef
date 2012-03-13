@@ -12,7 +12,7 @@ RemoteObject::RemoteObject()
     // empty
 }
     
-RemoteObject::RemoteObject( co::IComponent* component, IChannel* channel ) : _numFacets( 0 )
+RemoteObject::RemoteObject( co::IComponent* component, Channel* channel ) : _numFacets( 0 )
 {
     setComponent( component );
     channel->newInstance( component->getFullName() );
