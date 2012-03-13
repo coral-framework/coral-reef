@@ -22,10 +22,11 @@ public:
 	bool receiveReply( std::string& data ); //Blocking function
 
 private:
-    bool _connected;
 	std::string _address;
 	zmq::context_t _context;
     zmq::socket_t _socket;
+    
+    bool _connected;
 };
 
 class Binder
@@ -43,12 +44,13 @@ public:
 	void reply( const std::string& data );
 
 private:
-    bool _bound;
 	std::string _address;
 	zmq::context_t _context;
     zmq::socket_t _socket;
 
 	zmq::message_t _lastSender;
+    
+    bool _bound;
 };
 
 } // namespace reef

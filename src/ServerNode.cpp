@@ -1,6 +1,6 @@
 #include "ServerNode.h"
 
-#include "Channel.h"
+#include "Decoder.h"
 #include "Servant.h"
 
 #include "network/Connection.h"
@@ -25,11 +25,10 @@ void ServerNode::start( const std::string& address )
     _binder = new Binder();
     _binder->bind( address );
         
-	OutputChannel* serverChannel = new OutputChannel( 0, _binder );
-	serverChannel->setDelegate( this );
-    _channels.push_back( serverChannel );
-
-    _channels[0]->setId( 0 );
+	_decoder = new Decoder( _binder );
+	Servant* servant = new Servant( 0 );
+    servant->setServerNode( this );
+    _channels.push_back( servant );
 }
     
 void ServerNode::update()
@@ -41,7 +40,7 @@ void ServerNode::update()
 	if( _binder->receive( message ) )    
 	{
 		// Route the message to the proper channel
-		Channel::route( message, _channels );
+		_decoder->routeAndDeliver( message, _channels );
 	}
 }
 
@@ -49,20 +48,19 @@ void ServerNode::stop()
 {
     if( _binder )
         _binder->close();
+    
 }
        
-// OutputChannelDelegate
-int ServerNode::onNewInstance( Channel* channel, const std::string& typeName ) 
+// DecoderChannel
+int ServerNode::newInstance( const std::string& typeName ) 
 {
 	co::IObject* instance = co::newInstance( typeName );
-    OutputChannel* newChannel = new OutputChannel( this, _binder );
-    newChannel->setDelegate( new Servant( instance ) );
 
-	int newChannelId = _channels.size();
-	newChannel->setId( newChannelId );
-    _channels.push_back( newChannel );
+    _channels.push_back( new Servant( instance ) );
 
-	registerInstance( newChannelId, instance );
+    co::int32 newChannelId = _channels.size() - 1;
+    
+    registerInstance( newChannelId, instance );
         
     return newChannelId;
 }

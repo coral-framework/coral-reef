@@ -2,7 +2,7 @@
 #define __REMOTEOBJECT_H__
 
 #include "RemoteObject_Base.h"
-#include "Channel.h"
+#include "IChannel.h"
 
 namespace reef
 {
@@ -11,7 +11,7 @@ class RemoteObject : public RemoteObject_Base
 {
 public:
     RemoteObject();
-    RemoteObject( co::IComponent* component, Channel* channel );
+    RemoteObject( co::IComponent* component, IChannel* channel );
     virtual ~RemoteObject();
     
     void setComponent( co::IComponent* component );
@@ -24,12 +24,13 @@ public:
     // IDynamicServiceProvider
     co::IPort* dynamicGetFacet( co::int32 dynFacetId );
     const co::Any& dynamicGetField( co::int32 dynFacetId, co::IField* field );
-    const co::Any& dynamicInvoke( co::int32 dynFacetId, co::IMethod* method, co::Range<co::Any const> args );
+    const co::Any& dynamicInvoke( co::int32 dynFacetId, co::IMethod* method, 
+                                 co::Range<co::Any const> args );
     co::int32 dynamicRegisterService( co::IService* dynamicServiceProxy );
     void dynamicSetField( co::int32 dynFacetId, co::IField* field, const co::Any& value );
 
 private:
-    Channel* _channel;
+    IChannel* _channel;
     
     int _numFacets;
     co::Any _resultBuffer;

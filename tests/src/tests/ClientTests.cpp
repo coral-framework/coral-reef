@@ -6,7 +6,6 @@
 #include <testModule/IComplexTypes.h>
 
 #include <RemoteObject.h>
-#include <Channel.h>
 #include "RemObjTestChannel.h"
 
 #include <co/Coral.h>

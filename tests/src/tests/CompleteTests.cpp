@@ -21,11 +21,11 @@
 namespace reef
 {
     
-class FakeDelegate : public OutputChannelDelegate
+class FakeDelegate : public DecoderChannel
 {
 public:
     
-    // OutputChannelDelegate Methods
+    // DecoderChannel Methods
     int onNewInstance( Channel* channel, const std::string& typeName ) 
     { 
         _lastTypeName = typeName;
@@ -93,8 +93,8 @@ class BinderMsgTarget : public MsgTarget
 public:
     // register the binder. Its receive function will be called whenever
     // a msg is sent to FakeSocket, and the msg will be passed to Channel
-    BinderMsgTarget( Binder* binder, OutputChannel* outputChannel ) : 
-    _outputChannel( outputChannel ), _binder( binder )
+    BinderMsgTarget( Binder* binder, Decoder* Decoder ) : 
+    _Decoder( Decoder ), _binder( binder )
     {}
     
     void msgSent()
@@ -102,7 +102,7 @@ public:
         _binder->receive( _receivedMessage );
         Message msg;
         msg.ParseFromString( _receivedMessage );
-        _outputChannel->write( &msg );
+        _Decoder->write( &msg );
     }
     
     const std::string& getReceivedMessage()
@@ -112,7 +112,7 @@ public:
     
 private:
     std::string _receivedMessage;
-    OutputChannel* _outputChannel;
+    Decoder* _Decoder;
     Binder* _binder;
 };
 
@@ -131,13 +131,13 @@ TEST( CompleteTests, ChannelToChannelTest )
     co::IObject* dummyObj = co::newInstance( "testModule.TestComponent" );
     co::IInterface* dummySmplItf = dummyObj->getService<testModule::ISimpleTypes>()->getInterface();
     
-    OutputChannel* oc = new OutputChannel( dummyObj, b1 ); // use the same object for the server!
-    oc->setDelegate( static_cast<OutputChannelDelegate*>( &fd ) );
+    Decoder* oc = new Decoder( dummyObj, b1 ); // use the same object for the server!
+    oc->setDelegate( static_cast<DecoderChannel*>( &fd ) );
     oc->setId( 2 );
     BinderMsgTarget msgTarget( b1, oc );
     FakeSocket::setMsgTarget( static_cast<MsgTarget*>( &msgTarget ), "addr1" );
     
-    InputChannel* ic = new InputChannel( c1 );
+    Encoder* ic = new Encoder( c1 );
     ic->setId( -1 );
     
     co::IObject* dummyRemoteObj = new RemoteObject( dummyComponent, ic );
@@ -190,12 +190,12 @@ TEST( CompleteTests, ProxyToServantTest )
     co::IComponent* dummyComponent = co::cast<co::IComponent>( co::getType( "testModule.TestComponent" ) );
     co::IObject* dummyObj = co::newInstance( "testModule.TestComponent" );
     
-    OutputChannel* oc = new OutputChannel( dummyObj, b1 ); // Fake delegate to simulate newInstance creation
-    oc->setDelegate( static_cast<OutputChannelDelegate*>( &fd ) );
+    Decoder* oc = new Decoder( dummyObj, b1 ); // Fake delegate to simulate newInstance creation
+    oc->setDelegate( static_cast<DecoderChannel*>( &fd ) );
     BinderMsgTarget msgTarget( b1, oc );
     FakeSocket::setMsgTarget( static_cast<MsgTarget*>( &msgTarget ), "addr1" );
     
-    InputChannel* ic = new InputChannel( c1 );
+    Encoder* ic = new Encoder( c1 );
     ic->setId( -1 ); // there is an assertion in newInstance for id == -1
     
     // newInstance will be called
@@ -204,7 +204,7 @@ TEST( CompleteTests, ProxyToServantTest )
     
     // now that newInstance was called, set the appropriate servant
     Servant* servant = new Servant( dummyObj );
-    oc->setDelegate( static_cast<OutputChannelDelegate*>( servant ) );
+    oc->setDelegate( static_cast<DecoderChannel*>( servant ) );
     
     st->setDouble( 0.1 );
     EXPECT_EQ( st->getStoredDouble(), 0.1 );

@@ -13,15 +13,25 @@
 namespace reef
 {
 
-Servant::Servant( co::IObject* object )
+Servant::Servant( co::IObject* object ) : _serverNode( 0 )
 {
-    _object = object;
-	co::Range<co::IPort* const> ports = _object->getComponent()->getFacets();
-	_openedServices.resize( ports.getSize() );
-	_openedReflectors.resize( ports.getSize() );
+    if( object )
+    {
+        _object = object;
+        _component = object->getComponent();
+        co::Range<co::IPort* const> ports = _object->getComponent()->getFacets();
+        _openedServices.resize( ports.getSize() );
+        _openedReflectors.resize( ports.getSize() );
+    }
 }
     
-void Servant::onSendCall( Channel* channel, co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args )
+int Servant::newInstance( const std::string& typeName )
+{
+    assert( _serverNode );
+    return _serverNode->newInstance( typeName );
+}
+    
+void Servant::sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args )
 {
 	if( !_openedServices[serviceId] ) // if already used before access directly
 		onServiceFirstAccess( serviceId );
@@ -31,7 +41,7 @@ void Servant::onSendCall( Channel* channel, co::int32 serviceId, co::IMethod* me
 	_openedReflectors[serviceId]->invoke( _openedServices[serviceId], method, args, dummy );
 }
     
-void Servant::onCall( Channel* channel, co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result )
+void Servant::call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result )
 {
     if( !_openedServices[serviceId] ) // if already used before access directly
 		onServiceFirstAccess( serviceId );
@@ -39,7 +49,7 @@ void Servant::onCall( Channel* channel, co::int32 serviceId, co::IMethod* method
 	_openedReflectors[serviceId]->invoke( _openedServices[serviceId], method, args, result );		
 }
     
-void Servant::onGetField( Channel* channel, co::int32 serviceId, co::IField* field, co::Any& result )
+void Servant::getField( co::int32 serviceId, co::IField* field, co::Any& result )
 {
     if( !_openedServices[serviceId] ) // if already used before access directly
 		onServiceFirstAccess( serviceId );
@@ -47,7 +57,7 @@ void Servant::onGetField( Channel* channel, co::int32 serviceId, co::IField* fie
 	_openedReflectors[serviceId]->getField( _openedServices[serviceId], field, result );
 }
     
-void Servant::onSetField( Channel* channel, co::int32 serviceId, co::IField* field, const co::Any& value )
+void Servant::setField( co::int32 serviceId, co::IField* field, const co::Any& value )
 {
     if( !_openedServices[serviceId] ) // if already used before access directly
 		onServiceFirstAccess( serviceId );

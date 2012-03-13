@@ -1,13 +1,13 @@
 #include "ServerNode_Base.h"
-#include "Channel.h"
 #include <map>
 
 namespace reef {
 
 class Binder;
-class Channel;
+class Servant;
+class Decoder;
     
-class ServerNode : public ServerNode_Base, public OutputChannelDelegate
+class ServerNode : public ServerNode_Base
 {
 public:
     ServerNode();
@@ -20,8 +20,8 @@ public:
 
     void stop();
        
-    // OutputChannelDelegate
-    int onNewInstance( Channel* channel, const std::string& typeName );
+    // DecoderChannel
+    int newInstance( const std::string& typeName );
 
 	void registerInstance( co::int32 virtualAddress, co::IObject* object );
     
@@ -29,8 +29,9 @@ public:
 
 private:
 	Binder* _binder;
+    Decoder* _decoder;
 
-    typedef std::vector<Channel*> Channels;
+    typedef std::vector<Servant*> Channels;
     
     Channels _channels;
 	typedef std::map<co::int32,co::IObject*> InstanceMap;
