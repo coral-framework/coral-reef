@@ -128,8 +128,7 @@ TEST( CompleteTests, ChannelToChannelTest )
     
     Binder* b1 = new Binder();
     b1->bind( "addr1" );
-    Connecter* c1 = new Connecter();
-    c1->connect( "addr1" );
+    Connecter* c1 = Connecter::getOrOpenConnection( "addr1" );
     
     co::IComponent* dummyComponent = co::cast<co::IComponent>( co::getType( "testModule.TestComponent" ) );
     co::IPort* dummySmplPort = co::cast<co::IPort>( dummyComponent->getMember( "simple" ) );
@@ -182,8 +181,7 @@ TEST( CompleteTests, ProxyToServantTest )
 {
     Binder* b1 = new Binder();
     b1->bind( "addr1" );
-    Connecter* c1 = new Connecter();
-    c1->connect( "addr1" );
+    Connecter* c1 = Connecter::getOrOpenConnection( "addr1" );
     
     co::IComponent* dummyComponent = co::cast<co::IComponent>( co::getType( "testModule.TestComponent" ) );
     co::IObject* dummyObj = co::newInstance( "testModule.TestComponent" );

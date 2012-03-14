@@ -10,7 +10,7 @@
 
 namespace reef {
 
-ServerNode::ServerNode()
+ServerNode::ServerNode()  : _decoder( &_binder )
 {
     // empty constructor
 }
@@ -22,10 +22,7 @@ ServerNode::~ServerNode()
     
 void ServerNode::start( const std::string& address )
 {
-    _binder = new Binder();
-    _binder->bind( address );
-        
-	_decoder = new Decoder( _binder );
+    _binder.bind( address );
 	Servant* servant = new Servant( 0 );
     servant->setServerNode( this );
     _channels.push_back( servant );
@@ -33,22 +30,37 @@ void ServerNode::start( const std::string& address )
     
 void ServerNode::update()
 {
-    if( !_binder->isBinded() )
+    if( !_binder.isBound() )
         return;
         
 	std::string message;
-	if( _binder->receive( message ) )    
+	if( _binder.receive( message ) )    
 	{
 		// Route the message to the proper channel
-		_decoder->routeAndDeliver( message, _channels );
+		_decoder.routeAndDeliver( message, _channels );
 	}
 }
 
 void ServerNode::stop()
 {
-    if( _binder )
-        _binder->close();
+    if( _binder.isBound() )
+        _binder.close();
     
+    // fill the empty holes in the channels vector
+    for( ; !_freedIds.empty(); _freedIds.pop() )
+    {
+        if( _freedIds.top() != _channels.size() )
+            _channels[_freedIds.top()] = _channels.back();
+        
+        _channels.pop_back();
+    }
+    
+    // now delete all the servants
+    size_t size = _channels.size();
+    for( int i = 0; i < size; i++ )
+    {
+        delete static_cast<Servant*>( _channels[i] );
+    }
 }
        
 // DecoderChannel
@@ -56,30 +68,28 @@ int ServerNode::newInstance( const std::string& typeName )
 {
 	co::IObject* instance = co::newInstance( typeName );
 
-    _channels.push_back( new Servant( instance ) );
-
-    co::int32 newChannelId = _channels.size() - 1;
+    Channel* servant = new Servant( instance );
+    co::int32 newChannelId;
     
-    registerInstance( newChannelId, instance );
+    if( !_freedIds.empty() )
+    {
+        newChannelId = _freedIds.top();
+        _channels[newChannelId];
+        _freedIds.pop();
+        return newChannelId;
+    }
+    
+    _channels.push_back( servant );
+
+    newChannelId = _channels.size() - 1;
         
     return newChannelId;
 }
 
-void ServerNode::registerInstance( co::int32 virtualAddress, co::IObject* object )
+void ServerNode::removeInstance( co::int32 instanceId )
 {
-	InstanceMap::iterator it = _instanceMap.find( virtualAddress );
-	assert( it == _instanceMap.end() );
-
-	_instanceMap.insert( std::pair<int, co::IObject*>( virtualAddress, object ) );
-}
-    
-co::IObject* ServerNode::mapInstance( co::int32 virtualAddress )
-{
-	InstanceMap::iterator it = _instanceMap.find( virtualAddress );
-	if( it == _instanceMap.end() )
-		return 0;
-
-	return it->second;
+    delete static_cast<Servant*>( _channels[instanceId] );
+    _freedIds.push( instanceId );
 }
 
 CORAL_EXPORT_COMPONENT( ServerNode, ServerNode );

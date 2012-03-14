@@ -1,12 +1,14 @@
 #include "ServerNode_Base.h"
 #include <map>
 
+#include "Decoder.h"
+#include "network/Connection.h"
+#include <stack>
+
 namespace reef {
 
-class Binder;
 class Channel;
 class Servant;
-class Decoder;
     
 class ServerNode : public ServerNode_Base
 {
@@ -24,19 +26,17 @@ public:
     // DecoderChannel
     int newInstance( const std::string& typeName );
 
-	void registerInstance( co::int32 virtualAddress, co::IObject* object );
+	void removeInstance( co::int32 instanceId );
     
-	co::IObject* mapInstance( co::int32 virtualAddress );
-
 private:
-	Binder* _binder;
-    Decoder* _decoder;
+	Binder _binder;
+    Decoder _decoder;
 
     typedef std::vector<Channel*> Channels;
     
     Channels _channels;
-	typedef std::map<co::int32,co::IObject*> InstanceMap;
-	InstanceMap _instanceMap;
+    
+    std::stack<co::int32> _freedIds;
 };
     
 } // namespace reef

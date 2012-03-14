@@ -34,7 +34,7 @@ private:
 	void fetchReturnValue( co::IType* descriptor, co::Any& returnValue );
 
 private:
-	Connecter* _connecter;
+    co::RefPtr<Connecter> _connecter;
     
     co::int32 _decoderAddress;
 };

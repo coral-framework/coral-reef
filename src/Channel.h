@@ -15,6 +15,10 @@ namespace reef {
 class Channel
 {
 public:
+    virtual ~Channel()
+    {
+    }
+    
     virtual int newInstance( const std::string& typeName ) = 0;
     virtual void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args ) = 0;
     virtual void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result ) = 0;

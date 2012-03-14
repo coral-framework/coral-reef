@@ -19,30 +19,20 @@ public:
     
     virtual ~ClientNode()
     {
-        // empty destructor
     }
     
     co::IObject* newRemoteInstance( const std::string& componentTypeName, const std::string& address )
     {
-        Connecter* connecter;
-        
-        std::map<std::string, Connecter*>::iterator it = _connections.find( address );
-        if( it != _connections.end() )
-        {
-            connecter = (*it).second;
-        }
-        else
-        {
-            connecter = new Connecter();
-            connecter->connect( address );
-        }            
-        
         co::IComponent* componentType = co::cast<co::IComponent>( co::getType( componentTypeName ) );
+        Connecter* connecter = Connecter::getOrOpenConnection( address );
         return new reef::RemoteObject( componentType, new Encoder( connecter ) );
-    }   
+    }
     
-private:
-    std::map<std::string, Connecter*> _connections;
+    void onConnecterDestroyed( const std::string& address )
+    {
+        
+
+    }
 };
 
 CORAL_EXPORT_COMPONENT( ClientNode, ClientNode );

@@ -8,6 +8,25 @@
 
 namespace reef {
 
+typedef std::map<std::string, Connecter*> Connecters;
+
+// map holding all open connections
+static Connecters _connecters;
+
+Connecter* Connecter::getOrOpenConnection( const std::string& address )
+{    
+    Connecters::iterator it = _connecters.find( address );
+    if( it != _connecters.end() )
+    {
+        return (*it).second;
+    }
+    
+    Connecter* connecter = new Connecter();
+    connecter->connect( address );
+    
+    return connecter;
+}
+
 Connecter::Connecter() 
     : _context( 1 ), _socket( _context, ZMQ_DEALER ), _connected( false )
 {
@@ -16,7 +35,12 @@ Connecter::Connecter()
 
 Connecter::~Connecter()
 {
-    // empty
+    // remove the entry in the connections map
+    Connecters::iterator it = _connecters.find( _address );
+    if( it != _connecters.end() )
+    {
+        _connecters.erase( it );
+    }
 }
     
 bool Connecter::connect( const std::string& address )

@@ -21,7 +21,7 @@ RemoteObject::RemoteObject( co::IComponent* component, Channel* channel ) : _num
 
 RemoteObject::~RemoteObject()
 {
-    // empty destructor
+    delete _channel;
 }
     
 void RemoteObject::setComponent( co::IComponent* component )

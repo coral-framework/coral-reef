@@ -4,14 +4,17 @@
 #include <string>
 #include <zmq.hpp>
 
+#include <co/reserved/RefCounted.h>
+
 namespace reef
 {
     
-class Connecter
+class Connecter : public co::RefCounted
 {
 public:
-	Connecter();
-	~Connecter();
+    // Factory method. The returned Pointer must be saved in a RefPtr.
+    static Connecter* getOrOpenConnection( const std::string& address );
+    ~Connecter();
 
 	bool connect( const std::string& address );
 	void close();
@@ -22,6 +25,9 @@ public:
 	bool receiveReply( std::string& data ); //Blocking function
 
 private:
+
+    Connecter();
+    
 	std::string _address;
 	zmq::context_t _context;
     zmq::socket_t _socket;
@@ -38,7 +44,7 @@ public:
 	bool bind( const std::string& address );
 	void close();
     
-    bool isBinded() { return _bound; }
+    bool isBound() { return _bound; }
 
 	bool receive( std::string& data ); // Non-Blocking
 	void reply( const std::string& data );
