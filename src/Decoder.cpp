@@ -106,7 +106,7 @@ void Decoder::deliverNew( const Message_New* subMessage )
     VirtualAddress va;
     va.set_address( virtualAddress );
     
-    std::string output;
+    std::string output = "";
     va.SerializeToString( &output );
     _binder->reply( output );
     

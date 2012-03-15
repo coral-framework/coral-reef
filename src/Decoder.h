@@ -23,9 +23,7 @@ class Decoder
 public:
     // Routes the given message to the proper channel using message destination identifier.
     void routeAndDeliver( const std::string& data, const std::vector<Channel*>& channels );
-    // uses the internal Servant vector to route
-    void routeAndDeliver( const std::string& data );
-    
+        
     void deliver( Message* msg, Channel* destination );
     
     // this overload is for testing only
@@ -53,7 +51,6 @@ private:
 
     Channel* _destination;
     
-    std::vector<Channel*> _channels;
 };
     
 } // namespace reef
