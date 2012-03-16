@@ -24,7 +24,7 @@ TEST( ClientTests, remoteObjectTest )
 
 	// create remote object of TestComponent type
 	co::IComponent* TCComponent = co::cast<co::IComponent>( co::getType( "testModule.TestComponent" ) );
-	co::IObject* TCObject = new RemoteObject( TCComponent, fakeChannel  );
+    co::RefPtr<co::IObject> TCObject = new RemoteObject( TCComponent, fakeChannel  );
 
 	// get the ISimpleTypes port so we can know the index of the port to check later.
 	co::IPort* STPort = co::cast<co::IPort>( TCComponent->getMember( "simple" ) );

@@ -4,6 +4,9 @@
 #include "RemoteObject_Base.h"
 #include "Channel.h"
 
+#include <co/IService.h>
+#include <co/RefVector.h>
+
 namespace reef
 {
     
@@ -34,7 +37,7 @@ private:
     
     int _numFacets;
     co::Any _resultBuffer;
-    co::IService** _facets;
+    std::vector<co::IService*> _facets;
     co::IComponent* _componentType;
 };
 

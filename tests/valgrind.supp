@@ -29,31 +29,3 @@
 	...
 	fun:vfprintf_l
 }
-{
-   protobuf's SerializeToString jumps using unitialized string
-   Memcheck:Cond
-   ...
-   fun:_ZNK6google8protobuf11MessageLite17SerializeToStringEPSs
-   ...
-}
-{
-   protobuf's SerializeToString uses unitialized string
-   Memcheck:Value8
-   ...
-   fun:_ZNK6google8protobuf11MessageLite17SerializeToStringEPSs
-   ...
-}
-{
-   protobuf's ParseFromString jumps using unitialized string
-   Memcheck:Cond
-   ...
-   fun:_ZN6google8protobuf11MessageLite15ParseFromStringERKSs
-   ...
-}
-{
-   protobuf's ParseFromString uses unitialized string
-   Memcheck:Value8
-   ...
-   fun:_ZN6google8protobuf11MessageLite15ParseFromStringERKSs
-   ...
-}

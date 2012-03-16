@@ -22,6 +22,11 @@ RemoteObject::RemoteObject( co::IComponent* component, Channel* channel ) : _num
 RemoteObject::~RemoteObject()
 {
     delete _channel;
+    
+    for( std::vector<co::IService*>::iterator it = _facets.begin(); it != _facets.end(); it++ )
+    {
+        delete (*it);
+    }
 }
     
 void RemoteObject::setComponent( co::IComponent* component )
@@ -31,12 +36,11 @@ void RemoteObject::setComponent( co::IComponent* component )
 	// create proxy interfaces for our facets
 	co::Range<co::IPort* const> facets = _componentType->getFacets();
 	int numFacets = static_cast<int>( facets.getSize() );
-	_facets = new co::IService*[numFacets];
+    _facets.resize( numFacets );
 	for( int i = 0; i < numFacets; ++i )
 	{
-		assert( _numFacets == i );
+		assert( _numFacets >= i );
 		facets[i]->getType()->getReflector()->newDynamicProxy( this );
-		assert( _numFacets == i + 1 );
 	}
 }
 

@@ -26,7 +26,7 @@ namespace reef
 class FakeServant : public Channel
 {
 public:
-    FakeServant()
+    FakeServant() : _instanceIdToReturn( 1 )
     {
     }
     
@@ -126,22 +126,22 @@ TEST( CompleteTests, ChannelToChannelTest )
     FakeServant fd;
     fd._instanceIdToReturn = 5;
     
-    Binder* b1 = new Binder();
-    b1->bind( "addr1" );
+    Binder b1;
+    b1.bind( "addr1" );
     Connecter* c1 = Connecter::getOrOpenConnection( "addr1" );
     
     co::IComponent* dummyComponent = co::cast<co::IComponent>( co::getType( "testModule.TestComponent" ) );
     co::IPort* dummySmplPort = co::cast<co::IPort>( dummyComponent->getMember( "simple" ) );
-    co::IObject* dummyObj = co::newInstance( "testModule.TestComponent" );
+    co::RefPtr<co::IObject> dummyObj = co::newInstance( "testModule.TestComponent" );
     co::IInterface* dummySmplItf = dummyObj->getService<testModule::ISimpleTypes>()->getInterface();
     
     fd.setComponent( dummyComponent );
-    BinderMsgTarget msgTarget( b1, &fd );
+    BinderMsgTarget msgTarget( &b1, &fd );
     FakeSocket::setMsgTarget( static_cast<MsgTarget*>( &msgTarget ), "addr1" );
     
     Encoder* ic = new Encoder( c1 );
     
-    co::IObject* dummyRemoteObj = new RemoteObject( dummyComponent, ic );
+    co::RefPtr<co::IObject> dummyRemoteObj = new RemoteObject( dummyComponent, ic );
     testModule::ISimpleTypes* st = dummyRemoteObj->getService<testModule::ISimpleTypes>();
     
     EXPECT_EQ( ic->newInstance( "test1" ), 5 );
@@ -179,27 +179,27 @@ TEST( CompleteTests, ChannelToChannelTest )
     
 TEST( CompleteTests, ProxyToServantTest )
 {
-    Binder* b1 = new Binder();
-    b1->bind( "addr1" );
+    Binder b1;
+    b1.bind( "addr1" );
     Connecter* c1 = Connecter::getOrOpenConnection( "addr1" );
     
     co::IComponent* dummyComponent = co::cast<co::IComponent>( co::getType( "testModule.TestComponent" ) );
-    co::IObject* dummyObj = co::newInstance( "testModule.TestComponent" );
+    co::RefPtr<co::IObject> dummyObj = co::newInstance( "testModule.TestComponent" );
     
     // now that newInstance was called, set the appropriate servant
     FakeServant fakeServant;
     
-    BinderMsgTarget fakeMsgTarget( b1, &fakeServant );
+    BinderMsgTarget fakeMsgTarget( &b1, &fakeServant );
     FakeSocket::setMsgTarget( static_cast<MsgTarget*>( &fakeMsgTarget ), "addr1" );
     
     Encoder* ic = new Encoder( c1 );
 
     // newInstance will be called
-    co::IObject* dummyRemoteObj = new RemoteObject( dummyComponent, ic );
+    co::RefPtr<co::IObject> dummyRemoteObj = new RemoteObject( dummyComponent, ic );
     testModule::ISimpleTypes* st = dummyRemoteObj->getService<testModule::ISimpleTypes>();
     
-    Servant servant( dummyObj );
-    BinderMsgTarget msgtarget( b1, &servant );
+    Servant servant( dummyObj.get() );
+    BinderMsgTarget msgtarget( &b1, &servant );
     FakeSocket::setMsgTarget( static_cast<MsgTarget*>( &msgtarget ), "addr1" );
     
     st->setDouble( 0.1 );
@@ -260,7 +260,6 @@ TEST( CompleteTests, ProxyToServantTest )
     
     EXPECT_STREQ( stringRange[0].c_str(), stringVec[2].c_str() );
     EXPECT_STREQ( stringRange[1].c_str(), stringVec2[2].c_str() );
-    
 }
     
 }

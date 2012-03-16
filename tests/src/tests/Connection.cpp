@@ -35,6 +35,9 @@ Connecter::Connecter()
 
 Connecter::~Connecter()
 {
+    if( _connected )
+        close();
+    
     // remove the entry in the connections map
     Connecters::iterator it = _connecters.find( _address );
     if( it != _connecters.end() )
@@ -78,7 +81,8 @@ Binder::Binder()
 
 Binder::~Binder()
 {
-    // empty
+    if( _bound )
+        close();
 }
 
 bool Binder::bind( const std::string& address )

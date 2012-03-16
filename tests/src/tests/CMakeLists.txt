@@ -47,8 +47,8 @@ IF( VALGRIND_COMMAND )
 	ADD_TEST(
 		NAME tests_MemoryCheck
 		COMMAND ${VALGRIND_COMMAND} --leak-check=full --show-reachable=yes --num-callers=30 --dsymutil=yes
-			--gen-suppressions=all --log-file=${CMAKE_BINARY_DIR}/Valgrind$<CONFIGURATION>.log --error-exitcode=13
-			--suppressions=${CMAKE_SOURCE_DIR}/tests/valgrind.supp $<TARGET_FILE:tests>
+			--gen-suppressions=no --log-file=${CMAKE_BINARY_DIR}/Valgrind$<CONFIGURATION>.log --error-exitcode=13
+			--track-origins=yes --suppressions=${CMAKE_SOURCE_DIR}/tests/valgrind.supp $<TARGET_FILE:tests>
 	)
 	CORAL_TEST_ENVIRONMENT( tests_MemoryCheck )
 ENDIF()
