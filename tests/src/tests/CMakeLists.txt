@@ -7,9 +7,9 @@ CORAL_GENERATE_MODULE( _GENERATED_FILES reef )
 
 INCLUDE_DIRECTORIES(
 	${GTEST_INCLUDE_DIRS}
-	${testModule_BINARY_DIR}/generated
 	${REEF_SOURCE_DIR}/src
 	${CMAKE_CURRENT_BINARY_DIR}/generated
+	${testModule_BINARY_DIR}/generated
 )
 
 # Gather source files in the current directory

@@ -7,9 +7,12 @@
 #include <co/ISystem.h>
 #include <co/reserved/LibraryManager.h>
 #include <gtest/gtest.h>
+#include "Message.pb.h"
 
 int main( int argc, char** argv )
 {
+    GOOGLE_PROTOBUF_VERIFY_VERSION;
+    
 	testing::InitGoogleTest( &argc, argv );
 
 	// skip dlclose() so we get proper valgrind reports
@@ -30,6 +33,7 @@ int main( int argc, char** argv )
 		res = 42;
 	}
 
+    google::protobuf::ShutdownProtobufLibrary();
 	co::shutdown();
 
 	return res;	
