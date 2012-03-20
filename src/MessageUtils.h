@@ -73,6 +73,9 @@ private:
 		}
 		
 		size_t size = arg.data().size();
+		if( size == 0 ) // required for vector subscript out of range assertion
+			return;
+
 		std::vector<co::uint8>& vec = any.createArray( elementType, size );
 		T* toCast = reinterpret_cast<T*>( &vec[0] );
 		for( int i = 0; i < size; i++ )

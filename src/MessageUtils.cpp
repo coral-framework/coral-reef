@@ -90,6 +90,9 @@ void MessageUtils::PBArgWithTypeToAny<std::string>( const Argument& arg, co::Any
     }
     
     size_t size = arg.data().size();
+	if( size == 0 ) // required for vector subscript out of range assertion
+			return;
+
     std::vector<co::uint8>& vec = any.createArray( elementType, size );
     std::string* toCast = reinterpret_cast<std::string*>( &vec[0] );
     for( int i = 0; i < size; i++ )
