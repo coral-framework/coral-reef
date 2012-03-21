@@ -35,15 +35,15 @@ INSTALL( TARGETS reef
 	COMPONENT "Reef Module"
 )
 
-INSTALL( FILES "${CMAKE_BINARY_DIR}/modules/ca/ca_debug.pdb"
-	DESTINATION "modules/ca"
+INSTALL( FILES "${CMAKE_BINARY_DIR}/modules/reef/reef_debug.pdb"
+	DESTINATION "modules/reef"
 	CONFIGURATIONS Debug
 	COMPONENT "Reef Module"
 	OPTIONAL
 )
 
 # install module files
-INSTALL( DIRECTORY ${CMAKE_SOURCE_DIR}/modules/ca
+INSTALL( DIRECTORY ${CMAKE_SOURCE_DIR}/modules/reef
 	DESTINATION "modules"
 	CONFIGURATIONS Release RelWithDebInfo
 	COMPONENT "Reef Module"
