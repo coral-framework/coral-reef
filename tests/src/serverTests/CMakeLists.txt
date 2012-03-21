@@ -2,9 +2,9 @@
 # The 'tests' executable
 ################################################################################
 
-PROJECT( SERVERTESTS )
+project( SERVERTESTS )
 
-INCLUDE_DIRECTORIES(
+include_directories(
 	${GTEST_INCLUDE_DIRS}
 	${TOTO_BINARY_DIR}/generated
 	${CMAKE_BINARY_DIR}/src/generated
@@ -12,22 +12,22 @@ INCLUDE_DIRECTORIES(
 )
 
 # Gather source files in the current directory
-FILE( GLOB _HEADERS *.h )
-FILE( GLOB _SOURCES *.cpp )
+file( GLOB _HEADERS *.h )
+file( GLOB _SOURCES *.cpp )
 
-ADD_EXECUTABLE( serverTests EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} ${_CORE_SOURCES} ${_GENERATED_FILES} )
-ADD_DEPENDENCIES( serverTests toto reef )
+add_executable( serverTests EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} ${_CORE_SOURCES} ${_GENERATED_FILES} )
+add_dependencies( serverTests toto reef )
 
 CORAL_TARGET( serverTests )
 
-SET_TARGET_PROPERTIES( serverTests PROPERTIES
+set_target_properties( serverTests PROPERTIES
 	PROJECT_LABEL "serverTests"
 )
 
-TARGET_LINK_LIBRARIES( serverTests ${CORAL_LIBRARIES} ${GTEST_LIBRARIES} ${ZMQ_LIBRARIES} ${PROTOBUF_LIBRARIES} ${PROTOBUF_LIBRARY_DEBUG} ${PROTOBUF_PROTOC_LIBRARY_DEBUG} ${PROTOBUF_PROTOC_LIBRARIES} )
+target_link_libraries( serverTests ${CORAL_LIBRARIES} ${GTEST_LIBRARIES} ${ZMQ_LIBRARIES} ${PROTOBUF_LIBRARIES} ${PROTOBUF_LIBRARY_DEBUG} ${PROTOBUF_PROTOC_LIBRARY_DEBUG} ${PROTOBUF_PROTOC_LIBRARIES} )
 
 ################################################################################
 # Source Groups
 ################################################################################
 
-SOURCE_GROUP( "@Generated" FILES ${_GENERATED_FILES} )
+source_group( "@Generated" FILES ${_GENERATED_FILES} )
