@@ -2,28 +2,28 @@
 # testModule, an auxiliary test module
 ################################################################################
 
-PROJECT( testModule )
+project( testModule )
 
 # Run the coral compiler on the module
 CORAL_GENERATE_MODULE( _GENERATED_FILES testModule )
 
-INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR}/generated )
+include_directories( ${CMAKE_CURRENT_BINARY_DIR}/generated )
 
-FILE( GLOB _HEADERS *.h )
-FILE( GLOB _SOURCES *.cpp )
+file( GLOB _HEADERS *.h )
+file( GLOB _SOURCES *.cpp )
 
-ADD_LIBRARY( testModule MODULE EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} ${_GENERATED_FILES} )
+add_library( testModule MODULE EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} ${_GENERATED_FILES} )
 
 CORAL_MODULE_TARGET( "testModule" testModule )
 
-SET_TARGET_PROPERTIES( testModule PROPERTIES
+set_target_properties( testModule PROPERTIES
 	PROJECT_LABEL "testModule"
 )
 
-TARGET_LINK_LIBRARIES( testModule ${CORAL_LIBRARIES} )
+target_link_libraries( testModule ${CORAL_LIBRARIES} )
 
 ################################################################################
 # Source Groups
 ################################################################################
 
-SOURCE_GROUP( "@Generated" FILES ${_GENERATED_FILES} )
+source_group( "@Generated" FILES ${_GENERATED_FILES} )

@@ -2,9 +2,9 @@
 # The 'tests' executable
 ################################################################################
 
-PROJECT( CLIENTTESTS )
+project( CLIENTTESTS )
 
-INCLUDE_DIRECTORIES(
+include_directories(
 	${GTEST_INCLUDE_DIRS}
 	${testModule_BINARY_DIR}/generated
 	${CMAKE_BINARY_DIR}/src/generated
@@ -12,17 +12,17 @@ INCLUDE_DIRECTORIES(
 )
 
 # Gather source files in the current directory
-FILE( GLOB _HEADERS *.h )
-FILE( GLOB _SOURCES *.cpp )
+file( GLOB _HEADERS *.h )
+file( GLOB _SOURCES *.cpp )
 
-ADD_EXECUTABLE( clientTests EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} )
-ADD_DEPENDENCIES( clientTests testModule reef )
+add_executable( clientTests EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} )
+add_dependencies( clientTests testModule reef )
 
 CORAL_TARGET( clientTests )
 
-SET_TARGET_PROPERTIES( clientTests PROPERTIES
+set_target_properties( clientTests PROPERTIES
 	PROJECT_LABEL "clientTests"
 )
 
-TARGET_LINK_LIBRARIES( clientTests ${CORAL_LIBRARIES} ${GTEST_LIBRARIES} )
+target_link_libraries( clientTests ${CORAL_LIBRARIES} ${GTEST_LIBRARIES} )
 
