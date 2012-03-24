@@ -100,6 +100,20 @@ void RemoteObject::dynamicSetField( co::int32 dynFacetId, co::IField* field, con
     _channel->setField( dynFacetId, field, value );
 }
 
+void RemoteObject::onReferenceReturned( co::IMethod* method )
+{
+
+}
+
+void RemoteObject::checkReferenceParams( co::IMethod* method, co::Range<co::Any const> args )
+{
+	co::Range<co::IParameter* const> params = method->getParameters();
+	for( int i = 0; params; params.popFirst(), i++ )
+	{
+		
+	}
+}
+
 CORAL_EXPORT_COMPONENT( RemoteObject, RemoteObject );
     
 } // namespace reef

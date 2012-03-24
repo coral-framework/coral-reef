@@ -33,6 +33,15 @@ public:
     void dynamicSetField( co::int32 dynFacetId, co::IField* field, const co::Any& value );
 
 private:
+	/* 
+		Check all the arguments for ref types. For each one found, it checks if the object is 
+		local or remote and behaves accordingly. See reef's wiki for each case's explanation
+		Under the 'Reference Arguments' page.
+	*/
+	void checkReferenceParams( co::IMethod* method, co::Range<co::Any const> args );
+
+	void RemoteObject::onReferenceReturned( co::IMethod* method );
+private:
     Channel* _channel;
     
     int _numFacets;
