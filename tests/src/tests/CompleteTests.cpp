@@ -2,7 +2,6 @@
 
 #include "FakeSocket.h"
 #include "network/Connection.h"
-#include "Channel.h"
 #include "Encoder.h"
 #include "Decoder.h"
 #include <RemoteObject.h>
@@ -23,27 +22,27 @@
 namespace reef
 {
     
-class FakeServant : public Channel
+class FakeServant : public Servant
 {
 public:
-    FakeServant() : _instanceIdToReturn( 1 )
+    FakeServant() : Servant( 0 ), _instanceIdToReturn( 1 )
     {
     }
     
     // DecoderChannel Methods
-    int newInstance( const std::string& typeName ) 
+    virtual int newInstance( const std::string& typeName ) 
     { 
         _lastTypeName = typeName;
         return _instanceIdToReturn;
     }
     
-    void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args ) 
+    virtual void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args ) 
     {
         _lastServiceId = serviceId;
         _lastMethod = method;
         co::assign( args, _lastArguments );
     }
-    void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result ) 
+    virtual void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result ) 
     {
         _lastServiceId = serviceId;
         _lastMethod = method;
@@ -51,21 +50,21 @@ public:
         result.set<co::int32>( _returnValue );
     }
     
-    void getField( co::int32 serviceId, co::IField* field, co::Any& result ) 
+    virtual void getField( co::int32 serviceId, co::IField* field, co::Any& result ) 
     {
         _lastServiceId = serviceId;
         _lastField = field;
         result.set<co::int32>( _returnValue ); 
     }
     
-    void setField( co::int32 serviceId, co::IField* field, const co::Any& value ) 
+    virtual void setField( co::int32 serviceId, co::IField* field, const co::Any& value ) 
     {
         _lastServiceId = serviceId;
         _lastField = field;
         _lastValue = value;
     }
     
-    void clearAll()
+    virtual void clearAll()
     {
         _lastTypeName = "";
         _lastServiceId = 0;
@@ -75,6 +74,10 @@ public:
         _lastArguments.clear();
     }
     
+    void setObject( co::IObject* obj )
+    {
+        _object = obj;
+    }
 public:
     co::int32 _instanceIdToReturn;
     co::int32 _returnValue;
@@ -98,15 +101,15 @@ class BinderMsgTarget : public MsgTarget
 public:
     // register the binder. Its receive function will be called whenever
     // a msg is sent to FakeSocket, and the msg will be passed to Channel
-    BinderMsgTarget( Binder* binder, Channel* channel ) : 
-        _binder( binder ), _decoder( _binder ), _channel( channel )
+    BinderMsgTarget( Binder* binder, Servant* servant ) : 
+        _binder( binder ), _decoder( _binder ), _servant( servant )
     { 
     }
     
     void msgSent()
     {
         _binder->receive( _receivedMessage );
-        _decoder.deliver( _receivedMessage, _channel );
+        _decoder.deliver( _receivedMessage, _servant );
     }
     
     const std::string& getReceivedMessage()
@@ -118,7 +121,7 @@ private:
     std::string _receivedMessage;
     Binder* _binder;
     Decoder _decoder;
-    Channel* _channel;
+    Servant* _servant;
 };
 
 TEST( CompleteTests, ChannelToChannelTest )
@@ -134,8 +137,8 @@ TEST( CompleteTests, ChannelToChannelTest )
     co::IPort* dummySmplPort = co::cast<co::IPort>( dummyComponent->getMember( "simple" ) );
     co::RefPtr<co::IObject> dummyObj = co::newInstance( "testModule.TestComponent" );
     co::IInterface* dummySmplItf = dummyObj->getService<testModule::ISimpleTypes>()->getInterface();
+    fd.setObject( dummyObj.get() );
     
-    fd.setComponent( dummyComponent );
     BinderMsgTarget msgTarget( &b1, &fd );
     FakeSocket::setMsgTarget( static_cast<MsgTarget*>( &msgTarget ), "addr1" );
     
@@ -191,6 +194,7 @@ TEST( CompleteTests, ProxyToServantTest )
     
     BinderMsgTarget fakeMsgTarget( &b1, &fakeServant );
     FakeSocket::setMsgTarget( static_cast<MsgTarget*>( &fakeMsgTarget ), "addr1" );
+    fakeServant.setObject( dummyObj.get() );
     
     Encoder* ic = new Encoder( c1 );
 

@@ -1,9 +1,9 @@
-#include "Channel.h"
+#include "Encoder.h"
 
 namespace reef
 {
-//! Template abstract class.
-class RemObjTestChannel : public Channel
+
+class RemObjTestChannel : public Encoder
 {
 public:
     RemObjTestChannel();
@@ -11,24 +11,24 @@ public:
     ~RemObjTestChannel();
        
     // Creates a new instance and retrieves its unique id.
-    int newInstance( const std::string& typeName );
-    void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args );
+    virtual int newInstance( const std::string& typeName );
+    virtual void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args );
     
 	// Only supports int32 double and string as return types
-	void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result );
-    void getField( co::int32 serviceId, co::IField* field, co::Any& result );
+	virtual void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result );
+    virtual void getField( co::int32 serviceId, co::IField* field, co::Any& result );
 
-    void setField( co::int32 serviceId, co::IField* field, const co::Any& value );
+    virtual void setField( co::int32 serviceId, co::IField* field, const co::Any& value );
 
     // ---------- Methods for testing only ------------ //
-	void getCalledValues( co::int32& serviceId, co::IMethod*& method, co::IField*& field )
+	virtual void getCalledValues( co::int32& serviceId, co::IMethod*& method, co::IField*& field )
 	{
 		serviceId = _lastServiceId;
 		method = _lastMethod;
 		field = _lastField;
 	}
 
-	bool compareCalledValues( co::int32 serviceId, co::IMethod* method, co::IField* field )
+	virtual bool compareCalledValues( co::int32 serviceId, co::IMethod* method, co::IField* field )
 	{
 		return serviceId == _lastServiceId && method == _lastMethod && field == _lastField;
 	}

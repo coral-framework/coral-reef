@@ -2,7 +2,7 @@
 #define __REMOTEOBJECT_H__
 
 #include "RemoteObject_Base.h"
-#include "Channel.h"
+#include "Encoder.h"
 
 #include <co/IService.h>
 #include <co/RefVector.h>
@@ -14,7 +14,7 @@ class RemoteObject : public RemoteObject_Base
 {
 public:
     RemoteObject();
-    RemoteObject( co::IComponent* component, Channel* channel );
+    RemoteObject( co::IComponent* component, Encoder* encoder );
     virtual ~RemoteObject();
     
     void setComponent( co::IComponent* component );
@@ -40,13 +40,20 @@ private:
 	*/
 	void checkReferenceParams( co::IMethod* method, co::Range<co::Any const> args );
 
-	void RemoteObject::onReferenceReturned( co::IMethod* method );
-private:
-    Channel* _channel;
+    void onLocalObjParam( co::IService* param );
     
+    void onRemoteObjParam( co::IService* param );
+    
+	void onReferenceReturned( co::IMethod* method );
+    
+    inline bool isLocalObject( void* obj ) 
+    { return *reinterpret_cast<void**>( obj ) != _remObjFingerprint; }
+private:
+    Encoder* _encoder;
+    void* _remObjFingerprint;
     int _numFacets;
     co::Any _resultBuffer;
-    std::vector<co::IService*> _facets;
+    co::IService** _facets;
     co::IComponent* _componentType;
 };
 

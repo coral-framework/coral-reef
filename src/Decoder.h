@@ -14,7 +14,7 @@ namespace reef
 class Message;
 class Message_New;
 class Message_Member;
-class Channel;
+class Servant;
 class ServerNode;
 
 // A channel that converts raw message writes into events that can be delegated
@@ -22,12 +22,12 @@ class Decoder
 {
 public:
     // Routes the given message to the proper channel using message destination identifier.
-    void routeAndDeliver( const std::string& data, const std::vector<Channel*>& channels );
+    void routeAndDeliver( const std::string& data, const std::vector<Servant*>& channels );
         
-    void deliver( Message* msg, Channel* destination );
+    void deliver( Message* msg, Servant* destination );
     
     // this overload is for testing only
-    void deliver( const std::string& data, Channel* destination );
+    void deliver( const std::string& data, Servant* destination );
     
     
     Decoder( Binder* binder );
@@ -49,7 +49,7 @@ private:
     
 	Binder* _binder;
 
-    Channel* _destination;
+    Servant* _destination;
     
 };
     

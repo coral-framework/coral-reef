@@ -4,29 +4,35 @@
 #include <co/IField.h>
 #include <co/IMethod.h>
 #include <co/IReflector.h>
+#include <co/IParameter.h>
 
 namespace reef {
 
+    
 RemoteObject::RemoteObject()
 {
     // empty
 }
     
-RemoteObject::RemoteObject( co::IComponent* component, Channel* channel ) : _numFacets( 0 )
+RemoteObject::RemoteObject( co::IComponent* component, Encoder* encoder ) : _numFacets( 0 )
 {
     setComponent( component );
-    channel->newInstance( component->getFullName() );
-    _channel = channel;
+    encoder->newInstance( component->getFullName() );
+    _encoder = encoder;
+    
+    // necessary to separate regular from remote objects
+    _remObjFingerprint = *reinterpret_cast<void**>( this );
 }
 
 RemoteObject::~RemoteObject()
 {
-    delete _channel;
+    delete _encoder;
     
-    for( std::vector<co::IService*>::iterator it = _facets.begin(); it != _facets.end(); it++ )
+    for( int i = 0; i < _numFacets; i++ )
     {
-        delete (*it);
+        delete _facets[i];
     }
+    delete [] _facets;
 }
     
 void RemoteObject::setComponent( co::IComponent* component )
@@ -36,10 +42,9 @@ void RemoteObject::setComponent( co::IComponent* component )
 	// create proxy interfaces for our facets
 	co::Range<co::IPort* const> facets = _componentType->getFacets();
 	int numFacets = static_cast<int>( facets.getSize() );
-    _facets.resize( numFacets );
+    _facets = new co::IService*[numFacets];
 	for( int i = 0; i < numFacets; ++i )
 	{
-		assert( _numFacets >= i );
 		facets[i]->getType()->getReflector()->newDynamicProxy( this );
 	}
 }
@@ -75,16 +80,16 @@ co::IPort* RemoteObject::dynamicGetFacet( co::int32 dynFacetId )
 
 const co::Any& RemoteObject::dynamicGetField( co::int32 dynFacetId, co::IField* field )
 {
-    _channel->getField( dynFacetId, field, _resultBuffer );
+    _encoder->getField( dynFacetId, field, _resultBuffer );
     return _resultBuffer;
 }
 
 const co::Any& RemoteObject::dynamicInvoke( co::int32 dynFacetId, co::IMethod* method, co::Range<co::Any const> args )
 {
 	if( !method->getReturnType() )
-		_channel->sendCall( dynFacetId, method, args );
+		_encoder->sendCall( dynFacetId, method, args );
 	else
-		_channel->call( dynFacetId, method, args, _resultBuffer );
+		_encoder->call( dynFacetId, method, args, _resultBuffer );
 
     return _resultBuffer;
 }
@@ -97,9 +102,19 @@ co::int32 RemoteObject::dynamicRegisterService( co::IService* dynamicServiceProx
 
 void RemoteObject::dynamicSetField( co::int32 dynFacetId, co::IField* field, const co::Any& value )
 {
-    _channel->setField( dynFacetId, field, value );
+    _encoder->setField( dynFacetId, field, value );
 }
 
+void RemoteObject::onLocalObjParam( co::IService* param )
+{
+    
+}
+
+void RemoteObject::onRemoteObjParam( co::IService* param )
+{
+    
+}
+    
 void RemoteObject::onReferenceReturned( co::IMethod* method )
 {
 
@@ -108,9 +123,17 @@ void RemoteObject::onReferenceReturned( co::IMethod* method )
 void RemoteObject::checkReferenceParams( co::IMethod* method, co::Range<co::Any const> args )
 {
 	co::Range<co::IParameter* const> params = method->getParameters();
-	for( int i = 0; params; params.popFirst(), i++ )
+	for( ; params; params.popFirst(), args.popFirst() )
 	{
-		
+		if( params.getFirst()->getType()->getKind() == co::TK_INTERFACE )
+        {
+            co::IService* param = args.getFirst().get<co::IService*>();
+            if( isLocalObject( param->getProvider() ) )
+               onLocalObjParam( param );
+            else
+               onRemoteObjParam( param );
+            
+        }
 	}
 }
 

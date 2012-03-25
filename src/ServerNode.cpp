@@ -26,6 +26,7 @@ void ServerNode::start( const std::string& address )
 	Servant* servant = new Servant( 0 );
     servant->setServerNode( this );
     _channels.push_back( servant );
+    _instances.push_back( 0 );
 }
     
 void ServerNode::update()
@@ -62,13 +63,12 @@ void ServerNode::stop()
         delete static_cast<Servant*>( _channels[i] );
     }
 }
-       
-// DecoderChannel
+
 int ServerNode::newInstance( const std::string& typeName ) 
 {
 	co::IObject* instance = co::newInstance( typeName );
 
-    Channel* servant = new Servant( instance );
+    Servant* servant = new Servant( instance );
     co::int32 newChannelId;
     
     if( !_freedIds.empty() )
@@ -76,20 +76,24 @@ int ServerNode::newInstance( const std::string& typeName )
         newChannelId = _freedIds.top();
         _channels[newChannelId];
         _freedIds.pop();
-        return newChannelId;
+    }
+    else
+    {
+        _channels.push_back( servant );
+        newChannelId = _channels.size() - 1;
     }
     
-    _channels.push_back( servant );
-
-    newChannelId = _channels.size() - 1;
+    _instances.push_back( instance );
+    _vas.insert( objToAddress( instance, newChannelId ) );
         
     return newChannelId;
 }
 
 void ServerNode::removeInstance( co::int32 instanceId )
 {
-    delete static_cast<Servant*>( _channels[instanceId] );
+    delete _channels[instanceId];
     _freedIds.push( instanceId );
+    
 }
 
 CORAL_EXPORT_COMPONENT( ServerNode, ServerNode );

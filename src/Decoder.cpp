@@ -1,6 +1,6 @@
+#include "Servant.h"
 #include "Decoder.h"
 
-#include "Channel.h"
 #include "Message.pb.h"
 
 #include <co/IMethod.h>
@@ -27,17 +27,17 @@ Decoder::~Decoder()
     // empty
 }
 
-void Decoder::routeAndDeliver( const std::string& data, const std::vector<Channel*>& channels )
+void Decoder::routeAndDeliver( const std::string& data, const std::vector<Servant*>& servants )
 {
     Message message;
     message.ParseFromString( data );
     
     int dest = message.destination();
-    assert( dest >= 0 && dest < channels.size() );
-    deliver( &message, channels[dest] );
+    assert( dest >= 0 && dest < servants.size() );
+    deliver( &message, servants[dest] );
 }
     
-void Decoder::deliver( const std::string& data, Channel* destination )
+void Decoder::deliver( const std::string& data, Servant* destination )
 {   
     Message message;
     message.ParseFromString( data );
@@ -45,7 +45,7 @@ void Decoder::deliver( const std::string& data, Channel* destination )
     deliver( &message, destination );
 }
     
-void Decoder::deliver( Message* msg, Channel* destination )
+void Decoder::deliver( Message* msg, Servant* destination )
 {
     Message::Type type = msg->type();
     _destination = destination;

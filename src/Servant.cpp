@@ -18,11 +18,15 @@ Servant::Servant( co::IObject* object ) : _serverNode( 0 )
     if( object )
     {
         _object = object;
-        _component = object->getComponent();
         co::Range<co::IPort* const> ports = _object->getComponent()->getFacets();
         _openedServices.resize( ports.getSize() );
         _openedReflectors.resize( ports.getSize() );
     }
+}
+    
+Servant::~Servant()
+{
+
 }
     
 int Servant::newInstance( const std::string& typeName )

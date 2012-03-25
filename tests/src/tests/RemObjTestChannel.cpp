@@ -8,7 +8,7 @@
 namespace reef
 {
 
-	RemObjTestChannel::RemObjTestChannel() : _lastServiceId( -1 ), _lastMethod( 0 ),
+	RemObjTestChannel::RemObjTestChannel() : Encoder( 0 ), _lastServiceId( -1 ), _lastMethod( 0 ),
 		_lastField( 0 )
 	{
 	}
