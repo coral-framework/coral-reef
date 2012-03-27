@@ -30,15 +30,18 @@ public:
     virtual void getField( co::int32 serviceId, co::IField* field, co::Any& result );
     virtual void setField( co::int32 serviceId, co::IField* field, const co::Any& value );
     
-    inline co::IComponent* getComponent()
-        {   return _object->getComponent(); }
+    inline co::IComponent* getComponent() {   return _object->getComponent(); }
+    
+    inline co::IObject* getObject() { return _object.get(); }
 protected:
     co::RefPtr<co::IObject> _object;
    
 private:
     ServerNode* _serverNode;
 
-	// initializes _openedService's and Reflector's index for the accessed service
+    co::int32 _remoteRefCount;
+    
+    // initializes _openedService's and Reflector's index for the accessed service
 	void onServiceFirstAccess( co::int32 serviceId );
 	std::vector<co::IService*> _openedServices;
 	std::vector<co::IReflector*> _openedReflectors;

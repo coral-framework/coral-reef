@@ -14,7 +14,9 @@ RemoteObject::RemoteObject()
     // empty
 }
     
-RemoteObject::RemoteObject( co::IComponent* component, Encoder* encoder ) : _numFacets( 0 )
+RemoteObject::RemoteObject( 
+        co::IComponent* component, Encoder* encoder, ServerNode* serverNode ) : 
+        _numFacets( 0 ), _serverNode( serverNode )
 {
     setComponent( component );
     encoder->newInstance( component->getFullName() );

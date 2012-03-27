@@ -25,8 +25,7 @@ void ServerNode::start( const std::string& address )
     _binder.bind( address );
 	Servant* servant = new Servant( 0 );
     servant->setServerNode( this );
-    _channels.push_back( servant );
-    _instances.push_back( 0 );
+    _servants.push_back( servant );
 }
     
 void ServerNode::update()
@@ -37,8 +36,8 @@ void ServerNode::update()
 	std::string message;
 	if( _binder.receive( message ) )    
 	{
-		// Route the message to the proper channel
-		_decoder.routeAndDeliver( message, _channels );
+		// Route the message to the proper servant
+		_decoder.routeAndDeliver( message, _servants );
 	}
 }
 
@@ -47,52 +46,94 @@ void ServerNode::stop()
     if( _binder.isBound() )
         _binder.close();
     
-    // fill the empty holes in the channels vector
+    // fill the empty holes in the servants vector
     for( ; !_freedIds.empty(); _freedIds.pop() )
     {
-        if( _freedIds.top() != _channels.size() )
-            _channels[_freedIds.top()] = _channels.back();
+        if( _freedIds.top() != _servants.size() )
+            _servants[_freedIds.top()] = _servants.back();
         
-        _channels.pop_back();
+        _servants.pop_back();
     }
     
     // now delete all the servants
-    size_t size = _channels.size();
+    size_t size = _servants.size();
     for( int i = 0; i < size; i++ )
     {
-        delete static_cast<Servant*>( _channels[i] );
+        delete static_cast<Servant*>( _servants[i] );
     }
 }
 
-int ServerNode::newInstance( const std::string& typeName ) 
+co::int32 ServerNode::newInstance( const std::string& typeName ) 
 {
 	co::IObject* instance = co::newInstance( typeName );
 
-    Servant* servant = new Servant( instance );
-    co::int32 newChannelId;
+    return publishInstance( instance );        
+}
     
+co::int32 ServerNode::openRemoteReference( co::IObject* instance )
+{
+    co::int32 va = getVirtualAddress( instance );
+    if( va != -1 )
+        _remoteRefCounting[va]++;
+    else
+        va = publishInstance( instance );
+    
+    return va;
+}
+
+void ServerNode::closeRemoteReference( co::int32 virtualAddress )
+{
+    if( --_remoteRefCounting[virtualAddress] < 1 )
+        releaseInstance( virtualAddress );
+    
+}
+
+co::int32 ServerNode::getVirtualAddress( const co::IObject* instance )
+{
+    VirtualAddresses::iterator it = _vas.find( instance );
+    if( it != _vas.end() )
+        return (*it).second;
+    
+    return -1;
+}
+    
+co::int32 ServerNode::newVirtualAddress()
+{
     if( !_freedIds.empty() )
     {
-        newChannelId = _freedIds.top();
-        _channels[newChannelId];
+        co::int32 newServantId = _freedIds.top();
         _freedIds.pop();
+        return newServantId;
     }
     else
     {
-        _channels.push_back( servant );
-        newChannelId = _channels.size() - 1;
+        _servants.push_back( 0 );
+        _remoteRefCounting.push_back( 0 );
+        return _servants.size() - 1;
     }
     
-    _instances.push_back( instance );
-    _vas.insert( objToAddress( instance, newChannelId ) );
-        
-    return newChannelId;
 }
-
-void ServerNode::removeInstance( co::int32 instanceId )
+   
+co::int32 ServerNode::publishInstance( co::IObject* instance )
 {
-    delete _channels[instanceId];
-    _freedIds.push( instanceId );
+    co::int32 newServantId = newVirtualAddress();
+    _vas.insert( objToAddress( instance, newServantId ) );
+    
+    _servants[newServantId] = new Servant( instance );
+    _remoteRefCounting[newServantId] = 1;
+    
+    return newServantId;
+}
+    
+
+void ServerNode::releaseInstance( co::int32 virtualAddress )
+{
+    co::IObject* instance = _servants[virtualAddress]->getObject();
+    VirtualAddresses::iterator it = _vas.find( instance );
+    _vas.erase( it );
+    
+    delete _servants[virtualAddress];
+    _freedIds.push( virtualAddress );
     
 }
 

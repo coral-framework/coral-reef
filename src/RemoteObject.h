@@ -10,11 +10,14 @@
 namespace reef
 {
     
+class ServerNode;
+    
 class RemoteObject : public RemoteObject_Base
 {
 public:
     RemoteObject();
-    RemoteObject( co::IComponent* component, Encoder* encoder );
+    RemoteObject( co::IComponent* component, Encoder* encoder, 
+                 ServerNode* serverNode );
     virtual ~RemoteObject();
     
     void setComponent( co::IComponent* component );
@@ -52,6 +55,7 @@ private:
     Encoder* _encoder;
     void* _remObjFingerprint;
     int _numFacets;
+    ServerNode* _serverNode;
     co::Any _resultBuffer;
     co::IService** _facets;
     co::IComponent* _componentType;

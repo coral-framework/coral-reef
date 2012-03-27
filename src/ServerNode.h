@@ -7,7 +7,7 @@
 
 namespace reef {
 
-class Channel;
+class Servant;
 class Servant;
     
 class ServerNode : public ServerNode_Base
@@ -23,39 +23,45 @@ public:
 
     void stop();
        
-    int newInstance( const std::string& typeName );
+    co::int32 newInstance( const std::string& typeName );
 
-	void removeInstance( co::int32 instanceId );
-    
-    /*
-     checks if an object has been published (made available for remote access).
-     If published, increment the instance's ref counting and returns its Virtual 
-     Address, else return -1.
-    */
-    co::int32 newRemoteAccessor( const co::IObject* instance );
-    
-    
-    void removeRemoteAccessor( const co::IObject* instance );
-    
     /*
      Makes an instance available for remote usage. Which means: creating a 
     Virtual Address, and start a remote-references counting for it.
+     Only increment reference and return address if already available.
      */
-    co::int32 publishInstance( const co::IObject* instance );
+    co::int32 openRemoteReference( co::IObject* instance );
+    
+    /*
+     Remove a remote reference to the instance. If there are no more references,
+     remove the internal reference to it and cleear the virtual address.
+     */
+    void closeRemoteReference( co::int32 virtualAddress );
+    
+private:
+    void releaseInstance( co::int32 virtualAddress );
+    
+     // Creates a servant for the instance and returns its VA
+    co::int32 publishInstance( co::IObject* instance );
+    
+    co::int32 newVirtualAddress();
+    
+    // returns -1 if not found
+    co::int32 getVirtualAddress( const co::IObject* instance );
     
 private:
 	Binder _binder;
     Decoder _decoder;
 
-    typedef std::vector<Servant*> Channels;
-    typedef std::vector<co::IObject*> Instances;
+    // the servants and the number of remote references for it
+    std::vector<Servant*> _servants;
+    std::vector<co::int32> _remoteRefCounting;
     
+    // used to map easily an instance to a virtual address
     typedef std::pair<co::IObject*, co::int32> objToAddress;
-    typedef std::map<co::IObject*, co::int32> VirtualAddresses;
-    
-    Instances _instances;
-    Channels _channels;
+    typedef std::map<const co::IObject*, co::int32> VirtualAddresses;
     VirtualAddresses _vas;
+
     
     std::stack<co::int32> _freedIds;
 };
