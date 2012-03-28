@@ -23,9 +23,10 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* Argument_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   Argument_reflection_ = NULL;
-const ::google::protobuf::Descriptor* VirtualAddress_descriptor_ = NULL;
+const ::google::protobuf::Descriptor* RefType_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  VirtualAddress_reflection_ = NULL;
+  RefType_reflection_ = NULL;
+const ::google::protobuf::EnumDescriptor* RefType_OwnerType_descriptor_ = NULL;
 const ::google::protobuf::Descriptor* Message_Member_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   Message_Member_reflection_ = NULL;
@@ -47,10 +48,11 @@ void protobuf_AssignDesc_Message_2eproto() {
       "Message.proto");
   GOOGLE_CHECK(file != NULL);
   DataContainer_descriptor_ = file->message_type(0);
-  static const int DataContainer_offsets_[3] = {
+  static const int DataContainer_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DataContainer, boolean_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DataContainer, str_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DataContainer, numeric_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DataContainer, reftype_),
   };
   DataContainer_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -78,21 +80,25 @@ void protobuf_AssignDesc_Message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Argument));
-  VirtualAddress_descriptor_ = file->message_type(2);
-  static const int VirtualAddress_offsets_[1] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(VirtualAddress, address_),
+  RefType_descriptor_ = file->message_type(2);
+  static const int RefType_offsets_[4] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RefType, owner_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RefType, virtualaddress_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RefType, interfaceindex_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RefType, ownerip_),
   };
-  VirtualAddress_reflection_ =
+  RefType_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
-      VirtualAddress_descriptor_,
-      VirtualAddress::default_instance_,
-      VirtualAddress_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(VirtualAddress, _has_bits_[0]),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(VirtualAddress, _unknown_fields_),
+      RefType_descriptor_,
+      RefType::default_instance_,
+      RefType_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RefType, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RefType, _unknown_fields_),
       -1,
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
-      sizeof(VirtualAddress));
+      sizeof(RefType));
+  RefType_OwnerType_descriptor_ = RefType_descriptor_->enum_type(0);
   Message_Member_descriptor_ = file->message_type(3);
   static const int Message_Member_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message_Member, hasreturn_),
@@ -162,7 +168,7 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     Argument_descriptor_, &Argument::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    VirtualAddress_descriptor_, &VirtualAddress::default_instance());
+    RefType_descriptor_, &RefType::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     Message_Member_descriptor_, &Message_Member::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
@@ -178,8 +184,8 @@ void protobuf_ShutdownFile_Message_2eproto() {
   delete DataContainer_reflection_;
   delete Argument::default_instance_;
   delete Argument_reflection_;
-  delete VirtualAddress::default_instance_;
-  delete VirtualAddress_reflection_;
+  delete RefType::default_instance_;
+  delete RefType_reflection_;
   delete Message_Member::default_instance_;
   delete Message_Member_reflection_;
   delete Message_New::default_instance_;
@@ -195,31 +201,36 @@ void protobuf_AddDesc_Message_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\rMessage.proto\022\004reef\">\n\rDataContainer\022\017"
+    "\n\rMessage.proto\022\004reef\"^\n\rDataContainer\022\017"
     "\n\007boolean\030\001 \001(\010\022\013\n\003str\030\002 \001(\t\022\017\n\007numeric\030"
-    "\003 \001(\001\"-\n\010Argument\022!\n\004data\030\001 \003(\0132\023.reef.D"
-    "ataContainer\"!\n\016VirtualAddress\022\017\n\007addres"
-    "s\030\001 \002(\005\"q\n\016Message_Member\022\021\n\thasReturn\030\001"
-    " \002(\010\022\024\n\014serviceIndex\030\002 \002(\r\022\023\n\013memberInde"
-    "x\030\003 \002(\r\022!\n\targuments\030\004 \003(\0132\016.reef.Argume"
-    "nt\"(\n\013Message_New\022\031\n\021componentTypeName\030\001"
-    " \002(\t\"\342\001\n\007Message\022 \n\004type\030\001 \002(\0162\022.reef.Me"
-    "ssage.Type\022\023\n\013destination\030\002 \002(\r\022!\n\006msgNe"
-    "w\030\003 \001(\0132\021.reef.Message_New\022\'\n\tmsgMember\030"
-    "\004 \001(\0132\024.reef.Message_Member\"T\n\004Type\022\014\n\010T"
-    "YPE_NEW\020\000\022\016\n\nTYPE_FIELD\020\001\022\r\n\tTYPE_CALL\020\002"
-    "\022\017\n\013TYPE_RETURN\020\003\022\016\n\nTYPE_OTHER\020\004", 553);
+    "\003 \001(\001\022\036\n\007refType\030\004 \001(\0132\r.reef.RefType\"-\n"
+    "\010Argument\022!\n\004data\030\001 \003(\0132\023.reef.DataConta"
+    "iner\"\250\001\n\007RefType\022&\n\005owner\030\001 \002(\0162\027.reef.R"
+    "efType.OwnerType\022\026\n\016virtualAddress\030\002 \002(\r"
+    "\022\026\n\016interfaceIndex\030\003 \002(\r\022\017\n\007ownerIP\030\004 \001("
+    "\t\"4\n\tOwnerType\022\010\n\004SELF\020\000\022\014\n\010RECEIVER\020\001\022\017"
+    "\n\013THIRD_PARTY\020\002\"q\n\016Message_Member\022\021\n\thas"
+    "Return\030\001 \002(\010\022\024\n\014serviceIndex\030\002 \002(\r\022\023\n\013me"
+    "mberIndex\030\003 \002(\r\022!\n\targuments\030\004 \003(\0132\016.ree"
+    "f.Argument\"(\n\013Message_New\022\031\n\021componentTy"
+    "peName\030\001 \002(\t\"\342\001\n\007Message\022 \n\004type\030\001 \002(\0162\022"
+    ".reef.Message.Type\022\023\n\013destination\030\002 \002(\r\022"
+    "!\n\006msgNew\030\003 \001(\0132\021.reef.Message_New\022\'\n\tms"
+    "gMember\030\004 \001(\0132\024.reef.Message_Member\"T\n\004T"
+    "ype\022\014\n\010TYPE_NEW\020\000\022\016\n\nTYPE_FIELD\020\001\022\r\n\tTYP"
+    "E_CALL\020\002\022\017\n\013TYPE_RETURN\020\003\022\016\n\nTYPE_OTHER\020"
+    "\004", 721);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "Message.proto", &protobuf_RegisterTypes);
   DataContainer::default_instance_ = new DataContainer();
   Argument::default_instance_ = new Argument();
-  VirtualAddress::default_instance_ = new VirtualAddress();
+  RefType::default_instance_ = new RefType();
   Message_Member::default_instance_ = new Message_Member();
   Message_New::default_instance_ = new Message_New();
   Message::default_instance_ = new Message();
   DataContainer::default_instance_->InitAsDefaultInstance();
   Argument::default_instance_->InitAsDefaultInstance();
-  VirtualAddress::default_instance_->InitAsDefaultInstance();
+  RefType::default_instance_->InitAsDefaultInstance();
   Message_Member::default_instance_->InitAsDefaultInstance();
   Message_New::default_instance_->InitAsDefaultInstance();
   Message::default_instance_->InitAsDefaultInstance();
@@ -240,6 +251,7 @@ struct StaticDescriptorInitializer_Message_2eproto {
 const int DataContainer::kBooleanFieldNumber;
 const int DataContainer::kStrFieldNumber;
 const int DataContainer::kNumericFieldNumber;
+const int DataContainer::kRefTypeFieldNumber;
 #endif  // !_MSC_VER
 
 DataContainer::DataContainer()
@@ -248,6 +260,7 @@ DataContainer::DataContainer()
 }
 
 void DataContainer::InitAsDefaultInstance() {
+  reftype_ = const_cast< ::reef::RefType*>(&::reef::RefType::default_instance());
 }
 
 DataContainer::DataContainer(const DataContainer& from)
@@ -261,6 +274,7 @@ void DataContainer::SharedCtor() {
   boolean_ = false;
   str_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   numeric_ = 0;
+  reftype_ = NULL;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -273,6 +287,7 @@ void DataContainer::SharedDtor() {
     delete str_;
   }
   if (this != default_instance_) {
+    delete reftype_;
   }
 }
 
@@ -305,6 +320,9 @@ void DataContainer::Clear() {
       }
     }
     numeric_ = 0;
+    if (has_reftype()) {
+      if (reftype_ != NULL) reftype_->::reef::RefType::Clear();
+    }
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -360,6 +378,20 @@ bool DataContainer::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(34)) goto parse_refType;
+        break;
+      }
+      
+      // optional .reef.RefType refType = 4;
+      case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_refType:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_reftype()));
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -401,6 +433,12 @@ void DataContainer::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteDouble(3, this->numeric(), output);
   }
   
+  // optional .reef.RefType refType = 4;
+  if (has_reftype()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      4, this->reftype(), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -429,6 +467,13 @@ void DataContainer::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(3, this->numeric(), target);
   }
   
+  // optional .reef.RefType refType = 4;
+  if (has_reftype()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        4, this->reftype(), target);
+  }
+  
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -455,6 +500,13 @@ int DataContainer::ByteSize() const {
     // optional double numeric = 3;
     if (has_numeric()) {
       total_size += 1 + 8;
+    }
+    
+    // optional .reef.RefType refType = 4;
+    if (has_reftype()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->reftype());
     }
     
   }
@@ -493,6 +545,9 @@ void DataContainer::MergeFrom(const DataContainer& from) {
     if (from.has_numeric()) {
       set_numeric(from.numeric());
     }
+    if (from.has_reftype()) {
+      mutable_reftype()->::reef::RefType::MergeFrom(from.reftype());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -511,6 +566,9 @@ void DataContainer::CopyFrom(const DataContainer& from) {
 
 bool DataContainer::IsInitialized() const {
   
+  if (has_reftype()) {
+    if (!this->reftype().IsInitialized()) return false;
+  }
   return true;
 }
 
@@ -519,6 +577,7 @@ void DataContainer::Swap(DataContainer* other) {
     std::swap(boolean_, other->boolean_);
     std::swap(str_, other->str_);
     std::swap(numeric_, other->numeric_);
+    std::swap(reftype_, other->reftype_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
@@ -715,6 +774,9 @@ void Argument::CopyFrom(const Argument& from) {
 
 bool Argument::IsInitialized() const {
   
+  for (int i = 0; i < data_size(); i++) {
+    if (!this->data(i).IsInitialized()) return false;
+  }
   return true;
 }
 
@@ -738,81 +800,174 @@ void Argument::Swap(Argument* other) {
 
 // ===================================================================
 
+const ::google::protobuf::EnumDescriptor* RefType_OwnerType_descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return RefType_OwnerType_descriptor_;
+}
+bool RefType_OwnerType_IsValid(int value) {
+  switch(value) {
+    case 0:
+    case 1:
+    case 2:
+      return true;
+    default:
+      return false;
+  }
+}
+
 #ifndef _MSC_VER
-const int VirtualAddress::kAddressFieldNumber;
+const RefType_OwnerType RefType::SELF;
+const RefType_OwnerType RefType::RECEIVER;
+const RefType_OwnerType RefType::THIRD_PARTY;
+const RefType_OwnerType RefType::OwnerType_MIN;
+const RefType_OwnerType RefType::OwnerType_MAX;
+const int RefType::OwnerType_ARRAYSIZE;
+#endif  // _MSC_VER
+#ifndef _MSC_VER
+const int RefType::kOwnerFieldNumber;
+const int RefType::kVirtualAddressFieldNumber;
+const int RefType::kInterfaceIndexFieldNumber;
+const int RefType::kOwnerIPFieldNumber;
 #endif  // !_MSC_VER
 
-VirtualAddress::VirtualAddress()
+RefType::RefType()
   : ::google::protobuf::Message() {
   SharedCtor();
 }
 
-void VirtualAddress::InitAsDefaultInstance() {
+void RefType::InitAsDefaultInstance() {
 }
 
-VirtualAddress::VirtualAddress(const VirtualAddress& from)
+RefType::RefType(const RefType& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
 }
 
-void VirtualAddress::SharedCtor() {
+void RefType::SharedCtor() {
   _cached_size_ = 0;
-  address_ = 0;
+  owner_ = 0;
+  virtualaddress_ = 0u;
+  interfaceindex_ = 0u;
+  ownerip_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
-VirtualAddress::~VirtualAddress() {
+RefType::~RefType() {
   SharedDtor();
 }
 
-void VirtualAddress::SharedDtor() {
+void RefType::SharedDtor() {
+  if (ownerip_ != &::google::protobuf::internal::kEmptyString) {
+    delete ownerip_;
+  }
   if (this != default_instance_) {
   }
 }
 
-void VirtualAddress::SetCachedSize(int size) const {
+void RefType::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
 }
-const ::google::protobuf::Descriptor* VirtualAddress::descriptor() {
+const ::google::protobuf::Descriptor* RefType::descriptor() {
   protobuf_AssignDescriptorsOnce();
-  return VirtualAddress_descriptor_;
+  return RefType_descriptor_;
 }
 
-const VirtualAddress& VirtualAddress::default_instance() {
+const RefType& RefType::default_instance() {
   if (default_instance_ == NULL) protobuf_AddDesc_Message_2eproto();  return *default_instance_;
 }
 
-VirtualAddress* VirtualAddress::default_instance_ = NULL;
+RefType* RefType::default_instance_ = NULL;
 
-VirtualAddress* VirtualAddress::New() const {
-  return new VirtualAddress;
+RefType* RefType::New() const {
+  return new RefType;
 }
 
-void VirtualAddress::Clear() {
+void RefType::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    address_ = 0;
+    owner_ = 0;
+    virtualaddress_ = 0u;
+    interfaceindex_ = 0u;
+    if (has_ownerip()) {
+      if (ownerip_ != &::google::protobuf::internal::kEmptyString) {
+        ownerip_->clear();
+      }
+    }
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
 
-bool VirtualAddress::MergePartialFromCodedStream(
+bool RefType::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!(EXPRESSION)) return false
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // required int32 address = 1;
+      // required .reef.RefType.OwnerType owner = 1;
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+          int value;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &address_)));
-          set_has_address();
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          if (::reef::RefType_OwnerType_IsValid(value)) {
+            set_owner(static_cast< ::reef::RefType_OwnerType >(value));
+          } else {
+            mutable_unknown_fields()->AddVarint(1, value);
+          }
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(16)) goto parse_virtualAddress;
+        break;
+      }
+      
+      // required uint32 virtualAddress = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_virtualAddress:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &virtualaddress_)));
+          set_has_virtualaddress();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(24)) goto parse_interfaceIndex;
+        break;
+      }
+      
+      // required uint32 interfaceIndex = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_interfaceIndex:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &interfaceindex_)));
+          set_has_interfaceindex();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(34)) goto parse_ownerIP;
+        break;
+      }
+      
+      // optional string ownerIP = 4;
+      case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_ownerIP:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_ownerip()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->ownerip().data(), this->ownerip().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
         } else {
           goto handle_uninterpreted;
         }
@@ -836,11 +991,31 @@ bool VirtualAddress::MergePartialFromCodedStream(
 #undef DO_
 }
 
-void VirtualAddress::SerializeWithCachedSizes(
+void RefType::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // required int32 address = 1;
-  if (has_address()) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->address(), output);
+  // required .reef.RefType.OwnerType owner = 1;
+  if (has_owner()) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      1, this->owner(), output);
+  }
+  
+  // required uint32 virtualAddress = 2;
+  if (has_virtualaddress()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(2, this->virtualaddress(), output);
+  }
+  
+  // required uint32 interfaceIndex = 3;
+  if (has_interfaceindex()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(3, this->interfaceindex(), output);
+  }
+  
+  // optional string ownerIP = 4;
+  if (has_ownerip()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->ownerip().data(), this->ownerip().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      4, this->ownerip(), output);
   }
   
   if (!unknown_fields().empty()) {
@@ -849,11 +1024,32 @@ void VirtualAddress::SerializeWithCachedSizes(
   }
 }
 
-::google::protobuf::uint8* VirtualAddress::SerializeWithCachedSizesToArray(
+::google::protobuf::uint8* RefType::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // required int32 address = 1;
-  if (has_address()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->address(), target);
+  // required .reef.RefType.OwnerType owner = 1;
+  if (has_owner()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      1, this->owner(), target);
+  }
+  
+  // required uint32 virtualAddress = 2;
+  if (has_virtualaddress()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(2, this->virtualaddress(), target);
+  }
+  
+  // required uint32 interfaceIndex = 3;
+  if (has_interfaceindex()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(3, this->interfaceindex(), target);
+  }
+  
+  // optional string ownerIP = 4;
+  if (has_ownerip()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->ownerip().data(), this->ownerip().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        4, this->ownerip(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -863,15 +1059,35 @@ void VirtualAddress::SerializeWithCachedSizes(
   return target;
 }
 
-int VirtualAddress::ByteSize() const {
+int RefType::ByteSize() const {
   int total_size = 0;
   
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // required int32 address = 1;
-    if (has_address()) {
+    // required .reef.RefType.OwnerType owner = 1;
+    if (has_owner()) {
       total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::Int32Size(
-          this->address());
+        ::google::protobuf::internal::WireFormatLite::EnumSize(this->owner());
+    }
+    
+    // required uint32 virtualAddress = 2;
+    if (has_virtualaddress()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->virtualaddress());
+    }
+    
+    // required uint32 interfaceIndex = 3;
+    if (has_interfaceindex()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->interfaceindex());
+    }
+    
+    // optional string ownerIP = 4;
+    if (has_ownerip()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->ownerip());
     }
     
   }
@@ -886,10 +1102,10 @@ int VirtualAddress::ByteSize() const {
   return total_size;
 }
 
-void VirtualAddress::MergeFrom(const ::google::protobuf::Message& from) {
+void RefType::MergeFrom(const ::google::protobuf::Message& from) {
   GOOGLE_CHECK_NE(&from, this);
-  const VirtualAddress* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const VirtualAddress*>(
+  const RefType* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const RefType*>(
       &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
@@ -898,48 +1114,60 @@ void VirtualAddress::MergeFrom(const ::google::protobuf::Message& from) {
   }
 }
 
-void VirtualAddress::MergeFrom(const VirtualAddress& from) {
+void RefType::MergeFrom(const RefType& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from.has_address()) {
-      set_address(from.address());
+    if (from.has_owner()) {
+      set_owner(from.owner());
+    }
+    if (from.has_virtualaddress()) {
+      set_virtualaddress(from.virtualaddress());
+    }
+    if (from.has_interfaceindex()) {
+      set_interfaceindex(from.interfaceindex());
+    }
+    if (from.has_ownerip()) {
+      set_ownerip(from.ownerip());
     }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
-void VirtualAddress::CopyFrom(const ::google::protobuf::Message& from) {
+void RefType::CopyFrom(const ::google::protobuf::Message& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void VirtualAddress::CopyFrom(const VirtualAddress& from) {
+void RefType::CopyFrom(const RefType& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool VirtualAddress::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+bool RefType::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000007) != 0x00000007) return false;
   
   return true;
 }
 
-void VirtualAddress::Swap(VirtualAddress* other) {
+void RefType::Swap(RefType* other) {
   if (other != this) {
-    std::swap(address_, other->address_);
+    std::swap(owner_, other->owner_);
+    std::swap(virtualaddress_, other->virtualaddress_);
+    std::swap(interfaceindex_, other->interfaceindex_);
+    std::swap(ownerip_, other->ownerip_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
   }
 }
 
-::google::protobuf::Metadata VirtualAddress::GetMetadata() const {
+::google::protobuf::Metadata RefType::GetMetadata() const {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::Metadata metadata;
-  metadata.descriptor = VirtualAddress_descriptor_;
-  metadata.reflection = VirtualAddress_reflection_;
+  metadata.descriptor = RefType_descriptor_;
+  metadata.reflection = RefType_reflection_;
   return metadata;
 }
 
@@ -1246,6 +1474,9 @@ void Message_Member::CopyFrom(const Message_Member& from) {
 bool Message_Member::IsInitialized() const {
   if ((_has_bits_[0] & 0x00000007) != 0x00000007) return false;
   
+  for (int i = 0; i < arguments_size(); i++) {
+    if (!this->arguments(i).IsInitialized()) return false;
+  }
   return true;
 }
 

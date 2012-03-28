@@ -1,5 +1,6 @@
 #include "RemoteObject.h"
 
+#include <reef/IServerNode.h>
 #include <co/IPort.h>
 #include <co/IField.h>
 #include <co/IMethod.h>
@@ -8,22 +9,29 @@
 
 namespace reef {
 
+void* RemoteObject::_classPtr = 0;
+    
+void* RemoteObject::getClassPtr()
+{
+    if( _classPtr )
+        return _classPtr;
+    
+    RemoteObject dummyObj;
+    return _classPtr;
+}
     
 RemoteObject::RemoteObject()
 {
-    // empty
+    _classPtr = *reinterpret_cast<void**>( this );
 }
     
-RemoteObject::RemoteObject( 
-        co::IComponent* component, Encoder* encoder, ServerNode* serverNode ) : 
-        _numFacets( 0 ), _serverNode( serverNode )
+RemoteObject::RemoteObject( co::IComponent* component, Encoder* encoder ) : 
+        _numFacets( 0 )
 {
     setComponent( component );
     encoder->newInstance( component->getFullName() );
     _encoder = encoder;
-    
-    // necessary to separate regular from remote objects
-    _remObjFingerprint = *reinterpret_cast<void**>( this );
+    _classPtr = *reinterpret_cast<void**>( this );
 }
 
 RemoteObject::~RemoteObject()
@@ -107,37 +115,6 @@ void RemoteObject::dynamicSetField( co::int32 dynFacetId, co::IField* field, con
     _encoder->setField( dynFacetId, field, value );
 }
 
-void RemoteObject::onLocalObjParam( co::IService* param )
-{
-    
-}
-
-void RemoteObject::onRemoteObjParam( co::IService* param )
-{
-    
-}
-    
-void RemoteObject::onReferenceReturned( co::IMethod* method )
-{
-
-}
-
-void RemoteObject::checkReferenceParams( co::IMethod* method, co::Range<co::Any const> args )
-{
-	co::Range<co::IParameter* const> params = method->getParameters();
-	for( ; params; params.popFirst(), args.popFirst() )
-	{
-		if( params.getFirst()->getType()->getKind() == co::TK_INTERFACE )
-        {
-            co::IService* param = args.getFirst().get<co::IService*>();
-            if( isLocalObject( param->getProvider() ) )
-               onLocalObjParam( param );
-            else
-               onRemoteObjParam( param );
-            
-        }
-	}
-}
 
 CORAL_EXPORT_COMPONENT( RemoteObject, RemoteObject );
     

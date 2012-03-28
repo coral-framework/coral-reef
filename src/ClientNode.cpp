@@ -8,6 +8,8 @@
 #include <map>
 
 namespace reef {
+ 
+class IServerNode;
     
 class ClientNode : public ClientNode_Base
 {
@@ -21,18 +23,20 @@ public:
     {
     }
     
-    co::IObject* newRemoteInstance( const std::string& componentTypeName, const std::string& address )
+    co::IObject* newRemoteInstance( const std::string& componentTypeName, 
+                                   const std::string& address )
     {
-        co::IComponent* componentType = co::cast<co::IComponent>( co::getType( componentTypeName ) );
+        co::IComponent* componentType = co::cast<co::IComponent>( 
+                                          co::getType( componentTypeName ) );
+        
         Connecter* connecter = Connecter::getOrOpenConnection( address );
-        return new reef::RemoteObject( componentType, new Encoder( connecter ) );
+        
+        return new RemoteObject( componentType, new Encoder( connecter,
+                                        _serverNode ) );
     }
     
-    void onConnecterDestroyed( const std::string& address )
-    {
-        
-
-    }
+private:
+    IServerNode* _serverNode;
 };
 
 CORAL_EXPORT_COMPONENT( ClientNode, ClientNode );

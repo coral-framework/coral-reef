@@ -34,11 +34,31 @@ void protobuf_ShutdownFile_Message_2eproto();
 
 class DataContainer;
 class Argument;
-class VirtualAddress;
+class RefType;
 class Message_Member;
 class Message_New;
 class Message;
 
+enum RefType_OwnerType {
+  RefType_OwnerType_SELF = 0,
+  RefType_OwnerType_RECEIVER = 1,
+  RefType_OwnerType_THIRD_PARTY = 2
+};
+bool RefType_OwnerType_IsValid(int value);
+const RefType_OwnerType RefType_OwnerType_OwnerType_MIN = RefType_OwnerType_SELF;
+const RefType_OwnerType RefType_OwnerType_OwnerType_MAX = RefType_OwnerType_THIRD_PARTY;
+const int RefType_OwnerType_OwnerType_ARRAYSIZE = RefType_OwnerType_OwnerType_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* RefType_OwnerType_descriptor();
+inline const ::std::string& RefType_OwnerType_Name(RefType_OwnerType value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    RefType_OwnerType_descriptor(), value);
+}
+inline bool RefType_OwnerType_Parse(
+    const ::std::string& name, RefType_OwnerType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<RefType_OwnerType>(
+    RefType_OwnerType_descriptor(), name, value);
+}
 enum Message_Type {
   Message_Type_TYPE_NEW = 0,
   Message_Type_TYPE_FIELD = 1,
@@ -142,6 +162,14 @@ class DataContainer : public ::google::protobuf::Message {
   inline double numeric() const;
   inline void set_numeric(double value);
   
+  // optional .reef.RefType refType = 4;
+  inline bool has_reftype() const;
+  inline void clear_reftype();
+  static const int kRefTypeFieldNumber = 4;
+  inline const ::reef::RefType& reftype() const;
+  inline ::reef::RefType* mutable_reftype();
+  inline ::reef::RefType* release_reftype();
+  
   // @@protoc_insertion_point(class_scope:reef.DataContainer)
  private:
   inline void set_has_boolean();
@@ -150,15 +178,18 @@ class DataContainer : public ::google::protobuf::Message {
   inline void clear_has_str();
   inline void set_has_numeric();
   inline void clear_has_numeric();
+  inline void set_has_reftype();
+  inline void clear_has_reftype();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::std::string* str_;
   double numeric_;
+  ::reef::RefType* reftype_;
   bool boolean_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
   
   friend void  protobuf_AddDesc_Message_2eproto();
   friend void protobuf_AssignDesc_Message_2eproto();
@@ -254,14 +285,14 @@ class Argument : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
-class VirtualAddress : public ::google::protobuf::Message {
+class RefType : public ::google::protobuf::Message {
  public:
-  VirtualAddress();
-  virtual ~VirtualAddress();
+  RefType();
+  virtual ~RefType();
   
-  VirtualAddress(const VirtualAddress& from);
+  RefType(const RefType& from);
   
-  inline VirtualAddress& operator=(const VirtualAddress& from) {
+  inline RefType& operator=(const RefType& from) {
     CopyFrom(from);
     return *this;
   }
@@ -275,17 +306,17 @@ class VirtualAddress : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const VirtualAddress& default_instance();
+  static const RefType& default_instance();
   
-  void Swap(VirtualAddress* other);
+  void Swap(RefType* other);
   
   // implements Message ----------------------------------------------
   
-  VirtualAddress* New() const;
+  RefType* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const VirtualAddress& from);
-  void MergeFrom(const VirtualAddress& from);
+  void CopyFrom(const RefType& from);
+  void MergeFrom(const RefType& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -306,33 +337,92 @@ class VirtualAddress : public ::google::protobuf::Message {
   
   // nested types ----------------------------------------------------
   
+  typedef RefType_OwnerType OwnerType;
+  static const OwnerType SELF = RefType_OwnerType_SELF;
+  static const OwnerType RECEIVER = RefType_OwnerType_RECEIVER;
+  static const OwnerType THIRD_PARTY = RefType_OwnerType_THIRD_PARTY;
+  static inline bool OwnerType_IsValid(int value) {
+    return RefType_OwnerType_IsValid(value);
+  }
+  static const OwnerType OwnerType_MIN =
+    RefType_OwnerType_OwnerType_MIN;
+  static const OwnerType OwnerType_MAX =
+    RefType_OwnerType_OwnerType_MAX;
+  static const int OwnerType_ARRAYSIZE =
+    RefType_OwnerType_OwnerType_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  OwnerType_descriptor() {
+    return RefType_OwnerType_descriptor();
+  }
+  static inline const ::std::string& OwnerType_Name(OwnerType value) {
+    return RefType_OwnerType_Name(value);
+  }
+  static inline bool OwnerType_Parse(const ::std::string& name,
+      OwnerType* value) {
+    return RefType_OwnerType_Parse(name, value);
+  }
+  
   // accessors -------------------------------------------------------
   
-  // required int32 address = 1;
-  inline bool has_address() const;
-  inline void clear_address();
-  static const int kAddressFieldNumber = 1;
-  inline ::google::protobuf::int32 address() const;
-  inline void set_address(::google::protobuf::int32 value);
+  // required .reef.RefType.OwnerType owner = 1;
+  inline bool has_owner() const;
+  inline void clear_owner();
+  static const int kOwnerFieldNumber = 1;
+  inline ::reef::RefType_OwnerType owner() const;
+  inline void set_owner(::reef::RefType_OwnerType value);
   
-  // @@protoc_insertion_point(class_scope:reef.VirtualAddress)
+  // required uint32 virtualAddress = 2;
+  inline bool has_virtualaddress() const;
+  inline void clear_virtualaddress();
+  static const int kVirtualAddressFieldNumber = 2;
+  inline ::google::protobuf::uint32 virtualaddress() const;
+  inline void set_virtualaddress(::google::protobuf::uint32 value);
+  
+  // required uint32 interfaceIndex = 3;
+  inline bool has_interfaceindex() const;
+  inline void clear_interfaceindex();
+  static const int kInterfaceIndexFieldNumber = 3;
+  inline ::google::protobuf::uint32 interfaceindex() const;
+  inline void set_interfaceindex(::google::protobuf::uint32 value);
+  
+  // optional string ownerIP = 4;
+  inline bool has_ownerip() const;
+  inline void clear_ownerip();
+  static const int kOwnerIPFieldNumber = 4;
+  inline const ::std::string& ownerip() const;
+  inline void set_ownerip(const ::std::string& value);
+  inline void set_ownerip(const char* value);
+  inline void set_ownerip(const char* value, size_t size);
+  inline ::std::string* mutable_ownerip();
+  inline ::std::string* release_ownerip();
+  
+  // @@protoc_insertion_point(class_scope:reef.RefType)
  private:
-  inline void set_has_address();
-  inline void clear_has_address();
+  inline void set_has_owner();
+  inline void clear_has_owner();
+  inline void set_has_virtualaddress();
+  inline void clear_has_virtualaddress();
+  inline void set_has_interfaceindex();
+  inline void clear_has_interfaceindex();
+  inline void set_has_ownerip();
+  inline void clear_has_ownerip();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
-  ::google::protobuf::int32 address_;
+  int owner_;
+  ::google::protobuf::uint32 virtualaddress_;
+  ::std::string* ownerip_;
+  ::google::protobuf::uint32 interfaceindex_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
   
   friend void  protobuf_AddDesc_Message_2eproto();
   friend void protobuf_AssignDesc_Message_2eproto();
   friend void protobuf_ShutdownFile_Message_2eproto();
   
   void InitAsDefaultInstance();
-  static VirtualAddress* default_instance_;
+  static RefType* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -785,6 +875,35 @@ inline void DataContainer::set_numeric(double value) {
   numeric_ = value;
 }
 
+// optional .reef.RefType refType = 4;
+inline bool DataContainer::has_reftype() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void DataContainer::set_has_reftype() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void DataContainer::clear_has_reftype() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void DataContainer::clear_reftype() {
+  if (reftype_ != NULL) reftype_->::reef::RefType::Clear();
+  clear_has_reftype();
+}
+inline const ::reef::RefType& DataContainer::reftype() const {
+  return reftype_ != NULL ? *reftype_ : *default_instance_->reftype_;
+}
+inline ::reef::RefType* DataContainer::mutable_reftype() {
+  set_has_reftype();
+  if (reftype_ == NULL) reftype_ = new ::reef::RefType;
+  return reftype_;
+}
+inline ::reef::RefType* DataContainer::release_reftype() {
+  clear_has_reftype();
+  ::reef::RefType* temp = reftype_;
+  reftype_ = NULL;
+  return temp;
+}
+
 // -------------------------------------------------------------------
 
 // Argument
@@ -816,28 +935,131 @@ Argument::mutable_data() {
 
 // -------------------------------------------------------------------
 
-// VirtualAddress
+// RefType
 
-// required int32 address = 1;
-inline bool VirtualAddress::has_address() const {
+// required .reef.RefType.OwnerType owner = 1;
+inline bool RefType::has_owner() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void VirtualAddress::set_has_address() {
+inline void RefType::set_has_owner() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void VirtualAddress::clear_has_address() {
+inline void RefType::clear_has_owner() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void VirtualAddress::clear_address() {
-  address_ = 0;
-  clear_has_address();
+inline void RefType::clear_owner() {
+  owner_ = 0;
+  clear_has_owner();
 }
-inline ::google::protobuf::int32 VirtualAddress::address() const {
-  return address_;
+inline ::reef::RefType_OwnerType RefType::owner() const {
+  return static_cast< ::reef::RefType_OwnerType >(owner_);
 }
-inline void VirtualAddress::set_address(::google::protobuf::int32 value) {
-  set_has_address();
-  address_ = value;
+inline void RefType::set_owner(::reef::RefType_OwnerType value) {
+  GOOGLE_DCHECK(::reef::RefType_OwnerType_IsValid(value));
+  set_has_owner();
+  owner_ = value;
+}
+
+// required uint32 virtualAddress = 2;
+inline bool RefType::has_virtualaddress() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void RefType::set_has_virtualaddress() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void RefType::clear_has_virtualaddress() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void RefType::clear_virtualaddress() {
+  virtualaddress_ = 0u;
+  clear_has_virtualaddress();
+}
+inline ::google::protobuf::uint32 RefType::virtualaddress() const {
+  return virtualaddress_;
+}
+inline void RefType::set_virtualaddress(::google::protobuf::uint32 value) {
+  set_has_virtualaddress();
+  virtualaddress_ = value;
+}
+
+// required uint32 interfaceIndex = 3;
+inline bool RefType::has_interfaceindex() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void RefType::set_has_interfaceindex() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void RefType::clear_has_interfaceindex() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void RefType::clear_interfaceindex() {
+  interfaceindex_ = 0u;
+  clear_has_interfaceindex();
+}
+inline ::google::protobuf::uint32 RefType::interfaceindex() const {
+  return interfaceindex_;
+}
+inline void RefType::set_interfaceindex(::google::protobuf::uint32 value) {
+  set_has_interfaceindex();
+  interfaceindex_ = value;
+}
+
+// optional string ownerIP = 4;
+inline bool RefType::has_ownerip() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void RefType::set_has_ownerip() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void RefType::clear_has_ownerip() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void RefType::clear_ownerip() {
+  if (ownerip_ != &::google::protobuf::internal::kEmptyString) {
+    ownerip_->clear();
+  }
+  clear_has_ownerip();
+}
+inline const ::std::string& RefType::ownerip() const {
+  return *ownerip_;
+}
+inline void RefType::set_ownerip(const ::std::string& value) {
+  set_has_ownerip();
+  if (ownerip_ == &::google::protobuf::internal::kEmptyString) {
+    ownerip_ = new ::std::string;
+  }
+  ownerip_->assign(value);
+}
+inline void RefType::set_ownerip(const char* value) {
+  set_has_ownerip();
+  if (ownerip_ == &::google::protobuf::internal::kEmptyString) {
+    ownerip_ = new ::std::string;
+  }
+  ownerip_->assign(value);
+}
+inline void RefType::set_ownerip(const char* value, size_t size) {
+  set_has_ownerip();
+  if (ownerip_ == &::google::protobuf::internal::kEmptyString) {
+    ownerip_ = new ::std::string;
+  }
+  ownerip_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* RefType::mutable_ownerip() {
+  set_has_ownerip();
+  if (ownerip_ == &::google::protobuf::internal::kEmptyString) {
+    ownerip_ = new ::std::string;
+  }
+  return ownerip_;
+}
+inline ::std::string* RefType::release_ownerip() {
+  clear_has_ownerip();
+  if (ownerip_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = ownerip_;
+    ownerip_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
 }
 
 // -------------------------------------------------------------------
@@ -1113,6 +1335,10 @@ inline ::reef::Message_Member* Message::release_msgmember() {
 namespace google {
 namespace protobuf {
 
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::reef::RefType_OwnerType>() {
+  return ::reef::RefType_OwnerType_descriptor();
+}
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::reef::Message_Type>() {
   return ::reef::Message_Type_descriptor();

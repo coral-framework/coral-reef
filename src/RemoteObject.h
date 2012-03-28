@@ -10,17 +10,19 @@
 namespace reef
 {
     
-class ServerNode;
+class IServerNode;
     
 class RemoteObject : public RemoteObject_Base
 {
 public:
     RemoteObject();
-    RemoteObject( co::IComponent* component, Encoder* encoder, 
-                 ServerNode* serverNode );
+    RemoteObject( co::IComponent* component, Encoder* encoder );
     virtual ~RemoteObject();
     
     void setComponent( co::IComponent* component );
+    
+    inline void setServerNode( IServerNode* serverNode ) 
+        { _serverNode = serverNode; }
     
     // IComponent
     co::IComponent* getComponent();
@@ -34,28 +36,18 @@ public:
                                  co::Range<co::Any const> args );
     co::int32 dynamicRegisterService( co::IService* dynamicServiceProxy );
     void dynamicSetField( co::int32 dynFacetId, co::IField* field, const co::Any& value );
-
+    
+    // These functions are used for differentiating a RemoteObject from an Object
+	static void* getClassPtr();
+    static inline bool isLocalObject( void* obj )
+    { return *reinterpret_cast<void**>( obj ) != RemoteObject::getClassPtr(); }
+    
 private:
-	/* 
-		Check all the arguments for ref types. For each one found, it checks if the object is 
-		local or remote and behaves accordingly. See reef's wiki for each case's explanation
-		Under the 'Reference Arguments' page.
-	*/
-	void checkReferenceParams( co::IMethod* method, co::Range<co::Any const> args );
-
-    void onLocalObjParam( co::IService* param );
+    static void* _classPtr;
     
-    void onRemoteObjParam( co::IService* param );
-    
-	void onReferenceReturned( co::IMethod* method );
-    
-    inline bool isLocalObject( void* obj ) 
-    { return *reinterpret_cast<void**>( obj ) != _remObjFingerprint; }
-private:
     Encoder* _encoder;
-    void* _remObjFingerprint;
     int _numFacets;
-    ServerNode* _serverNode;
+    IServerNode* _serverNode;
     co::Any _resultBuffer;
     co::IService** _facets;
     co::IComponent* _componentType;

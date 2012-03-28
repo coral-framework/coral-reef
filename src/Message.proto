@@ -6,6 +6,7 @@ message DataContainer
 	optional bool boolean = 1;
 	optional string str = 2;
 	optional double numeric = 3;
+	optional RefType refType = 4;
 }
 
 message Argument
@@ -13,9 +14,18 @@ message Argument
 	repeated DataContainer data = 1;
 }
 
-message VirtualAddress
+message RefType
 {
-	required int32 address = 1;
+	enum OwnerType
+	{
+		SELF = 0;
+		RECEIVER = 1;
+		THIRD_PARTY = 2;
+	}
+	required OwnerType owner = 1;
+	required uint32 virtualAddress = 2;
+	required uint32 interfaceIndex = 3;
+	optional string ownerIP = 4;
 }
 
 // Commands (triggers actions into destination nodes)

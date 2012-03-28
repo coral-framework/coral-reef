@@ -142,7 +142,7 @@ TEST( CompleteTests, ChannelToChannelTest )
     BinderMsgTarget msgTarget( &b1, &fd );
     FakeSocket::setMsgTarget( static_cast<MsgTarget*>( &msgTarget ), "addr1" );
     
-    Encoder* ic = new Encoder( c1 );
+    Encoder* ic = new Encoder( c1, 0 );
     
     co::RefPtr<co::IObject> dummyRemoteObj = new RemoteObject( dummyComponent, ic );
     testModule::ISimpleTypes* st = dummyRemoteObj->getService<testModule::ISimpleTypes>();
@@ -196,7 +196,7 @@ TEST( CompleteTests, ProxyToServantTest )
     FakeSocket::setMsgTarget( static_cast<MsgTarget*>( &fakeMsgTarget ), "addr1" );
     fakeServant.setObject( dummyObj.get() );
     
-    Encoder* ic = new Encoder( c1 );
+    Encoder* ic = new Encoder( c1, 0 );
 
     // newInstance will be called
     co::RefPtr<co::IObject> dummyRemoteObj = new RemoteObject( dummyComponent, ic );

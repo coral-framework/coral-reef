@@ -1,4 +1,5 @@
 #include "Encoder.h"
+#include "RemoteObject.h"
 
 #include "Message.pb.h"
 #include "MessageUtils.h"
@@ -10,8 +11,9 @@
 namespace reef {
     
 // Encoder
-Encoder::Encoder( Connecter* connecter ) : _connecter( connecter )
-{   
+Encoder::Encoder( Connecter* connecter, IServerNode* publisher ) : 
+    _connecter( connecter ), _publisher( publisher )
+{
 }
 
 Encoder::~Encoder()
@@ -43,22 +45,19 @@ int Encoder::newInstance( const std::string& typeName )
     std::string input;
     _connecter->receiveReply( input );
     
-    VirtualAddress va;
-    va.ParseFromString( input );
+    DataContainer instanceAddress;
+    instanceAddress.ParseFromString( input );
     
-    int virtualAddress = va.address();
-    assert( virtualAddress > 0 );
+    _instanceAddress = instanceAddress.numeric();
     
-    _decoderAddress = va.address();
-    
-    return _decoderAddress;
+    return _instanceAddress;
 }
 
 void Encoder::sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args )
 {
     // make a call without returns
     Message message;
-    MessageUtils::makeCallMessage( _decoderAddress, false, message, serviceId, method->getIndex(), args );
+    makeCallMessage( _instanceAddress, false, message, serviceId, method->getIndex(), args );
     write( &message );
 }
 
@@ -66,7 +65,7 @@ void Encoder::call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any 
 {
     // make a call with returns
     Message message;
-    MessageUtils::makeCallMessage( _decoderAddress, true, message, serviceId, method->getIndex(), args );
+    makeCallMessage( _instanceAddress, true, message, serviceId, method->getIndex(), args );
     
     write( &message );
     
@@ -78,7 +77,7 @@ void Encoder::call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any 
 void Encoder::getField( co::int32 serviceId, co::IField* field, co::Any& result )
 {
     Message message;
-    MessageUtils::makeGetFieldMessage( _decoderAddress, message, serviceId, field->getIndex() );
+    makeGetFieldMessage( _instanceAddress, message, serviceId, field->getIndex() );
     
     write( &message );
     
@@ -88,7 +87,7 @@ void Encoder::getField( co::int32 serviceId, co::IField* field, co::Any& result 
 void Encoder::setField( co::int32 serviceId, co::IField* field, const co::Any& value )
 {
     Message message;
-    MessageUtils::makeSetFieldMessage( _decoderAddress, message, serviceId, field->getIndex(), value );
+    makeSetFieldMessage( _instanceAddress, message, serviceId, field->getIndex(), value );
     
     write( &message );
 }
@@ -99,6 +98,83 @@ void Encoder::write( const Message* message )
     message->SerializeToString( &output );
     
     _connecter->send( output );
+}
+
+    
+void Encoder::makeCallMessage( co::int32 destination, bool hasReturn, Message& owner, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args )
+{
+    owner.set_destination( destination );
+    owner.set_type( Message::TYPE_CALL );
+    
+    Message_Member* mc = owner.mutable_msgmember();
+    mc->set_hasreturn( hasReturn );
+    mc->set_serviceindex( serviceId );
+    mc->set_memberindex( methodIndex );
+    for( ; args; args.popFirst() )
+    {
+        Argument* PBArg = mc->add_arguments();
+        MessageUtils::anyToPBArg( args.getFirst(), PBArg );
+    }
+}
+
+void Encoder::makeSetFieldMessage( co::int32 destination, Message& owner, co::int32 serviceId, co::int32 fieldIndex, const co::Any& value )
+{
+    owner.set_destination( destination );
+    owner.set_type( Message::TYPE_FIELD );
+    
+    Message_Member* mf = owner.mutable_msgmember();
+    mf->set_serviceindex( serviceId );
+    mf->set_hasreturn( false ); // it is a set field event
+    mf->set_memberindex( fieldIndex );
+    
+    Argument* PBArg = mf->add_arguments();
+    MessageUtils::anyToPBArg( value, PBArg );
+}
+
+void Encoder::makeGetFieldMessage( co::int32 destination, Message& owner, co::int32 serviceId, co::int32 fieldIndex )
+{
+    owner.set_destination( destination );
+    owner.set_type( Message::TYPE_FIELD );
+    
+    Message_Member* mf = owner.mutable_msgmember();
+    mf->set_serviceindex( serviceId );
+    mf->set_hasreturn( true ); // it is a get field event
+    mf->set_memberindex( fieldIndex );
+}
+
+void Encoder::convertArgs( Message_Member* msgMember, co::Range<co::Any const> args )
+{
+    for( ; args; args.popFirst() )
+    {
+        Argument* PBArg = msgMember->add_arguments();
+        
+        if( args.getFirst().getKind() != co::TK_INTERFACE )
+            MessageUtils::anyToPBArg( args.getFirst(), PBArg );
+        else
+            convertRefTypeArg( args.getFirst(), PBArg );
+    }
+}
+    
+void Encoder::convertRefTypeArg( const co::Any refType, Argument* PBArg )
+{
+    co::int32 virtualAddress;
+    co::int32 interfaceIndex;
+    co::int32 addressOwnerType;
+    std::string AddressOwnerIP;
+    
+    co::IService* service = refType.get<co::IService*>();
+    interfaceIndex = service->getFacet()->getIndex();
+    co::IObject* provider = service->getProvider();
+    
+    if( RemoteObject::isLocalObject( provider ) )
+    {
+        addressOwnerType = 0;
+        virtualAddress = _publisher->publishInstance( provider );
+    }
+    else
+    {
+        
+    }
 }
 
 }

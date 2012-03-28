@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <Encoder.h>
 #include <Message.pb.h>
 #include <MessageUtils.h>
 
@@ -169,10 +170,11 @@ TEST( CodecTests, simpleTypesTest )
 	co::IField* storedIntListField = co::cast<co::IField>( STInterface->getMember( "storedIntList" ) );
 
 	// Create the messages
-	MessageUtils::makeCallMessage( 5, true, call_5_3_4_sArr_sArr, 3, 4, sArr_sArr_arg );
-	MessageUtils::makeCallMessage( 10, true, call_10_25_999_dArr_dArr, 25, 999, dArr_dArr_arg );
-	MessageUtils::makeCallMessage( 3, true, sendcall_3_7_9_s, 7, 9, s_arg );
-	MessageUtils::makeSetFieldMessage( 2, setfield_2_3_4_iArr, 3, 4, iArr_arg[0] );
+    Encoder encoder( 0, 0 );
+	encoder.makeCallMessage( 5, true, call_5_3_4_sArr_sArr, 3, 4, sArr_sArr_arg );
+	encoder.makeCallMessage( 10, true, call_10_25_999_dArr_dArr, 25, 999, dArr_dArr_arg );
+	encoder.makeCallMessage( 3, true, sendcall_3_7_9_s, 7, 9, s_arg );
+	encoder.makeSetFieldMessage( 2, setfield_2_3_4_iArr, 3, 4, iArr_arg[0] );
 	
 	EXPECT_TRUE( checkCallMessage( &call_5_3_4_sArr_sArr, Message::TYPE_CALL, 5, 3, 4, getThirdElements, 
 		sArr_sArr_arg ) );

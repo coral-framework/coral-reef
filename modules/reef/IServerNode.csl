@@ -4,4 +4,7 @@ interface IServerNode
 	void stop();
 	
 	void update();
+	
+	//! makes an instance available for remote access through returned address
+	int32 publishInstance( in co.IObject instance );
 };

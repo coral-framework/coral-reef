@@ -81,10 +81,10 @@ co::int32 ServerNode::openRemoteReference( co::IObject* instance )
     return va;
 }
 
-void ServerNode::closeRemoteReference( co::int32 virtualAddress )
+void ServerNode::closeRemoteReference( co::int32 vAddress )
 {
-    if( --_remoteRefCounting[virtualAddress] < 1 )
-        releaseInstance( virtualAddress );
+    if( --_remoteRefCounting[vAddress] < 1 )
+        releaseInstance( vAddress );
     
 }
 
@@ -126,14 +126,14 @@ co::int32 ServerNode::publishInstance( co::IObject* instance )
 }
     
 
-void ServerNode::releaseInstance( co::int32 virtualAddress )
+void ServerNode::releaseInstance( co::int32 vAddress )
 {
-    co::IObject* instance = _servants[virtualAddress]->getObject();
+    co::IObject* instance = _servants[vAddress]->getObject();
     VirtualAddresses::iterator it = _vas.find( instance );
     _vas.erase( it );
     
-    delete _servants[virtualAddress];
-    _freedIds.push( virtualAddress );
+    delete _servants[vAddress];
+    _freedIds.push( vAddress );
     
 }
 

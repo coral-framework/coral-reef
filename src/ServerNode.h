@@ -36,10 +36,10 @@ public:
      Remove a remote reference to the instance. If there are no more references,
      remove the internal reference to it and cleear the virtual address.
      */
-    void closeRemoteReference( co::int32 virtualAddress );
+    void closeRemoteReference( co::int32 vAddress );
     
 private:
-    void releaseInstance( co::int32 virtualAddress );
+    void releaseInstance( co::int32 vAddress );
     
      // Creates a servant for the instance and returns its VA
     co::int32 publishInstance( co::IObject* instance );
