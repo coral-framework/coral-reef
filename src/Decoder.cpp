@@ -101,10 +101,10 @@ void Decoder::setField( co::int32 serviceId, co::IField* field, const co::Any& v
       
 void Decoder::deliverNew( const Message_New* subMessage )
 {
-    int vAddress = newInstance( subMessage->componenttypename() );
+    int instanceID = newInstance( subMessage->componenttypename() );
 
     DataContainer instanceAddress;
-    instanceAddress.set_numeric( vAddress );
+    instanceAddress.set_numeric( instanceID );
     
     std::string output = "";
     instanceAddress.SerializeToString( &output );

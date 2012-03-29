@@ -55,7 +55,7 @@ private:
 	void fetchReturnValue( co::IType* descriptor, co::Any& returnValue );
 
     void publishRefTypes( co::IMethod* method, 
-            co::Range<co::Any const> args, std::vector<co::int32>& vAddresses );
+            co::Range<co::Any const> args, std::vector<co::int32>& instanceIDes );
 
     
     void convertArgs( Message_Member* msgMember, co::Range<co::Any const> args );
