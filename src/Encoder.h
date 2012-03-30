@@ -1,76 +1,73 @@
-#ifndef _REEF_ENCODER_H_
-#define _REEF_ENCODER_H_
+#ifndef __REEF_ENCODER_H__
+#define __REEF_ENCODER_H__
 
 #include <co/Any.h>
-#include <co/Range.h>
-#include <reef/IServerNode.h>
+#include <co/Coral.h>
 
-namespace reef
+#include <string>
+
+namespace reef 
 {
     
 class Message;
-class Argument;
-class Connecter;
 class Message_Member;
-    
-/*
-    Client-side Channel. Receives the calls from the RemoteObject, 
-    encodes and sends to Server
- */
+
 class Encoder
 {
+    
 public:
-    /* 
-     Requires a ServerNode in order to publish any ref type that is passed as 
-     a parameter.
+    enum RefOwner
+    {
+        LOCAL,
+        RECEIVER,
+        ANOTHER
+    };
+    
+    Encoder();
+    ~Encoder();
+    
+    // ----- New Instance ----- //
+    void encodeNewInstMsg( const std::string& typeName, std::string& msg );
+    
+    
+    /*
+     Encoder functions for Call/Field msgs. As these messages require different amounts of 
+     parameters of different types, they can't be encoded with a single function. 
+     Usage: begin, add all the parameters and finish encoding the message. 
      */
-    Encoder( Connecter* connecter, IServerNode* publisher );
-    virtual ~Encoder();
+    void beginEncodingCallMsg( co::int32 instanceID, co::int32 facetIdx, co::int32 memberIdx,
+                              bool hasReturn );
     
-    virtual int newInstance( const std::string& typeName );
-    virtual void sendCall( co::int32 serviceId, co::IMethod* method, 
-                          co::Range<co::Any const> args );
-    virtual void call( co::int32 serviceId, co::IMethod* method, 
-                      co::Range<co::Any const> args, co::Any& result );
-    virtual void getField( co::int32 serviceId, co::IField* field, 
-                          co::Any& result );
-    virtual void setField( co::int32 serviceId, co::IField* field, 
-                          const co::Any& value );
+    // adds a Value Type parameter
+    void addValueParam( const co::Any& param );
     
-    // Functions are public for testing
-    void makeCallMessage( co::int32 destination, bool hasReturn, Message& owner,
-                         co::int32 serviceId, co::int32 methodIndex, 
-                         co::Range<co::Any const> args );
+    // adds a ref-type parameter, instance is local
+    void addRefParam( co::int32 instanceID, co::int32 facetIdx, RefOwner owner, 
+                     const std::string* ownerAddress = 0 );
     
-	void makeSetFieldMessage( co::int32 destination, Message& owner, 
-                             co::int32 serviceId, co::int32 fieldIndex, 
-                             const co::Any& value );
+    // get the built call msg with all the arguments
+    void finishEncodingCallMsg( std::string& msg );
     
-	void makeGetFieldMessage( co::int32 destination, Message& owner, 
-                             co::int32 serviceId, co::int32 fieldIndex );
-
+    
+    // ----- Data Container codec ----- //
+    void encodeData( bool value, std::string& msg );
+    
+    void encodeData( double value, std::string& msg );
+    
+    void encodeData( co::int32 value, std::string& msg );
+    
+    void encodeData( const std::string& value, std::string& msg );
+    
+    void encodeData( const co::Any& value, std::string& msg );
 private:
-    void write( const Message* message );
     
-	void fetchReturnValue( co::IType* descriptor, co::Any& returnValue );
-
-    void publishRefTypes( co::IMethod* method, 
-            co::Range<co::Any const> args, std::vector<co::int32>& instanceIDes );
-
-    
-    void convertArgs( Message_Member* msgMember, co::Range<co::Any const> args );
-    
-    void convertRefTypeArg( const co::Any refType, Argument* PBArg );
-    
+    void checkIfCallMsg();
     
 private:
-    co::RefPtr<Connecter> _connecter;
+    Message* _message;
+    Message_Member* _msgMember;
     
-    IServerNode* _publisher;
-    
-    co::int32 _instanceAddress;
 };
 
 }
-
 #endif

@@ -2,7 +2,10 @@
 #define __REMOTEOBJECT_H__
 
 #include "RemoteObject_Base.h"
+
+#include "Decoder.h"
 #include "Encoder.h"
+#include "network/Connection.h"
 
 #include <co/IService.h>
 #include <co/RefVector.h>
@@ -16,7 +19,7 @@ class RemoteObject : public RemoteObject_Base
 {
 public:
     RemoteObject();
-    RemoteObject( co::IComponent* component, Encoder* encoder );
+    RemoteObject( co::IComponent* component, const std::string& address );
     virtual ~RemoteObject();
     
     void setComponent( co::IComponent* component );
@@ -37,18 +40,33 @@ public:
     co::int32 dynamicRegisterService( co::IService* dynamicServiceProxy );
     void dynamicSetField( co::int32 dynFacetId, co::IField* field, const co::Any& value );
     
-    // These functions are used for differentiating a RemoteObject from an Object
-	static void* getClassPtr();
-    static inline bool isLocalObject( void* obj )
-    { return *reinterpret_cast<void**>( obj ) != RemoteObject::getClassPtr(); }
+    // IInstanceInfo
+	co::int32 getInstanceID();
+	const std::string& getOwnerAddress();
+    
+    inline bool isLocalObject( void* obj ) { return *reinterpret_cast<void**>( obj ) != _classPtr; }
     
 private:
-    static void* _classPtr;
+    /* 
+     Treats all possible cases of a TK_INTERFACE param in a call/field msg. 
+     See Reference Values page on reef's wiki for further info.
+     */
+    void onInterfaceParam( co::IService* param );
     
-    Encoder* _encoder;
-    int _numFacets;
-    IServerNode* _serverNode;
+    void fetchReturnValue( co::IType* descriptor, co::Any& returnValue );
+private:
+    void* _classPtr;
+    
+    co::int32 _instanceID;
+    
+    Encoder _encoder;
+    Decoder _decoder;
+    co::RefPtr<Connecter> _connecter;
     co::Any _resultBuffer;
+    IServerNode* _serverNode;
+    
+    
+    co::int32 _numFacets;
     co::IService** _facets;
     co::IComponent* _componentType;
 };

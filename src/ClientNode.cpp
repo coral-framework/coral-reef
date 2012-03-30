@@ -29,10 +29,7 @@ public:
         co::IComponent* componentType = co::cast<co::IComponent>( 
                                           co::getType( componentTypeName ) );
         
-        Connecter* connecter = Connecter::getOrOpenConnection( address );
-        
-        return new RemoteObject( componentType, new Encoder( connecter,
-                                        _serverNode ) );
+        return new RemoteObject( componentType, address );
     }
     
 private:

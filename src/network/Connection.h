@@ -24,6 +24,7 @@ public:
 	void send( const std::string& data );
 	bool receiveReply( std::string& data ); //Blocking function
 
+    inline const std::string& getAddress() { return _address; }
 private:
 
     Connecter();

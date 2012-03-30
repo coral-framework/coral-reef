@@ -1,180 +1,271 @@
 #include "Encoder.h"
-#include "RemoteObject.h"
 
 #include "Message.pb.h"
-#include "MessageUtils.h"
 #include "network/Connection.h"
 
 #include <co/IField.h>
 #include <co/IMethod.h>
+#include <co/Exception.h>
 
-namespace reef {
-    
-// Encoder
-Encoder::Encoder( Connecter* connecter, IServerNode* publisher ) : 
-    _connecter( connecter ), _publisher( publisher )
+namespace reef
 {
+   
+    // ------------ Any to Protobuf conversion functions --------------- //
+    
+// Specializes for each Data container's different set function.
+template <typename T>
+static void setPBContainerData( Data_Container* container, T value ) 
+{
+    container->set_numeric( static_cast<double>( value ) );
+}
+
+template <>
+void setPBContainerData<bool>( Data_Container* container, bool value ) 
+{
+    container->set_boolean( value );
+}
+
+template <>
+void setPBContainerData<const std::string&>( Data_Container* container, const std::string& value ) 
+{
+    container->set_str( value );
+}
+
+// Extracts the provided type's data from Any (deals with arrays and values)
+template <typename T>
+static void anyWithTypeToPBArg( const co::Any& any, Argument* arg )
+{
+    // if the Any is a single value, set it directly 
+    if( any.getKind() != co::TK_ARRAY )
+    {
+        Data_Container* container = arg->add_data();
+        setPBContainerData<T>( container, any.get<T>() );
+        return;
+    }
+    
+    // if the Any is an array, iterate through the values adding to the Argument
+    const co::Range<const T> range = any.get<const co::Range<const T> >();
+    
+    size_t size = range.getSize();
+    for( int i = 0; i < size; i++ )
+    {
+        Data_Container* container = arg->add_data();
+        setPBContainerData<T>( container, range[i] );
+    }
+}
+
+template <>
+void anyWithTypeToPBArg<std::string>( const co::Any& any, Argument* arg )
+{
+    // if the Any is a single value, set it directly 
+    if( any.getKind() != co::TK_ARRAY )
+    {
+        Data_Container* container = arg->add_data();
+        setPBContainerData<const std::string&>( container, any.get<const std::string&>() );
+        return;
+    }
+    
+    // if the Any is an array, iterate through the values adding to the Argument
+    const co::Range<const std::string> range = any.get<const co::Range<const std::string> >();
+    
+    size_t size = range.getSize();
+    for( int i = 0; i < size; i++ )
+    {
+        Data_Container* container = arg->add_data();
+        setPBContainerData<const std::string&>( container, range[i] );
+    }
+}
+
+template <>
+void anyWithTypeToPBArg<bool>( const co::Any& any, Argument* arg )
+{
+    // if the Any is a single value, set it directly 
+    if( any.getKind() != co::TK_ARRAY )
+    {
+        Data_Container* container = arg->add_data();
+        setPBContainerData<bool>( container, any.get<bool>() );
+        return;
+    }
+    
+    // if the Any is an array, iterate through the values adding to the Argument
+    const std::vector<bool>& vec = any.get<const std::vector<bool> &>();
+    
+    size_t size = vec.size();
+    for( int i = 0; i < size; i++ )
+    {
+        Data_Container* container = arg->add_data();
+        setPBContainerData<bool>( container, vec[i] );
+    }
+}
+
+// Converts an any containing a vlue type to a protobuf Argument
+void anyToPBArg( const co::Any& any, Argument* arg )
+{
+    std::vector<co::Any> anyVec;
+    co::TypeKind kind = any.getKind();
+    
+    if( kind == co::TK_ARRAY )
+        kind = any.getType()->getKind();
+    
+    switch( kind )
+    {
+        case co::TK_BOOLEAN:
+            anyWithTypeToPBArg<bool>( any, arg );
+            break;
+        case co::TK_INT8:
+            anyWithTypeToPBArg<co::int8>( any, arg );
+            break;
+        case co::TK_UINT8:
+            anyWithTypeToPBArg<co::uint8>( any, arg );
+            break;
+        case co::TK_INT16:
+            anyWithTypeToPBArg<co::int16>( any, arg );
+            break;
+        case co::TK_UINT16:
+            anyWithTypeToPBArg<co::uint16>( any, arg );
+            break;
+        case co::TK_INT32:
+            anyWithTypeToPBArg<co::int32>( any, arg );
+            break;
+        case co::TK_UINT32:
+            anyWithTypeToPBArg<co::uint32>( any, arg );
+            break;
+        case co::TK_INT64:
+            anyWithTypeToPBArg<co::int64>( any, arg );
+            break;
+        case co::TK_UINT64:
+            anyWithTypeToPBArg<co::uint64>( any, arg );
+            break;
+        case co::TK_FLOAT:
+            anyWithTypeToPBArg<float>( any, arg );
+            break;
+        case co::TK_DOUBLE:
+            anyWithTypeToPBArg<double>( any, arg );
+            break;
+        case co::TK_STRING:
+            anyWithTypeToPBArg<std::string>( any, arg );
+            break;
+        default:
+            assert( false );
+    }
+}
+
+Encoder::Encoder()
+{
+    _message = new Message();
 }
 
 Encoder::~Encoder()
 {
-    // empty
-}            
-
-// Blocking function
-void Encoder::fetchReturnValue( co::IType* descriptor, co::Any& returnValue )
+    delete _message;
+}
+    
+void Encoder::encodeNewInstMsg( const std::string& typeName, std::string& msg )
 {
-	std::string input;
-    _connecter->receiveReply( input );
-	Argument arg;
-	arg.ParseFromString( input );
-	MessageUtils::PBArgToAny( arg, descriptor, returnValue );
+    _message->set_instance_id( 0 ); // 0 is always the node channel
+    
+	Message_New* msgNew = _message->mutable_msg_new();
+    msgNew->set_component_type_name( typeName );
+    
+    _message->SerializeToString( &msg );
+    _message->Clear();
 }
 
-int Encoder::newInstance( const std::string& typeName )
+void Encoder::beginEncodingCallMsg( co::int32 instanceID, co::int32 facetIdx, co::int32 memberIdx,
+                                   bool hasReturn )
 {
-    Message message;
-    message.set_destination( 0 ); // 0 is always the node channel
-    message.set_type( Message::TYPE_NEW );
+    if( instanceID == 0 )
+        throw new co::Exception( "A call msg can't have an instanceID of 0" );
     
-	Message_New* msgNew = message.mutable_msgnew();
-    msgNew->set_componenttypename( typeName );
+    _message->set_instance_id( instanceID );
     
-    write( &message );
-    
-    std::string input;
-    _connecter->receiveReply( input );
-    
-    DataContainer instanceAddress;
-    instanceAddress.ParseFromString( input );
-    
-    _instanceAddress = instanceAddress.numeric();
-    
-    return _instanceAddress;
+    _msgMember = _message->mutable_msg_member();
+    _msgMember->set_has_return( hasReturn );
+    _msgMember->set_facet_idx( facetIdx );
+    _msgMember->set_member_idx( memberIdx );
 }
 
-void Encoder::sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args )
+void Encoder::addValueParam( const co::Any& param )
 {
-    // make a call without returns
-    Message message;
-    makeCallMessage( _instanceAddress, false, message, serviceId, method->getIndex(), args );
-    write( &message );
+    checkIfCallMsg();
+    Argument* PBArg = _msgMember->add_arguments();
+    anyToPBArg( param, PBArg );
 }
 
-void Encoder::call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result )
+void Encoder::addRefParam( co::int32 instanceID, co::int32 facetIdx, RefOwner owner, 
+                        const std::string* ownerAddress )
 {
-    // make a call with returns
-    Message message;
-    makeCallMessage( _instanceAddress, true, message, serviceId, method->getIndex(), args );
+    checkIfCallMsg();
+    Argument* PBArg = _msgMember->add_arguments();
+    Data_Container* dc = PBArg->add_data();
+    Ref_Type* refType = dc->mutable_ref_type();
     
-    write( &message );
+    refType->set_instance_id( instanceID );
+    refType->set_facet_idx( facetIdx );
     
-	fetchReturnValue( method->getReturnType(), result );
-    
-    // TODO: properly set returned value into result variable and set all out values from args list
-}
 
-void Encoder::getField( co::int32 serviceId, co::IField* field, co::Any& result )
-{
-    Message message;
-    makeGetFieldMessage( _instanceAddress, message, serviceId, field->getIndex() );
-    
-    write( &message );
-    
-    fetchReturnValue( field->getType(), result );
-}
-
-void Encoder::setField( co::int32 serviceId, co::IField* field, const co::Any& value )
-{
-    Message message;
-    makeSetFieldMessage( _instanceAddress, message, serviceId, field->getIndex(), value );
-    
-    write( &message );
-}
-
-void Encoder::write( const Message* message )
-{
-    std::string output;
-    message->SerializeToString( &output );
-    
-    _connecter->send( output );
-}
-
-    
-void Encoder::makeCallMessage( co::int32 destination, bool hasReturn, Message& owner, co::int32 serviceId, co::int32 methodIndex, co::Range<co::Any const> args )
-{
-    owner.set_destination( destination );
-    owner.set_type( Message::TYPE_CALL );
-    
-    Message_Member* mc = owner.mutable_msgmember();
-    mc->set_hasreturn( hasReturn );
-    mc->set_serviceindex( serviceId );
-    mc->set_memberindex( methodIndex );
-    for( ; args; args.popFirst() )
+    switch( owner )
     {
-        Argument* PBArg = mc->add_arguments();
-        MessageUtils::anyToPBArg( args.getFirst(), PBArg );
+    case RefOwner::LOCAL:
+            refType->set_owner( Ref_Type::OWNER_LOCAL );
+            break;
+    case RefOwner::RECEIVER:
+            refType->set_owner( Ref_Type::OWNER_RECEIVER );
+            break;
+    case RefOwner::ANOTHER:
+            refType->set_owner( Ref_Type::OWNER_ANOTHER );
+            refType->set_owner_ip( *ownerAddress );
+            break;        
     }
 }
 
-void Encoder::makeSetFieldMessage( co::int32 destination, Message& owner, co::int32 serviceId, co::int32 fieldIndex, const co::Any& value )
+
+void Encoder::finishEncodingCallMsg( std::string& msg )
 {
-    owner.set_destination( destination );
-    owner.set_type( Message::TYPE_FIELD );
-    
-    Message_Member* mf = owner.mutable_msgmember();
-    mf->set_serviceindex( serviceId );
-    mf->set_hasreturn( false ); // it is a set field event
-    mf->set_memberindex( fieldIndex );
-    
-    Argument* PBArg = mf->add_arguments();
-    MessageUtils::anyToPBArg( value, PBArg );
+    _message->SerializeToString( &msg );
+    _message->Clear();
+    _msgMember = 0;
 }
 
-void Encoder::makeGetFieldMessage( co::int32 destination, Message& owner, co::int32 serviceId, co::int32 fieldIndex )
+void Encoder::encodeData( bool value, std::string& msg )
 {
-    owner.set_destination( destination );
-    owner.set_type( Message::TYPE_FIELD );
-    
-    Message_Member* mf = owner.mutable_msgmember();
-    mf->set_serviceindex( serviceId );
-    mf->set_hasreturn( true ); // it is a get field event
-    mf->set_memberindex( fieldIndex );
+    Data_Container data;
+    data.set_boolean( value );
+    data.SerializeToString( &msg );
 }
 
-void Encoder::convertArgs( Message_Member* msgMember, co::Range<co::Any const> args )
+void Encoder::encodeData( double value, std::string& msg )
 {
-    for( ; args; args.popFirst() )
-    {
-        Argument* PBArg = msgMember->add_arguments();
-        
-        if( args.getFirst().getKind() != co::TK_INTERFACE )
-            MessageUtils::anyToPBArg( args.getFirst(), PBArg );
-        else
-            convertRefTypeArg( args.getFirst(), PBArg );
-    }
-}
-    
-void Encoder::convertRefTypeArg( const co::Any refType, Argument* PBArg )
-{
-    co::int32 virtualAddress;
-    co::int32 interfaceIndex;
-    co::int32 addressOwnerType;
-    std::string AddressOwnerIP;
-    
-    co::IService* service = refType.get<co::IService*>();
-    interfaceIndex = service->getFacet()->getIndex();
-    co::IObject* provider = service->getProvider();
-    
-    if( RemoteObject::isLocalObject( provider ) )
-    {
-        addressOwnerType = 0;
-        virtualAddress = _publisher->publishInstance( provider );
-    }
-    else
-    {
-        
-    }
+    Data_Container data;
+    data.set_numeric( value );
+    data.SerializeToString( &msg );
 }
 
+void Encoder::encodeData( co::int32 value, std::string& msg )
+{
+    Data_Container data;
+    data.set_numeric( static_cast<co::int32>( value ) );
+    data.SerializeToString( &msg );
+}
+
+void Encoder::encodeData( const std::string& value, std::string& msg )
+{
+    Data_Container data;
+    data.set_str( value );
+    data.SerializeToString( &msg );
+}
+    
+void Encoder::encodeData( const co::Any& value, std::string& msg )
+{
+    Argument returnArg;
+    anyToPBArg( value, &returnArg );
+    returnArg.SerializeToString( &msg );
+}
+    
+void Encoder::checkIfCallMsg()
+{
+    if( !_msgMember )
+        throw new co::Exception( "Could not add a Parameter to an empty Message" );
+}
+    
 }

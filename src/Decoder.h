@@ -1,58 +1,72 @@
-#ifndef _REEF_ENCODER_CHANNEL_H_
-#define _REEF_ENCODER_CHANNEL_H_
+#ifndef __REEF_DECODER_H__
+#define __REEF_DECODER_H__
 
 #include <co/Any.h>
 #include <co/Coral.h>
 
-#include "network/Connection.h"
-
-#include <sstream>
+#include <string>
 
 namespace reef 
 {
-
+    
 class Message;
-class Message_New;
 class Message_Member;
-class Servant;
-class ServerNode;
 
-// A channel that converts raw message writes into events that can be delegated
 class Decoder
 {
+    
 public:
-    // Routes the given message to the proper channel using message destination identifier.
-    void routeAndDeliver( const std::string& data, const std::vector<Servant*>& channels );
-        
-    void deliver( Message* msg, Servant* destination );
+    enum RefOwner
+    {
+        LOCAL,
+        RECEIVER,
+        ANOTHER
+    };
     
-    // this overload is for testing only
-    void deliver( const std::string& data, Servant* destination );
     
-    
-    Decoder( Binder* binder );
+    Decoder();
     ~Decoder();
     
+    /* 
+       Sets a msg for decoding, if instanceID == 0 then it is a New Instance message, 
+     else it is a Call msg. Call the appropriate method for decoding each case as explained below. 
+     */
+    void setMsgForDecoding( const std::string& msg, co::int32& instanceID );
+    
+    // if msg type is NEW, then, this function will decode it
+    void decodeNewInstMsg( std::string& typeName );
+    
+    /* 
+     Starts a decoding state of call/field msg. 
+     The decoding state will only be reset after all params are decoded.
+     */
+    void beginDecodingCallMsg( co::int32& facetIdx, co::int32& memberIdx );
+    
+    void getValueParam( co::Any& param, co::IType* descriptor );
+    
+    void getRefParam( co::int32& instanceID, co::int32& facetIdx, RefOwner& owner,
+                     std::string& ownerAddress );
+    
+    
+    // ----- Just for plain simple types data, so message structure with it ----- //
+    void decodeData( const std::string& msg, bool& value );
+    
+    void decodeData( const std::string& msg, double& value );
+    
+    void decodeData( const std::string& msg, co::int32& value );
+    
+    void decodeData( const std::string& msg, std::string& value );
+    
+    void decodeData( const std::string& msg, co::IType* descriptor, co::Any& value );
 private:
-    void deliverNew( const Message_New* subMessage );
-    void deliverCall( const Message_Member* subMessage );
-    void deliverField( const Message_Member* subMessage );
-    
-    
-    int newInstance( const std::string& typeName );
-    void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args );
-    void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result );
-    void getField( co::int32 serviceId, co::IField* field, co::Any& result );
-    void setField( co::int32 serviceId, co::IField* field, const co::Any& value );
+    void checkIfCallMsg();
     
 private:
-    
-	Binder* _binder;
-
-    Servant* _destination;
+    Message* _message;
+    const Message_Member* _msgMember;
+    co::int32 _currentParam;
     
 };
-    
-} // namespace reef
 
+}
 #endif

@@ -1,191 +1,241 @@
-#include "Servant.h"
 #include "Decoder.h"
 
 #include "Message.pb.h"
+#include "network/Connection.h"
 
-#include <co/IMethod.h>
 #include <co/IField.h>
-#include <co/IParameter.h>
+#include <co/IMethod.h>
+#include <co/Exception.h>
 
-#include <iostream>
-
-#include "ServerNode.h"
-
-#include "MessageUtils.h"
-
-namespace reef 
+namespace reef
 {
+    // -------------- Protobuf to Any conversion functions ------------------//
     
-// Decoder
-Decoder::Decoder( Binder* binder )
-    : _binder( binder ) 
+// Specializes for each Data container's different get function.
+template <typename T>
+static T getPBContainerData( const Data_Container& container )
 {
+    return static_cast<T>( container.numeric() );
+}
+
+// ------------- get and set functions specialization for string and bool ----------- //
+template <>
+const std::string& getPBContainerData<const std::string&>( const Data_Container& container )
+{
+    return container.str();
+}
+
+template <>
+bool getPBContainerData<bool>( const Data_Container& container )
+{
+    return container.boolean();
+}
+    
+// Extracts the provided type's data from Argument (deals with arrays and values)
+template <typename T>
+static void PBArgWithTypeToAny( const Argument& arg, co::Any& any, co::IType* elementType )
+{
+    if( !elementType )
+    {
+        any.set<T>( getPBContainerData<T>( arg.data( 0 ) ) );
+        return;
+    }
+    
+    size_t size = arg.data().size();
+    if( size == 0 ) // required for vector subscript out of range assertion
+        return;
+    
+    std::vector<co::uint8>& vec = any.createArray( elementType, size );
+    T* toCast = reinterpret_cast<T*>( &vec[0] );
+    for( int i = 0; i < size; i++ )
+    {
+        toCast[i] = getPBContainerData<T>( arg.data( i ) );
+    }
+}
+
+// ----------------- PBArgWithTypeToAny specializations for string and bool --------------- //
+template <>
+void PBArgWithTypeToAny<std::string>( const Argument& arg, co::Any& any, co::IType* elementType )
+{
+    if( !elementType )
+    {
+        std::string& anyString = any.createString();
+        anyString = getPBContainerData<const std::string&>( arg.data( 0 ) );
+        return;
+    }
+    
+    size_t size = arg.data().size();
+    if( size == 0 ) // required for vector subscript out of range assertion
+        return;
+    
+    std::vector<co::uint8>& vec = any.createArray( elementType, size );
+    std::string* toCast = reinterpret_cast<std::string*>( &vec[0] );
+    for( int i = 0; i < size; i++ )
+    {
+        toCast[i] = getPBContainerData<const std::string&>( arg.data( i ) );
+    }
+}
+
+void PBArgToAny( const Argument& arg, co::IType* descriptor, co::Any& any )
+{
+    co::TypeKind kind = descriptor->getKind();
+    co::IType* elementType = 0; // only used for arrays
+    
+    if( kind == co::TK_ARRAY )
+    {
+        elementType = co::cast<co::IArray>( descriptor )->getElementType();
+        kind = elementType->getKind();
+    }
+    
+    switch( kind )
+    {
+        case co::TK_BOOLEAN:
+            PBArgWithTypeToAny<bool>( arg, any, elementType );
+            break;
+        case co::TK_INT8:
+            PBArgWithTypeToAny<co::int8>( arg, any, elementType );
+            break;
+        case co::TK_UINT8:
+            PBArgWithTypeToAny<co::uint8>( arg, any, elementType );
+            break;
+        case co::TK_INT16:
+            PBArgWithTypeToAny<co::int16>( arg, any, elementType );
+            break;
+        case co::TK_UINT16:
+            PBArgWithTypeToAny<co::uint16>( arg, any, elementType );
+            break;
+        case co::TK_INT32:
+            PBArgWithTypeToAny<co::int32>( arg, any, elementType );
+            break;
+        case co::TK_UINT32:
+            PBArgWithTypeToAny<co::uint32>( arg, any, elementType );
+            break;
+        case co::TK_INT64:
+            PBArgWithTypeToAny<co::int64>( arg, any, elementType );
+            break;
+        case co::TK_UINT64:
+            PBArgWithTypeToAny<co::uint64>( arg, any, elementType );
+            break;
+        case co::TK_FLOAT:
+            PBArgWithTypeToAny<float>( arg, any, elementType );
+            break;
+        case co::TK_DOUBLE:
+            PBArgWithTypeToAny<double>( arg, any, elementType );
+            break;
+        case co::TK_STRING:
+            PBArgWithTypeToAny<std::string>( arg, any, elementType );
+            break;
+        default:
+            assert( false );
+    }
+}
+
+Decoder::Decoder() : _currentParam( 0 )
+{
+    _message = new Message();
 }
 
 Decoder::~Decoder()
 {
-    // empty
+    delete _message;
+}
+    
+// sets the message that will be decoded and return its type and destination
+void Decoder::setMsgForDecoding( const std::string& msg, co::int32& instanceID )
+{
+    _message->Clear();
+    _message->ParseFromString( msg );
+    instanceID = _message->instance_id();
 }
 
-void Decoder::routeAndDeliver( const std::string& data, const std::vector<Servant*>& servants )
+// if msg type is NEW, then, this function will decode it
+void Decoder::decodeNewInstMsg( std::string& typeName )
 {
-    Message message;
-    message.ParseFromString( data );
-    
-    int dest = message.destination();
-    assert( dest >= 0 && dest < servants.size() );
-    deliver( &message, servants[dest] );
-}
-    
-void Decoder::deliver( const std::string& data, Servant* destination )
-{   
-    Message message;
-    message.ParseFromString( data );
-    
-    deliver( &message, destination );
-}
-    
-void Decoder::deliver( Message* msg, Servant* destination )
-{
-    Message::Type type = msg->type();
-    _destination = destination;
-    
-    switch ( type ) 
-    {
-        case Message::TYPE_NEW:
-        {
-            const Message_New& subMsg = msg->msgnew(); 
-            deliverNew( &subMsg );
-            break;
-        }
-        case Message::TYPE_FIELD:
-        {
-            const Message_Member& subMsg = msg->msgmember(); 
-            deliverField( &subMsg );
-            break;
-        }
-        case Message::TYPE_CALL:
-        {
-            const Message_Member& subMsg = msg->msgmember(); 
-            deliverCall( &subMsg );
-            break;
-        }
-        default:
-            throw co::Exception( "Unsupported message type received" );
-    }
-}
-int Decoder::newInstance( const std::string& typeName )
-{
-    return _destination->newInstance( typeName );
+    const Message_New& msgNew = _message->msg_new();
+    typeName = msgNew.component_type_name();
 }
 
-void Decoder::sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args )
+/* 
+ Starts a decoding state of call/field msg. 
+ The decoding state will only be reset after all params are decoded.
+ */
+void Decoder::beginDecodingCallMsg( co::int32& facetIdx, co::int32& memberIdx )
 {
-    _destination->sendCall( serviceId, method, args );
+    _msgMember = &_message->msg_member();
+    _currentParam = 0;
+    facetIdx = _msgMember->facet_idx();
+    memberIdx = _msgMember->member_idx();
 }
-    
-void Decoder::call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result )
-{
-    _destination->call( serviceId, method, args, result );
-}
-    
-void Decoder::getField( co::int32 serviceId, co::IField* field, co::Any& result )
-{
-    _destination->getField( serviceId, field, result );
-}
-    
-void Decoder::setField( co::int32 serviceId, co::IField* field, const co::Any& value )
-{
-    _destination->setField( serviceId, field, value );
-}
-      
-void Decoder::deliverNew( const Message_New* subMessage )
-{
-    int instanceID = newInstance( subMessage->componenttypename() );
 
-    DataContainer instanceAddress;
-    instanceAddress.set_numeric( instanceID );
-    
-    std::string output = "";
-    instanceAddress.SerializeToString( &output );
-    _binder->reply( output );
-    
-}        
-void Decoder::deliverField( const Message_Member* subMessage )
+void Decoder::getValueParam( co::Any& param, co::IType* descriptor )
 {
-    co::int32 serviceId = subMessage->serviceindex();
-    co::int32 memberIndex = subMessage->memberindex();
-    
-    // TODO: handle call arguments (translate to co::Any)
-    // const DataArgument& argument = call.arguments( 0 );
-    
-    co::IPort* port = _destination->getComponent()->getPorts()[serviceId];
-    co::IInterface* iface = port->getType();
-    
-    co::IMember* member = iface->getMembers()[memberIndex];
-    co::IField* field =  co::cast<co::IField>( member );
-    
-    if( subMessage->hasreturn() ) // getField
-    {
-        co::Any returnValue;
-        getField( serviceId, field, returnValue );
-        
-        Argument returnArg;
-        MessageUtils::anyToPBArg( returnValue, &returnArg );
-        std::string output;
-        returnArg.SerializeToString( &output );
-        _binder->reply( output );
-    }
-    else // setField
-    {
-        co::Any value;
-        const Argument& pbArg = subMessage->arguments( 0 );
-        MessageUtils::PBArgToAny( pbArg, field->getType(), value );
-        setField( serviceId, field, value );
-    }
+    checkIfCallMsg();
+    PBArgToAny( _msgMember->arguments( _currentParam++ ), descriptor, param );
 }
-void Decoder::deliverCall( const Message_Member* subMessage )
+
+void Decoder::getRefParam( co::int32& instanceID, co::int32& facetIdx, RefOwner& owner,
+                 std::string& ownerAddress )
 {
-    co::int32 serviceId = subMessage->serviceindex();
-    co::int32 memberIndex = subMessage->memberindex();
+    checkIfCallMsg();
+    const Ref_Type& refType = _msgMember->arguments( _currentParam++ ).data( 0 ).ref_type();
+    instanceID = refType.instance_id();
+    facetIdx = refType.facet_idx();
     
-    // TODO: handle call arguments (translate to co::Any)
-    // const DataArgument& argument = call.arguments( 0 );
-    
-    co::IPort* port = _destination->getComponent()->getPorts()[serviceId];
-    co::IInterface* iface = port->getType();
-
-    co::IMember* member = iface->getMembers()[memberIndex];
-    co::IMethod* method =  co::cast<co::IMethod>( member );
-    co::Range<co::IParameter* const> params = method->getParameters();
-
-    std::vector<co::Any> anyArgs;
-    google::protobuf::RepeatedPtrField<Argument> pbArgs = subMessage->arguments();
-    google::protobuf::RepeatedPtrField<Argument>::const_iterator it = pbArgs.begin();
-    size_t size = pbArgs.size();
-    anyArgs.resize( size );
-    for( int i = 0; i < size; i++ )
+    switch( refType.owner() )
     {
-        MessageUtils::PBArgToAny( *it, params.getFirst()->getType(), anyArgs[i] );
-        it++;
-        params.popFirst();
-    }
-    
-    if( !subMessage->hasreturn() )
-    {
-        sendCall( serviceId, method, anyArgs );
-    }
-    else
-    {
-        co::Any returnValue;
-        call( serviceId, method, anyArgs, returnValue );
-
-        Argument returnArg;
-        MessageUtils::anyToPBArg( returnValue, &returnArg );
-        std::string output;
-        returnArg.SerializeToString( &output );
-        _binder->reply( output );
+        case Ref_Type::OWNER_LOCAL:
+            owner = RefOwner::LOCAL;
+            return;
+        case Ref_Type::OWNER_RECEIVER:
+            owner = RefOwner::RECEIVER;
+            return;
+        case Ref_Type::OWNER_ANOTHER:
+            owner = RefOwner::ANOTHER;
+            ownerAddress = refType.owner_ip();
+            return;
     }
 }
 
-} // namespace reef
+// ----- Data Container codec ----- //
+void Decoder::decodeData( const std::string& msg, bool& value )
+{
+    Data_Container data;
+    data.ParseFromString( msg );
+    value = data.boolean();
+}
+
+void Decoder::decodeData( const std::string& msg, double& value )
+{
+    Data_Container data;
+    data.ParseFromString( msg );
+    value = data.numeric();
+}
+
+void Decoder::decodeData( const std::string& msg, co::int32& value )
+{
+    Data_Container data;
+    data.ParseFromString( msg );
+    value = static_cast<co::int32>( data.numeric() );
+}
+
+void Decoder::decodeData( const std::string& msg, std::string& value )
+{
+    Data_Container data;
+    data.ParseFromString( msg );
+    value = data.str();
+}
+    
+void Decoder::decodeData( const std::string& msg, co::IType* descriptor, co::Any& value )
+{
+    Argument arg;
+    arg.ParseFromString( msg );
+    PBArgToAny( arg, descriptor, value );
+}
+
+void Decoder::checkIfCallMsg()
+{
+    if( !_msgMember )
+        throw new co::Exception( "Requires a call message being decoded to extract Param" );
+}
+    
+}
