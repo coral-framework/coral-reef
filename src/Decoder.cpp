@@ -141,11 +141,12 @@ Decoder::~Decoder()
 }
     
 // sets the message that will be decoded and return its type and destination
-void Decoder::setMsgForDecoding( const std::string& msg, co::int32& instanceID )
+void Decoder::setMsgForDecoding( const std::string& msg, co::int32& instanceID, bool& hasReturn )
 {
     _message->Clear();
     _message->ParseFromString( msg );
     instanceID = _message->instance_id();
+    hasReturn = _message->has_return();
 }
 
 // if msg type is NEW, then, this function will decode it
@@ -159,7 +160,7 @@ void Decoder::decodeNewInstMsg( std::string& typeName )
  Starts a decoding state of call/field msg. 
  The decoding state will only be reset after all params are decoded.
  */
-void Decoder::beginDecodingCallMsg( co::int32& facetIdx, co::int32& memberIdx )
+void Decoder::beginDecodingCallMsg( co::int32& facetIdx, co::int32& memberIdxn )
 {
     _msgMember = &_message->msg_member();
     _currentParam = 0;

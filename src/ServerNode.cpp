@@ -2,15 +2,16 @@
 
 #include "Decoder.h"
 #include "Servant.h"
-
 #include "network/Connection.h"
+
+#include <co/Exception.h>
 
 #include <iostream>
 #include <map>
 
 namespace reef {
 
-ServerNode::ServerNode()  : _decoder( &_binder )
+ServerNode::ServerNode()
 {
     // empty constructor
 }
@@ -23,22 +24,31 @@ ServerNode::~ServerNode()
 void ServerNode::start( const std::string& address )
 {
     _binder.bind( address );
-	Servant* servant = new Servant( 0 );
-    servant->setServerNode( this );
-    _servants.push_back( servant );
+    
+    // This first instanceID is for the ServerNode
+    _servants.push_back( 0 );
 }
     
 void ServerNode::update()
 {
     if( !_binder.isBound() )
-        return;
+        throw new co::Exception( "The server node must be started" );
         
-	std::string message;
-	if( _binder.receive( message ) )    
-	{
-		// Route the message to the proper servant
-		_decoder.routeAndDeliver( message, _servants );
-	}
+	std::string msg;
+    _binder.receive( msg );
+    
+    co::int32 instanceID;
+    _decoder.setMsgForDecoding( msg, instanceID );
+    
+    if( instanceID > 0 )
+        forwardCall( getServantFor( instanceID ) );
+    else
+    {
+        std::string instanceTypeName;
+        _decoder.decodeNewInstMsg( instanceTypeName );
+        newInstance( instanceTypeName );
+    }
+    
 }
 
 void ServerNode::stop()
@@ -57,7 +67,7 @@ void ServerNode::stop()
     
     // now delete all the servants
     size_t size = _servants.size();
-    for( int i = 0; i < size; i++ )
+    for( int i = 1; i < size; i++ )
     {
         delete static_cast<Servant*>( _servants[i] );
     }
@@ -88,6 +98,13 @@ void ServerNode::closeRemoteReference( co::int32 instanceID )
     
 }
 
+void ServerNode::forwardCall( Servant* servant )
+{
+    co::int32 facetIdx;
+    co::int32 memberIdx;
+    _decoder.beginDecodingCallMsg(<#co::int32 &facetIdx#>, <#co::int32 &memberIdx#>)
+}
+    
 co::int32 ServerNode::getVirtualAddress( const co::IObject* instance )
 {
     VirtualAddresses::iterator it = _vas.find( instance );

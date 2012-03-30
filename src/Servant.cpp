@@ -1,19 +1,18 @@
 #include "Servant.h"
 
 #include <co/IPort.h>
-#include <co/IReflector.h>
 #include <co/IMethod.h>
 #include <co/IMember.h>
+#include <co/IReflector.h>
+#include <co/IParameter.h>
 
 #include <string>
 #include <iostream>
 
-#include "ServerNode.h"
-
 namespace reef
 {
 
-Servant::Servant( co::IObject* object ) : _serverNode( 0 )
+Servant::Servant( co::IObject* object )
 {
     if( object )
     {
@@ -29,12 +28,48 @@ Servant::~Servant()
 
 }
     
-int Servant::newInstance( const std::string& typeName )
+void Servant::onCall( Decoder& decoder, bool hasReturn, co::Any* retValue )
 {
-    assert( _serverNode );
-    return _serverNode->newInstance( typeName );
-}
+    co::int32 facetIdx;
+    co::int32 memberIdx;
+    decoder.beginDecodingCallMsg( facetIdx, memberIdx );
     
+    if( !_openedServices[facetIdx] ) // if already used before access directly
+		onServiceFirstAccess( facetIdx );
+
+    co::IMember* member = _openedInterfaces[facetIdx]->getMembers()[memberIdx];
+    co::MemberKind kind = member->getKind();
+    if( kind == co::MK_METHOD )
+    {
+        onCallMethod( facetIdx, co::cast<co::IMethod>( member ), decoder, retValue );
+    }
+    else if( kind == co::MK_FIELD )
+    {
+        if( hasReturn )
+            onGetField( facetIdx, co::cast<co::IField>( member ), decoder, retValue );
+        else
+            onSetField( facetIdx, co::cast<co::IField>( member ), decoder );
+    }
+}
+
+void Servant::onCallMethod( Decoder& decoder, co::int32 facetIdx, co::IMethod* method, 
+                           co::Any* retValue )
+{
+    std::vector<co::Any> anyArgs;
+    co::Range<co::IParameter* const> params = method->getParameters(); 
+    
+    size_t size = params.getSize();
+    anyArgs.resize( size );
+    for( int i = 0; i < size; i++ )
+    {
+        co::IType* paramType = params[i]->getType();
+        if( paramType->getKind() != co::TK_INTERFACE )
+            decoder.getValueParam( anyArgs[i], paramType );
+        else
+            onRefParam( decoder, anyArgs[i] );
+    }
+
+}
 void Servant::sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args )
 {
 	if( !_openedServices[serviceId] ) // if already used before access directly
@@ -84,6 +119,7 @@ void Servant::onServiceFirstAccess( co::int32 serviceId )
 
 	// saving for easier later access
 	_openedServices[serviceId] = service;
+    _openedInterfaces[serviceId] = itf;
     _openedReflectors[serviceId] = reflector;
 }
     

@@ -472,13 +472,6 @@ class Message_Member : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 member_idx() const;
   inline void set_member_idx(::google::protobuf::uint32 value);
   
-  // required bool has_return = 3;
-  inline bool has_has_return() const;
-  inline void clear_has_return();
-  static const int kHasReturnFieldNumber = 3;
-  inline bool has_return() const;
-  inline void set_has_return(bool value);
-  
   // repeated .reef.Argument arguments = 4;
   inline int arguments_size() const;
   inline void clear_arguments();
@@ -497,18 +490,15 @@ class Message_Member : public ::google::protobuf::Message {
   inline void clear_has_facet_idx();
   inline void set_has_member_idx();
   inline void clear_has_member_idx();
-  inline void set_has_has_return();
-  inline void clear_has_has_return();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint32 facet_idx_;
   ::google::protobuf::uint32 member_idx_;
   ::google::protobuf::RepeatedPtrField< ::reef::Argument > arguments_;
-  bool has_return_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
   
   friend void  protobuf_AddDesc_Message_2eproto();
   friend void protobuf_AssignDesc_Message_2eproto();
@@ -666,18 +656,25 @@ class Message : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 instance_id() const;
   inline void set_instance_id(::google::protobuf::uint32 value);
   
-  // optional .reef.Message_New msg_new = 2;
+  // required bool has_return = 2;
+  inline bool has_has_return() const;
+  inline void clear_has_return();
+  static const int kHasReturnFieldNumber = 2;
+  inline bool has_return() const;
+  inline void set_has_return(bool value);
+  
+  // optional .reef.Message_New msg_new = 3;
   inline bool has_msg_new() const;
   inline void clear_msg_new();
-  static const int kMsgNewFieldNumber = 2;
+  static const int kMsgNewFieldNumber = 3;
   inline const ::reef::Message_New& msg_new() const;
   inline ::reef::Message_New* mutable_msg_new();
   inline ::reef::Message_New* release_msg_new();
   
-  // optional .reef.Message_Member msg_member = 3;
+  // optional .reef.Message_Member msg_member = 4;
   inline bool has_msg_member() const;
   inline void clear_msg_member();
-  static const int kMsgMemberFieldNumber = 3;
+  static const int kMsgMemberFieldNumber = 4;
   inline const ::reef::Message_Member& msg_member() const;
   inline ::reef::Message_Member* mutable_msg_member();
   inline ::reef::Message_Member* release_msg_member();
@@ -686,6 +683,8 @@ class Message : public ::google::protobuf::Message {
  private:
   inline void set_has_instance_id();
   inline void clear_has_instance_id();
+  inline void set_has_has_return();
+  inline void clear_has_has_return();
   inline void set_has_msg_new();
   inline void clear_has_msg_new();
   inline void set_has_msg_member();
@@ -693,12 +692,13 @@ class Message : public ::google::protobuf::Message {
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
+  ::google::protobuf::uint32 instance_id_;
+  bool has_return_;
   ::reef::Message_New* msg_new_;
   ::reef::Message_Member* msg_member_;
-  ::google::protobuf::uint32 instance_id_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
   
   friend void  protobuf_AddDesc_Message_2eproto();
   friend void protobuf_AssignDesc_Message_2eproto();
@@ -1051,28 +1051,6 @@ inline void Message_Member::set_member_idx(::google::protobuf::uint32 value) {
   member_idx_ = value;
 }
 
-// required bool has_return = 3;
-inline bool Message_Member::has_has_return() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void Message_Member::set_has_has_return() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void Message_Member::clear_has_has_return() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void Message_Member::clear_has_return() {
-  has_return_ = false;
-  clear_has_has_return();
-}
-inline bool Message_Member::has_return() const {
-  return has_return_;
-}
-inline void Message_Member::set_has_return(bool value) {
-  set_has_has_return();
-  has_return_ = value;
-}
-
 // repeated .reef.Argument arguments = 4;
 inline int Message_Member::arguments_size() const {
   return arguments_.size();
@@ -1186,15 +1164,37 @@ inline void Message::set_instance_id(::google::protobuf::uint32 value) {
   instance_id_ = value;
 }
 
-// optional .reef.Message_New msg_new = 2;
-inline bool Message::has_msg_new() const {
+// required bool has_return = 2;
+inline bool Message::has_has_return() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void Message::set_has_msg_new() {
+inline void Message::set_has_has_return() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void Message::clear_has_msg_new() {
+inline void Message::clear_has_has_return() {
   _has_bits_[0] &= ~0x00000002u;
+}
+inline void Message::clear_has_return() {
+  has_return_ = false;
+  clear_has_has_return();
+}
+inline bool Message::has_return() const {
+  return has_return_;
+}
+inline void Message::set_has_return(bool value) {
+  set_has_has_return();
+  has_return_ = value;
+}
+
+// optional .reef.Message_New msg_new = 3;
+inline bool Message::has_msg_new() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void Message::set_has_msg_new() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void Message::clear_has_msg_new() {
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline void Message::clear_msg_new() {
   if (msg_new_ != NULL) msg_new_->::reef::Message_New::Clear();
@@ -1215,15 +1215,15 @@ inline ::reef::Message_New* Message::release_msg_new() {
   return temp;
 }
 
-// optional .reef.Message_Member msg_member = 3;
+// optional .reef.Message_Member msg_member = 4;
 inline bool Message::has_msg_member() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
+  return (_has_bits_[0] & 0x00000008u) != 0;
 }
 inline void Message::set_has_msg_member() {
-  _has_bits_[0] |= 0x00000004u;
+  _has_bits_[0] |= 0x00000008u;
 }
 inline void Message::clear_has_msg_member() {
-  _has_bits_[0] &= ~0x00000004u;
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline void Message::clear_msg_member() {
   if (msg_member_ != NULL) msg_member_->::reef::Message_Member::Clear();

@@ -99,10 +99,9 @@ void protobuf_AssignDesc_Message_2eproto() {
       sizeof(Ref_Type));
   Ref_Type_Owner_descriptor_ = Ref_Type_descriptor_->enum_type(0);
   Message_Member_descriptor_ = file->message_type(3);
-  static const int Message_Member_offsets_[4] = {
+  static const int Message_Member_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message_Member, facet_idx_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message_Member, member_idx_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message_Member, has_return_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message_Member, arguments_),
   };
   Message_Member_reflection_ =
@@ -132,8 +131,9 @@ void protobuf_AssignDesc_Message_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Message_New));
   Message_descriptor_ = file->message_type(5);
-  static const int Message_offsets_[3] = {
+  static const int Message_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, instance_id_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, has_return_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, msg_new_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, msg_member_),
   };
@@ -206,14 +206,14 @@ void protobuf_AddDesc_Message_2eproto() {
     "eef.Ref_Type.Owner\022\023\n\013instance_id\030\002 \002(\r\022"
     "\021\n\tfacet_idx\030\003 \002(\r\022\020\n\010owner_ip\030\004 \001(\t\"\?\n\005"
     "Owner\022\017\n\013OWNER_LOCAL\020\000\022\022\n\016OWNER_RECEIVER"
-    "\020\001\022\021\n\rOWNER_ANOTHER\020\002\"n\n\016Message_Member\022"
-    "\021\n\tfacet_idx\030\001 \002(\r\022\022\n\nmember_idx\030\002 \002(\r\022\022"
-    "\n\nhas_return\030\003 \002(\010\022!\n\targuments\030\004 \003(\0132\016."
-    "reef.Argument\"*\n\013Message_New\022\033\n\023componen"
-    "t_type_name\030\001 \002(\t\"l\n\007Message\022\023\n\013instance"
-    "_id\030\001 \002(\r\022\"\n\007msg_new\030\002 \001(\0132\021.reef.Messag"
-    "e_New\022(\n\nmsg_member\030\003 \001(\0132\024.reef.Message"
-    "_Member", 607);
+    "\020\001\022\021\n\rOWNER_ANOTHER\020\002\"Z\n\016Message_Member\022"
+    "\021\n\tfacet_idx\030\001 \002(\r\022\022\n\nmember_idx\030\002 \002(\r\022!"
+    "\n\targuments\030\004 \003(\0132\016.reef.Argument\"*\n\013Mes"
+    "sage_New\022\033\n\023component_type_name\030\001 \002(\t\"\200\001"
+    "\n\007Message\022\023\n\013instance_id\030\001 \002(\r\022\022\n\nhas_re"
+    "turn\030\002 \002(\010\022\"\n\007msg_new\030\003 \001(\0132\021.reef.Messa"
+    "ge_New\022(\n\nmsg_member\030\004 \001(\0132\024.reef.Messag"
+    "e_Member", 608);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "Message.proto", &protobuf_RegisterTypes);
   Data_Container::default_instance_ = new Data_Container();
@@ -1171,7 +1171,6 @@ void Ref_Type::Swap(Ref_Type* other) {
 #ifndef _MSC_VER
 const int Message_Member::kFacetIdxFieldNumber;
 const int Message_Member::kMemberIdxFieldNumber;
-const int Message_Member::kHasReturnFieldNumber;
 const int Message_Member::kArgumentsFieldNumber;
 #endif  // !_MSC_VER
 
@@ -1193,7 +1192,6 @@ void Message_Member::SharedCtor() {
   _cached_size_ = 0;
   facet_idx_ = 0u;
   member_idx_ = 0u;
-  has_return_ = false;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1230,7 +1228,6 @@ void Message_Member::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     facet_idx_ = 0u;
     member_idx_ = 0u;
-    has_return_ = false;
   }
   arguments_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -1267,22 +1264,6 @@ bool Message_Member::MergePartialFromCodedStream(
                    ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
                  input, &member_idx_)));
           set_has_member_idx();
-        } else {
-          goto handle_uninterpreted;
-        }
-        if (input->ExpectTag(24)) goto parse_has_return;
-        break;
-      }
-      
-      // required bool has_return = 3;
-      case 3: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
-         parse_has_return:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
-                 input, &has_return_)));
-          set_has_has_return();
         } else {
           goto handle_uninterpreted;
         }
@@ -1333,11 +1314,6 @@ void Message_Member::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(2, this->member_idx(), output);
   }
   
-  // required bool has_return = 3;
-  if (has_has_return()) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(3, this->has_return(), output);
-  }
-  
   // repeated .reef.Argument arguments = 4;
   for (int i = 0; i < this->arguments_size(); i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
@@ -1360,11 +1336,6 @@ void Message_Member::SerializeWithCachedSizes(
   // required uint32 member_idx = 2;
   if (has_member_idx()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(2, this->member_idx(), target);
-  }
-  
-  // required bool has_return = 3;
-  if (has_has_return()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(3, this->has_return(), target);
   }
   
   // repeated .reef.Argument arguments = 4;
@@ -1397,11 +1368,6 @@ int Message_Member::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::UInt32Size(
           this->member_idx());
-    }
-    
-    // required bool has_return = 3;
-    if (has_has_return()) {
-      total_size += 1 + 1;
     }
     
   }
@@ -1446,9 +1412,6 @@ void Message_Member::MergeFrom(const Message_Member& from) {
     if (from.has_member_idx()) {
       set_member_idx(from.member_idx());
     }
-    if (from.has_has_return()) {
-      set_has_return(from.has_return());
-    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -1466,7 +1429,7 @@ void Message_Member::CopyFrom(const Message_Member& from) {
 }
 
 bool Message_Member::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000007) != 0x00000007) return false;
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
   
   for (int i = 0; i < arguments_size(); i++) {
     if (!this->arguments(i).IsInitialized()) return false;
@@ -1478,7 +1441,6 @@ void Message_Member::Swap(Message_Member* other) {
   if (other != this) {
     std::swap(facet_idx_, other->facet_idx_);
     std::swap(member_idx_, other->member_idx_);
-    std::swap(has_return_, other->has_return_);
     arguments_.Swap(&other->arguments_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
@@ -1724,6 +1686,7 @@ void Message_New::Swap(Message_New* other) {
 
 #ifndef _MSC_VER
 const int Message::kInstanceIdFieldNumber;
+const int Message::kHasReturnFieldNumber;
 const int Message::kMsgNewFieldNumber;
 const int Message::kMsgMemberFieldNumber;
 #endif  // !_MSC_VER
@@ -1747,6 +1710,7 @@ Message::Message(const Message& from)
 void Message::SharedCtor() {
   _cached_size_ = 0;
   instance_id_ = 0u;
+  has_return_ = false;
   msg_new_ = NULL;
   msg_member_ = NULL;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -1786,6 +1750,7 @@ Message* Message::New() const {
 void Message::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     instance_id_ = 0u;
+    has_return_ = false;
     if (has_msg_new()) {
       if (msg_new_ != NULL) msg_new_->::reef::Message_New::Clear();
     }
@@ -1814,12 +1779,28 @@ bool Message::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(18)) goto parse_msg_new;
+        if (input->ExpectTag(16)) goto parse_has_return;
         break;
       }
       
-      // optional .reef.Message_New msg_new = 2;
+      // required bool has_return = 2;
       case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_has_return:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &has_return_)));
+          set_has_has_return();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(26)) goto parse_msg_new;
+        break;
+      }
+      
+      // optional .reef.Message_New msg_new = 3;
+      case 3: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
          parse_msg_new:
@@ -1828,12 +1809,12 @@ bool Message::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(26)) goto parse_msg_member;
+        if (input->ExpectTag(34)) goto parse_msg_member;
         break;
       }
       
-      // optional .reef.Message_Member msg_member = 3;
-      case 3: {
+      // optional .reef.Message_Member msg_member = 4;
+      case 4: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
          parse_msg_member:
@@ -1869,16 +1850,21 @@ void Message::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->instance_id(), output);
   }
   
-  // optional .reef.Message_New msg_new = 2;
-  if (has_msg_new()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, this->msg_new(), output);
+  // required bool has_return = 2;
+  if (has_has_return()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(2, this->has_return(), output);
   }
   
-  // optional .reef.Message_Member msg_member = 3;
+  // optional .reef.Message_New msg_new = 3;
+  if (has_msg_new()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      3, this->msg_new(), output);
+  }
+  
+  // optional .reef.Message_Member msg_member = 4;
   if (has_msg_member()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3, this->msg_member(), output);
+      4, this->msg_member(), output);
   }
   
   if (!unknown_fields().empty()) {
@@ -1894,18 +1880,23 @@ void Message::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(1, this->instance_id(), target);
   }
   
-  // optional .reef.Message_New msg_new = 2;
+  // required bool has_return = 2;
+  if (has_has_return()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(2, this->has_return(), target);
+  }
+  
+  // optional .reef.Message_New msg_new = 3;
   if (has_msg_new()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
-        2, this->msg_new(), target);
+        3, this->msg_new(), target);
   }
   
-  // optional .reef.Message_Member msg_member = 3;
+  // optional .reef.Message_Member msg_member = 4;
   if (has_msg_member()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
-        3, this->msg_member(), target);
+        4, this->msg_member(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -1926,14 +1917,19 @@ int Message::ByteSize() const {
           this->instance_id());
     }
     
-    // optional .reef.Message_New msg_new = 2;
+    // required bool has_return = 2;
+    if (has_has_return()) {
+      total_size += 1 + 1;
+    }
+    
+    // optional .reef.Message_New msg_new = 3;
     if (has_msg_new()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
           this->msg_new());
     }
     
-    // optional .reef.Message_Member msg_member = 3;
+    // optional .reef.Message_Member msg_member = 4;
     if (has_msg_member()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
@@ -1970,6 +1966,9 @@ void Message::MergeFrom(const Message& from) {
     if (from.has_instance_id()) {
       set_instance_id(from.instance_id());
     }
+    if (from.has_has_return()) {
+      set_has_return(from.has_return());
+    }
     if (from.has_msg_new()) {
       mutable_msg_new()->::reef::Message_New::MergeFrom(from.msg_new());
     }
@@ -1993,7 +1992,7 @@ void Message::CopyFrom(const Message& from) {
 }
 
 bool Message::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
   
   if (has_msg_new()) {
     if (!this->msg_new().IsInitialized()) return false;
@@ -2007,6 +2006,7 @@ bool Message::IsInitialized() const {
 void Message::Swap(Message* other) {
   if (other != this) {
     std::swap(instance_id_, other->instance_id_);
+    std::swap(has_return_, other->has_return_);
     std::swap(msg_new_, other->msg_new_);
     std::swap(msg_member_, other->msg_member_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);

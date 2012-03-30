@@ -163,6 +163,8 @@ Encoder::~Encoder()
 void Encoder::encodeNewInstMsg( const std::string& typeName, std::string& msg )
 {
     _message->set_instance_id( 0 ); // 0 is always the node channel
+    _message->set_has_return( true );
+
     
 	Message_New* msgNew = _message->mutable_msg_new();
     msgNew->set_component_type_name( typeName );
@@ -178,9 +180,9 @@ void Encoder::beginEncodingCallMsg( co::int32 instanceID, co::int32 facetIdx, co
         throw new co::Exception( "A call msg can't have an instanceID of 0" );
     
     _message->set_instance_id( instanceID );
+    _message->set_has_return( hasReturn );
     
     _msgMember = _message->mutable_msg_member();
-    _msgMember->set_has_return( hasReturn );
     _msgMember->set_facet_idx( facetIdx );
     _msgMember->set_member_idx( memberIdx );
 }

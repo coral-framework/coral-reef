@@ -31,7 +31,7 @@ public:
        Sets a msg for decoding, if instanceID == 0 then it is a New Instance message, 
      else it is a Call msg. Call the appropriate method for decoding each case as explained below. 
      */
-    void setMsgForDecoding( const std::string& msg, co::int32& instanceID );
+    void setMsgForDecoding( const std::string& msg, co::int32& instanceID, bool& hasReturn );
     
     // if msg type is NEW, then, this function will decode it
     void decodeNewInstMsg( std::string& typeName );

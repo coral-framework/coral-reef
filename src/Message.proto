@@ -33,7 +33,6 @@ message Message_Member
 {
 	required uint32 facet_idx = 1;
 	required uint32 member_idx = 2;
-	required bool has_return = 3;
 	repeated Argument arguments = 4;
 }
 
@@ -46,10 +45,12 @@ message Message
 {
 	required uint32 instance_id = 1;
 	
+	required bool has_return = 2;
+	
 	// If instance_id == 0 it is a New instance msg, 
-	optional Message_New msg_new = 2;
+	optional Message_New msg_new = 3;
 	
 	// If instance_id != 0 then it is a call msg
-	optional Message_Member msg_member = 3;
+	optional Message_Member msg_member = 4;
 }
 

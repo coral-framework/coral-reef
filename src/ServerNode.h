@@ -2,6 +2,7 @@
 #include <map>
 
 #include "Decoder.h"
+#include "Encoder.h"
 #include "network/Connection.h"
 #include <stack>
 
@@ -22,8 +23,6 @@ public:
 	void update();
 
     void stop();
-       
-    co::int32 newInstance( const std::string& typeName );
 
     /*
      Makes an instance available for remote usage. Which means: creating a 
@@ -39,6 +38,12 @@ public:
     void closeRemoteReference( co::int32 instanceID );
     
 private:
+    // An incoming msg results in a call to one of these two functions
+    void forwardCall( Servant* servant );
+    co::int32 newInstance( const std::string& typeName );
+    
+    inline Servant* getServantFor( co::int32 instanceID ) { return _servants[instanceID]; }
+    
     void releaseInstance( co::int32 instanceID );
     
      // Creates a servant for the instance and returns its VA
@@ -52,6 +57,7 @@ private:
 private:
 	Binder _binder;
     Decoder _decoder;
+    Encoder _encoder;
 
     // the servants and the number of remote references for it
     std::vector<Servant*> _servants;
