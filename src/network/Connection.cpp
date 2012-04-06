@@ -20,6 +20,7 @@ Connecter* Connecter::getOrOpenConnection( const std::string& address )
     }
     
     Connecter* connecter = new Connecter();
+    _connecters.insert( std::pair<std::string, Connecter*>( address, connecter ) );
     connecter->connect( address );
     
     return connecter;

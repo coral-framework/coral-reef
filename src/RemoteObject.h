@@ -18,14 +18,11 @@ class IServerNode;
 class RemoteObject : public RemoteObject_Base
 {
 public:
-    RemoteObject();
-    RemoteObject( co::IComponent* component, const std::string& address );
+    // Gets or creates a remote object pointing to an existing instance. 
+    static RemoteObject* getOrCreateRemoteObject( co::IComponent* component, Connecter* connecter,
+                                             co::int32 instanceID = -1 );
+
     virtual ~RemoteObject();
-    
-    void setComponent( co::IComponent* component );
-    
-    inline void setServerNode( IServerNode* serverNode ) 
-        { _serverNode = serverNode; }
     
     // IComponent
     co::IComponent* getComponent();
@@ -47,6 +44,9 @@ public:
     inline bool isLocalObject( void* obj ) { return *reinterpret_cast<void**>( obj ) != _classPtr; }
     
 private:
+    RemoteObject();
+    RemoteObject( co::IComponent* component, Connecter* connecter, co::int32 instanceID );
+    
     /* 
      Treats all possible cases of a TK_INTERFACE param in a call/field msg. 
      See Reference Values page on reef's wiki for further info.
@@ -54,6 +54,9 @@ private:
     void onInterfaceParam( co::IService* param );
     
     void fetchReturnValue( co::IType* descriptor, co::Any& returnValue );
+    
+    void setComponent( co::IComponent* component );
+
 private:
     void* _classPtr;
     
@@ -68,7 +71,7 @@ private:
     
     co::int32 _numFacets;
     co::IService** _facets;
-    co::IComponent* _componentType;
+    co::IComponent* _component;
 };
 
 } // namespace reef

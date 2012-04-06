@@ -129,7 +129,28 @@ void PBArgToAny( const Argument& arg, co::IType* descriptor, co::Any& any )
             assert( false );
     }
 }
+    
+void Message_Type2MsgType( Message_Type message_type, Decoder::MsgType& msgType )
+{
+    switch( message_type )
+    {
+        case Message::MSG_NEW_INST:
+            msgType = Decoder::MsgType::NEW_INST;
+            break;
+        case Message::MSG_ACCESS_INST:
+            msgType = Decoder::MsgType::ACCESS_INST;
+            break;
+        case Message::MSG_CALL:
+            msgType = Decoder::MsgType::CALL;
+            break;
+        case Message::MSG_FIELD:
+            msgType = Decoder::MsgType::FIELD;
+            break;
+    }
+}
+    
 
+    
 Decoder::Decoder() : _currentParam( 0 )
 {
     _message = new Message();
@@ -141,26 +162,36 @@ Decoder::~Decoder()
 }
     
 // sets the message that will be decoded and return its type and destination
-void Decoder::setMsgForDecoding( const std::string& msg, co::int32& instanceID, bool& hasReturn )
+void Decoder::setMsgForDecoding( const std::string& msg, MsgType& type, co::int32& instanceID, 
+                                bool& hasReturn )
 {
     _message->Clear();
     _message->ParseFromString( msg );
     instanceID = _message->instance_id();
     hasReturn = _message->has_return();
+    Message_Type2MsgType( _message->msg_type(), type );
 }
 
 // if msg type is NEW, then, this function will decode it
 void Decoder::decodeNewInstMsg( std::string& typeName )
 {
-    const Message_New& msgNew = _message->msg_new();
-    typeName = msgNew.component_type_name();
+    const Message_New_Inst& msgNewInst = _message->msg_new_inst();
+    typeName = msgNewInst.new_instance_type();
 }
 
+void Decoder::decodeAccessInstMsg( std::string& refererIP, co::int32& instanceID, bool& increment )
+{
+    const Message_Acc_Inst& msgAccessInst = _message->msg_acc_inst();
+    // refererIP = msgAccessInst.referer_ip();
+    instanceID = msgAccessInst.instance_id();
+    increment = msgAccessInst.increment();
+}
+    
 /* 
  Starts a decoding state of call/field msg. 
  The decoding state will only be reset after all params are decoded.
  */
-void Decoder::beginDecodingCallMsg( co::int32& facetIdx, co::int32& memberIdxn )
+void Decoder::beginDecodingCallMsg( co::int32& facetIdx, co::int32& memberIdx )
 {
     _msgMember = &_message->msg_member();
     _currentParam = 0;

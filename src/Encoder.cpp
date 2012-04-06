@@ -166,13 +166,28 @@ void Encoder::encodeNewInstMsg( const std::string& typeName, std::string& msg )
     _message->set_has_return( true );
 
     
-	Message_New* msgNew = _message->mutable_msg_new();
-    msgNew->set_component_type_name( typeName );
+	Message_New_Inst* msgNewInst = _message->mutable_msg_new_inst();
+    msgNewInst->set_new_instance_type( typeName );
     
     _message->SerializeToString( &msg );
     _message->Clear();
 }
 
+void Encoder::encodeAccessInstMsg( co::int32 instanceID, bool increment, std::string& msg )
+{
+    _message->set_instance_id( 0 ); // 0 is always the node channel
+    _message->set_has_return( false );
+    
+    
+	Message_Acc_Inst* msgAccInst = _message->mutable_msg_acc_inst();
+    //TODO: set referer as self
+    msgAccInst->set_increment( increment );
+    msgAccInst->set_instance_id( instanceID );
+    
+    _message->SerializeToString( &msg );
+    _message->Clear();
+}
+    
 void Encoder::beginEncodingCallMsg( co::int32 instanceID, co::int32 facetIdx, co::int32 memberIdx,
                                    bool hasReturn )
 {

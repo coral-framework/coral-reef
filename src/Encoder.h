@@ -28,7 +28,7 @@ public:
     
     // ----- New Instance ----- //
     void encodeNewInstMsg( const std::string& typeName, std::string& msg );
-    
+    void encodeAccessInstMsg( co::int32 instanceID, bool increment, std::string& msg );
     
     /*
      Encoder functions for Call/Field msgs. As these messages require different amounts of 

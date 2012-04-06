@@ -10,28 +10,74 @@
 #include <co/IReflector.h>
 #include <co/IParameter.h>
 
+#include <map>
+
 namespace reef {
+
+class Host
+{
+public:
+    inline void addInstance( RemoteObject* remoteObj, co::int32 instanceID )
+    {
+        _instances.insert( std::pair<co::int32, RemoteObject*>( instanceID, remoteObj ) );
+    }
+    
+    inline RemoteObject* getInstance( co::int32 instanceID )
+    {
+        InstanceMap::iterator it = _instances.find( instanceID );
+        return it != _instances.end() ? it->second : 0;
+    }
+    
+    inline void removeInstance( co::int32 instanceID )
+    {
+        InstanceMap::iterator it = _instances.find( instanceID );
+        _instances.erase( it );
+    }
+private:
+    typedef std::map<co::int32, RemoteObject*> InstanceMap;
+    InstanceMap _instances;
+};
+
+typedef std::map<Connecter*, Host*> Hosts;
+static Hosts _hosts;
+    
+RemoteObject* RemoteObject::getOrCreateRemoteObject( co::IComponent* component,
+                                            Connecter* connecter, co::int32 instanceID )
+{
+    Host* host = 0;
+    RemoteObject* retValue = 0;
+    Hosts::iterator it = _hosts.find( connecter );
+    if( it != _hosts.end() )
+    {
+        host = it->second;
+        retValue = host->getInstance( instanceID );
+        
+        if( retValue )
+            return retValue;
+    }
+    else
+    {
+        host = new Host();
+        _hosts.insert( std::pair<Connecter*, Host*>( connecter, host ) );
+    }
+    
+    retValue = new RemoteObject( component, connecter, instanceID );
+    
+    return retValue;
+}
     
 RemoteObject::RemoteObject()
 {
 }
     
-RemoteObject::RemoteObject( co::IComponent* component, const std::string& address ) : 
-        _numFacets( 0 )
+RemoteObject::RemoteObject( co::IComponent* component, Connecter* connecter, co::int32 instanceID ) :
+    _connecter( connecter ), _numFacets( 0 )
 {
     _classPtr = *reinterpret_cast<void**>( this );
     setComponent( component );
-    _connecter = Connecter::getOrOpenConnection( address );
-    
-    std::string msg;
-    _encoder.encodeNewInstMsg( component->getFullName(), msg );
-    _connecter->send( msg );
-    
-    _connecter->receiveReply( msg );
-
-    _decoder.decodeData( msg, _instanceID );
+    _instanceID = instanceID;
 }
-
+    
 RemoteObject::~RemoteObject()
 {    
     for( int i = 0; i < _numFacets; i++ )
@@ -43,10 +89,10 @@ RemoteObject::~RemoteObject()
     
 void RemoteObject::setComponent( co::IComponent* component )
 {    
-	_componentType = component;
+	_component = component;
     
 	// create proxy interfaces for our facets
-	co::Range<co::IPort* const> facets = _componentType->getFacets();
+	co::Range<co::IPort* const> facets = _component->getFacets();
 	int numFacets = static_cast<int>( facets.getSize() );
     _facets = new co::IService*[numFacets];
 	for( int i = 0; i < numFacets; ++i )
@@ -57,13 +103,13 @@ void RemoteObject::setComponent( co::IComponent* component )
 
 co::IComponent* RemoteObject::getComponent()
 {
-    return _componentType;
+    return _component;
 }
 
 co::IService* RemoteObject::getServiceAt( co::IPort* port )
 {
     co::ICompositeType* owner = port->getOwner();
-    if( owner == _componentType )
+    if( owner == _component )
     {
         int portIndex = port->getIndex();
         assert( portIndex <= _numFacets );

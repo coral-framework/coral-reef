@@ -20,14 +20,8 @@ public:
     
      ~Servant();
     
-    // Expects a decoder in a before-decoding-a-call-msg state (see Decoder). 
-    void onCall( Decoder& decoder, co::Any& retValue );
-    
-    // IChannel methods
-    virtual void sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args );
-    virtual void call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result );
-    virtual void getField( co::int32 serviceId, co::IField* field, co::Any& result );
-    virtual void setField( co::int32 serviceId, co::IField* field, const co::Any& value );
+    // Expects a decoder in a before-decoding-a-call-msg state (see Decoder).
+    void onCallOrField( Decoder& decoder, co::Any* retValue = 0 );
     
     inline co::IComponent* getComponent() {   return _object->getComponent(); }
     
@@ -37,6 +31,14 @@ protected:
    
 private:
 
+    // Called by onCall. Extract the parameters from decoder and call method via reflector
+    void onMethod( Decoder& decoder, co::int32 facetIdx, co::IMethod* method, 
+                  co::Any* retValue = 0 );
+    
+    void onField( Decoder& decoder, co::int32 facetIdx, co::IField* field, co::Any* retValue = 0 );
+    
+    void onGetParam( Decoder& decoder, co::IType* paramType, co::Any& param );
+    
     co::int32 _remoteRefCount;
     
     // initializes _openedService's and Reflector's index for the accessed service

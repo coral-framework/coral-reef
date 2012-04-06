@@ -23,6 +23,13 @@ public:
         ANOTHER
     };
     
+    enum MsgType
+    {
+        NEW_INST,
+        ACCESS_INST,
+        CALL,
+        FIELD
+    };
     
     Decoder();
     ~Decoder();
@@ -31,10 +38,14 @@ public:
        Sets a msg for decoding, if instanceID == 0 then it is a New Instance message, 
      else it is a Call msg. Call the appropriate method for decoding each case as explained below. 
      */
-    void setMsgForDecoding( const std::string& msg, co::int32& instanceID, bool& hasReturn );
+    void setMsgForDecoding( const std::string& msg, MsgType& type, co::int32& instanceID,
+                           bool& hasReturn );
     
     // if msg type is NEW, then, this function will decode it
     void decodeNewInstMsg( std::string& typeName );
+    
+    // decodes message of type ACCESS_INST
+    void decodeAccessInstMsg( std::string& refererIP, co::int32& instanceID, bool& increment );
     
     /* 
      Starts a decoding state of call/field msg. 

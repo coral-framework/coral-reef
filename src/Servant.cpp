@@ -1,6 +1,7 @@
 #include "Servant.h"
 
 #include <co/IPort.h>
+#include <co/IField.h>
 #include <co/IMethod.h>
 #include <co/IMember.h>
 #include <co/IReflector.h>
@@ -28,7 +29,7 @@ Servant::~Servant()
 
 }
     
-void Servant::onCall( Decoder& decoder, bool hasReturn, co::Any* retValue )
+void Servant::onCallOrField( Decoder& decoder, co::Any* retValue )
 {
     co::int32 facetIdx;
     co::int32 memberIdx;
@@ -39,71 +40,81 @@ void Servant::onCall( Decoder& decoder, bool hasReturn, co::Any* retValue )
 
     co::IMember* member = _openedInterfaces[facetIdx]->getMembers()[memberIdx];
     co::MemberKind kind = member->getKind();
+    
     if( kind == co::MK_METHOD )
     {
-        onCallMethod( facetIdx, co::cast<co::IMethod>( member ), decoder, retValue );
+        onMethod( decoder, facetIdx, co::cast<co::IMethod>( member ), retValue );
     }
     else if( kind == co::MK_FIELD )
     {
-        if( hasReturn )
-            onGetField( facetIdx, co::cast<co::IField>( member ), decoder, retValue );
-        else
-            onSetField( facetIdx, co::cast<co::IField>( member ), decoder );
+        onField( decoder, facetIdx, co::cast<co::IField>( member ), retValue );
     }
 }
 
-void Servant::onCallMethod( Decoder& decoder, co::int32 facetIdx, co::IMethod* method, 
+void Servant::onMethod( Decoder& decoder, co::int32 facetIdx, co::IMethod* method, 
                            co::Any* retValue )
 {
-    std::vector<co::Any> anyArgs;
+    std::vector<co::Any> args;
     co::Range<co::IParameter* const> params = method->getParameters(); 
     
     size_t size = params.getSize();
-    anyArgs.resize( size );
+    args.resize( size );
     for( int i = 0; i < size; i++ )
     {
-        co::IType* paramType = params[i]->getType();
-        if( paramType->getKind() != co::TK_INTERFACE )
-            decoder.getValueParam( anyArgs[i], paramType );
-        else
-            onRefParam( decoder, anyArgs[i] );
+        onGetParam( decoder, params[i]->getType(), args[i] );
     }
 
+    if( !retValue )
+    {
+        co::Any dummy;
+        _openedReflectors[facetIdx]->invoke( _openedServices[facetIdx], method, args, dummy );
+    }
+    else
+    {
+        _openedReflectors[facetIdx]->invoke( _openedServices[facetIdx], method, args, *retValue );
+    }
 }
-void Servant::sendCall( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args )
+    
+void Servant::onField( Decoder& decoder, co::int32 facetIdx, co::IField* field, co::Any* retValue )
 {
-	if( !_openedServices[serviceId] ) // if already used before access directly
-		onServiceFirstAccess( serviceId );
+    if( !retValue )
+    {
+        co::Any value;
+        onGetParam( decoder, field->getType(), value );
     
-    co::Any dummy;
-		
-	_openedReflectors[serviceId]->invoke( _openedServices[serviceId], method, args, dummy );
+        _openedReflectors[facetIdx]->setField( _openedServices[facetIdx], field, value );
+    }
+    else
+    {
+        _openedReflectors[facetIdx]->setField( _openedServices[facetIdx], field, retValue );
+    }
 }
-    
-void Servant::call( co::int32 serviceId, co::IMethod* method, co::Range<co::Any const> args, co::Any& result )
+ 
+void Servant::onGetParam( Decoder& decoder, co::IType* paramType, co::Any& param )
 {
-    if( !_openedServices[serviceId] ) // if already used before access directly
-		onServiceFirstAccess( serviceId );
-		
-	_openedReflectors[serviceId]->invoke( _openedServices[serviceId], method, args, result );		
+    if( paramType->getKind() != co::TK_INTERFACE )
+    {
+        decoder.getValueParam( param, paramType );
+        return;
+    }
+    
+    co::int32 instanceID;
+    co::int32 facetIdx;
+    Decoder::RefOwner owner;
+    std::string ownerAddress;
+    
+    decoder.getRefParam( instanceID, facetIdx, owner, ownerAddress );
+    
+    switch( owner )
+    {
+        case Decoder::RefOwner::LOCAL:
+            
+        case Decoder::RefOwner::RECEIVER:
+        case Decoder::RefOwner::ANOTHER:
+            
+    }
 }
     
-void Servant::getField( co::int32 serviceId, co::IField* field, co::Any& result )
-{
-    if( !_openedServices[serviceId] ) // if already used before access directly
-		onServiceFirstAccess( serviceId );
-    
-	_openedReflectors[serviceId]->getField( _openedServices[serviceId], field, result );
-}
-    
-void Servant::setField( co::int32 serviceId, co::IField* field, const co::Any& value )
-{
-    if( !_openedServices[serviceId] ) // if already used before access directly
-		onServiceFirstAccess( serviceId );
-    
-	_openedReflectors[serviceId]->setField( _openedServices[serviceId], field, value );
-}
-
 void Servant::onServiceFirstAccess( co::int32 serviceId )
 {
 	co::Range<co::IPort* const> ports = _object->getComponent()->getFacets();

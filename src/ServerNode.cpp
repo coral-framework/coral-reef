@@ -37,18 +37,7 @@ void ServerNode::update()
 	std::string msg;
     _binder.receive( msg );
     
-    co::int32 instanceID;
-    _decoder.setMsgForDecoding( msg, instanceID );
-    
-    if( instanceID > 0 )
-        forwardCall( getServantFor( instanceID ) );
-    else
-    {
-        std::string instanceTypeName;
-        _decoder.decodeNewInstMsg( instanceTypeName );
-        newInstance( instanceTypeName );
-    }
-    
+    dispatchMessage( msg );
 }
 
 void ServerNode::stop()
@@ -73,39 +62,93 @@ void ServerNode::stop()
     }
 }
 
-co::int32 ServerNode::newInstance( const std::string& typeName ) 
+void ServerNode::dispatchMessage( const std::string& msg )
 {
-	co::IObject* instance = co::newInstance( typeName );
-
-    return publishInstance( instance );        
+    co::int32 destInstanceID;
+    Decoder::MsgType type;
+    bool hasReturn;
+    _decoder.setMsgForDecoding( msg, type, destInstanceID, hasReturn );
+    
+    switch( type )
+    {
+        case Decoder::MsgType::NEW_INST:
+            onNewInstMsg();
+            break;
+        case Decoder::MsgType::ACCESS_INST:
+            onAccessInstMsg();
+            break;
+        default: // the message isn't destined to the ServerNode. Pass to the appropriate servant. 
+            onMsgForServant( destInstanceID, hasReturn );
+    }  
 }
     
-co::int32 ServerNode::openRemoteReference( co::IObject* instance )
+void ServerNode::onNewInstMsg() 
 {
-    co::int32 va = getVirtualAddress( instance );
-    if( va != -1 )
-        _remoteRefCounting[va]++;
+    std::string instanceTypeName;
+    _decoder.decodeNewInstMsg( instanceTypeName );
+    
+	co::IObject* instance = co::newInstance( instanceTypeName );
+    co::int32 instanceID = startRemoteRefCount( instance );
+    
+    // Encode the new instanceID as reply message
+    std::string msg;
+    _encoder.encodeData( instanceID, msg );
+    
+    // reply it to the client
+    _binder.reply( msg );
+}
+    
+void ServerNode::onAccessInstMsg()
+{
+    std::string refererIP;
+    co::int32 instanceID;
+    bool increment;            
+    _decoder.decodeAccessInstMsg( refererIP, instanceID, increment );
+    openRemoteReference( instanceID );    
+}
+  
+void ServerNode::onMsgForServant( co::int32 instanceID, bool hasReturn )
+{
+    Servant* servant = getServantFor( instanceID );
+    if( !hasReturn )
+    {
+        servant->onCallOrField( _decoder );
+        return;
+    }
+    
+    co::Any retValue;
+    servant->onCallOrField( _decoder, &retValue );
+    
+    std::string msg;
+    _encoder.encodeData( retValue, msg );
+    
+    _binder.reply( msg );
+}
+
+co::int32 ServerNode::publishInstance( co::IObject* instance )
+{
+    co::int32 instanceID = getInstanceID( instance );
+    if( instanceID != -1 )
+        openRemoteReference( instanceID ); // TODO set referer
     else
-        va = publishInstance( instance );
+        instanceID = startRemoteRefCount( instance );
     
-    return va;
+    return instanceID;
 }
 
+void ServerNode::openRemoteReference( co::int32 instanceID )
+{
+    _remoteRefCounting[instanceID]++;
+}
+    
 void ServerNode::closeRemoteReference( co::int32 instanceID )
 {
     if( --_remoteRefCounting[instanceID] < 1 )
         releaseInstance( instanceID );
     
 }
-
-void ServerNode::forwardCall( Servant* servant )
-{
-    co::int32 facetIdx;
-    co::int32 memberIdx;
-    _decoder.beginDecodingCallMsg(<#co::int32 &facetIdx#>, <#co::int32 &memberIdx#>)
-}
     
-co::int32 ServerNode::getVirtualAddress( const co::IObject* instance )
+co::int32 ServerNode::getInstanceID( const co::IObject* instance )
 {
     VirtualAddresses::iterator it = _vas.find( instance );
     if( it != _vas.end() )
@@ -131,17 +174,16 @@ co::int32 ServerNode::newVirtualAddress()
     
 }
    
-co::int32 ServerNode::publishInstance( co::IObject* instance )
+co::int32 ServerNode::startRemoteRefCount( co::IObject* instance )
 {
     co::int32 newServantId = newVirtualAddress();
     _vas.insert( objToAddress( instance, newServantId ) );
     
     _servants[newServantId] = new Servant( instance );
-    _remoteRefCounting[newServantId] = 1;
+    _remoteRefCounting[newServantId] = 1; // TODO set referer
     
     return newServantId;
 }
-    
 
 void ServerNode::releaseInstance( co::int32 instanceID )
 {

@@ -36,7 +36,8 @@ class Data_Container;
 class Argument;
 class Ref_Type;
 class Message_Member;
-class Message_New;
+class Message_New_Inst;
+class Message_Acc_Inst;
 class Message;
 
 enum Ref_Type_Owner {
@@ -58,6 +59,27 @@ inline bool Ref_Type_Owner_Parse(
     const ::std::string& name, Ref_Type_Owner* value) {
   return ::google::protobuf::internal::ParseNamedEnum<Ref_Type_Owner>(
     Ref_Type_Owner_descriptor(), name, value);
+}
+enum Message_Type {
+  Message_Type_MSG_NEW_INST = 0,
+  Message_Type_MSG_ACCESS_INST = 1,
+  Message_Type_MSG_CALL = 2,
+  Message_Type_MSG_FIELD = 3
+};
+bool Message_Type_IsValid(int value);
+const Message_Type Message_Type_Type_MIN = Message_Type_MSG_NEW_INST;
+const Message_Type Message_Type_Type_MAX = Message_Type_MSG_FIELD;
+const int Message_Type_Type_ARRAYSIZE = Message_Type_Type_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* Message_Type_descriptor();
+inline const ::std::string& Message_Type_Name(Message_Type value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    Message_Type_descriptor(), value);
+}
+inline bool Message_Type_Parse(
+    const ::std::string& name, Message_Type* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<Message_Type>(
+    Message_Type_descriptor(), name, value);
 }
 // ===================================================================
 
@@ -509,14 +531,14 @@ class Message_Member : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
-class Message_New : public ::google::protobuf::Message {
+class Message_New_Inst : public ::google::protobuf::Message {
  public:
-  Message_New();
-  virtual ~Message_New();
+  Message_New_Inst();
+  virtual ~Message_New_Inst();
   
-  Message_New(const Message_New& from);
+  Message_New_Inst(const Message_New_Inst& from);
   
-  inline Message_New& operator=(const Message_New& from) {
+  inline Message_New_Inst& operator=(const Message_New_Inst& from) {
     CopyFrom(from);
     return *this;
   }
@@ -530,17 +552,17 @@ class Message_New : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const Message_New& default_instance();
+  static const Message_New_Inst& default_instance();
   
-  void Swap(Message_New* other);
+  void Swap(Message_New_Inst* other);
   
   // implements Message ----------------------------------------------
   
-  Message_New* New() const;
+  Message_New_Inst* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const Message_New& from);
-  void MergeFrom(const Message_New& from);
+  void CopyFrom(const Message_New_Inst& from);
+  void MergeFrom(const Message_New_Inst& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -563,25 +585,25 @@ class Message_New : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // required string component_type_name = 1;
-  inline bool has_component_type_name() const;
-  inline void clear_component_type_name();
-  static const int kComponentTypeNameFieldNumber = 1;
-  inline const ::std::string& component_type_name() const;
-  inline void set_component_type_name(const ::std::string& value);
-  inline void set_component_type_name(const char* value);
-  inline void set_component_type_name(const char* value, size_t size);
-  inline ::std::string* mutable_component_type_name();
-  inline ::std::string* release_component_type_name();
+  // optional string new_instance_type = 1;
+  inline bool has_new_instance_type() const;
+  inline void clear_new_instance_type();
+  static const int kNewInstanceTypeFieldNumber = 1;
+  inline const ::std::string& new_instance_type() const;
+  inline void set_new_instance_type(const ::std::string& value);
+  inline void set_new_instance_type(const char* value);
+  inline void set_new_instance_type(const char* value, size_t size);
+  inline ::std::string* mutable_new_instance_type();
+  inline ::std::string* release_new_instance_type();
   
-  // @@protoc_insertion_point(class_scope:reef.Message_New)
+  // @@protoc_insertion_point(class_scope:reef.Message_New_Inst)
  private:
-  inline void set_has_component_type_name();
-  inline void clear_has_component_type_name();
+  inline void set_has_new_instance_type();
+  inline void clear_has_new_instance_type();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
-  ::std::string* component_type_name_;
+  ::std::string* new_instance_type_;
   
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
@@ -591,7 +613,99 @@ class Message_New : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_Message_2eproto();
   
   void InitAsDefaultInstance();
-  static Message_New* default_instance_;
+  static Message_New_Inst* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class Message_Acc_Inst : public ::google::protobuf::Message {
+ public:
+  Message_Acc_Inst();
+  virtual ~Message_Acc_Inst();
+  
+  Message_Acc_Inst(const Message_Acc_Inst& from);
+  
+  inline Message_Acc_Inst& operator=(const Message_Acc_Inst& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Message_Acc_Inst& default_instance();
+  
+  void Swap(Message_Acc_Inst* other);
+  
+  // implements Message ----------------------------------------------
+  
+  Message_Acc_Inst* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const Message_Acc_Inst& from);
+  void MergeFrom(const Message_Acc_Inst& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // required bool increment = 1;
+  inline bool has_increment() const;
+  inline void clear_increment();
+  static const int kIncrementFieldNumber = 1;
+  inline bool increment() const;
+  inline void set_increment(bool value);
+  
+  // required uint32 instance_id = 2;
+  inline bool has_instance_id() const;
+  inline void clear_instance_id();
+  static const int kInstanceIdFieldNumber = 2;
+  inline ::google::protobuf::uint32 instance_id() const;
+  inline void set_instance_id(::google::protobuf::uint32 value);
+  
+  // @@protoc_insertion_point(class_scope:reef.Message_Acc_Inst)
+ private:
+  inline void set_has_increment();
+  inline void clear_has_increment();
+  inline void set_has_instance_id();
+  inline void clear_has_instance_id();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  bool increment_;
+  ::google::protobuf::uint32 instance_id_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_Message_2eproto();
+  friend void protobuf_AssignDesc_Message_2eproto();
+  friend void protobuf_ShutdownFile_Message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static Message_Acc_Inst* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -647,58 +761,105 @@ class Message : public ::google::protobuf::Message {
   
   // nested types ----------------------------------------------------
   
+  typedef Message_Type Type;
+  static const Type MSG_NEW_INST = Message_Type_MSG_NEW_INST;
+  static const Type MSG_ACCESS_INST = Message_Type_MSG_ACCESS_INST;
+  static const Type MSG_CALL = Message_Type_MSG_CALL;
+  static const Type MSG_FIELD = Message_Type_MSG_FIELD;
+  static inline bool Type_IsValid(int value) {
+    return Message_Type_IsValid(value);
+  }
+  static const Type Type_MIN =
+    Message_Type_Type_MIN;
+  static const Type Type_MAX =
+    Message_Type_Type_MAX;
+  static const int Type_ARRAYSIZE =
+    Message_Type_Type_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  Type_descriptor() {
+    return Message_Type_descriptor();
+  }
+  static inline const ::std::string& Type_Name(Type value) {
+    return Message_Type_Name(value);
+  }
+  static inline bool Type_Parse(const ::std::string& name,
+      Type* value) {
+    return Message_Type_Parse(name, value);
+  }
+  
   // accessors -------------------------------------------------------
   
-  // required uint32 instance_id = 1;
+  // required .reef.Message.Type msg_type = 1;
+  inline bool has_msg_type() const;
+  inline void clear_msg_type();
+  static const int kMsgTypeFieldNumber = 1;
+  inline ::reef::Message_Type msg_type() const;
+  inline void set_msg_type(::reef::Message_Type value);
+  
+  // required uint32 instance_id = 2;
   inline bool has_instance_id() const;
   inline void clear_instance_id();
-  static const int kInstanceIdFieldNumber = 1;
+  static const int kInstanceIdFieldNumber = 2;
   inline ::google::protobuf::uint32 instance_id() const;
   inline void set_instance_id(::google::protobuf::uint32 value);
   
-  // required bool has_return = 2;
+  // required bool has_return = 3;
   inline bool has_has_return() const;
   inline void clear_has_return();
-  static const int kHasReturnFieldNumber = 2;
+  static const int kHasReturnFieldNumber = 3;
   inline bool has_return() const;
   inline void set_has_return(bool value);
   
-  // optional .reef.Message_New msg_new = 3;
-  inline bool has_msg_new() const;
-  inline void clear_msg_new();
-  static const int kMsgNewFieldNumber = 3;
-  inline const ::reef::Message_New& msg_new() const;
-  inline ::reef::Message_New* mutable_msg_new();
-  inline ::reef::Message_New* release_msg_new();
+  // optional .reef.Message_New_Inst msg_new_inst = 4;
+  inline bool has_msg_new_inst() const;
+  inline void clear_msg_new_inst();
+  static const int kMsgNewInstFieldNumber = 4;
+  inline const ::reef::Message_New_Inst& msg_new_inst() const;
+  inline ::reef::Message_New_Inst* mutable_msg_new_inst();
+  inline ::reef::Message_New_Inst* release_msg_new_inst();
   
-  // optional .reef.Message_Member msg_member = 4;
+  // optional .reef.Message_Acc_Inst msg_acc_inst = 5;
+  inline bool has_msg_acc_inst() const;
+  inline void clear_msg_acc_inst();
+  static const int kMsgAccInstFieldNumber = 5;
+  inline const ::reef::Message_Acc_Inst& msg_acc_inst() const;
+  inline ::reef::Message_Acc_Inst* mutable_msg_acc_inst();
+  inline ::reef::Message_Acc_Inst* release_msg_acc_inst();
+  
+  // optional .reef.Message_Member msg_member = 6;
   inline bool has_msg_member() const;
   inline void clear_msg_member();
-  static const int kMsgMemberFieldNumber = 4;
+  static const int kMsgMemberFieldNumber = 6;
   inline const ::reef::Message_Member& msg_member() const;
   inline ::reef::Message_Member* mutable_msg_member();
   inline ::reef::Message_Member* release_msg_member();
   
   // @@protoc_insertion_point(class_scope:reef.Message)
  private:
+  inline void set_has_msg_type();
+  inline void clear_has_msg_type();
   inline void set_has_instance_id();
   inline void clear_has_instance_id();
   inline void set_has_has_return();
   inline void clear_has_has_return();
-  inline void set_has_msg_new();
-  inline void clear_has_msg_new();
+  inline void set_has_msg_new_inst();
+  inline void clear_has_msg_new_inst();
+  inline void set_has_msg_acc_inst();
+  inline void clear_has_msg_acc_inst();
   inline void set_has_msg_member();
   inline void clear_has_msg_member();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
+  int msg_type_;
   ::google::protobuf::uint32 instance_id_;
-  bool has_return_;
-  ::reef::Message_New* msg_new_;
+  ::reef::Message_New_Inst* msg_new_inst_;
+  ::reef::Message_Acc_Inst* msg_acc_inst_;
   ::reef::Message_Member* msg_member_;
+  bool has_return_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
   
   friend void  protobuf_AddDesc_Message_2eproto();
   friend void protobuf_AssignDesc_Message_2eproto();
@@ -1078,79 +1239,150 @@ Message_Member::mutable_arguments() {
 
 // -------------------------------------------------------------------
 
-// Message_New
+// Message_New_Inst
 
-// required string component_type_name = 1;
-inline bool Message_New::has_component_type_name() const {
+// optional string new_instance_type = 1;
+inline bool Message_New_Inst::has_new_instance_type() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void Message_New::set_has_component_type_name() {
+inline void Message_New_Inst::set_has_new_instance_type() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void Message_New::clear_has_component_type_name() {
+inline void Message_New_Inst::clear_has_new_instance_type() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void Message_New::clear_component_type_name() {
-  if (component_type_name_ != &::google::protobuf::internal::kEmptyString) {
-    component_type_name_->clear();
+inline void Message_New_Inst::clear_new_instance_type() {
+  if (new_instance_type_ != &::google::protobuf::internal::kEmptyString) {
+    new_instance_type_->clear();
   }
-  clear_has_component_type_name();
+  clear_has_new_instance_type();
 }
-inline const ::std::string& Message_New::component_type_name() const {
-  return *component_type_name_;
+inline const ::std::string& Message_New_Inst::new_instance_type() const {
+  return *new_instance_type_;
 }
-inline void Message_New::set_component_type_name(const ::std::string& value) {
-  set_has_component_type_name();
-  if (component_type_name_ == &::google::protobuf::internal::kEmptyString) {
-    component_type_name_ = new ::std::string;
+inline void Message_New_Inst::set_new_instance_type(const ::std::string& value) {
+  set_has_new_instance_type();
+  if (new_instance_type_ == &::google::protobuf::internal::kEmptyString) {
+    new_instance_type_ = new ::std::string;
   }
-  component_type_name_->assign(value);
+  new_instance_type_->assign(value);
 }
-inline void Message_New::set_component_type_name(const char* value) {
-  set_has_component_type_name();
-  if (component_type_name_ == &::google::protobuf::internal::kEmptyString) {
-    component_type_name_ = new ::std::string;
+inline void Message_New_Inst::set_new_instance_type(const char* value) {
+  set_has_new_instance_type();
+  if (new_instance_type_ == &::google::protobuf::internal::kEmptyString) {
+    new_instance_type_ = new ::std::string;
   }
-  component_type_name_->assign(value);
+  new_instance_type_->assign(value);
 }
-inline void Message_New::set_component_type_name(const char* value, size_t size) {
-  set_has_component_type_name();
-  if (component_type_name_ == &::google::protobuf::internal::kEmptyString) {
-    component_type_name_ = new ::std::string;
+inline void Message_New_Inst::set_new_instance_type(const char* value, size_t size) {
+  set_has_new_instance_type();
+  if (new_instance_type_ == &::google::protobuf::internal::kEmptyString) {
+    new_instance_type_ = new ::std::string;
   }
-  component_type_name_->assign(reinterpret_cast<const char*>(value), size);
+  new_instance_type_->assign(reinterpret_cast<const char*>(value), size);
 }
-inline ::std::string* Message_New::mutable_component_type_name() {
-  set_has_component_type_name();
-  if (component_type_name_ == &::google::protobuf::internal::kEmptyString) {
-    component_type_name_ = new ::std::string;
+inline ::std::string* Message_New_Inst::mutable_new_instance_type() {
+  set_has_new_instance_type();
+  if (new_instance_type_ == &::google::protobuf::internal::kEmptyString) {
+    new_instance_type_ = new ::std::string;
   }
-  return component_type_name_;
+  return new_instance_type_;
 }
-inline ::std::string* Message_New::release_component_type_name() {
-  clear_has_component_type_name();
-  if (component_type_name_ == &::google::protobuf::internal::kEmptyString) {
+inline ::std::string* Message_New_Inst::release_new_instance_type() {
+  clear_has_new_instance_type();
+  if (new_instance_type_ == &::google::protobuf::internal::kEmptyString) {
     return NULL;
   } else {
-    ::std::string* temp = component_type_name_;
-    component_type_name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    ::std::string* temp = new_instance_type_;
+    new_instance_type_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
     return temp;
   }
 }
 
 // -------------------------------------------------------------------
 
-// Message
+// Message_Acc_Inst
 
-// required uint32 instance_id = 1;
-inline bool Message::has_instance_id() const {
+// required bool increment = 1;
+inline bool Message_Acc_Inst::has_increment() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void Message::set_has_instance_id() {
+inline void Message_Acc_Inst::set_has_increment() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void Message::clear_has_instance_id() {
+inline void Message_Acc_Inst::clear_has_increment() {
   _has_bits_[0] &= ~0x00000001u;
+}
+inline void Message_Acc_Inst::clear_increment() {
+  increment_ = false;
+  clear_has_increment();
+}
+inline bool Message_Acc_Inst::increment() const {
+  return increment_;
+}
+inline void Message_Acc_Inst::set_increment(bool value) {
+  set_has_increment();
+  increment_ = value;
+}
+
+// required uint32 instance_id = 2;
+inline bool Message_Acc_Inst::has_instance_id() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void Message_Acc_Inst::set_has_instance_id() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void Message_Acc_Inst::clear_has_instance_id() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void Message_Acc_Inst::clear_instance_id() {
+  instance_id_ = 0u;
+  clear_has_instance_id();
+}
+inline ::google::protobuf::uint32 Message_Acc_Inst::instance_id() const {
+  return instance_id_;
+}
+inline void Message_Acc_Inst::set_instance_id(::google::protobuf::uint32 value) {
+  set_has_instance_id();
+  instance_id_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// Message
+
+// required .reef.Message.Type msg_type = 1;
+inline bool Message::has_msg_type() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void Message::set_has_msg_type() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void Message::clear_has_msg_type() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void Message::clear_msg_type() {
+  msg_type_ = 0;
+  clear_has_msg_type();
+}
+inline ::reef::Message_Type Message::msg_type() const {
+  return static_cast< ::reef::Message_Type >(msg_type_);
+}
+inline void Message::set_msg_type(::reef::Message_Type value) {
+  GOOGLE_DCHECK(::reef::Message_Type_IsValid(value));
+  set_has_msg_type();
+  msg_type_ = value;
+}
+
+// required uint32 instance_id = 2;
+inline bool Message::has_instance_id() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void Message::set_has_instance_id() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void Message::clear_has_instance_id() {
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline void Message::clear_instance_id() {
   instance_id_ = 0u;
@@ -1164,15 +1396,15 @@ inline void Message::set_instance_id(::google::protobuf::uint32 value) {
   instance_id_ = value;
 }
 
-// required bool has_return = 2;
+// required bool has_return = 3;
 inline bool Message::has_has_return() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
+  return (_has_bits_[0] & 0x00000004u) != 0;
 }
 inline void Message::set_has_has_return() {
-  _has_bits_[0] |= 0x00000002u;
+  _has_bits_[0] |= 0x00000004u;
 }
 inline void Message::clear_has_has_return() {
-  _has_bits_[0] &= ~0x00000002u;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline void Message::clear_has_return() {
   has_return_ = false;
@@ -1186,44 +1418,73 @@ inline void Message::set_has_return(bool value) {
   has_return_ = value;
 }
 
-// optional .reef.Message_New msg_new = 3;
-inline bool Message::has_msg_new() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
+// optional .reef.Message_New_Inst msg_new_inst = 4;
+inline bool Message::has_msg_new_inst() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
 }
-inline void Message::set_has_msg_new() {
-  _has_bits_[0] |= 0x00000004u;
+inline void Message::set_has_msg_new_inst() {
+  _has_bits_[0] |= 0x00000008u;
 }
-inline void Message::clear_has_msg_new() {
-  _has_bits_[0] &= ~0x00000004u;
+inline void Message::clear_has_msg_new_inst() {
+  _has_bits_[0] &= ~0x00000008u;
 }
-inline void Message::clear_msg_new() {
-  if (msg_new_ != NULL) msg_new_->::reef::Message_New::Clear();
-  clear_has_msg_new();
+inline void Message::clear_msg_new_inst() {
+  if (msg_new_inst_ != NULL) msg_new_inst_->::reef::Message_New_Inst::Clear();
+  clear_has_msg_new_inst();
 }
-inline const ::reef::Message_New& Message::msg_new() const {
-  return msg_new_ != NULL ? *msg_new_ : *default_instance_->msg_new_;
+inline const ::reef::Message_New_Inst& Message::msg_new_inst() const {
+  return msg_new_inst_ != NULL ? *msg_new_inst_ : *default_instance_->msg_new_inst_;
 }
-inline ::reef::Message_New* Message::mutable_msg_new() {
-  set_has_msg_new();
-  if (msg_new_ == NULL) msg_new_ = new ::reef::Message_New;
-  return msg_new_;
+inline ::reef::Message_New_Inst* Message::mutable_msg_new_inst() {
+  set_has_msg_new_inst();
+  if (msg_new_inst_ == NULL) msg_new_inst_ = new ::reef::Message_New_Inst;
+  return msg_new_inst_;
 }
-inline ::reef::Message_New* Message::release_msg_new() {
-  clear_has_msg_new();
-  ::reef::Message_New* temp = msg_new_;
-  msg_new_ = NULL;
+inline ::reef::Message_New_Inst* Message::release_msg_new_inst() {
+  clear_has_msg_new_inst();
+  ::reef::Message_New_Inst* temp = msg_new_inst_;
+  msg_new_inst_ = NULL;
   return temp;
 }
 
-// optional .reef.Message_Member msg_member = 4;
+// optional .reef.Message_Acc_Inst msg_acc_inst = 5;
+inline bool Message::has_msg_acc_inst() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void Message::set_has_msg_acc_inst() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void Message::clear_has_msg_acc_inst() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void Message::clear_msg_acc_inst() {
+  if (msg_acc_inst_ != NULL) msg_acc_inst_->::reef::Message_Acc_Inst::Clear();
+  clear_has_msg_acc_inst();
+}
+inline const ::reef::Message_Acc_Inst& Message::msg_acc_inst() const {
+  return msg_acc_inst_ != NULL ? *msg_acc_inst_ : *default_instance_->msg_acc_inst_;
+}
+inline ::reef::Message_Acc_Inst* Message::mutable_msg_acc_inst() {
+  set_has_msg_acc_inst();
+  if (msg_acc_inst_ == NULL) msg_acc_inst_ = new ::reef::Message_Acc_Inst;
+  return msg_acc_inst_;
+}
+inline ::reef::Message_Acc_Inst* Message::release_msg_acc_inst() {
+  clear_has_msg_acc_inst();
+  ::reef::Message_Acc_Inst* temp = msg_acc_inst_;
+  msg_acc_inst_ = NULL;
+  return temp;
+}
+
+// optional .reef.Message_Member msg_member = 6;
 inline bool Message::has_msg_member() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
+  return (_has_bits_[0] & 0x00000020u) != 0;
 }
 inline void Message::set_has_msg_member() {
-  _has_bits_[0] |= 0x00000008u;
+  _has_bits_[0] |= 0x00000020u;
 }
 inline void Message::clear_has_msg_member() {
-  _has_bits_[0] &= ~0x00000008u;
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline void Message::clear_msg_member() {
   if (msg_member_ != NULL) msg_member_->::reef::Message_Member::Clear();
@@ -1256,6 +1517,10 @@ namespace protobuf {
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::reef::Ref_Type_Owner>() {
   return ::reef::Ref_Type_Owner_descriptor();
+}
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::reef::Message_Type>() {
+  return ::reef::Message_Type_descriptor();
 }
 
 }  // namespace google

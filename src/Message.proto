@@ -36,21 +36,38 @@ message Message_Member
 	repeated Argument arguments = 4;
 }
 
-message Message_New
+message Message_New_Inst
 {
-	required string component_type_name = 1;
+	optional string new_instance_type = 1;
+}
+
+message Message_Acc_Inst
+{
+	required bool increment = 1;
+	required uint32 instance_id = 2;
+	// TODO required string referer_ip = 3;
 }
 
 message Message 
 {
-	required uint32 instance_id = 1;
+	enum Type
+	{
+		MSG_NEW_INST = 0;
+		MSG_ACCESS_INST = 1;
+		MSG_CALL = 2;
+		MSG_FIELD = 3;
+	}
 	
-	required bool has_return = 2;
+	required Type msg_type = 1;
 	
-	// If instance_id == 0 it is a New instance msg, 
-	optional Message_New msg_new = 3;
+	required uint32 instance_id = 2;
 	
-	// If instance_id != 0 then it is a call msg
-	optional Message_Member msg_member = 4;
+	required bool has_return = 3;
+	 
+	optional Message_New_Inst msg_new_inst = 4;
+	
+	optional Message_Acc_Inst msg_acc_inst = 5;
+		
+	optional Message_Member msg_member = 6;
 }
 
