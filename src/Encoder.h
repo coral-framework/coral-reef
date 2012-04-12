@@ -38,12 +38,15 @@ public:
     void beginEncodingCallMsg( co::int32 instanceID, co::int32 facetIdx, co::int32 memberIdx,
                               bool hasReturn );
     
+    void beginEncodingFieldMsg( co::int32 instanceID, co::int32 facetIdx, co::int32 memberIdx,
+                              bool hasReturn );
+    
     // adds a Value Type parameter
     void addValueParam( const co::Any& param );
     
     // adds a ref-type parameter, instance is local
     void addRefParam( co::int32 instanceID, co::int32 facetIdx, RefOwner owner, 
-                     const std::string* ownerAddress = 0 );
+                     const std::string* instanceType = 0, const std::string* ownerAddress = 0 );
     
     // get the built call msg with all the arguments
     void finishEncodingCallMsg( std::string& msg );

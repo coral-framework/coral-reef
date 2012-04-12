@@ -1,7 +1,8 @@
-#include "ServerNode.h"
+#include "Node.h"
 
 #include "Decoder.h"
 #include "Servant.h"
+#include "RemoteObject.h"
 #include "network/Connection.h"
 
 #include <co/Exception.h>
@@ -11,36 +12,54 @@
 
 namespace reef {
 
-ServerNode::ServerNode()
+Node* Node::_nodeInstance = 0;
+    
+Node::Node()
 {
-    // empty constructor
+    if( _nodeInstance )
+        throw new co::Exception( "Only one server node allowed at a time" );
+    
+    _nodeInstance = this;
 }
     
-ServerNode::~ServerNode()
+Node::~Node()
 {
-    // empty destructor
+    _nodeInstance = 0;
 }
     
-void ServerNode::start( const std::string& address )
+co::IObject* Node::newRemoteInstance( const std::string& instanceType, 
+                                           const std::string& address )
 {
-    _binder.bind( address );
+    Connecter* connecter = Connecter::getOrOpenConnection( address );
+    co::int32 instanceID = requestNewInstance( connecter, instanceType );
     
-    // This first instanceID is for the ServerNode
+    co::IComponent* component = co::cast<co::IComponent>( co::getType( instanceType ) );
+    
+    return RemoteObject::getOrCreateRemoteObject( component, connecter, instanceID );
+}
+
+void Node::start( const std::string&  boundAddress, const std::string& connectableAddress )
+{
+    _binder.bind( boundAddress );
+    
+    _myPublicAddress = connectableAddress;
+    
+    // This first instanceID is for the Node
     _servants.push_back( 0 );
+    _remoteRefCounting.push_back( 0 );
 }
     
-void ServerNode::update()
+void Node::update()
 {
     if( !_binder.isBound() )
         throw new co::Exception( "The server node must be started" );
         
 	std::string msg;
-    _binder.receive( msg );
-    
-    dispatchMessage( msg );
+    if( _binder.receive( msg ) )
+        dispatchMessage( msg );
 }
 
-void ServerNode::stop()
+void Node::stop()
 {
     if( _binder.isBound() )
         _binder.close();
@@ -62,7 +81,32 @@ void ServerNode::stop()
     }
 }
 
-void ServerNode::dispatchMessage( const std::string& msg )
+co::IObject* Node::getRemoteInstance( const std::string& instanceType, co::int32 instanceID, 
+                                     const std::string& ownerAddress )
+{
+    Connecter* connecter = Connecter::getOrOpenConnection( ownerAddress );
+    
+    co::IComponent* component = co::cast<co::IComponent>( co::getType( instanceType ) );
+    
+    return RemoteObject::getOrCreateRemoteObject( component, connecter, instanceID );
+}
+
+co::int32 Node::requestNewInstance( Connecter* connecter, const std::string& componentName )
+{
+    std::string msg;
+    _encoder.encodeNewInstMsg( componentName, msg );
+    connecter->send( msg );
+    
+    while( !connecter->receiveReply( msg ) )
+        update();
+    
+    co::int32 instanceID;
+    _decoder.decodeData( msg, instanceID );
+    
+    return instanceID;
+}
+
+void Node::dispatchMessage( const std::string& msg )
 {
     co::int32 destInstanceID;
     Decoder::MsgType type;
@@ -77,12 +121,12 @@ void ServerNode::dispatchMessage( const std::string& msg )
         case Decoder::MsgType::ACCESS_INST:
             onAccessInstMsg();
             break;
-        default: // the message isn't destined to the ServerNode. Pass to the appropriate servant. 
+        default: // the message isn't destined to the Node. Pass to the appropriate servant. 
             onMsgForServant( destInstanceID, hasReturn );
     }  
 }
     
-void ServerNode::onNewInstMsg() 
+void Node::onNewInstMsg() 
 {
     std::string instanceTypeName;
     _decoder.decodeNewInstMsg( instanceTypeName );
@@ -98,7 +142,7 @@ void ServerNode::onNewInstMsg()
     _binder.reply( msg );
 }
     
-void ServerNode::onAccessInstMsg()
+void Node::onAccessInstMsg()
 {
     std::string refererIP;
     co::int32 instanceID;
@@ -107,7 +151,7 @@ void ServerNode::onAccessInstMsg()
     openRemoteReference( instanceID );    
 }
   
-void ServerNode::onMsgForServant( co::int32 instanceID, bool hasReturn )
+void Node::onMsgForServant( co::int32 instanceID, bool hasReturn )
 {
     Servant* servant = getServantFor( instanceID );
     if( !hasReturn )
@@ -117,6 +161,7 @@ void ServerNode::onMsgForServant( co::int32 instanceID, bool hasReturn )
     }
     
     co::Any retValue;
+    retValue.set<co::int32>( 42 );
     servant->onCallOrField( _decoder, &retValue );
     
     std::string msg;
@@ -125,7 +170,7 @@ void ServerNode::onMsgForServant( co::int32 instanceID, bool hasReturn )
     _binder.reply( msg );
 }
 
-co::int32 ServerNode::publishInstance( co::IObject* instance )
+co::int32 Node::publishInstance( co::IObject* instance )
 {
     co::int32 instanceID = getInstanceID( instance );
     if( instanceID != -1 )
@@ -136,19 +181,19 @@ co::int32 ServerNode::publishInstance( co::IObject* instance )
     return instanceID;
 }
 
-void ServerNode::openRemoteReference( co::int32 instanceID )
+void Node::openRemoteReference( co::int32 instanceID )
 {
     _remoteRefCounting[instanceID]++;
 }
     
-void ServerNode::closeRemoteReference( co::int32 instanceID )
+void Node::closeRemoteReference( co::int32 instanceID )
 {
     if( --_remoteRefCounting[instanceID] < 1 )
         releaseInstance( instanceID );
     
 }
     
-co::int32 ServerNode::getInstanceID( const co::IObject* instance )
+co::int32 Node::getInstanceID( const co::IObject* instance )
 {
     VirtualAddresses::iterator it = _vas.find( instance );
     if( it != _vas.end() )
@@ -157,7 +202,7 @@ co::int32 ServerNode::getInstanceID( const co::IObject* instance )
     return -1;
 }
     
-co::int32 ServerNode::newVirtualAddress()
+co::int32 Node::newVirtualAddress()
 {
     if( !_freedIds.empty() )
     {
@@ -174,7 +219,7 @@ co::int32 ServerNode::newVirtualAddress()
     
 }
    
-co::int32 ServerNode::startRemoteRefCount( co::IObject* instance )
+co::int32 Node::startRemoteRefCount( co::IObject* instance )
 {
     co::int32 newServantId = newVirtualAddress();
     _vas.insert( objToAddress( instance, newServantId ) );
@@ -185,7 +230,7 @@ co::int32 ServerNode::startRemoteRefCount( co::IObject* instance )
     return newServantId;
 }
 
-void ServerNode::releaseInstance( co::int32 instanceID )
+void Node::releaseInstance( co::int32 instanceID )
 {
     co::IObject* instance = _servants[instanceID]->getObject();
     VirtualAddresses::iterator it = _vas.find( instance );
@@ -196,6 +241,6 @@ void ServerNode::releaseInstance( co::int32 instanceID )
     
 }
 
-CORAL_EXPORT_COMPONENT( ServerNode, ServerNode );
+CORAL_EXPORT_COMPONENT( Node, Node );
     
 } // namespace reef

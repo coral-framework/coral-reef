@@ -1,4 +1,0 @@
-component ServerNode
-{
-	provides IServerNode server;
-};

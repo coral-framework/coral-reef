@@ -27,8 +27,7 @@ public:
     {
         NEW_INST,
         ACCESS_INST,
-        CALL,
-        FIELD
+        CALL
     };
     
     Decoder();
@@ -56,7 +55,7 @@ public:
     void getValueParam( co::Any& param, co::IType* descriptor );
     
     void getRefParam( co::int32& instanceID, co::int32& facetIdx, RefOwner& owner,
-                     std::string& ownerAddress );
+                     std::string& instanceType, std::string& ownerAddress );
     
     
     // ----- Just for plain simple types data, so message structure with it ----- //

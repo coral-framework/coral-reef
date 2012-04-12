@@ -1,5 +1,8 @@
 #include "Servant.h"
 
+#include "Node.h"
+#include "Node.h"
+
 #include <co/IPort.h>
 #include <co/IField.h>
 #include <co/IMethod.h>
@@ -15,12 +18,17 @@ namespace reef
 
 Servant::Servant( co::IObject* object )
 {
+    _node = Node::getNodeInstance();
+    
     if( object )
     {
         _object = object;
-        co::Range<co::IPort* const> ports = _object->getComponent()->getFacets();
-        _openedServices.resize( ports.getSize() );
-        _openedReflectors.resize( ports.getSize() );
+        _component = _object->getComponent();
+        co::Range<co::IPort* const> ports = _component->getFacets();
+        co::int32 numPorts = ports.getSize();
+        _openedServices.resize( numPorts );
+        _openedInterfaces.resize( numPorts );
+        _openedReflectors.resize( numPorts );
     }
 }
     
@@ -86,7 +94,7 @@ void Servant::onField( Decoder& decoder, co::int32 facetIdx, co::IField* field, 
     }
     else
     {
-        _openedReflectors[facetIdx]->setField( _openedServices[facetIdx], field, retValue );
+        _openedReflectors[facetIdx]->getField( _openedServices[facetIdx], field, *retValue );
     }
 }
  
@@ -101,18 +109,26 @@ void Servant::onGetParam( Decoder& decoder, co::IType* paramType, co::Any& param
     co::int32 instanceID;
     co::int32 facetIdx;
     Decoder::RefOwner owner;
+    std::string instanceType;
     std::string ownerAddress;
     
-    decoder.getRefParam( instanceID, facetIdx, owner, ownerAddress );
-    
+    decoder.getRefParam( instanceID, facetIdx, owner, instanceType, ownerAddress );
+    co::IObject* instance;
     switch( owner )
     {
-        case Decoder::RefOwner::LOCAL:
-            
         case Decoder::RefOwner::RECEIVER:
+            instance = _node->getInstanceFor( instanceID );
+            break;
+        case Decoder::RefOwner::LOCAL:
         case Decoder::RefOwner::ANOTHER:
-            
+            instance = _node->getRemoteInstance( instanceType, instanceID, 
+                                                     ownerAddress );
+            break;
     }
+    co::Range<co::IPort* const> ports = _object->getComponent()->getFacets();
+    
+    co::IPort* port = ports[facetIdx];
+    param.set<co::IService*>( instance->getServiceAt( port ) );
 }
     
 void Servant::onServiceFirstAccess( co::int32 serviceId )

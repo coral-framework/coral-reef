@@ -84,10 +84,11 @@ void protobuf_AssignDesc_Message_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Argument));
   Ref_Type_descriptor_ = file->message_type(2);
-  static const int Ref_Type_offsets_[4] = {
+  static const int Ref_Type_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Ref_Type, owner_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Ref_Type, instance_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Ref_Type, facet_idx_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Ref_Type, instance_type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Ref_Type, owner_ip_),
   };
   Ref_Type_reflection_ =
@@ -229,24 +230,24 @@ void protobuf_AddDesc_Message_2eproto() {
     "\017\n\007boolean\030\001 \001(\010\022\013\n\003str\030\002 \001(\t\022\017\n\007numeric"
     "\030\003 \001(\001\022 \n\010ref_type\030\004 \001(\0132\016.reef.Ref_Type"
     "\".\n\010Argument\022\"\n\004data\030\001 \003(\0132\024.reef.Data_C"
-    "ontainer\"\252\001\n\010Ref_Type\022#\n\005owner\030\001 \002(\0162\024.r"
+    "ontainer\"\301\001\n\010Ref_Type\022#\n\005owner\030\001 \002(\0162\024.r"
     "eef.Ref_Type.Owner\022\023\n\013instance_id\030\002 \002(\r\022"
-    "\021\n\tfacet_idx\030\003 \002(\r\022\020\n\010owner_ip\030\004 \001(\t\"\?\n\005"
-    "Owner\022\017\n\013OWNER_LOCAL\020\000\022\022\n\016OWNER_RECEIVER"
-    "\020\001\022\021\n\rOWNER_ANOTHER\020\002\"Z\n\016Message_Member\022"
-    "\021\n\tfacet_idx\030\001 \002(\r\022\022\n\nmember_idx\030\002 \002(\r\022!"
-    "\n\targuments\030\004 \003(\0132\016.reef.Argument\"-\n\020Mes"
-    "sage_New_Inst\022\031\n\021new_instance_type\030\001 \001(\t"
-    "\":\n\020Message_Acc_Inst\022\021\n\tincrement\030\001 \002(\010\022"
-    "\023\n\013instance_id\030\002 \002(\r\"\252\002\n\007Message\022$\n\010msg_"
-    "type\030\001 \002(\0162\022.reef.Message.Type\022\023\n\013instan"
-    "ce_id\030\002 \002(\r\022\022\n\nhas_return\030\003 \002(\010\022,\n\014msg_n"
-    "ew_inst\030\004 \001(\0132\026.reef.Message_New_Inst\022,\n"
-    "\014msg_acc_inst\030\005 \001(\0132\026.reef.Message_Acc_I"
-    "nst\022(\n\nmsg_member\030\006 \001(\0132\024.reef.Message_M"
-    "ember\"J\n\004Type\022\020\n\014MSG_NEW_INST\020\000\022\023\n\017MSG_A"
-    "CCESS_INST\020\001\022\014\n\010MSG_CALL\020\002\022\r\n\tMSG_FIELD\020"
-    "\003", 841);
+    "\021\n\tfacet_idx\030\003 \002(\r\022\025\n\rinstance_type\030\004 \001("
+    "\t\022\020\n\010owner_ip\030\005 \001(\t\"\?\n\005Owner\022\017\n\013OWNER_LO"
+    "CAL\020\000\022\022\n\016OWNER_RECEIVER\020\001\022\021\n\rOWNER_ANOTH"
+    "ER\020\002\"Z\n\016Message_Member\022\021\n\tfacet_idx\030\001 \002("
+    "\r\022\022\n\nmember_idx\030\002 \002(\r\022!\n\targuments\030\004 \003(\013"
+    "2\016.reef.Argument\"-\n\020Message_New_Inst\022\031\n\021"
+    "new_instance_type\030\001 \001(\t\":\n\020Message_Acc_I"
+    "nst\022\021\n\tincrement\030\001 \002(\010\022\023\n\013instance_id\030\002 "
+    "\002(\r\"\233\002\n\007Message\022$\n\010msg_type\030\001 \002(\0162\022.reef"
+    ".Message.Type\022\023\n\013instance_id\030\002 \002(\r\022\022\n\nha"
+    "s_return\030\003 \002(\010\022,\n\014msg_new_inst\030\004 \001(\0132\026.r"
+    "eef.Message_New_Inst\022,\n\014msg_acc_inst\030\005 \001"
+    "(\0132\026.reef.Message_Acc_Inst\022(\n\nmsg_member"
+    "\030\006 \001(\0132\024.reef.Message_Member\";\n\004Type\022\020\n\014"
+    "MSG_NEW_INST\020\000\022\023\n\017MSG_ACCESS_INST\020\001\022\014\n\010M"
+    "SG_CALL\020\002", 849);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "Message.proto", &protobuf_RegisterTypes);
   Data_Container::default_instance_ = new Data_Container();
@@ -856,6 +857,7 @@ const int Ref_Type::Owner_ARRAYSIZE;
 const int Ref_Type::kOwnerFieldNumber;
 const int Ref_Type::kInstanceIdFieldNumber;
 const int Ref_Type::kFacetIdxFieldNumber;
+const int Ref_Type::kInstanceTypeFieldNumber;
 const int Ref_Type::kOwnerIpFieldNumber;
 #endif  // !_MSC_VER
 
@@ -878,6 +880,7 @@ void Ref_Type::SharedCtor() {
   owner_ = 0;
   instance_id_ = 0u;
   facet_idx_ = 0u;
+  instance_type_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   owner_ip_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
@@ -887,6 +890,9 @@ Ref_Type::~Ref_Type() {
 }
 
 void Ref_Type::SharedDtor() {
+  if (instance_type_ != &::google::protobuf::internal::kEmptyString) {
+    delete instance_type_;
+  }
   if (owner_ip_ != &::google::protobuf::internal::kEmptyString) {
     delete owner_ip_;
   }
@@ -919,6 +925,11 @@ void Ref_Type::Clear() {
     owner_ = 0;
     instance_id_ = 0u;
     facet_idx_ = 0u;
+    if (has_instance_type()) {
+      if (instance_type_ != &::google::protobuf::internal::kEmptyString) {
+        instance_type_->clear();
+      }
+    }
     if (has_owner_ip()) {
       if (owner_ip_ != &::google::protobuf::internal::kEmptyString) {
         owner_ip_->clear();
@@ -983,12 +994,29 @@ bool Ref_Type::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(34)) goto parse_owner_ip;
+        if (input->ExpectTag(34)) goto parse_instance_type;
         break;
       }
       
-      // optional string owner_ip = 4;
+      // optional string instance_type = 4;
       case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_instance_type:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_instance_type()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->instance_type().data(), this->instance_type().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(42)) goto parse_owner_ip;
+        break;
+      }
+      
+      // optional string owner_ip = 5;
+      case 5: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
          parse_owner_ip:
@@ -1038,13 +1066,22 @@ void Ref_Type::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(3, this->facet_idx(), output);
   }
   
-  // optional string owner_ip = 4;
+  // optional string instance_type = 4;
+  if (has_instance_type()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->instance_type().data(), this->instance_type().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      4, this->instance_type(), output);
+  }
+  
+  // optional string owner_ip = 5;
   if (has_owner_ip()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->owner_ip().data(), this->owner_ip().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
     ::google::protobuf::internal::WireFormatLite::WriteString(
-      4, this->owner_ip(), output);
+      5, this->owner_ip(), output);
   }
   
   if (!unknown_fields().empty()) {
@@ -1071,14 +1108,24 @@ void Ref_Type::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(3, this->facet_idx(), target);
   }
   
-  // optional string owner_ip = 4;
+  // optional string instance_type = 4;
+  if (has_instance_type()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->instance_type().data(), this->instance_type().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        4, this->instance_type(), target);
+  }
+  
+  // optional string owner_ip = 5;
   if (has_owner_ip()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->owner_ip().data(), this->owner_ip().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        4, this->owner_ip(), target);
+        5, this->owner_ip(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -1112,7 +1159,14 @@ int Ref_Type::ByteSize() const {
           this->facet_idx());
     }
     
-    // optional string owner_ip = 4;
+    // optional string instance_type = 4;
+    if (has_instance_type()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->instance_type());
+    }
+    
+    // optional string owner_ip = 5;
     if (has_owner_ip()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
@@ -1155,6 +1209,9 @@ void Ref_Type::MergeFrom(const Ref_Type& from) {
     if (from.has_facet_idx()) {
       set_facet_idx(from.facet_idx());
     }
+    if (from.has_instance_type()) {
+      set_instance_type(from.instance_type());
+    }
     if (from.has_owner_ip()) {
       set_owner_ip(from.owner_ip());
     }
@@ -1185,6 +1242,7 @@ void Ref_Type::Swap(Ref_Type* other) {
     std::swap(owner_, other->owner_);
     std::swap(instance_id_, other->instance_id_);
     std::swap(facet_idx_, other->facet_idx_);
+    std::swap(instance_type_, other->instance_type_);
     std::swap(owner_ip_, other->owner_ip_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
@@ -1973,7 +2031,6 @@ bool Message_Type_IsValid(int value) {
     case 0:
     case 1:
     case 2:
-    case 3:
       return true;
     default:
       return false;
@@ -1984,7 +2041,6 @@ bool Message_Type_IsValid(int value) {
 const Message_Type Message::MSG_NEW_INST;
 const Message_Type Message::MSG_ACCESS_INST;
 const Message_Type Message::MSG_CALL;
-const Message_Type Message::MSG_FIELD;
 const Message_Type Message::Type_MIN;
 const Message_Type Message::Type_MAX;
 const int Message::Type_ARRAYSIZE;

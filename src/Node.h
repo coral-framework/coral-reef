@@ -1,43 +1,67 @@
-#include "ServerNode_Base.h"
-#include <map>
+#ifndef __REEF_NODE_H__
+#define __REEF_NODE_H__
 
+#include "Node_Base.h"
+
+#include "Servant.h"
 #include "Decoder.h"
 #include "Encoder.h"
 #include "network/Connection.h"
+
+#include <map>
 #include <stack>
 
 namespace reef {
-
-class Servant;
-class Servant;
     
-class ServerNode : public ServerNode_Base
+class Node : public Node_Base
 {
-public:
-    ServerNode();
+public:    
+    Node();
     
-    virtual ~ServerNode();
+    virtual ~Node();
     
-    void start( const std::string& address );
+    // INode methods
+    co::IObject* newRemoteInstance( const std::string& instanceType, const std::string& address );
+    
+    void start( const std::string& boundAddress, const std::string& connectableAddress );
     
 	void update();
 
     void stop();
 
+public:
+    inline static Node* getNodeInstance() { assert( _nodeInstance ); return _nodeInstance; }
+    
+    // C++ only methods
+    inline const std::string& getPublicAddress(){ assert( !_myPublicAddress.empty() ); 
+        return _myPublicAddress; }
+    
+    // returns a local instance that is mapped to the provided ID
+    inline co::IObject* getInstanceFor( co::int32 instanceID )
+    { return getServantFor( instanceID )->getObject(); }
+    
     /*
      Makes an instance available for remote usage. Which means: creating a 
     Virtual Address, and start a remote-references counting for it.
-     Only increment reference and return address if already available.
+      If already available, then only increment reference and return address.
      */
     co::int32 publishInstance( co::IObject* instance );
     
+    // Create a new remoteObject pointing to the instance or fetch a existing one
+    co::IObject* getRemoteInstance( const std::string& instanceType, co::int32 instanceID, 
+                                          const std::string& ownerAddress );
+    
 private:
+    // Sends a message to another node to create an instance of provided type, blocking.
+    co::int32 requestNewInstance( Connecter* connecter, const std::string& componentName );
+    
     // Dispatches the msg received during an update()
     void dispatchMessage( const std::string& msg );
     
-    // If a message is destined to the own ServerNode it will be dispatched to these methods.
+    // If a message is destined to the own Node it will be dispatched to these methods.
     void onNewInstMsg(); // creates instance, start its ref counting and replies the instanceID
     void onAccessInstMsg(); // increments the instance ref count
+    
     void onMsgForServant( co::int32 instanceID, bool hasReturn );
        
 private:
@@ -66,7 +90,10 @@ private:
 	Binder _binder;
     Decoder _decoder;
     Encoder _encoder;
+    
+    std::string _myPublicAddress;
 
+    static Node* _nodeInstance;
     // the servants and the number of remote references for it
     std::vector<Servant*> _servants;
     std::vector<co::int32> _remoteRefCounting;
@@ -83,3 +110,5 @@ private:
 };
     
 } // namespace reef
+
+#endif

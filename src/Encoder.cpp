@@ -162,6 +162,7 @@ Encoder::~Encoder()
     
 void Encoder::encodeNewInstMsg( const std::string& typeName, std::string& msg )
 {
+    _message->set_msg_type( Message::MSG_NEW_INST );
     _message->set_instance_id( 0 ); // 0 is always the node channel
     _message->set_has_return( true );
 
@@ -175,6 +176,7 @@ void Encoder::encodeNewInstMsg( const std::string& typeName, std::string& msg )
 
 void Encoder::encodeAccessInstMsg( co::int32 instanceID, bool increment, std::string& msg )
 {
+    _message->set_msg_type( Message::MSG_ACCESS_INST );
     _message->set_instance_id( 0 ); // 0 is always the node channel
     _message->set_has_return( false );
     
@@ -194,6 +196,22 @@ void Encoder::beginEncodingCallMsg( co::int32 instanceID, co::int32 facetIdx, co
     if( instanceID == 0 )
         throw new co::Exception( "A call msg can't have an instanceID of 0" );
     
+    _message->set_msg_type( Message::MSG_CALL );
+    _message->set_instance_id( instanceID );
+    _message->set_has_return( hasReturn );
+    
+    _msgMember = _message->mutable_msg_member();
+    _msgMember->set_facet_idx( facetIdx );
+    _msgMember->set_member_idx( memberIdx );
+}
+
+void Encoder::beginEncodingFieldMsg( co::int32 instanceID, co::int32 facetIdx, co::int32 memberIdx,
+                                   bool hasReturn )
+{
+    if( instanceID == 0 )
+        throw new co::Exception( "A call msg can't have an instanceID of 0" );
+    
+    _message->set_msg_type( Message::MSG_CALL );
     _message->set_instance_id( instanceID );
     _message->set_has_return( hasReturn );
     
@@ -210,7 +228,7 @@ void Encoder::addValueParam( const co::Any& param )
 }
 
 void Encoder::addRefParam( co::int32 instanceID, co::int32 facetIdx, RefOwner owner, 
-                        const std::string* ownerAddress )
+                        const std::string* instanceType, const std::string* ownerAddress )
 {
     checkIfCallMsg();
     Argument* PBArg = _msgMember->add_arguments();
@@ -225,6 +243,8 @@ void Encoder::addRefParam( co::int32 instanceID, co::int32 facetIdx, RefOwner ow
     {
     case RefOwner::LOCAL:
             refType->set_owner( Ref_Type::OWNER_LOCAL );
+            refType->set_owner_ip( *ownerAddress );
+            refType->set_instance_type( *instanceType );
             break;
     case RefOwner::RECEIVER:
             refType->set_owner( Ref_Type::OWNER_RECEIVER );
@@ -232,6 +252,7 @@ void Encoder::addRefParam( co::int32 instanceID, co::int32 facetIdx, RefOwner ow
     case RefOwner::ANOTHER:
             refType->set_owner( Ref_Type::OWNER_ANOTHER );
             refType->set_owner_ip( *ownerAddress );
+            refType->set_instance_type( *instanceType );
             break;        
     }
 }

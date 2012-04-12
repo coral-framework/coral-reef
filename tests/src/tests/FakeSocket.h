@@ -8,7 +8,7 @@ namespace reef
 {
 
 class Binder;
-class IServerNode;
+class INode;
 struct BinderQueue;
 
 class MsgTarget

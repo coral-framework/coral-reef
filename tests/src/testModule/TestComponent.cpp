@@ -45,15 +45,21 @@ public:
 	}
 
 	// ------ testModule.IReferenceTypes Methods ------ //
-
-	co::int32 getDummy()
+    
+	double callDivideDouble( testModule::ISimpleTypes* service, double dividend, double divisor )
 	{
-		return _dummy;
+		return service->divide( dividend, divisor );
 	}
-
-	void setDummy( co::int32 dummy )
+    
+	co::int32 callIncrementInt( testModule::ISimpleTypes* service, co::int32 number )
 	{
-		_dummy = dummy;
+		return service->incrementInt( number );
+	}
+    
+	const std::string& concatenateString( testModule::ISimpleTypes* service, const std::string& str1, const std::string& str2 )
+	{
+		_storedString = service->concatenateString( str1, str2 );
+        return _storedString;
 	}
 
 	// ------ testModule.ISimpleTypes Methods ------ //

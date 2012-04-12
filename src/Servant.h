@@ -2,7 +2,6 @@
 #define _REEF_SERVANT_H_
 
 #include "Decoder.h"
-
 #include <co/Any.h>
 #include <co/RefPtr.h>
 #include <co/IObject.h>
@@ -11,6 +10,7 @@
 
 namespace reef
 {
+class Node;
     
 // Server-side implementation of IChannel. Delivers the appropriate calls to the Objects
 class Servant
@@ -38,8 +38,14 @@ private:
     void onField( Decoder& decoder, co::int32 facetIdx, co::IField* field, co::Any* retValue = 0 );
     
     void onGetParam( Decoder& decoder, co::IType* paramType, co::Any& param );
+   
+private:
     
     co::int32 _remoteRefCount;
+    
+    co::IComponent* _component;
+    
+    Node* _node;
     
     // initializes _openedService's and Reflector's index for the accessed service
 	void onServiceFirstAccess( co::int32 serviceId );

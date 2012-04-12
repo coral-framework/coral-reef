@@ -1,0 +1,4 @@
+component Node
+{
+	provides INode client;
+};

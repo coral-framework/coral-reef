@@ -63,12 +63,11 @@ inline bool Ref_Type_Owner_Parse(
 enum Message_Type {
   Message_Type_MSG_NEW_INST = 0,
   Message_Type_MSG_ACCESS_INST = 1,
-  Message_Type_MSG_CALL = 2,
-  Message_Type_MSG_FIELD = 3
+  Message_Type_MSG_CALL = 2
 };
 bool Message_Type_IsValid(int value);
 const Message_Type Message_Type_Type_MIN = Message_Type_MSG_NEW_INST;
-const Message_Type Message_Type_Type_MAX = Message_Type_MSG_FIELD;
+const Message_Type Message_Type_Type_MAX = Message_Type_MSG_CALL;
 const int Message_Type_Type_ARRAYSIZE = Message_Type_Type_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* Message_Type_descriptor();
@@ -385,10 +384,21 @@ class Ref_Type : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 facet_idx() const;
   inline void set_facet_idx(::google::protobuf::uint32 value);
   
-  // optional string owner_ip = 4;
+  // optional string instance_type = 4;
+  inline bool has_instance_type() const;
+  inline void clear_instance_type();
+  static const int kInstanceTypeFieldNumber = 4;
+  inline const ::std::string& instance_type() const;
+  inline void set_instance_type(const ::std::string& value);
+  inline void set_instance_type(const char* value);
+  inline void set_instance_type(const char* value, size_t size);
+  inline ::std::string* mutable_instance_type();
+  inline ::std::string* release_instance_type();
+  
+  // optional string owner_ip = 5;
   inline bool has_owner_ip() const;
   inline void clear_owner_ip();
-  static const int kOwnerIpFieldNumber = 4;
+  static const int kOwnerIpFieldNumber = 5;
   inline const ::std::string& owner_ip() const;
   inline void set_owner_ip(const ::std::string& value);
   inline void set_owner_ip(const char* value);
@@ -404,6 +414,8 @@ class Ref_Type : public ::google::protobuf::Message {
   inline void clear_has_instance_id();
   inline void set_has_facet_idx();
   inline void clear_has_facet_idx();
+  inline void set_has_instance_type();
+  inline void clear_has_instance_type();
   inline void set_has_owner_ip();
   inline void clear_has_owner_ip();
   
@@ -411,11 +423,12 @@ class Ref_Type : public ::google::protobuf::Message {
   
   int owner_;
   ::google::protobuf::uint32 instance_id_;
+  ::std::string* instance_type_;
   ::std::string* owner_ip_;
   ::google::protobuf::uint32 facet_idx_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
   
   friend void  protobuf_AddDesc_Message_2eproto();
   friend void protobuf_AssignDesc_Message_2eproto();
@@ -765,7 +778,6 @@ class Message : public ::google::protobuf::Message {
   static const Type MSG_NEW_INST = Message_Type_MSG_NEW_INST;
   static const Type MSG_ACCESS_INST = Message_Type_MSG_ACCESS_INST;
   static const Type MSG_CALL = Message_Type_MSG_CALL;
-  static const Type MSG_FIELD = Message_Type_MSG_FIELD;
   static inline bool Type_IsValid(int value) {
     return Message_Type_IsValid(value);
   }
@@ -1106,15 +1118,73 @@ inline void Ref_Type::set_facet_idx(::google::protobuf::uint32 value) {
   facet_idx_ = value;
 }
 
-// optional string owner_ip = 4;
-inline bool Ref_Type::has_owner_ip() const {
+// optional string instance_type = 4;
+inline bool Ref_Type::has_instance_type() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
-inline void Ref_Type::set_has_owner_ip() {
+inline void Ref_Type::set_has_instance_type() {
   _has_bits_[0] |= 0x00000008u;
 }
-inline void Ref_Type::clear_has_owner_ip() {
+inline void Ref_Type::clear_has_instance_type() {
   _has_bits_[0] &= ~0x00000008u;
+}
+inline void Ref_Type::clear_instance_type() {
+  if (instance_type_ != &::google::protobuf::internal::kEmptyString) {
+    instance_type_->clear();
+  }
+  clear_has_instance_type();
+}
+inline const ::std::string& Ref_Type::instance_type() const {
+  return *instance_type_;
+}
+inline void Ref_Type::set_instance_type(const ::std::string& value) {
+  set_has_instance_type();
+  if (instance_type_ == &::google::protobuf::internal::kEmptyString) {
+    instance_type_ = new ::std::string;
+  }
+  instance_type_->assign(value);
+}
+inline void Ref_Type::set_instance_type(const char* value) {
+  set_has_instance_type();
+  if (instance_type_ == &::google::protobuf::internal::kEmptyString) {
+    instance_type_ = new ::std::string;
+  }
+  instance_type_->assign(value);
+}
+inline void Ref_Type::set_instance_type(const char* value, size_t size) {
+  set_has_instance_type();
+  if (instance_type_ == &::google::protobuf::internal::kEmptyString) {
+    instance_type_ = new ::std::string;
+  }
+  instance_type_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* Ref_Type::mutable_instance_type() {
+  set_has_instance_type();
+  if (instance_type_ == &::google::protobuf::internal::kEmptyString) {
+    instance_type_ = new ::std::string;
+  }
+  return instance_type_;
+}
+inline ::std::string* Ref_Type::release_instance_type() {
+  clear_has_instance_type();
+  if (instance_type_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = instance_type_;
+    instance_type_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// optional string owner_ip = 5;
+inline bool Ref_Type::has_owner_ip() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void Ref_Type::set_has_owner_ip() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void Ref_Type::clear_has_owner_ip() {
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline void Ref_Type::clear_owner_ip() {
   if (owner_ip_ != &::google::protobuf::internal::kEmptyString) {

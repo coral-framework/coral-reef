@@ -1,8 +1,7 @@
 #include "RemoteObject.h"
 
+#include "Node.h"
 #include "network/Connection.h"
-
-#include <reef/IServerNode.h>
 
 #include <co/IPort.h>
 #include <co/IField.h>
@@ -14,6 +13,9 @@
 
 namespace reef {
 
+/*
+ Maps a all the instance Ids belonging to a host to their local Remote objects representations.
+ */
 class Host
 {
 public:
@@ -33,11 +35,17 @@ public:
         InstanceMap::iterator it = _instances.find( instanceID );
         _instances.erase( it );
     }
+    
+    inline bool hasInstance()
+    {
+        return _instances.size() > 0;
+    }
 private:
     typedef std::map<co::int32, RemoteObject*> InstanceMap;
     InstanceMap _instances;
 };
 
+// Maps every Connecter to a Host. Could be ip to Host but would be slower.
 typedef std::map<Connecter*, Host*> Hosts;
 static Hosts _hosts;
     
@@ -62,6 +70,7 @@ RemoteObject* RemoteObject::getOrCreateRemoteObject( co::IComponent* component,
     }
     
     retValue = new RemoteObject( component, connecter, instanceID );
+    host->addInstance( retValue, instanceID );
     
     return retValue;
 }
@@ -73,13 +82,23 @@ RemoteObject::RemoteObject()
 RemoteObject::RemoteObject( co::IComponent* component, Connecter* connecter, co::int32 instanceID ) :
     _connecter( connecter ), _numFacets( 0 )
 {
+    _node = Node::getNodeInstance();
     _classPtr = *reinterpret_cast<void**>( this );
     setComponent( component );
     _instanceID = instanceID;
 }
     
 RemoteObject::~RemoteObject()
-{    
+{   
+    Hosts::iterator it = _hosts.find( _connecter.get() );
+    assert( it != _hosts.end() );
+    
+    Host* host = it->second;
+    host->removeInstance( _instanceID );
+    
+    if( !host->hasInstance() )
+        _hosts.erase( it );
+    
     for( int i = 0; i < _numFacets; i++ )
     {
         delete _facets[i];
@@ -105,7 +124,7 @@ co::IComponent* RemoteObject::getComponent()
 {
     return _component;
 }
-
+    
 co::IService* RemoteObject::getServiceAt( co::IPort* port )
 {
     co::ICompositeType* owner = port->getOwner();
@@ -124,10 +143,9 @@ void RemoteObject::setServiceAt( co::IPort* receptacle, co::IService* instance )
     // empty: setting remote services not supported yet
 }
 
-co::IPort* RemoteObject::dynamicGetFacet( co::int32 dynFacetId )
+co::IPort* RemoteObject::dynamicGetFacet( co::int32 cookie )
 {
-    co::IService* service = _facets[dynFacetId];
-    return service->getFacet();
+    return _component->getFacets()[cookie];
 }
         
 const co::Any& RemoteObject::dynamicGetField( co::int32 dynFacetId, co::IField* field )
@@ -137,7 +155,8 @@ const co::Any& RemoteObject::dynamicGetField( co::int32 dynFacetId, co::IField* 
     _encoder.finishEncodingCallMsg( msg );
     _connecter->send( msg );
     
-    _connecter->receiveReply( msg );
+    awaitReplyUpdating( msg );
+    
     _decoder.decodeData( msg, field->getType(), _resultBuffer );
 
     return _resultBuffer;
@@ -145,7 +164,13 @@ const co::Any& RemoteObject::dynamicGetField( co::int32 dynFacetId, co::IField* 
     
 void RemoteObject::dynamicSetField( co::int32 dynFacetId, co::IField* field, const co::Any& value )
 {
-    _encoder.beginEncodingCallMsg( _instanceID, dynFacetId, field->getIndex(), true );
+    _encoder.beginEncodingCallMsg( _instanceID, dynFacetId, field->getIndex(), false );
+    
+    if( value.getKind() != co::TK_INTERFACE )
+        _encoder.addValueParam( value );
+    else
+        onInterfaceParam( value.get<co::IService*>() );
+
     std::string msg;
     _encoder.finishEncodingCallMsg( msg );
     _connecter->send( msg );
@@ -177,7 +202,7 @@ const co::Any& RemoteObject::dynamicInvoke( co::int32 dynFacetId, co::IMethod* m
     
 	if( returnType )
     {
-        _connecter->receiveReply( msg );
+        awaitReplyUpdating( msg );
         _decoder.decodeData( msg, method->getReturnType(), _resultBuffer );
     }
 
@@ -193,17 +218,20 @@ co::int32 RemoteObject::dynamicRegisterService( co::IService* dynamicServiceProx
 void RemoteObject::onInterfaceParam( co::IService* param )
 {
     co::IObject* provider = param->getProvider();
+    std::string providerType = provider->getComponent()->getFullName();
     co::int32 facetIdx = param->getFacet()->getIndex();
     co::int32 instanceID;
     
     if( isLocalObject( provider ) )
     {
-        instanceID = _serverNode->publishInstance( provider );
-        _encoder.addRefParam( instanceID, facetIdx, Encoder::RefOwner::LOCAL );
+        instanceID = _node->publishInstance( provider );
+        _encoder.addRefParam( instanceID, facetIdx, Encoder::RefOwner::LOCAL, &providerType, 
+                             &_node->getPublicAddress() );
     }
     else // is a remote object, so it provides the IInstanceInfo service
     {
-        IInstanceInfo* info = provider->getService<IInstanceInfo>();
+        RemoteObject* providerRO = static_cast<RemoteObject*>( provider );
+        IInstanceInfo* info = static_cast<IInstanceInfo*>( providerRO );
         
         instanceID = info->getInstanceID();
         const std::string& ownerAddress = info->getOwnerAddress();
@@ -214,7 +242,8 @@ void RemoteObject::onInterfaceParam( co::IService* param )
         }
         else
         {
-            _encoder.addRefParam( instanceID, facetIdx, Encoder::RefOwner::ANOTHER, &ownerAddress );
+            _encoder.addRefParam( instanceID, facetIdx, Encoder::RefOwner::ANOTHER, &providerType, 
+                                 &ownerAddress );
         }
     }
 }
@@ -229,6 +258,13 @@ co::int32 RemoteObject::getInstanceID()
 const std::string& RemoteObject::getOwnerAddress()
 {
     return _connecter->getAddress();
+}
+    
+void RemoteObject::awaitReplyUpdating( std::string& msg )
+{
+    while( !_connecter->receiveReply( msg ) )
+        _node->update();
+
 }
 
 CORAL_EXPORT_COMPONENT( RemoteObject, RemoteObject );

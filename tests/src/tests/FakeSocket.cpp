@@ -54,7 +54,7 @@ namespace reef
 		void notifyTarget()
 		{
 			if( !_target )
-				throw co::Exception( "A message sent needs a Target ServerNode" );
+				throw co::Exception( "A message sent needs a Target Node" );
             
             _target->msgSent();
 		}

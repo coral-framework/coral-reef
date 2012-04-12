@@ -25,7 +25,8 @@ message Ref_Type
 	required Owner owner = 1;
 	required uint32 instance_id = 2;
 	required uint32 facet_idx = 3;
-	optional string owner_ip = 4;
+	optional string instance_type = 4;
+	optional string owner_ip = 5;
 }
 
 // Commands (triggers actions into destination nodes)
@@ -55,7 +56,6 @@ message Message
 		MSG_NEW_INST = 0;
 		MSG_ACCESS_INST = 1;
 		MSG_CALL = 2;
-		MSG_FIELD = 3;
 	}
 	
 	required Type msg_type = 1;

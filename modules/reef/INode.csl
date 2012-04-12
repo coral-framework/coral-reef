@@ -1,9 +1,10 @@
 /*
 	This service is responsible for managing components in remote locations. Remote components are proxies 
 	for components which are not locally instancied and their real actual memory representation exists only
-	in other location (remote machine).
+	in other location (remote machine). In order to answer requests, get return values and
+	maintain coherence, there should be a loop calling update() frequently.
 */
-interface IClientNode
+interface INode
 {
 	/*!
 		Creates a new remote instance for a component of type named \a componentTypeName
@@ -12,4 +13,12 @@ interface IClientNode
 		\throws exception para tipo inexistente no destino.
 	 */
 	co.IObject newRemoteInstance( in string componentTypeName, in string address );
+
+// TODO remove second parameter and get from system
+	void start( in string boundAddress, in string publicAddress );
+	
+	void stop();
+	
+	// Get and process incoming messages
+	void update();
 };

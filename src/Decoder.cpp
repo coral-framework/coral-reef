@@ -143,9 +143,6 @@ void Message_Type2MsgType( Message_Type message_type, Decoder::MsgType& msgType 
         case Message::MSG_CALL:
             msgType = Decoder::MsgType::CALL;
             break;
-        case Message::MSG_FIELD:
-            msgType = Decoder::MsgType::FIELD;
-            break;
     }
 }
     
@@ -206,7 +203,7 @@ void Decoder::getValueParam( co::Any& param, co::IType* descriptor )
 }
 
 void Decoder::getRefParam( co::int32& instanceID, co::int32& facetIdx, RefOwner& owner,
-                 std::string& ownerAddress )
+                  std::string& instanceType, std::string& ownerAddress )
 {
     checkIfCallMsg();
     const Ref_Type& refType = _msgMember->arguments( _currentParam++ ).data( 0 ).ref_type();
@@ -217,6 +214,8 @@ void Decoder::getRefParam( co::int32& instanceID, co::int32& facetIdx, RefOwner&
     {
         case Ref_Type::OWNER_LOCAL:
             owner = RefOwner::LOCAL;
+            ownerAddress = refType.owner_ip();
+            instanceType = refType.instance_type();
             return;
         case Ref_Type::OWNER_RECEIVER:
             owner = RefOwner::RECEIVER;
@@ -224,6 +223,7 @@ void Decoder::getRefParam( co::int32& instanceID, co::int32& facetIdx, RefOwner&
         case Ref_Type::OWNER_ANOTHER:
             owner = RefOwner::ANOTHER;
             ownerAddress = refType.owner_ip();
+            instanceType = refType.instance_type();
             return;
     }
 }

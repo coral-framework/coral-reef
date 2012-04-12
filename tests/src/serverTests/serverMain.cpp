@@ -7,7 +7,7 @@
 #include <co/ISystem.h>
 #include <co/reserved/LibraryManager.h>
 
-#include <reef/IServerNode.h>
+#include <reef/INode.h>
 
 #include <co/Coral.h>
 #include <co/IObject.h>
@@ -23,10 +23,10 @@ int main( int argc, char** argv )
 
 	try
 	{
-		co::IObject* obj = co::newInstance( "reef.ServerNode" );
-		reef::IServerNode* server = obj->getService<reef::IServerNode>();
+		co::IObject* obj = co::newInstance( "reef.Node" );
+		reef::INode* server = obj->getService<reef::INode>();
     
-		server->start( "tcp://*:4020" );
+		server->start( "tcp://*:4020", "tcp://localhost:4020" );
 
 		while( true )
 			server->update();

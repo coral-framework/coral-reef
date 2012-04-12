@@ -2,18 +2,20 @@
 
 #include <testModule/ISimpleTypes.h>
 #include <testModule/IComplexTypes.h>
+#include <testModule/IReferenceTypes.h>
 
-#include <reef/IClientNode.h>
+#include <reef/INode.h>
 
 #include <co/Coral.h>
+#include <co/RefPtr.h>
 #include <co/IObject.h>
 
 namespace reef
 {
-    
-TEST( SmokeTests, communicationTest )
+
+TEST( SmokeTests, simpleTypesTest )
 {
-    reef::IClientNode* cNode = co::newInstance( "reef.ClientNode" )->getService<reef::IClientNode>();
+    reef::INode* cNode = co::newInstance( "reef.Node" )->getService<reef::INode>();
     
     testModule::ISimpleTypes* simple = cNode->newRemoteInstance( "testModule.TestComponent",
                                             "tcp://localhost:4020" )->getService<testModule::ISimpleTypes>();
@@ -77,5 +79,29 @@ TEST( SmokeTests, communicationTest )
     EXPECT_STREQ( stringRange[0].c_str(), stringVec[2].c_str() );
     EXPECT_STREQ( stringRange[1].c_str(), stringVec2[2].c_str() );
 }
+//
+//TEST( SmokeTests, refTypeParameterTest )
+//{
+//    reef::INode* node = co::newInstance( "reef.Node" )->getService<reef::INode>();
+//    node->start( "tcp://*:4021", "tcp://localhost:4021" );
+//    co::RefPtr<co::IObject> remoteTC = node->newRemoteInstance( "testModule.TestComponent",
+//                                                                "tcp://localhost:4020" );
+//    testModule::ISimpleTypes* remoteSimple = remoteTC->getService<testModule::ISimpleTypes>();
+//    testModule::IReferenceTypes* remoteRef = remoteTC->getService<testModule::IReferenceTypes>();
+//    
+//    co::RefPtr<co::IObject> localTC = co::newInstance( "testModule.TestComponent" );
+//    testModule::ISimpleTypes* localSimple = localTC->getService<testModule::ISimpleTypes>();
+//    testModule::IReferenceTypes* localRef = localTC->getService<testModule::IReferenceTypes>();
+//    
+//    EXPECT_EQ( remoteRef->callIncrementInt( remoteSimple, 3 ), 4 );
+//    EXPECT_EQ( remoteRef->callDivideDouble( remoteSimple, 15, 5 ), 3 );
+//    EXPECT_STREQ( remoteRef->concatenateString( remoteSimple, "aaa", "bbb" ).c_str(), "aaabbb" );
+//    
+//    EXPECT_EQ( remoteRef->callIncrementInt( localSimple, 3 ), 4 );
+//    EXPECT_EQ( remoteRef->callDivideDouble( localSimple, 15, 5 ), 3 );
+//    EXPECT_STREQ( remoteRef->concatenateString( localSimple, "aaa", "bbb" ).c_str(), "aaabbb" );
+//
+//}
+
     
 }

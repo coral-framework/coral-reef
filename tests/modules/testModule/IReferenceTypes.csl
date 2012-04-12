@@ -1,4 +1,6 @@
 interface IReferenceTypes
 {
-	int32 dummy;
+	int32 callIncrementInt( in ISimpleTypes service, in int32 number );
+	double callDivideDouble( in ISimpleTypes service, in double dividend,  in double divisor );
+	string concatenateString( in ISimpleTypes service, in string str1, in string str2 );
 };
