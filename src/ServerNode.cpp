@@ -3,16 +3,17 @@
 #include "Decoder.h"
 #include "Servant.h"
 
-#include "network/Connection.h"
+#include "network/Transport.h"
 
 #include <iostream>
 #include <map>
 
 namespace reef {
 
-ServerNode::ServerNode()  : _decoder( &_binder )
+ServerNode::ServerNode()  : _decoder( _binder )
 {
-    // empty constructor
+    _transport = Transport::getInstance();
+    _binder = 0;
 }
     
 ServerNode::~ServerNode()
@@ -22,7 +23,7 @@ ServerNode::~ServerNode()
     
 void ServerNode::start( const std::string& address )
 {
-    _binder.bind( address );
+     _binder = _transport->newBinder( address );
 	Servant* servant = new Servant( 0 );
     servant->setServerNode( this );
     _servants.push_back( servant );
@@ -30,11 +31,10 @@ void ServerNode::start( const std::string& address )
     
 void ServerNode::update()
 {
-    if( !_binder.isBound() )
-        return;
+    assert( _binder );
         
 	std::string message;
-	if( _binder.receive( message ) )    
+	if( _binder->receive( message ) )    
 	{
 		// Route the message to the proper servant
 		_decoder.routeAndDeliver( message, _servants );
@@ -43,8 +43,7 @@ void ServerNode::update()
 
 void ServerNode::stop()
 {
-    if( _binder.isBound() )
-        _binder.close();
+    assert( _binder );
     
     // fill the empty holes in the servants vector
     for( ; !_freedIds.empty(); _freedIds.pop() )
@@ -61,6 +60,8 @@ void ServerNode::stop()
     {
         delete static_cast<Servant*>( _servants[i] );
     }
+    
+    delete _binder;
 }
 
 co::int32 ServerNode::newInstance( const std::string& typeName ) 

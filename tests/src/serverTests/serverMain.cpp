@@ -23,6 +23,7 @@ int main( int argc, char** argv )
 
 	try
 	{
+        
 		co::IObject* obj = co::newInstance( "reef.ServerNode" );
 		reef::IServerNode* server = obj->getService<reef::IServerNode>();
     

@@ -3,7 +3,7 @@
 
 #include "Message.pb.h"
 #include "MessageUtils.h"
-#include "network/Connection.h"
+#include "network/Transport.h"
 
 #include <co/IField.h>
 #include <co/IMethod.h>

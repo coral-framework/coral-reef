@@ -4,7 +4,7 @@
 #include <co/Any.h>
 #include <co/Coral.h>
 
-#include "network/Connection.h"
+#include "network/Transport.h"
 
 #include <sstream>
 

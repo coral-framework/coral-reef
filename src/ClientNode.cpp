@@ -1,7 +1,7 @@
 #include "ClientNode_Base.h"
 #include "RemoteObject.h"
 #include "Encoder.h"
-#include "network/Connection.h"
+#include "network/Transport.h"
 
 #include <co/IObject.h>
 
@@ -16,7 +16,7 @@ class ClientNode : public ClientNode_Base
 public:
     ClientNode()
     {
-        // empty constructor
+        _transport = Transport::getInstance();
     }
     
     virtual ~ClientNode()
@@ -29,13 +29,14 @@ public:
         co::IComponent* componentType = co::cast<co::IComponent>( 
                                           co::getType( componentTypeName ) );
         
-        Connecter* connecter = Connecter::getOrOpenConnection( address );
+        Connecter* connecter = _transport->getConnecter( address );
         
         return new RemoteObject( componentType, new Encoder( connecter,
                                         _serverNode ) );
     }
     
 private:
+    Transport* _transport;
     IServerNode* _serverNode;
 };
 

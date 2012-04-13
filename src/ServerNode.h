@@ -2,7 +2,7 @@
 #include <map>
 
 #include "Decoder.h"
-#include "network/Connection.h"
+#include "network/Transport.h"
 #include <stack>
 
 namespace reef {
@@ -50,7 +50,8 @@ private:
     co::int32 getVirtualAddress( const co::IObject* instance );
     
 private:
-	Binder _binder;
+    Transport* _transport;
+	Binder* _binder;
     Decoder _decoder;
 
     // the servants and the number of remote references for it
