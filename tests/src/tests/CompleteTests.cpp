@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "FakeSocket.h"
-#include "network/Connection.h"
+#include "network/Transport.h"
 #include "Encoder.h"
 #include "Decoder.h"
 #include <RemoteObject.h>

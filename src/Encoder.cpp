@@ -1,7 +1,6 @@
 #include "Encoder.h"
 
 #include "Message.pb.h"
-#include "network/Connection.h"
 
 #include <co/IField.h>
 #include <co/IMethod.h>
