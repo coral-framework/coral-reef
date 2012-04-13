@@ -16,6 +16,7 @@ namespace reef
 TEST( SmokeTests, simpleTypesTest )
 {
     reef::INode* cNode = co::newInstance( "reef.Node" )->getService<reef::INode>();
+    cNode->start( "tcp://*:4021", "tcp://localhost:4021" );
     
     testModule::ISimpleTypes* simple = cNode->newRemoteInstance( "testModule.TestComponent",
                                             "tcp://localhost:4020" )->getService<testModule::ISimpleTypes>();

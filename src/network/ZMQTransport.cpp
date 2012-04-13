@@ -36,11 +36,14 @@ public:
     bool receiveReply( std::string& data )
     {
         zmq::message_t msg;
-        _socket.recv( &msg );
-        data.resize( msg.size() );
-        memcpy( &data[0], msg.data(), msg.size() );
+        if( _socket.recv( &msg, ZMQ_NOBLOCK ) )
+        {
+            data.resize( msg.size() );
+            memcpy( &data[0], msg.data(), msg.size() );
+            return true;
+        }
         
-        return true;        
+        return false;        
     }
     
     const std::string& getAddress() { return _address; }

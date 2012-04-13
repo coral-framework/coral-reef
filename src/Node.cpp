@@ -3,7 +3,7 @@
 #include "Decoder.h"
 #include "Servant.h"
 #include "RemoteObject.h"
-#include "network/Connection.h"
+#include "network/Transport.h"
 
 #include <co/Exception.h>
 
@@ -14,7 +14,7 @@ namespace reef {
 
 Node* Node::_nodeInstance = 0;
     
-Node::Node()
+Node::Node() : _binder( 0 )
 {
     if( _nodeInstance )
         throw new co::Exception( "Only one server node allowed at a time" );
@@ -25,12 +25,15 @@ Node::Node()
 Node::~Node()
 {
     _nodeInstance = 0;
+    
+    if( _binder )
+        stop();
 }
     
 co::IObject* Node::newRemoteInstance( const std::string& instanceType, 
                                            const std::string& address )
 {
-    Connecter* connecter = Connecter::getOrOpenConnection( address );
+    Connecter* connecter = _transport->getConnecter( address );
     co::int32 instanceID = requestNewInstance( connecter, instanceType );
     
     co::IComponent* component = co::cast<co::IComponent>( co::getType( instanceType ) );
@@ -38,31 +41,30 @@ co::IObject* Node::newRemoteInstance( const std::string& instanceType,
     return RemoteObject::getOrCreateRemoteObject( component, connecter, instanceID );
 }
 
-void Node::start( const std::string&  boundAddress, const std::string& connectableAddress )
+void Node::start( const std::string&  boundAddress, const std::string& publicAddress )
 {
-    _binder.bind( boundAddress );
-    
-    _myPublicAddress = connectableAddress;
-    
-    // This first instanceID is for the Node
-    _servants.push_back( 0 );
-    _remoteRefCounting.push_back( 0 );
+    Transport::setConcreteTransport( Transport::Transports::ZMQ );
+    initialize( boundAddress, publicAddress );
+}
+
+void Node::startTest( const std::string&  boundAddress, const std::string& publicAddress )
+{
+    Transport::setConcreteTransport( Transport::Transports::LIST );
+    initialize( boundAddress, publicAddress );
 }
     
 void Node::update()
 {
-    if( !_binder.isBound() )
-        throw new co::Exception( "The server node must be started" );
+    assert( _binder );
         
 	std::string msg;
-    if( _binder.receive( msg ) )
+    if( _binder->receive( msg ) )
         dispatchMessage( msg );
 }
 
 void Node::stop()
 {
-    if( _binder.isBound() )
-        _binder.close();
+    assert( _binder );
     
     // fill the empty holes in the servants vector
     for( ; !_freedIds.empty(); _freedIds.pop() )
@@ -77,14 +79,17 @@ void Node::stop()
     size_t size = _servants.size();
     for( int i = 1; i < size; i++ )
     {
-        delete static_cast<Servant*>( _servants[i] );
+        delete _servants[i];
     }
+    
+    delete _binder;
+    _binder = 0;
 }
 
 co::IObject* Node::getRemoteInstance( const std::string& instanceType, co::int32 instanceID, 
                                      const std::string& ownerAddress )
 {
-    Connecter* connecter = Connecter::getOrOpenConnection( ownerAddress );
+    Connecter* connecter = _transport->getConnecter( ownerAddress );
     
     co::IComponent* component = co::cast<co::IComponent>( co::getType( instanceType ) );
     
@@ -139,7 +144,7 @@ void Node::onNewInstMsg()
     _encoder.encodeData( instanceID, msg );
     
     // reply it to the client
-    _binder.reply( msg );
+    _binder->reply( msg );
 }
     
 void Node::onAccessInstMsg()
@@ -167,7 +172,7 @@ void Node::onMsgForServant( co::int32 instanceID, bool hasReturn )
     std::string msg;
     _encoder.encodeData( retValue, msg );
     
-    _binder.reply( msg );
+    _binder->reply( msg );
 }
 
 co::int32 Node::publishInstance( co::IObject* instance )
@@ -239,6 +244,21 @@ void Node::releaseInstance( co::int32 instanceID )
     delete _servants[instanceID];
     _freedIds.push( instanceID );
     
+}
+    
+void Node::initialize( const std::string& boundAddress, const std::string& publicAddress )
+{
+    assert( !_binder );
+    _transport = Transport::getInstance();
+    
+    _binder = _transport->newBinder( boundAddress );
+    
+    _myPublicAddress = publicAddress;
+    
+    // This first instanceID is for the Node
+    _servants.push_back( 0 );
+    _remoteRefCounting.push_back( 0 );
+
 }
 
 CORAL_EXPORT_COMPONENT( Node, Node );

@@ -20,13 +20,13 @@ Transport::~Transport()
     
 void Transport::setConcreteTransport( Transports concreteType )
 {
-    if( !_instance )
+    if( _instance )
         throw new co::Exception( "Must clear the current transport instance before changing its type" );
     
     switch( concreteType )
     {
         case Transports::ZMQ: _instance = new ZMQTransport(); break;
-        //case Transports::LIST: return new ListTransport();
+        case Transports::LIST: throw new co::Exception( "NYI" );
     }
 }
 

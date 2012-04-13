@@ -1,7 +1,7 @@
 #include "RemoteObject.h"
 
 #include "Node.h"
-#include "network/Connection.h"
+#include "network/Transport.h"
 
 #include <co/IPort.h>
 #include <co/IField.h>

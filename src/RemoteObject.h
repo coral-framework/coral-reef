@@ -5,7 +5,7 @@
 
 #include "Decoder.h"
 #include "Encoder.h"
-#include "network/Connection.h"
+#include "network/Transport.h"
 
 #include <co/IService.h>
 #include <co/RefVector.h>

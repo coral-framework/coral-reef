@@ -17,6 +17,9 @@ interface INode
 // TODO remove second parameter and get from system
 	void start( in string boundAddress, in string publicAddress );
 	
+	// same as start, but uses a internal network implementation for local testing
+	void startTest( in string boundAddress, in string publicAddress );
+	
 	void stop();
 	
 	// Get and process incoming messages

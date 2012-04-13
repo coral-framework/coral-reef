@@ -6,7 +6,7 @@
 #include "Servant.h"
 #include "Decoder.h"
 #include "Encoder.h"
-#include "network/Connection.h"
+#include "network/Transport.h"
 
 #include <map>
 #include <stack>
@@ -23,7 +23,9 @@ public:
     // INode methods
     co::IObject* newRemoteInstance( const std::string& instanceType, const std::string& address );
     
-    void start( const std::string& boundAddress, const std::string& connectableAddress );
+    void start( const std::string& boundAddress, const std::string& publicAddress );
+    
+    void startTest( const std::string& boundAddress, const std::string& publicAddress );
     
 	void update();
 
@@ -86,8 +88,10 @@ private:
     // returns -1 if not found
     co::int32 getInstanceID( const co::IObject* instance );
     
+    void initialize( const std::string& boundAddress, const std::string& publicAddress );
 private:
-	Binder _binder;
+    Transport* _transport;
+	Binder* _binder;
     Decoder _decoder;
     Encoder _encoder;
     
