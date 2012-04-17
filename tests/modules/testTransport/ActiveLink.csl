@@ -1,0 +1,7 @@
+import reef.IActiveLink;
+
+component ActiveLink
+{
+	provides reef.IActiveLink active;
+
+};

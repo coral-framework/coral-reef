@@ -6,7 +6,6 @@ project( SERVERTESTS )
 
 include_directories(
 	${GTEST_INCLUDE_DIRS}
-	${TOTO_BINARY_DIR}/generated
 	${CMAKE_BINARY_DIR}/src/generated
 	${CMAKE_SOURCE_DIR}/src
 )
@@ -16,7 +15,7 @@ file( GLOB _HEADERS *.h )
 file( GLOB _SOURCES *.cpp )
 
 add_executable( serverTests EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} ${_CORE_SOURCES} ${_GENERATED_FILES} )
-add_dependencies( serverTests toto reef )
+add_dependencies( serverTests testModule testTransport reef )
 
 CORAL_TARGET( serverTests )
 

@@ -10,6 +10,7 @@ CORAL_GET_PATH_STRING( CORAL_PATH_STR )
 set_property( DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS "CORAL_PATH=\"${CORAL_PATH_STR}\"" )
 
 add_subdirectory( testModule )
+add_subdirectory( testTransport )
 add_subdirectory( tests )
 
 set( MANUAL_TESTING ON CACHE BOOL "Manual client server testing" )

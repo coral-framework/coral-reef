@@ -1,0 +1,13 @@
+import reef.ITransport;
+
+component Transport
+{
+	provides reef.ITransport transport;
+	
+	/* 
+	Workaround receptacle. works like a multiple INode setter. Usage: set repeatedly all the nodes 
+	that should be frequently updated and they will be stored internally. Whenever a Links has to
+	wait for a reply, all the provided nodes will be continuously updated until the reply is received
+	 */
+	receives reef.INode node;
+};

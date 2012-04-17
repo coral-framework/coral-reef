@@ -1,0 +1,6 @@
+import reef.IPassiveLink;
+
+component PassiveLink
+{
+	provides reef.IPassiveLink passive;
+};
