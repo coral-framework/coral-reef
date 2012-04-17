@@ -3,8 +3,9 @@
 #include "Decoder.h"
 #include "Servant.h"
 #include "RemoteObject.h"
-#include "network/Transport.h"
 
+#include <reef/IActiveLink.h>
+#include <reef/IPassiveLink.h>
 #include <co/Exception.h>
 
 #include <iostream>
@@ -14,7 +15,7 @@ namespace reef {
 
 Node* Node::_nodeInstance = 0;
     
-Node::Node() : _binder( 0 )
+Node::Node() : _passiveLink( 0 )
 {
     if( _nodeInstance )
         throw new co::Exception( "Only one server node allowed at a time" );
@@ -26,45 +27,46 @@ Node::~Node()
 {
     _nodeInstance = 0;
     
-    if( _binder )
+    if( _passiveLink )
         stop();
 }
     
 co::IObject* Node::newRemoteInstance( const std::string& instanceType, 
                                            const std::string& address )
 {
-    Connecter* connecter = _transport->getConnecter( address );
-    co::int32 instanceID = requestNewInstance( connecter, instanceType );
+    IActiveLink* link = _transport->connect( address );
+    co::int32 instanceID = requestNewInstance( link, instanceType );
     
     co::IComponent* component = co::cast<co::IComponent>( co::getType( instanceType ) );
     
-    return RemoteObject::getOrCreateRemoteObject( component, connecter, instanceID );
+    return RemoteObject::getOrCreateRemoteObject( component, link, instanceID );
 }
 
 void Node::start( const std::string&  boundAddress, const std::string& publicAddress )
 {
-    Transport::setConcreteTransport( Transport::Transports::ZMQ );
-    initialize( boundAddress, publicAddress );
-}
-
-void Node::startTest( const std::string&  boundAddress, const std::string& publicAddress )
-{
-    Transport::setConcreteTransport( Transport::Transports::LIST );
-    initialize( boundAddress, publicAddress );
+    assert( !_passiveLink );
+    
+    _passiveLink = _transport->bind( boundAddress );
+    
+    _myPublicAddress = publicAddress;
+    
+    // This first instanceID is for the Node
+    _servants.push_back( 0 );
+    _remoteRefCounting.push_back( 0 );
 }
     
 void Node::update()
 {
-    assert( _binder );
+    assert( _passiveLink );
         
 	std::string msg;
-    if( _binder->receive( msg ) )
+    if( _passiveLink->receive( msg ) )
         dispatchMessage( msg );
 }
 
 void Node::stop()
 {
-    assert( _binder );
+    assert( _passiveLink );
     
     // fill the empty holes in the servants vector
     for( ; !_freedIds.empty(); _freedIds.pop() )
@@ -82,27 +84,28 @@ void Node::stop()
         delete _servants[i];
     }
     
-    delete _binder;
-    _binder = 0;
+    delete _passiveLink;
+    _passiveLink = 0;
 }
 
 co::IObject* Node::getRemoteInstance( const std::string& instanceType, co::int32 instanceID, 
                                      const std::string& ownerAddress )
 {
-    Connecter* connecter = _transport->getConnecter( ownerAddress );
+    IActiveLink* link = _transport->connect( ownerAddress );
     
     co::IComponent* component = co::cast<co::IComponent>( co::getType( instanceType ) );
     
-    return RemoteObject::getOrCreateRemoteObject( component, connecter, instanceID );
+    return RemoteObject::getOrCreateRemoteObject( component, link, instanceID );
 }
 
-co::int32 Node::requestNewInstance( Connecter* connecter, const std::string& componentName )
+co::int32 Node::requestNewInstance( IActiveLink* link, const std::string& componentName )
 {
     std::string msg;
     _encoder.encodeNewInstMsg( componentName, msg );
-    connecter->send( msg );
+    link->send( msg );
     
-    while( !connecter->receiveReply( msg ) )
+    // The Wait for the reply still keeps updating the server
+    while( !link->receiveReply( msg ) )
         update();
     
     co::int32 instanceID;
@@ -144,7 +147,7 @@ void Node::onNewInstMsg()
     _encoder.encodeData( instanceID, msg );
     
     // reply it to the client
-    _binder->reply( msg );
+    _passiveLink->sendReply( msg );
 }
     
 void Node::onAccessInstMsg()
@@ -172,7 +175,7 @@ void Node::onMsgForServant( co::int32 instanceID, bool hasReturn )
     std::string msg;
     _encoder.encodeData( retValue, msg );
     
-    _binder->reply( msg );
+    _passiveLink->sendReply( msg );
 }
 
 co::int32 Node::publishInstance( co::IObject* instance )
@@ -245,22 +248,17 @@ void Node::releaseInstance( co::int32 instanceID )
     _freedIds.push( instanceID );
     
 }
-    
-void Node::initialize( const std::string& boundAddress, const std::string& publicAddress )
-{
-    assert( !_binder );
-    _transport = Transport::getInstance();
-    
-    _binder = _transport->newBinder( boundAddress );
-    
-    _myPublicAddress = publicAddress;
-    
-    // This first instanceID is for the Node
-    _servants.push_back( 0 );
-    _remoteRefCounting.push_back( 0 );
 
+reef::ITransport* Node::getTransportService()
+{
+    return _transport;
 }
 
+void Node::setTransportService( reef::ITransport* transport )
+{
+    _transport = transport;
+}
+    
 CORAL_EXPORT_COMPONENT( Node, Node );
     
 } // namespace reef

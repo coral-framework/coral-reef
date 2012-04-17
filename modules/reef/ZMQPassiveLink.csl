@@ -1,0 +1,4 @@
+component ZMQPassiveLink
+{
+	provides IPassiveLink passive;
+};

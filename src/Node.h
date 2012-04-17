@@ -6,7 +6,8 @@
 #include "Servant.h"
 #include "Decoder.h"
 #include "Encoder.h"
-#include "network/Transport.h"
+
+#include <reef/ITransport.h>
 
 #include <map>
 #include <stack>
@@ -30,6 +31,11 @@ public:
 	void update();
 
     void stop();
+    
+protected: // receptacles
+    reef::ITransport* getTransportService();
+    
+	void setTransportService( reef::ITransport* transport );
 
 public:
     inline static Node* getNodeInstance() { assert( _nodeInstance ); return _nodeInstance; }
@@ -55,7 +61,7 @@ public:
     
 private:
     // Sends a message to another node to create an instance of provided type, blocking.
-    co::int32 requestNewInstance( Connecter* connecter, const std::string& componentName );
+    co::int32 requestNewInstance( IActiveLink* link, const std::string& componentName );
     
     // Dispatches the msg received during an update()
     void dispatchMessage( const std::string& msg );
@@ -88,10 +94,9 @@ private:
     // returns -1 if not found
     co::int32 getInstanceID( const co::IObject* instance );
     
-    void initialize( const std::string& boundAddress, const std::string& publicAddress );
 private:
-    Transport* _transport;
-	Binder* _binder;
+    ITransport* _transport;
+	IPassiveLink* _passiveLink;
     Decoder _decoder;
     Encoder _encoder;
     

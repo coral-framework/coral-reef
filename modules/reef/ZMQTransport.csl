@@ -1,0 +1,4 @@
+component ZMQTransport
+{
+	provides ITransport transport;
+};

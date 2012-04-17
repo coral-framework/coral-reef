@@ -1,0 +1,11 @@
+// Receives messages and optionally replies. Should be paired with an IActiveLink
+interface IPassiveLink
+{
+	readonly string address;
+	
+	// Non-blocking. Checks for messages. If positive, store the msg in \a msg and returns true.
+	bool receive( out string msg );
+	
+	// Sends a message to the sender of the last received message.
+	void sendReply( in string msg );
+};

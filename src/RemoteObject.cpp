@@ -1,8 +1,8 @@
 #include "RemoteObject.h"
 
 #include "Node.h"
-#include "network/Transport.h"
 
+#include <reef/IActiveLink.h>
 #include <co/IPort.h>
 #include <co/IField.h>
 #include <co/IMethod.h>
@@ -46,15 +46,15 @@ private:
 };
 
 // Maps every Connecter to a Host. Could be ip to Host but would be slower.
-typedef std::map<Connecter*, Host*> Hosts;
+typedef std::map<IActiveLink*, Host*> Hosts;
 static Hosts _hosts;
     
 RemoteObject* RemoteObject::getOrCreateRemoteObject( co::IComponent* component,
-                                            Connecter* connecter, co::int32 instanceID )
+                                            IActiveLink* link, co::int32 instanceID )
 {
     Host* host = 0;
     RemoteObject* retValue = 0;
-    Hosts::iterator it = _hosts.find( connecter );
+    Hosts::iterator it = _hosts.find( link );
     if( it != _hosts.end() )
     {
         host = it->second;
@@ -66,10 +66,10 @@ RemoteObject* RemoteObject::getOrCreateRemoteObject( co::IComponent* component,
     else
     {
         host = new Host();
-        _hosts.insert( std::pair<Connecter*, Host*>( connecter, host ) );
+        _hosts.insert( std::pair<IActiveLink*, Host*>( link, host ) );
     }
     
-    retValue = new RemoteObject( component, connecter, instanceID );
+    retValue = new RemoteObject( component, link, instanceID );
     host->addInstance( retValue, instanceID );
     
     return retValue;
@@ -79,8 +79,8 @@ RemoteObject::RemoteObject()
 {
 }
     
-RemoteObject::RemoteObject( co::IComponent* component, Connecter* connecter, co::int32 instanceID ) :
-    _connecter( connecter ), _numFacets( 0 )
+RemoteObject::RemoteObject( co::IComponent* component, IActiveLink* link, co::int32 instanceID ) :
+    _link( link ), _numFacets( 0 )
 {
     _node = Node::getNodeInstance();
     _classPtr = *reinterpret_cast<void**>( this );
@@ -90,7 +90,7 @@ RemoteObject::RemoteObject( co::IComponent* component, Connecter* connecter, co:
     
 RemoteObject::~RemoteObject()
 {   
-    Hosts::iterator it = _hosts.find( _connecter.get() );
+    Hosts::iterator it = _hosts.find( _link.get() );
     assert( it != _hosts.end() );
     
     Host* host = it->second;
@@ -153,7 +153,7 @@ const co::Any& RemoteObject::dynamicGetField( co::int32 dynFacetId, co::IField* 
     _encoder.beginEncodingCallMsg( _instanceID, dynFacetId, field->getIndex(), true );
     std::string msg;
     _encoder.finishEncodingCallMsg( msg );
-    _connecter->send( msg );
+    _link->send( msg );
     
     awaitReplyUpdating( msg );
     
@@ -173,7 +173,7 @@ void RemoteObject::dynamicSetField( co::int32 dynFacetId, co::IField* field, con
 
     std::string msg;
     _encoder.finishEncodingCallMsg( msg );
-    _connecter->send( msg );
+    _link->send( msg );
 
 }
 
@@ -198,7 +198,7 @@ const co::Any& RemoteObject::dynamicInvoke( co::int32 dynFacetId, co::IMethod* m
     
     std::string msg;
     _encoder.finishEncodingCallMsg( msg );
-    _connecter->send( msg );
+    _link->send( msg );
     
 	if( returnType )
     {
@@ -236,7 +236,7 @@ void RemoteObject::onInterfaceParam( co::IService* param )
         instanceID = info->getInstanceID();
         const std::string& ownerAddress = info->getOwnerAddress();
         
-        if( ownerAddress == _connecter->getAddress() ) // Receiver
+        if( ownerAddress == _link->getAddress() ) // Receiver
         {
             _encoder.addRefParam( instanceID, facetIdx, Encoder::RefOwner::RECEIVER );
         }
@@ -257,12 +257,12 @@ co::int32 RemoteObject::getInstanceID()
 
 const std::string& RemoteObject::getOwnerAddress()
 {
-    return _connecter->getAddress();
+    return _link->getAddress();
 }
     
 void RemoteObject::awaitReplyUpdating( std::string& msg )
 {
-    while( !_connecter->receiveReply( msg ) )
+    while( !_link->receiveReply( msg ) )
         _node->update();
 
 }

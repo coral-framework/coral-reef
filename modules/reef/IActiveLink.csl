@@ -1,0 +1,11 @@
+// Sends messages and optionally receive replies, should be paired with an IPassiveLink.
+interface IActiveLink
+{
+	readonly string address;
+
+	// Sends a message
+	void send( in string msg );
+	
+	// Non-Blocking. Returns true if a message has arrived and has been stored in \a msg
+	bool receiveReply( out string msg );
+};
