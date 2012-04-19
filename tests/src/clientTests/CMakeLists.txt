@@ -16,7 +16,7 @@ file( GLOB _HEADERS *.h )
 file( GLOB _SOURCES *.cpp )
 
 add_executable( clientTests EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} )
-add_dependencies( clientTests testTransport testModule reef )
+add_dependencies( clientTests testModule reef )
 
 CORAL_TARGET( clientTests )
 

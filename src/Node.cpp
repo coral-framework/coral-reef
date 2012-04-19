@@ -13,21 +13,13 @@
 
 namespace reef {
 
-Node* Node::_nodeInstance = 0;
-    
 Node::Node() : _passiveLink( 0 )
 {
-    if( _nodeInstance )
-        throw new co::Exception( "Only one server node allowed at a time" );
-    
-    _nodeInstance = this;
 }
     
 Node::~Node()
 {
-    _nodeInstance = 0;
-    
-    if( _passiveLink )
+    if( _passiveLink.get() )
         stop();
 }
     
@@ -39,12 +31,12 @@ co::IObject* Node::newRemoteInstance( const std::string& instanceType,
     
     co::IComponent* component = co::cast<co::IComponent>( co::getType( instanceType ) );
     
-    return RemoteObject::getOrCreateRemoteObject( component, link, instanceID );
+    return RemoteObject::getOrCreateRemoteObject( this, component, link, instanceID );
 }
 
 void Node::start( const std::string&  boundAddress, const std::string& publicAddress )
 {
-    assert( !_passiveLink );
+    assert( !_passiveLink.get() );
     
     _passiveLink = _transport->bind( boundAddress );
     
@@ -57,7 +49,7 @@ void Node::start( const std::string&  boundAddress, const std::string& publicAdd
     
 void Node::update()
 {
-    assert( _passiveLink );
+    assert( _passiveLink.get() );
         
 	std::string msg;
     if( _passiveLink->receive( msg ) )
@@ -66,7 +58,7 @@ void Node::update()
 
 void Node::stop()
 {
-    assert( _passiveLink );
+    assert( _passiveLink.get() );
     
     // fill the empty holes in the servants vector
     for( ; !_freedIds.empty(); _freedIds.pop() )
@@ -84,7 +76,6 @@ void Node::stop()
         delete _servants[i];
     }
     
-    delete _passiveLink;
     _passiveLink = 0;
 }
 
@@ -95,7 +86,7 @@ co::IObject* Node::getRemoteInstance( const std::string& instanceType, co::int32
     
     co::IComponent* component = co::cast<co::IComponent>( co::getType( instanceType ) );
     
-    return RemoteObject::getOrCreateRemoteObject( component, link, instanceID );
+    return RemoteObject::getOrCreateRemoteObject( this, component, link, instanceID );
 }
 
 co::int32 Node::requestNewInstance( IActiveLink* link, const std::string& componentName )
@@ -209,6 +200,11 @@ co::int32 Node::getInstanceID( const co::IObject* instance )
     
     return -1;
 }
+
+Servant* Node::getServantFor( co::int32 instanceID )
+{ 
+    return _servants[instanceID]; 
+}
     
 co::int32 Node::newVirtualAddress()
 {
@@ -232,7 +228,7 @@ co::int32 Node::startRemoteRefCount( co::IObject* instance )
     co::int32 newServantId = newVirtualAddress();
     _vas.insert( objToAddress( instance, newServantId ) );
     
-    _servants[newServantId] = new Servant( instance );
+    _servants[newServantId] = new Servant( this, instance );
     _remoteRefCounting[newServantId] = 1; // TODO set referer
     
     return newServantId;

@@ -8,6 +8,7 @@
 #include "Encoder.h"
 
 #include <reef/ITransport.h>
+#include <reef/IPassiveLink.h>
 
 #include <map>
 #include <stack>
@@ -38,7 +39,6 @@ protected: // receptacles
 	void setTransportService( reef::ITransport* transport );
 
 public:
-    inline static Node* getNodeInstance() { assert( _nodeInstance ); return _nodeInstance; }
     
     // C++ only methods
     inline const std::string& getPublicAddress(){ assert( !_myPublicAddress.empty() ); 
@@ -89,20 +89,19 @@ private:
     
     co::int32 newVirtualAddress();
     
-    inline Servant* getServantFor( co::int32 instanceID ) { return _servants[instanceID]; }
+    Servant* getServantFor( co::int32 instanceID );
     
     // returns -1 if not found
     co::int32 getInstanceID( const co::IObject* instance );
     
 private:
     ITransport* _transport;
-	IPassiveLink* _passiveLink;
+    co::RefPtr<IPassiveLink> _passiveLink;
     Decoder _decoder;
     Encoder _encoder;
     
     std::string _myPublicAddress;
 
-    static Node* _nodeInstance;
     // the servants and the number of remote references for it
     std::vector<Servant*> _servants;
     std::vector<co::int32> _remoteRefCounting;

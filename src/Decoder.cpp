@@ -166,17 +166,22 @@ void Decoder::setMsgForDecoding( const std::string& msg, MsgType& type, co::int3
     instanceID = _message->instance_id();
     hasReturn = _message->has_return();
     Message_Type2MsgType( _message->msg_type(), type );
+    _msgType = type;
 }
 
 // if msg type is NEW, then, this function will decode it
 void Decoder::decodeNewInstMsg( std::string& typeName )
 {
+    assert( _msgType == MsgType::NEW_INST );
+    
     const Message_New_Inst& msgNewInst = _message->msg_new_inst();
     typeName = msgNewInst.new_instance_type();
 }
 
 void Decoder::decodeAccessInstMsg( std::string& refererIP, co::int32& instanceID, bool& increment )
 {
+    assert( _msgType == MsgType::ACCESS_INST );
+    
     const Message_Acc_Inst& msgAccessInst = _message->msg_acc_inst();
     // refererIP = msgAccessInst.referer_ip();
     instanceID = msgAccessInst.instance_id();
@@ -189,6 +194,8 @@ void Decoder::decodeAccessInstMsg( std::string& refererIP, co::int32& instanceID
  */
 void Decoder::beginDecodingCallMsg( co::int32& facetIdx, co::int32& memberIdx )
 {
+    assert( _msgType == MsgType::CALL );
+    
     _msgMember = &_message->msg_member();
     _currentParam = 0;
     facetIdx = _msgMember->facet_idx();
@@ -197,14 +204,14 @@ void Decoder::beginDecodingCallMsg( co::int32& facetIdx, co::int32& memberIdx )
 
 void Decoder::getValueParam( co::Any& param, co::IType* descriptor )
 {
-    checkIfCallMsg();
+    assert( _msgMember );
     PBArgToAny( _msgMember->arguments( _currentParam++ ), descriptor, param );
 }
 
 void Decoder::getRefParam( co::int32& instanceID, co::int32& facetIdx, RefOwner& owner,
                   std::string& instanceType, std::string& ownerAddress )
 {
-    checkIfCallMsg();
+    assert( _msgMember );
     const Ref_Type& refType = _msgMember->arguments( _currentParam++ ).data( 0 ).ref_type();
     instanceID = refType.instance_id();
     facetIdx = refType.facet_idx();
@@ -263,10 +270,5 @@ void Decoder::decodeData( const std::string& msg, co::IType* descriptor, co::Any
     PBArgToAny( arg, descriptor, value );
 }
 
-void Decoder::checkIfCallMsg()
-{
-    if( !_msgMember )
-        throw new co::Exception( "Requires a call message being decoded to extract Param" );
-}
     
 }

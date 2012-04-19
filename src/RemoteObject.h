@@ -19,8 +19,8 @@ class RemoteObject : public RemoteObject_Base
 {
 public:
     // Gets or creates a remote object pointing to an existing instance. 
-    static RemoteObject* getOrCreateRemoteObject( co::IComponent* component, IActiveLink* link,
-                                             co::int32 instanceID );
+    static RemoteObject* getOrCreateRemoteObject( Node* node, co::IComponent* component, 
+                                                 IActiveLink* link, co::int32 instanceID );
     RemoteObject();
     virtual ~RemoteObject();
     
@@ -44,7 +44,7 @@ public:
     inline bool isLocalObject( void* obj ) { return *reinterpret_cast<void**>( obj ) != _classPtr; }
     
 private:
-    RemoteObject( co::IComponent* component, IActiveLink* connecter, co::int32 instanceID );
+    RemoteObject( Node* node, co::IComponent* component, IActiveLink* connecter, co::int32 instanceID );
     
     /* 
      Treats all possible cases of a TK_INTERFACE param in a call/field msg. 

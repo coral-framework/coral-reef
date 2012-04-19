@@ -16,7 +16,7 @@ class Node;
 class Servant
 {
 public:
-    Servant( co::IObject* object );
+    Servant( Node* node, co::IObject* object );
     
      ~Servant();
     

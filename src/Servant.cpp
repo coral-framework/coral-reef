@@ -16,10 +16,8 @@
 namespace reef
 {
 
-Servant::Servant( co::IObject* object )
+Servant::Servant( Node* node, co::IObject* object ) : _node( node )
 {
-    _node = Node::getNodeInstance();
-    
     if( object )
     {
         _object = object;

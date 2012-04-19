@@ -73,6 +73,7 @@ private:
     
 private:
     Message* _message;
+    MsgType _msgType;
     const Message_Member* _msgMember;
     co::int32 _currentParam;
     

@@ -1,3 +1,4 @@
+@lua.Scripted( "testTransport.Transport" ) 
 import reef.ITransport;
 
 component Transport

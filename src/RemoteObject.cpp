@@ -49,7 +49,7 @@ private:
 typedef std::map<IActiveLink*, Host*> Hosts;
 static Hosts _hosts;
     
-RemoteObject* RemoteObject::getOrCreateRemoteObject( co::IComponent* component,
+RemoteObject* RemoteObject::getOrCreateRemoteObject( Node* node, co::IComponent* component,
                                             IActiveLink* link, co::int32 instanceID )
 {
     Host* host = 0;
@@ -69,7 +69,7 @@ RemoteObject* RemoteObject::getOrCreateRemoteObject( co::IComponent* component,
         _hosts.insert( std::pair<IActiveLink*, Host*>( link, host ) );
     }
     
-    retValue = new RemoteObject( component, link, instanceID );
+    retValue = new RemoteObject( node, component, link, instanceID );
     host->addInstance( retValue, instanceID );
     
     return retValue;
@@ -79,10 +79,9 @@ RemoteObject::RemoteObject()
 {
 }
     
-RemoteObject::RemoteObject( co::IComponent* component, IActiveLink* link, co::int32 instanceID ) :
-    _link( link ), _numFacets( 0 )
+RemoteObject::RemoteObject( Node* node, co::IComponent* component, IActiveLink* link, 
+                           co::int32 instanceID ) : _node( node ), _link( link ),_numFacets( 0 )
 {
-    _node = Node::getNodeInstance();
     _classPtr = *reinterpret_cast<void**>( this );
     setComponent( component );
     _instanceID = instanceID;
