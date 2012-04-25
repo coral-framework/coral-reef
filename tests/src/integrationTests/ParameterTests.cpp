@@ -17,13 +17,13 @@ namespace reef
     
 TEST( SmokeTests, simpleTypesTest )
 {
-    co::IObject* transportObj = co::newInstance( "mockReef.Transport" );
+    co::RefPtr<co::IObject> transportObj = co::newInstance( "mockReef.Transport" );
     reef::ITransport* transport = transportObj->getService<reef::ITransport>();
     
-    co::IObject* serverNodeObj = co::newInstance( "reef.Node" );
+    co::RefPtr<co::IObject> serverNodeObj = co::newInstance( "reef.Node" );
     serverNodeObj->setService( "transport", transport );
     
-    co::IObject* cliNodeObj = co::newInstance( "reef.Node" );
+    co::RefPtr<co::IObject> cliNodeObj = co::newInstance( "reef.Node" );
     cliNodeObj->setService( "transport", transport );
     
     reef::INode* server = serverNodeObj->getService<reef::INode>();
@@ -35,7 +35,7 @@ TEST( SmokeTests, simpleTypesTest )
     
     client->start( "address2", "address2" );
     
-    co::IObject* remoteInstance = client->newRemoteInstance( "moduleA.TestComponent",
+    co::RefPtr<co::IObject> remoteInstance = client->newRemoteInstance( "moduleA.TestComponent",
                                                             "address1" );
     moduleA::ISimpleTypes* simple = remoteInstance->getService<moduleA::ISimpleTypes>();
     
@@ -101,41 +101,57 @@ TEST( SmokeTests, simpleTypesTest )
 
 TEST( SmokeTests, refTypeParameterTest )
 {
-    co::IObject* transportObj = co::newInstance( "mockReef.Transport" );
+    co::RefPtr<co::IObject> transportObj = co::newInstance( "mockReef.Transport" );
     reef::ITransport* transport = transportObj->getService<reef::ITransport>();
     
-    co::IObject* serverNodeObj = co::newInstance( "reef.Node" );
-    serverNodeObj->setService( "transport", transport );
+    co::RefPtr<co::IObject> serverANodeObj = co::newInstance( "reef.Node" );
+    serverANodeObj->setService( "transport", transport );
     
-    co::IObject* cliNodeObj = co::newInstance( "reef.Node" );
+    co::RefPtr<co::IObject> cliNodeObj = co::newInstance( "reef.Node" );
     cliNodeObj->setService( "transport", transport );
     
-    reef::INode* server = serverNodeObj->getService<reef::INode>();
+    co::RefPtr<co::IObject> serverBNodeObj = co::newInstance( "reef.Node" );
+    serverBNodeObj->setService( "transport", transport );
+    
+    reef::INode* serverA = serverANodeObj->getService<reef::INode>();
     reef::INode* client = cliNodeObj->getService<reef::INode>();
-    transportObj->setService( "node", server );
+    reef::INode* serverB = serverBNodeObj->getService<reef::INode>();
+    transportObj->setService( "node", serverA );
     transportObj->setService( "node", client );
+    transportObj->setService( "node", serverB );
     
-    server->start( "address1", "address1" );    
+    serverA->start( "addressA", "addressA" );    
     
-    client->start( "address2", "address2" );
+    client->start( "addressClient", "addressClient" );
+    
+    serverB->start( "addressB", "addressB" );
 
 
-    co::RefPtr<co::IObject> remoteTC = client->newRemoteInstance( "moduleA.TestComponent",
-                                                                "address1" );
-    moduleA::ISimpleTypes* remoteSimple = remoteTC->getService<moduleA::ISimpleTypes>();
-    moduleA::IReferenceTypes* remoteRef = remoteTC->getService<moduleA::IReferenceTypes>();
+    co::RefPtr<co::IObject> instanceInA = client->newRemoteInstance( "moduleA.TestComponent",
+                                                                "addressA" );
+    moduleA::IReferenceTypes* refTypesServiceInA = instanceInA->getService<moduleA::IReferenceTypes>();
+    moduleA::ISimpleTypes* simpleTypesServiceInA = instanceInA->getService<moduleA::ISimpleTypes>();
     
-    co::RefPtr<co::IObject> localTC = co::newInstance( "moduleA.TestComponent" );
-    moduleA::ISimpleTypes* localSimple = localTC->getService<moduleA::ISimpleTypes>();
-    moduleA::IReferenceTypes* localRef = localTC->getService<moduleA::IReferenceTypes>();
+    co::RefPtr<co::IObject> instanceInB = client->newRemoteInstance( "moduleA.TestComponent",
+                                                                    "addressB" );
+    moduleA::ISimpleTypes* simpleTypesServiceInB = instanceInB->getService<moduleA::ISimpleTypes>();
+
     
-    EXPECT_EQ( remoteRef->callIncrementInt( remoteSimple, 3 ), 4 );
-    EXPECT_EQ( remoteRef->callDivideDouble( remoteSimple, 15, 5 ), 3 );
-    EXPECT_STREQ( remoteRef->concatenateString( remoteSimple, "aaa", "bbb" ).c_str(), "aaabbb" );
+    co::RefPtr<co::IObject> instanceLocal = co::newInstance( "moduleA.TestComponent" );
+    moduleA::ISimpleTypes* simpleTypesServiceLocal = instanceLocal->getService<moduleA::ISimpleTypes>();
     
-    EXPECT_EQ( remoteRef->callIncrementInt( localSimple, 3 ), 4 );
-    EXPECT_EQ( remoteRef->callDivideDouble( localSimple, 15, 5 ), 3 );
-    EXPECT_STREQ( remoteRef->concatenateString( localSimple, "aaa", "bbb" ).c_str(), "aaabbb" );
+    EXPECT_EQ( refTypesServiceInA->callIncrementInt( simpleTypesServiceInA, 3 ), 4 );
+    EXPECT_EQ( refTypesServiceInA->callDivideDouble( simpleTypesServiceInA, 15, 5 ), 3 );
+    EXPECT_STREQ( refTypesServiceInA->concatenateString( simpleTypesServiceInA, "aaa", "bbb" ).c_str(), "aaabbb" );
+    
+    EXPECT_EQ( refTypesServiceInA->callIncrementInt( simpleTypesServiceLocal, 3 ), 4 );
+    EXPECT_EQ( refTypesServiceInA->callDivideDouble( simpleTypesServiceLocal, 15, 5 ), 3 );
+    EXPECT_STREQ( refTypesServiceInA->concatenateString( simpleTypesServiceLocal, "aaa", "bbb" ).c_str(), "aaabbb" );
+    
+    
+    EXPECT_EQ( refTypesServiceInA->callIncrementInt( simpleTypesServiceInB, 3 ), 4 );
+    EXPECT_EQ( refTypesServiceInA->callDivideDouble( simpleTypesServiceInB, 15, 5 ), 3 );
+    EXPECT_STREQ( refTypesServiceInA->concatenateString( simpleTypesServiceInB, "aaa", "bbb" ).c_str(), "aaabbb" );
 
 }
     

@@ -4,6 +4,7 @@
 #include "Decoder.h"
 #include <co/Any.h>
 #include <co/RefPtr.h>
+#include <co/RefVector.h>
 #include <co/IObject.h>
 
 #include <string>
@@ -37,7 +38,9 @@ private:
     
     void onField( Decoder& decoder, co::int32 facetIdx, co::IField* field, co::Any* retValue = 0 );
     
-    void onGetParam( Decoder& decoder, co::IType* paramType, co::Any& param );
+    // TODO: remove the last param in coral 0.8
+    void onGetParam( Decoder& decoder, co::IType* paramType, co::Any& param, 
+                    co::RefVector<co::IObject>& tempRefs );
    
 private:
     
@@ -51,7 +54,7 @@ private:
 	void onServiceFirstAccess( co::int32 serviceId );
 	std::vector<co::IService*> _openedServices;
     std::vector<co::IInterface*> _openedInterfaces;
-	std::vector<co::IReflector*> _openedReflectors;
+	std::vector<co::IReflector*> _openedReflectors;    
 };
 
 } // namespace reef
