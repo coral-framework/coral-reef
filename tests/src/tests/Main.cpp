@@ -7,7 +7,9 @@
 #include <co/ISystem.h>
 #include <co/reserved/LibraryManager.h>
 #include <gtest/gtest.h>
+
 #include "Message.pb.h"
+#include "ModuleInstaller.h"
 
 int main( int argc, char** argv )
 {
@@ -21,7 +23,9 @@ int main( int argc, char** argv )
 	// set up the system
 	co::addPath( CORAL_PATH );
 	co::getSystem()->setup();
-
+    reef::ModuleInstaller& moduleInstaller = reef::ModuleInstaller::instance();
+    moduleInstaller.install();
+    
 	int res;
 	try
 	{
@@ -33,6 +37,14 @@ int main( int argc, char** argv )
 		res = 42;
 	}
 
+    try
+    {
+        moduleInstaller.uninstall();
+    }
+    catch( std::exception& e )
+    {
+    }
+    
     google::protobuf::ShutdownProtobufLibrary();
 	co::shutdown();
 

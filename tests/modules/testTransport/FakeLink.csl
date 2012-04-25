@@ -1,0 +1,9 @@
+@lua.Scripted( "testTransport.FakeLink" ) 
+import reef.IActiveLink;
+
+component FakeLink
+{
+	provides reef.IActiveLink active;
+	
+	provides IFakeLink fake;
+};

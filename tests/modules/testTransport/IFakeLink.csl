@@ -1,0 +1,8 @@
+interface IFakeLink
+{
+	void getMsg( out string msg );
+	
+	void setReply( in string reply );
+	
+	void setAddress( in string address );
+};

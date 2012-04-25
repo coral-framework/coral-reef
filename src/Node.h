@@ -27,8 +27,6 @@ public:
     
     void start( const std::string& boundAddress, const std::string& publicAddress );
     
-    void startTest( const std::string& boundAddress, const std::string& publicAddress );
-    
 	void update();
 
     void stop();

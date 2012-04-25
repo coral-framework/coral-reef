@@ -3,7 +3,7 @@
 ################################################################################
 
 project( TESTS )
-CORAL_GENERATE_MODULE( _GENERATED_FILES reef )
+CORAL_GENERATE_MODULE( _GENERATED_REEF_FILES reef )
 
 include_directories(
 	${GTEST_INCLUDE_DIRS}
@@ -18,9 +18,10 @@ file( GLOB _SOURCES *.cpp )
 
 # Calcium sources replicated here for testing
 file( GLOB _REPLICATED_MODULE_FILES	${CMAKE_SOURCE_DIR}/src/*.cpp )
+list( REMOVE_ITEM _GENERATED_REEF_FILES "${CMAKE_CURRENT_BINARY_DIR}/generated/__Bootstrap.cpp" )
 
-add_executable( tests EXCLUDE_FROM_ALL ${_REPLICATED_MODULE_FILES} ${_HEADERS} ${_SOURCES} ${_GENERATED_FILES} )
-add_dependencies( tests testModule )
+add_executable( tests EXCLUDE_FROM_ALL ${_REPLICATED_MODULE_FILES} ${_HEADERS} ${_SOURCES} ${_GENERATED_REEF_FILES} ${_GENERATED_MAPPINGS} )
+add_dependencies( tests testModule testTransport )
 
 CORAL_TARGET( tests )
 
@@ -56,5 +57,5 @@ endif()
 ################################################################################
 # Source Groups
 ################################################################################
-source_group( "@Replicated" FILES ${_REPLICATED_MODULE_FILES} ${_GENERATED_FILES} )
+source_group( "@Replicated" FILES ${_REPLICATED_MODULE_FILES} ${_GENERATED_REEF_FILES} )
 
