@@ -1,3 +1,4 @@
+
 #include <gtest/gtest.h>
 
 #include "Node.h"
@@ -96,7 +97,7 @@ TEST( ClientTests, refTypeCalls )
     fakeLinkB->setAddress( "addressB" );
    
     // Node is needed by the RemoteObjects to publish the local instances
-    Node* node = new reef::Node();
+    co::RefPtr<Node> node = new reef::Node();
     reef::ITransport* transport = co::newInstance( "testTransport.Transport" )->getService<reef::ITransport>();
     node->setService( "transport", transport );
     node->start( "addressLocal", "addressLocal" );
@@ -105,15 +106,15 @@ TEST( ClientTests, refTypeCalls )
     
     // A supposedly remote object for a TC in host "A"
     co::RefPtr<co::IObject> remoteObjectA1 = RemoteObject::getOrCreateRemoteObject( 
-                                                            node, TCComponent, activeLinkA, 3 );
+                                                            node.get(), TCComponent, activeLinkA, 3 );
     // A supposedly remote object for another TC in host "A"
     co::RefPtr<co::IObject> remoteObjectA2 = RemoteObject::getOrCreateRemoteObject( 
-                                                            node, TCComponent, activeLinkA, 3 );
+                                                            node.get(), TCComponent, activeLinkA, 3 );
     testModule::ISimpleTypes* simpleTypesA2 = remoteObjectA2->getService<testModule::ISimpleTypes>();
     
     // A supposedly remote object for a TC in host "B"
     co::RefPtr<co::IObject> remoteObjectB = RemoteObject::getOrCreateRemoteObject( 
-                                                            node, TCComponent, activeLinkB, 3 );
+                                                            node.get(), TCComponent, activeLinkB, 3 );
     testModule::ISimpleTypes* simpleTypesB = remoteObjectB->getService<testModule::ISimpleTypes>();
     
     // A local TC
@@ -128,7 +129,6 @@ TEST( ClientTests, refTypeCalls )
     
     // get the ISimpleTypes service's interface. Then, get the methods we want to check indices later.
     co::IInterface* STInterface = STPort->getType();
-	co::IMethod* incrIntMethod = co::cast<co::IMethod>( STInterface->getMember( "incrementInt" ) );
     co::IInterface* RTInterface = RTPort->getType();
 	co::IMethod* callIncrIntMethod = co::cast<co::IMethod>( RTInterface->getMember( "callIncrementInt" ) );
     

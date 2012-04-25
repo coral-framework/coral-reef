@@ -96,7 +96,10 @@ RemoteObject::~RemoteObject()
     host->removeInstance( _instanceID );
     
     if( !host->hasInstance() )
+    {
+        delete host;
         _hosts.erase( it );
+    }
     
     for( int i = 0; i < _numFacets; i++ )
     {

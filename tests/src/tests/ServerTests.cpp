@@ -64,7 +64,7 @@ TEST( ServerTests, servantTest )
 TEST( ServerTests, nodeTest )
 {
     // Node is needed by the RemoteObjects to publish the local instances
-    Node* node = new reef::Node();
+    co::RefPtr<Node> node = new reef::Node();
     ITransport* transport = co::newInstance( "testTransport.Transport" )->getService<ITransport>();
     node->setService( "transport", transport );
     node->start( "addressLocal", "addressLocal" );
@@ -82,8 +82,8 @@ TEST( ServerTests, nodeTest )
     instanceID = node->publishInstance( TCObject3.get() );
     EXPECT_EQ( instanceID, 3 );
     
-    co::IObject* object = node->getInstanceFor( 1 );
-    EXPECT_TRUE( object == TCObject1.get() );
+    co::RefPtr<co::IObject> object = node->getInstanceFor( 1 );
+    EXPECT_TRUE( object.get() == TCObject1.get() );
     
     object = node->getRemoteInstance( "testModule.TestComponent", 4, "address" );    
 }
