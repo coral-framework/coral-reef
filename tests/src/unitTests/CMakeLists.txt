@@ -33,6 +33,28 @@ set_target_properties( unitTests PROPERTIES
 
 target_link_libraries( unitTests ${CORAL_LIBRARIES} ${GTEST_LIBRARIES} ${ZMQ_LIBRARIES} ${PROTOBUF_LIBRARIES} ${PROTOBUF_LIBRARY_DEBUG} ${PROTOBUF_PROTOC_LIBRARY_DEBUG} ${PROTOBUF_PROTOC_LIBRARIES} )
 
+################################################################################
+# Register the test
+################################################################################
+file( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/unitTests/output )
+add_test(
+	NAME unitTests
+	COMMAND $<TARGET_FILE:unitTests> --gtest_output=xml:../../output/UnitTests$<CONFIGURATION>.xml
+)
+CORAL_TEST_ENVIRONMENT( unitTests )
+
+################################################################################
+# If Valgrind is available, repeat the test checking for memory leaks
+################################################################################
+if( VALGRIND_COMMAND )
+	add_test(
+		NAME unitTests_MemoryCheck
+		COMMAND ${VALGRIND_COMMAND} --leak-check=full --show-reachable=yes --num-callers=30 --dsymutil=yes
+			--gen-suppressions=no --log-file=${CMAKE_BINARY_DIR}/unitTestsValgrind$<CONFIGURATION>.log --error-exitcode=13
+			--track-origins=yes --suppressions=${CMAKE_SOURCE_DIR}/tests/valgrind.supp $<TARGET_FILE:unitTests>
+	)
+	CORAL_TEST_ENVIRONMENT( unitTests_MemoryCheck )
+endif()
 
 ################################################################################
 # Source Groups
