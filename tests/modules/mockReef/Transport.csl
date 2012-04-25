@@ -1,4 +1,4 @@
-@lua.Scripted( "testTransport.Transport" ) 
+@lua.Scripted( "mockReef.Transport" ) 
 import reef.ITransport;
 
 component Transport

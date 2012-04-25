@@ -1,26 +1,26 @@
 ################################################################################
-# testModule, an auxiliary test module
+# moduleA, an auxiliary test module
 ################################################################################
 
-project( testModule )
+project( moduleA )
 
 # Run the coral compiler on the module
-CORAL_GENERATE_MODULE( _GENERATED_FILES testModule )
+CORAL_GENERATE_MODULE( _GENERATED_FILES moduleA )
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/generated )
 
 file( GLOB _HEADERS *.h )
 file( GLOB _SOURCES *.cpp )
 
-add_library( testModule MODULE EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} ${_GENERATED_FILES} )
+add_library( moduleA MODULE EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} ${_GENERATED_FILES} )
 
-CORAL_MODULE_TARGET( "testModule" testModule )
+CORAL_MODULE_TARGET( "moduleA" moduleA )
 
-set_target_properties( testModule PROPERTIES
-	PROJECT_LABEL "testModule"
+set_target_properties( moduleA PROPERTIES
+	PROJECT_LABEL "moduleA"
 )
 
-target_link_libraries( testModule ${CORAL_LIBRARIES} )
+target_link_libraries( moduleA ${CORAL_LIBRARIES} )
 
 ################################################################################
 # Source Groups

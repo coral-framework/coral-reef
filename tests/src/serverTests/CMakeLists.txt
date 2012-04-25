@@ -15,7 +15,7 @@ file( GLOB _HEADERS *.h )
 file( GLOB _SOURCES *.cpp )
 
 add_executable( serverTests EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} ${_CORE_SOURCES} ${_GENERATED_FILES} )
-add_dependencies( serverTests testModule reef )
+add_dependencies( serverTests moduleA reef )
 
 CORAL_TARGET( serverTests )
 

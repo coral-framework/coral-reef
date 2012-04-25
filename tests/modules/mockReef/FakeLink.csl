@@ -1,4 +1,4 @@
-@lua.Scripted( "testTransport.FakeLink" ) 
+@lua.Scripted( "mockReef.FakeLink" ) 
 import reef.IActiveLink;
 
 component FakeLink
