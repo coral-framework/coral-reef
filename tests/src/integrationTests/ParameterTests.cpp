@@ -154,5 +154,6 @@ TEST( SmokeTests, refTypeParameterTest )
     EXPECT_STREQ( refTypesServiceInA->concatenateString( simpleTypesServiceInB, "aaa", "bbb" ).c_str(), "aaabbb" );
 
 }
+
     
 }

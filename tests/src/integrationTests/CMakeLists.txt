@@ -42,7 +42,7 @@ CORAL_TEST_ENVIRONMENT( integrationTests )
 if( VALGRIND_COMMAND )
 	add_test(
 		NAME integrationTests_MemoryCheck
-		COMMAND ${VALGRIND_COMMAND} --leak-check=full --show-reachable=yes --num-callers=50 --dsymutil=yes
+		COMMAND ${VALGRIND_COMMAND} --leak-check=full --show-reachable=yes --num-callers=5 --dsymutil=yes
 			--gen-suppressions=no --log-file=${CMAKE_BINARY_DIR}/integrationTestsValgrind$<CONFIGURATION>.log --error-exitcode=13
 			--track-origins=yes --suppressions=${CMAKE_SOURCE_DIR}/tests/valgrind.supp $<TARGET_FILE:integrationTests>
 	)

@@ -13,9 +13,16 @@ add_subdirectory( moduleA )
 add_subdirectory( mockReef )
 add_subdirectory( unitTests )
 add_subdirectory( integrationTests )
+add_subdirectory( luaTests )
 
 set( MANUAL_TESTING ON CACHE BOOL "Manual client server testing" )
 if( MANUAL_TESTING )
 	add_subdirectory( clientTests )
 	add_subdirectory( serverTests )
+	# Add a custom target to build all test artifacts
+	ADD_CUSTOM_TARGET( tests DEPENDS reef mockReef moduleA unitTests integrationTests
+		clientTests serverTests
+	)
+else()
+	ADD_CUSTOM_TARGET( tests DEPENDS reef mockReef moduleA unitTests integrationTests )
 endif()
