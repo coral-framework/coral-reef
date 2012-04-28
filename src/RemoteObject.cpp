@@ -226,7 +226,7 @@ void RemoteObject::onInterfaceParam( co::IService* param )
     
     if( isLocalObject( provider ) )
     {
-        instanceID = _node->publishInstance( provider );
+        instanceID = _node->publishAnonymousInstance( provider );
         _encoder.addRefParam( instanceID, facetIdx, Encoder::RefOwner::LOCAL, &providerType, 
                              &_node->getPublicAddress() );
     }

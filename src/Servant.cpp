@@ -122,7 +122,7 @@ void Servant::onGetParam( Decoder& decoder, co::IType* paramType, co::Any& param
     switch( owner )
     {
         case Decoder::RefOwner::RECEIVER:
-            instance = _node->getInstanceFor( instanceID );
+            instance = _node->getInstance( instanceID );
             break;
         case Decoder::RefOwner::LOCAL:
         case Decoder::RefOwner::ANOTHER:

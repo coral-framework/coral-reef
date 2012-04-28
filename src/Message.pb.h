@@ -37,6 +37,7 @@ class Argument;
 class Ref_Type;
 class Message_Member;
 class Message_New_Inst;
+class Message_Find_Inst;
 class Message_Acc_Inst;
 class Message;
 
@@ -63,7 +64,8 @@ inline bool Ref_Type_Owner_Parse(
 enum Message_Type {
   Message_Type_MSG_NEW_INST = 0,
   Message_Type_MSG_ACCESS_INST = 1,
-  Message_Type_MSG_CALL = 2
+  Message_Type_MSG_FIND_INST = 2,
+  Message_Type_MSG_CALL = 3
 };
 bool Message_Type_IsValid(int value);
 const Message_Type Message_Type_Type_MIN = Message_Type_MSG_NEW_INST;
@@ -630,6 +632,92 @@ class Message_New_Inst : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
+class Message_Find_Inst : public ::google::protobuf::Message {
+ public:
+  Message_Find_Inst();
+  virtual ~Message_Find_Inst();
+  
+  Message_Find_Inst(const Message_Find_Inst& from);
+  
+  inline Message_Find_Inst& operator=(const Message_Find_Inst& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Message_Find_Inst& default_instance();
+  
+  void Swap(Message_Find_Inst* other);
+  
+  // implements Message ----------------------------------------------
+  
+  Message_Find_Inst* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const Message_Find_Inst& from);
+  void MergeFrom(const Message_Find_Inst& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional string key = 1;
+  inline bool has_key() const;
+  inline void clear_key();
+  static const int kKeyFieldNumber = 1;
+  inline const ::std::string& key() const;
+  inline void set_key(const ::std::string& value);
+  inline void set_key(const char* value);
+  inline void set_key(const char* value, size_t size);
+  inline ::std::string* mutable_key();
+  inline ::std::string* release_key();
+  
+  // @@protoc_insertion_point(class_scope:reef.Message_Find_Inst)
+ private:
+  inline void set_has_key();
+  inline void clear_has_key();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::std::string* key_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_Message_2eproto();
+  friend void protobuf_AssignDesc_Message_2eproto();
+  friend void protobuf_ShutdownFile_Message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static Message_Find_Inst* default_instance_;
+};
+// -------------------------------------------------------------------
+
 class Message_Acc_Inst : public ::google::protobuf::Message {
  public:
   Message_Acc_Inst();
@@ -777,6 +865,7 @@ class Message : public ::google::protobuf::Message {
   typedef Message_Type Type;
   static const Type MSG_NEW_INST = Message_Type_MSG_NEW_INST;
   static const Type MSG_ACCESS_INST = Message_Type_MSG_ACCESS_INST;
+  static const Type MSG_FIND_INST = Message_Type_MSG_FIND_INST;
   static const Type MSG_CALL = Message_Type_MSG_CALL;
   static inline bool Type_IsValid(int value) {
     return Message_Type_IsValid(value);
@@ -838,10 +927,18 @@ class Message : public ::google::protobuf::Message {
   inline ::reef::Message_Acc_Inst* mutable_msg_acc_inst();
   inline ::reef::Message_Acc_Inst* release_msg_acc_inst();
   
-  // optional .reef.Message_Member msg_member = 6;
+  // optional .reef.Message_Find_Inst msg_find_inst = 6;
+  inline bool has_msg_find_inst() const;
+  inline void clear_msg_find_inst();
+  static const int kMsgFindInstFieldNumber = 6;
+  inline const ::reef::Message_Find_Inst& msg_find_inst() const;
+  inline ::reef::Message_Find_Inst* mutable_msg_find_inst();
+  inline ::reef::Message_Find_Inst* release_msg_find_inst();
+  
+  // optional .reef.Message_Member msg_member = 7;
   inline bool has_msg_member() const;
   inline void clear_msg_member();
-  static const int kMsgMemberFieldNumber = 6;
+  static const int kMsgMemberFieldNumber = 7;
   inline const ::reef::Message_Member& msg_member() const;
   inline ::reef::Message_Member* mutable_msg_member();
   inline ::reef::Message_Member* release_msg_member();
@@ -858,6 +955,8 @@ class Message : public ::google::protobuf::Message {
   inline void clear_has_msg_new_inst();
   inline void set_has_msg_acc_inst();
   inline void clear_has_msg_acc_inst();
+  inline void set_has_msg_find_inst();
+  inline void clear_has_msg_find_inst();
   inline void set_has_msg_member();
   inline void clear_has_msg_member();
   
@@ -867,11 +966,12 @@ class Message : public ::google::protobuf::Message {
   ::google::protobuf::uint32 instance_id_;
   ::reef::Message_New_Inst* msg_new_inst_;
   ::reef::Message_Acc_Inst* msg_acc_inst_;
+  ::reef::Message_Find_Inst* msg_find_inst_;
   ::reef::Message_Member* msg_member_;
   bool has_return_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(7 + 31) / 32];
   
   friend void  protobuf_AddDesc_Message_2eproto();
   friend void protobuf_AssignDesc_Message_2eproto();
@@ -1371,6 +1471,68 @@ inline ::std::string* Message_New_Inst::release_new_instance_type() {
 
 // -------------------------------------------------------------------
 
+// Message_Find_Inst
+
+// optional string key = 1;
+inline bool Message_Find_Inst::has_key() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void Message_Find_Inst::set_has_key() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void Message_Find_Inst::clear_has_key() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void Message_Find_Inst::clear_key() {
+  if (key_ != &::google::protobuf::internal::kEmptyString) {
+    key_->clear();
+  }
+  clear_has_key();
+}
+inline const ::std::string& Message_Find_Inst::key() const {
+  return *key_;
+}
+inline void Message_Find_Inst::set_key(const ::std::string& value) {
+  set_has_key();
+  if (key_ == &::google::protobuf::internal::kEmptyString) {
+    key_ = new ::std::string;
+  }
+  key_->assign(value);
+}
+inline void Message_Find_Inst::set_key(const char* value) {
+  set_has_key();
+  if (key_ == &::google::protobuf::internal::kEmptyString) {
+    key_ = new ::std::string;
+  }
+  key_->assign(value);
+}
+inline void Message_Find_Inst::set_key(const char* value, size_t size) {
+  set_has_key();
+  if (key_ == &::google::protobuf::internal::kEmptyString) {
+    key_ = new ::std::string;
+  }
+  key_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* Message_Find_Inst::mutable_key() {
+  set_has_key();
+  if (key_ == &::google::protobuf::internal::kEmptyString) {
+    key_ = new ::std::string;
+  }
+  return key_;
+}
+inline ::std::string* Message_Find_Inst::release_key() {
+  clear_has_key();
+  if (key_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = key_;
+    key_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// -------------------------------------------------------------------
+
 // Message_Acc_Inst
 
 // required bool increment = 1;
@@ -1546,15 +1708,44 @@ inline ::reef::Message_Acc_Inst* Message::release_msg_acc_inst() {
   return temp;
 }
 
-// optional .reef.Message_Member msg_member = 6;
-inline bool Message::has_msg_member() const {
+// optional .reef.Message_Find_Inst msg_find_inst = 6;
+inline bool Message::has_msg_find_inst() const {
   return (_has_bits_[0] & 0x00000020u) != 0;
 }
-inline void Message::set_has_msg_member() {
+inline void Message::set_has_msg_find_inst() {
   _has_bits_[0] |= 0x00000020u;
 }
-inline void Message::clear_has_msg_member() {
+inline void Message::clear_has_msg_find_inst() {
   _has_bits_[0] &= ~0x00000020u;
+}
+inline void Message::clear_msg_find_inst() {
+  if (msg_find_inst_ != NULL) msg_find_inst_->::reef::Message_Find_Inst::Clear();
+  clear_has_msg_find_inst();
+}
+inline const ::reef::Message_Find_Inst& Message::msg_find_inst() const {
+  return msg_find_inst_ != NULL ? *msg_find_inst_ : *default_instance_->msg_find_inst_;
+}
+inline ::reef::Message_Find_Inst* Message::mutable_msg_find_inst() {
+  set_has_msg_find_inst();
+  if (msg_find_inst_ == NULL) msg_find_inst_ = new ::reef::Message_Find_Inst;
+  return msg_find_inst_;
+}
+inline ::reef::Message_Find_Inst* Message::release_msg_find_inst() {
+  clear_has_msg_find_inst();
+  ::reef::Message_Find_Inst* temp = msg_find_inst_;
+  msg_find_inst_ = NULL;
+  return temp;
+}
+
+// optional .reef.Message_Member msg_member = 7;
+inline bool Message::has_msg_member() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void Message::set_has_msg_member() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void Message::clear_has_msg_member() {
+  _has_bits_[0] &= ~0x00000040u;
 }
 inline void Message::clear_msg_member() {
   if (msg_member_ != NULL) msg_member_->::reef::Message_Member::Clear();

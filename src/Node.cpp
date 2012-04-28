@@ -34,6 +34,20 @@ co::IObject* Node::newRemoteInstance( const std::string& instanceType,
     return RemoteObject::getOrCreateRemoteObject( this, component, link, instanceID );
 }
 
+co::IObject* Node::findRemoteInstance( const std::string& instanceType, const std::string& key, 
+                                      const std::string& address )
+{
+    IActiveLink* link = _transport->connect( address );
+    co::int32 instanceID = requestFindInstance( link, key );
+    
+    if( instanceID == 0 )
+        return 0;
+    
+    co::IComponent* component = co::cast<co::IComponent>( co::getType( instanceType ) );
+    
+    return RemoteObject::getOrCreateRemoteObject( this, component, link, instanceID );
+}
+    
 void Node::start( const std::string&  boundAddress, const std::string& publicAddress )
 {
     assert( !_passiveLink.get() );
@@ -79,6 +93,36 @@ void Node::stop()
     _passiveLink = 0;
 }
 
+co::IObject* Node::getInstance( co::int32 instanceID )
+{
+    return _servants[instanceID]->getObject();
+}
+
+bool Node::getRemoteReferences( co::IObject* instance, std::vector<std::string>& referers )
+{
+    return true;
+}
+ 
+co::int32 Node::publishInstance( co::IObject* instance, const std::string& key )
+{
+    // Makes the instance available for remote usage as any other instance
+    co::int32 instanceID = publishAnonymousInstance( instance );
+    
+    _publicInstances.insert( std::pair<std::string, co::int32>( key, instanceID ) );
+    
+    return instanceID;
+}
+    
+void Node::unpublishInstance( const std::string& key )
+{
+    std::map<std::string, co::int32>::iterator it = _publicInstances.find( key );
+    if( it == _publicInstances.end() )
+        throw new co::Exception( "The provided key does not match any public instance" );
+    
+    closeRemoteReference( it->second );
+    _publicInstances.erase( it );
+}
+
 co::IObject* Node::getRemoteInstance( const std::string& instanceType, co::int32 instanceID, 
                                      const std::string& ownerAddress )
 {
@@ -93,6 +137,22 @@ co::int32 Node::requestNewInstance( IActiveLink* link, const std::string& compon
 {
     std::string msg;
     _encoder.encodeNewInstMsg( componentName, msg );
+    link->send( msg );
+    
+    // The Wait for the reply still keeps updating the server
+    while( !link->receiveReply( msg ) )
+        update();
+    
+    co::int32 instanceID;
+    _decoder.decodeData( msg, instanceID );
+    
+    return instanceID;
+}
+
+co::int32 Node::requestFindInstance( IActiveLink* link, const std::string& key )
+{
+    std::string msg;
+    _encoder.encodeFindInstMsg( key, msg );
     link->send( msg );
     
     // The Wait for the reply still keeps updating the server
@@ -120,6 +180,9 @@ void Node::dispatchMessage( const std::string& msg )
         case Decoder::MsgType::ACCESS_INST:
             onAccessInstMsg();
             break;
+        case Decoder::MsgType::FIND_INST:
+            onFindInstMsg();
+            break;
         default: // the message isn't destined to the Node. Pass to the appropriate servant. 
             onMsgForServant( destInstanceID, hasReturn );
     }  
@@ -141,12 +204,32 @@ void Node::onNewInstMsg()
     _passiveLink->sendReply( msg );
 }
     
+void Node::onFindInstMsg() 
+{
+    std::string key;
+    _decoder.decodeFindInstMsg( key );
+    
+    std::map<std::string, co::int32>::iterator it = _publicInstances.find( key );
+    co::int32 instanceID = 0;
+    if( it != _publicInstances.end() )
+    {
+        instanceID = it->second;
+        openRemoteReference( instanceID );
+    }
+    
+    // Encode the instanceID (or 0 if not found) as reply message
+    std::string msg;
+    _encoder.encodeData( instanceID, msg );
+    
+    // reply it to the client
+    _passiveLink->sendReply( msg );
+}
+    
 void Node::onAccessInstMsg()
 {
-    std::string refererIP;
     co::int32 instanceID;
     bool increment;            
-    _decoder.decodeAccessInstMsg( refererIP, instanceID, increment );
+    _decoder.decodeAccessInstMsg( instanceID, increment );
     openRemoteReference( instanceID );    
 }
   
@@ -169,7 +252,7 @@ void Node::onMsgForServant( co::int32 instanceID, bool hasReturn )
     _passiveLink->sendReply( msg );
 }
 
-co::int32 Node::publishInstance( co::IObject* instance )
+co::int32 Node::publishAnonymousInstance( co::IObject* instance )
 {
     co::int32 instanceID = getInstanceID( instance );
     if( instanceID != -1 )

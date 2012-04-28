@@ -1,24 +1,64 @@
 /*
-	This service is responsible for managing components in remote locations. Remote components are proxies 
-	for components which are not locally instancied and their real actual memory representation exists only
-	in other location (remote machine). In order to answer requests, get return values and
-	maintain coherence, there should be a loop calling update() frequently.
+	\brief The main RPC interface.
+		   Access remote objects and manage remote calls to local objects. 
+		   
+	Accessing remote objects is done by calling the accessor functions asynchronously.
+	Providing remote access to local objects is done by starting a server and continuously updating.
+	
+	All local instances published (available for remote access) have an ID as long as they exist.
+	As soon as the instance is destroyed, the ID will be freed and made available for reuse.
+	The node has 2 ways of making an instance public, one is by receiving an existing local 
+	object explicitly through this interface and publishing it through a "key", other is by receiving 
+	a new instance request from a remote node and internally creating the requested instance.
 */
 interface INode
 {
-	/*!
+	/*
 		Creates a new remote instance for a component of type named \a componentTypeName
 		at \a specified address.
-		\throws exception para falha de conexao/address
-		\throws exception para tipo inexistente no destino.
+		\throws ConnectionFailureExpection for failure in connection
+		\throws TypeUnknownToHostException if the provided type is not recognized by the host
 	 */
 	co.IObject newRemoteInstance( in string componentTypeName, in string address );
 
+	/*
+		Finds an instance in \a address published with \a key. Returns null if not found.
+	*/
+	co.IObject findRemoteInstance( in string componentTypeName, in string key, in string address );
+	
+	/*
+		Starts a local server which answer remote requests in the provided port.
+		\throws ConnectionFailureExpection if Port is not available
+	*/
 // TODO remove second parameter and get from system
 	void start( in string boundAddress, in string publicAddress );
 	
 	void stop();
 	
-	// Get and process incoming messages
+	/*
+		Updates the local server
+	*/
 	void update();
+	
+	/*
+		Exposes a local instance to remote access through \a key key and returns the ID.
+	*/
+	int32 publishInstance( in co.IObject instance, in string key );
+	
+	/*
+		Revoke acces to the given instance through the key. If there is no remote references to it,
+		then the internal reference that the node has to it will be removed.
+	*/
+	void unpublishInstance( in string key );
+	
+	/*
+		Gets an instance of \a instanceID id that is public and available to remote access.
+	*/
+	co.IObject getInstance( in int32 instanceID );
+	
+	/*
+		If the provided instance is not public returns false. Returns a list with all the addresses 
+		of the nodes that reference the given instance.
+	*/
+	bool getRemoteReferences( in co.IObject instance, out string[] referers );
 };

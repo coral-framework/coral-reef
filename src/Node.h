@@ -31,6 +31,17 @@ public:
 
     void stop();
     
+    co::IObject* findRemoteInstance( const std::string& instanceType, const std::string& key, 
+                                    const std::string& address );
+    
+	co::IObject* getInstance( co::int32 instanceID );
+    
+	bool getRemoteReferences( co::IObject* instance, std::vector<std::string>& referers );
+    
+	co::int32 publishInstance( co::IObject* instance, const std::string& key );
+    
+    void unpublishInstance( const std::string& key );
+    
 protected: // receptacles
     reef::ITransport* getTransportService();
     
@@ -42,18 +53,13 @@ public:
     inline const std::string& getPublicAddress(){ assert( !_myPublicAddress.empty() ); 
         return _myPublicAddress; }
     
-    // returns a local instance that is mapped to the provided ID
-    inline co::IObject* getInstanceFor( co::int32 instanceID )
-    { return getServantFor( instanceID )->getObject(); }
-    
     /*
-     Makes an instance available for remote usage. Which means: creating a 
-    Virtual Address, and start a remote-references counting for it.
-      If already available, then only increment reference and return address.
+     Makes an instance available for remote usage but only through its ID. Only used when the
+     instance has been sent as a parameter to another host.
      */
-    co::int32 publishInstance( co::IObject* instance );
+    co::int32 publishAnonymousInstance( co::IObject* instance );
     
-    // Create a new remoteObject pointing to the instance or fetch a existing one
+    // returns a proxy to the requested remote instance
     co::IObject* getRemoteInstance( const std::string& instanceType, co::int32 instanceID, 
                                           const std::string& ownerAddress );
     
@@ -61,12 +67,16 @@ private:
     // Sends a message to another node to create an instance of provided type, blocking.
     co::int32 requestNewInstance( IActiveLink* link, const std::string& componentName );
     
+    // Sends a message to another node to search for an instance published under "key", blocking.
+    co::int32 requestFindInstance( IActiveLink* link, const std::string& key );
+    
     // Dispatches the msg received during an update()
     void dispatchMessage( const std::string& msg );
     
     // If a message is destined to the own Node it will be dispatched to these methods.
     void onNewInstMsg(); // creates instance, start its ref counting and replies the instanceID
     void onAccessInstMsg(); // increments the instance ref count
+    void onFindInstMsg(); // finds an instance published under a key, increment ref and return ID
     
     void onMsgForServant( co::int32 instanceID, bool hasReturn );
        
@@ -110,7 +120,9 @@ private:
     typedef std::pair<co::IObject*, co::int32> objToAddress;
     typedef std::map<const co::IObject*, co::int32> VirtualAddresses;
     VirtualAddresses _vas;
-
+    
+    // Instances that have been published not anonymously (through a key) will have their IDs here
+    std::map<std::string, co::int32> _publicInstances;
     
     std::stack<co::int32> _freedIds;
 };

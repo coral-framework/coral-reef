@@ -189,6 +189,20 @@ void Encoder::encodeAccessInstMsg( co::int32 instanceID, bool increment, std::st
     _message->Clear();
 }
     
+void Encoder::encodeFindInstMsg( const std::string& key, std::string& msg )
+{
+    _message->set_msg_type( Message::MSG_FIND_INST );
+    _message->set_instance_id( 0 ); // 0 is always the node channel
+    _message->set_has_return( true );
+    
+    
+	Message_Find_Inst* msgFindInst = _message->mutable_msg_find_inst();
+    msgFindInst->set_key( key );
+    
+    _message->SerializeToString( &msg );
+    _message->Clear();
+}
+    
 void Encoder::beginEncodingCallMsg( co::int32 instanceID, co::int32 facetIdx, co::int32 memberIdx,
                                    bool hasReturn )
 {

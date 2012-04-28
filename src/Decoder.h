@@ -27,6 +27,7 @@ public:
     {
         NEW_INST,
         ACCESS_INST,
+        FIND_INST,
         CALL
     };
     
@@ -44,8 +45,11 @@ public:
     void decodeNewInstMsg( std::string& typeName );
     
     // decodes message of type ACCESS_INST
-    void decodeAccessInstMsg( std::string& refererIP, co::int32& instanceID, bool& increment );
+    void decodeAccessInstMsg( co::int32& instanceID, bool& increment );
     
+    // if msg type is NEW, then, this function will decode it
+    void decodeFindInstMsg( std::string& key );
+
     /* 
      Starts a decoding state of call/field msg. 
      The decoding state will only be reset after all params are decoded.

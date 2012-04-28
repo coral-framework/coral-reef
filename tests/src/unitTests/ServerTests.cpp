@@ -72,17 +72,17 @@ TEST( ServerTests, nodeTest )
     co::RefPtr<co::IObject> TCObject2 = co::newInstance( "moduleA.TestComponent" );
     co::RefPtr<co::IObject> TCObject3 = co::newInstance( "moduleA.TestComponent" );
     
-    co::int32 instanceID = node->publishInstance( TCObject1.get() );
+    co::int32 instanceID = node->publishAnonymousInstance( TCObject1.get() );
     EXPECT_EQ( instanceID, 1 );
     instanceID = 2;
-    instanceID = node->publishInstance( TCObject1.get() );
+    instanceID = node->publishAnonymousInstance( TCObject1.get() );
     EXPECT_EQ( instanceID, 1 );
-    instanceID = node->publishInstance( TCObject2.get() );
+    instanceID = node->publishAnonymousInstance( TCObject2.get() );
     EXPECT_EQ( instanceID, 2 );
-    instanceID = node->publishInstance( TCObject3.get() );
+    instanceID = node->publishAnonymousInstance( TCObject3.get() );
     EXPECT_EQ( instanceID, 3 );
     
-    co::RefPtr<co::IObject> object = node->getInstanceFor( 1 );
+    co::RefPtr<co::IObject> object = node->getInstance( 1 );
     EXPECT_TRUE( object.get() == TCObject1.get() );
     
     object = node->getRemoteInstance( "moduleA.TestComponent", 4, "address" );    

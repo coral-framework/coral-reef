@@ -139,6 +139,9 @@ void Message_Type2MsgType( Message_Type message_type, Decoder::MsgType& msgType 
         case Message::MSG_ACCESS_INST:
             msgType = Decoder::MsgType::ACCESS_INST;
             break;
+        case Message::MSG_FIND_INST:
+            msgType = Decoder::MsgType::FIND_INST;
+            break;
         case Message::MSG_CALL:
             msgType = Decoder::MsgType::CALL;
             break;
@@ -178,7 +181,7 @@ void Decoder::decodeNewInstMsg( std::string& typeName )
     typeName = msgNewInst.new_instance_type();
 }
 
-void Decoder::decodeAccessInstMsg( std::string& refererIP, co::int32& instanceID, bool& increment )
+void Decoder::decodeAccessInstMsg( co::int32& instanceID, bool& increment )
 {
     assert( _msgType == MsgType::ACCESS_INST );
     
@@ -187,7 +190,14 @@ void Decoder::decodeAccessInstMsg( std::string& refererIP, co::int32& instanceID
     instanceID = msgAccessInst.instance_id();
     increment = msgAccessInst.increment();
 }
+   
+void Decoder::decodeFindInstMsg( std::string& key )
+{
+    assert( _msgType == MsgType::FIND_INST );
     
+    const Message_Find_Inst& msgFindInst = _message->msg_find_inst();
+    key = msgFindInst.key();
+}
 /* 
  Starts a decoding state of call/field msg. 
  The decoding state will only be reset after all params are decoded.

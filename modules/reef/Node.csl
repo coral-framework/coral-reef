@@ -1,6 +1,6 @@
 component Node
 {
-	provides INode client;
+	provides INode node;
 	
 	receives ITransport transport;
 };

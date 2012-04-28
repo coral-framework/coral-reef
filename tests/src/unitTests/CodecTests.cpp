@@ -48,10 +48,21 @@ TEST( CodecTests, simpleTypesTest )
     
     EXPECT_NO_THROW( decoder.decodeNewInstMsg( typeName ) );
     EXPECT_STREQ( typeName.c_str(), "test" );
+    
+    encoder.encodeFindInstMsg( "key", msg );
+    decoder.setMsgForDecoding( msg, msgType, msgReceiverID, hasReturn );
+    
+    EXPECT_EQ( msgType, MsgType::FIND_INST );
+    EXPECT_EQ( msgReceiverID, 0 );
+    EXPECT_TRUE( hasReturn );
+
+    std::string key;
+    
+    EXPECT_NO_THROW( decoder.decodeFindInstMsg( key ) );
+    EXPECT_STREQ( key.c_str(), "key" );
    
     // ------ accessinst
     bool increment;
-    std::string refererIP;
     
     encoder.encodeAccessInstMsg( 5, true, msg );
     decoder.setMsgForDecoding( msg, msgType, msgReceiverID, hasReturn );
@@ -60,7 +71,7 @@ TEST( CodecTests, simpleTypesTest )
     EXPECT_EQ( msgReceiverID, 0 );
     EXPECT_FALSE( hasReturn );
     
-    EXPECT_NO_THROW( decoder.decodeAccessInstMsg( refererIP, instanceID, increment ) );
+    EXPECT_NO_THROW( decoder.decodeAccessInstMsg( instanceID, increment ) );
     EXPECT_EQ( instanceID, 5 );
     EXPECT_TRUE( increment );
     
