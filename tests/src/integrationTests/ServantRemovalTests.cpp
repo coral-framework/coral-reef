@@ -57,11 +57,11 @@ TEST( ServantRemovalTests, simpleTest )
     
     for( int i = 0; i < 3; i++ )
     {
-        moduleA::ISimpleTypes* st = objects[2 * i + 1]->getService<moduleA::IReferenceTypes>();
-        moduleA::IReferenceTypes* rt = objects[2 * i + 2]->getService<moduleA::IReferenceTypes>();
+        moduleA::ISimpleTypes* st = objects[2 * i + 0]->getService<moduleA::ISimpleTypes>();
+        moduleA::IReferenceTypes* rt = objects[2 * i + 1]->getService<moduleA::IReferenceTypes>();
         rt->setSimple( st );
-        st = objects[2 * i + 2]->getService<moduleA::IReferenceTypes>();
-        rt = objects[2 * i + 1]->getService<moduleA::IReferenceTypes>();
+        st = objects[2 * i + 1]->getService<moduleA::ISimpleTypes>();
+        rt = objects[2 * i + 0]->getService<moduleA::IReferenceTypes>();
         rt->setSimple( st );
     }
     
@@ -81,6 +81,11 @@ TEST( ServantRemovalTests, simpleTest )
     EXPECT_EQ( hostC->getRemoteReferences( 3 ), 0 );
     
     objects.clear();
+    
+    // Only need remove 3 instead of 6 references because de other 3 referers will be destroyed
+    hostA->getInstance( 1 )->getService<moduleA::IReferenceTypes>()->setSimple( 0 );
+    hostA->getInstance( 2 )->getService<moduleA::IReferenceTypes>()->setSimple( 0 );
+    hostB->getInstance( 2 )->getService<moduleA::IReferenceTypes>()->setSimple( 0 );
     
     // There should be no more references
     EXPECT_EQ( hostA->getRemoteReferences( 1 ), 0 );
