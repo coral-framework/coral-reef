@@ -27,9 +27,8 @@ public:
     inline co::IComponent* getComponent() {   return _object->getComponent(); }
     
     inline co::IObject* getObject() { return _object.get(); }
-protected:
-    co::RefPtr<co::IObject> _object;
-   
+
+       
 private:
 
     // Called by onCall. Extract the parameters from decoder and call method via reflector
@@ -43,7 +42,8 @@ private:
                     co::RefVector<co::IObject>& tempRefs );
    
 private:
-    
+    co::RefPtr<co::IObject> _object;
+
     co::int32 _remoteRefCount;
     
     co::IComponent* _component;

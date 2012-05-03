@@ -39,7 +39,7 @@ public:
      else it is a Call msg. Call the appropriate method for decoding each case as explained below. 
      */
     void setMsgForDecoding( const std::string& msg, MsgType& type, co::int32& instanceID,
-                           bool& hasReturn );
+                           bool& hasReturn, std::string* referer = 0 );
     
     // if msg type is NEW, then, this function will decode it
     void decodeNewInstMsg( std::string& typeName );

@@ -95,12 +95,12 @@ void Node::stop()
 
 co::IObject* Node::getInstance( co::int32 instanceID )
 {
-    return _servants[instanceID]->getObject();
+    return instanceID < _servants.size() ? _servants[instanceID]->getObject() : 0;
 }
 
-bool Node::getRemoteReferences( co::IObject* instance, std::vector<std::string>& referers )
+co::int32 Node::getRemoteReferences( co::int32 instanceID )
 {
-    return true;
+    return instanceID < _remoteRefCounting.size() ? _remoteRefCounting[instanceID] : 0;
 }
  
 co::int32 Node::publishInstance( co::IObject* instance, const std::string& key )
@@ -136,7 +136,7 @@ co::IObject* Node::getRemoteInstance( const std::string& instanceType, co::int32
 co::int32 Node::requestNewInstance( IActiveLink* link, const std::string& componentName )
 {
     std::string msg;
-    _encoder.encodeNewInstMsg( componentName, msg );
+    _encoder.encodeNewInstMsg( componentName, msg, _myPublicAddress );
     link->send( msg );
     
     // The Wait for the reply still keeps updating the server
@@ -152,7 +152,7 @@ co::int32 Node::requestNewInstance( IActiveLink* link, const std::string& compon
 co::int32 Node::requestFindInstance( IActiveLink* link, const std::string& key )
 {
     std::string msg;
-    _encoder.encodeFindInstMsg( key, msg );
+    _encoder.encodeFindInstMsg( key, msg, _myPublicAddress );
     link->send( msg );
     
     // The Wait for the reply still keeps updating the server
@@ -170,7 +170,8 @@ void Node::dispatchMessage( const std::string& msg )
     co::int32 destInstanceID;
     Decoder::MsgType type;
     bool hasReturn;
-    _decoder.setMsgForDecoding( msg, type, destInstanceID, hasReturn );
+    std::string referer;
+    _decoder.setMsgForDecoding( msg, type, destInstanceID, hasReturn, &referer );
     
     switch( type )
     {
@@ -228,9 +229,14 @@ void Node::onFindInstMsg()
 void Node::onAccessInstMsg()
 {
     co::int32 instanceID;
-    bool increment;            
+    bool increment;
+    
     _decoder.decodeAccessInstMsg( instanceID, increment );
-    openRemoteReference( instanceID );    
+    
+    if( increment )
+        openRemoteReference( instanceID );
+    else
+        closeRemoteReference( instanceID );
 }
   
 void Node::onMsgForServant( co::int32 instanceID, bool hasReturn )
@@ -262,7 +268,24 @@ co::int32 Node::publishAnonymousInstance( co::IObject* instance )
     
     return instanceID;
 }
-
+    
+void Node::requestBeginAccess( const std::string& address, co::int32 instanceID,
+                                 const std::string& referer )
+{
+    IActiveLink* link = _transport->connect( address );
+    
+    std::string msg;
+    _encoder.encodeAccessInstMsg( instanceID, true, msg, referer );
+    link->send( msg );
+}
+  
+void Node::requestEndAccess( IActiveLink* link, co::int32 instanceID, const std::string& referer )
+{    
+    std::string msg;
+    _encoder.encodeAccessInstMsg( instanceID, false, msg, referer );
+    link->send( msg );
+}
+    
 void Node::openRemoteReference( co::int32 instanceID )
 {
     _remoteRefCounting[instanceID]++;

@@ -162,7 +162,7 @@ Decoder::~Decoder()
     
 // sets the message that will be decoded and return its type and destination
 void Decoder::setMsgForDecoding( const std::string& msg, MsgType& type, co::int32& instanceID, 
-                                bool& hasReturn )
+                                bool& hasReturn, std::string* referer )
 {
     _message->Clear();
     _message->ParseFromString( msg );
@@ -170,6 +170,9 @@ void Decoder::setMsgForDecoding( const std::string& msg, MsgType& type, co::int3
     hasReturn = _message->has_return();
     Message_Type2MsgType( _message->msg_type(), type );
     _msgType = type;
+    
+    if( type != MsgType::CALL )
+        *referer = _message->referer_ip();
 }
 
 // if msg type is NEW, then, this function will decode it

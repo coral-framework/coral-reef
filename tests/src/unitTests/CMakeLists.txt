@@ -58,5 +58,5 @@ endif()
 ################################################################################
 # Source Groups
 ################################################################################
-source_group( "@Replicated" FILES ${_REPLICATED_MODULE_FILES} ${_GENERATED_REEF_FILES} )
+source_group( "@Replicated" FILES ${_REPLICATED_MODULE_FILES} ${_GENERATED_REEF_FILES} ${_GENERATED_MAPPINGS} )
 

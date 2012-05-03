@@ -600,7 +600,7 @@ class Message_New_Inst : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // optional string new_instance_type = 1;
+  // required string new_instance_type = 1;
   inline bool has_new_instance_type() const;
   inline void clear_new_instance_type();
   static const int kNewInstanceTypeFieldNumber = 1;
@@ -686,7 +686,7 @@ class Message_Find_Inst : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // optional string key = 1;
+  // required string key = 1;
   inline bool has_key() const;
   inline void clear_key();
   static const int kKeyFieldNumber = 1;
@@ -911,34 +911,45 @@ class Message : public ::google::protobuf::Message {
   inline bool has_return() const;
   inline void set_has_return(bool value);
   
-  // optional .reef.Message_New_Inst msg_new_inst = 4;
+  // optional string referer_ip = 4;
+  inline bool has_referer_ip() const;
+  inline void clear_referer_ip();
+  static const int kRefererIpFieldNumber = 4;
+  inline const ::std::string& referer_ip() const;
+  inline void set_referer_ip(const ::std::string& value);
+  inline void set_referer_ip(const char* value);
+  inline void set_referer_ip(const char* value, size_t size);
+  inline ::std::string* mutable_referer_ip();
+  inline ::std::string* release_referer_ip();
+  
+  // optional .reef.Message_New_Inst msg_new_inst = 5;
   inline bool has_msg_new_inst() const;
   inline void clear_msg_new_inst();
-  static const int kMsgNewInstFieldNumber = 4;
+  static const int kMsgNewInstFieldNumber = 5;
   inline const ::reef::Message_New_Inst& msg_new_inst() const;
   inline ::reef::Message_New_Inst* mutable_msg_new_inst();
   inline ::reef::Message_New_Inst* release_msg_new_inst();
   
-  // optional .reef.Message_Acc_Inst msg_acc_inst = 5;
+  // optional .reef.Message_Acc_Inst msg_acc_inst = 6;
   inline bool has_msg_acc_inst() const;
   inline void clear_msg_acc_inst();
-  static const int kMsgAccInstFieldNumber = 5;
+  static const int kMsgAccInstFieldNumber = 6;
   inline const ::reef::Message_Acc_Inst& msg_acc_inst() const;
   inline ::reef::Message_Acc_Inst* mutable_msg_acc_inst();
   inline ::reef::Message_Acc_Inst* release_msg_acc_inst();
   
-  // optional .reef.Message_Find_Inst msg_find_inst = 6;
+  // optional .reef.Message_Find_Inst msg_find_inst = 7;
   inline bool has_msg_find_inst() const;
   inline void clear_msg_find_inst();
-  static const int kMsgFindInstFieldNumber = 6;
+  static const int kMsgFindInstFieldNumber = 7;
   inline const ::reef::Message_Find_Inst& msg_find_inst() const;
   inline ::reef::Message_Find_Inst* mutable_msg_find_inst();
   inline ::reef::Message_Find_Inst* release_msg_find_inst();
   
-  // optional .reef.Message_Member msg_member = 7;
+  // optional .reef.Message_Member msg_member = 8;
   inline bool has_msg_member() const;
   inline void clear_msg_member();
-  static const int kMsgMemberFieldNumber = 7;
+  static const int kMsgMemberFieldNumber = 8;
   inline const ::reef::Message_Member& msg_member() const;
   inline ::reef::Message_Member* mutable_msg_member();
   inline ::reef::Message_Member* release_msg_member();
@@ -951,6 +962,8 @@ class Message : public ::google::protobuf::Message {
   inline void clear_has_instance_id();
   inline void set_has_has_return();
   inline void clear_has_has_return();
+  inline void set_has_referer_ip();
+  inline void clear_has_referer_ip();
   inline void set_has_msg_new_inst();
   inline void clear_has_msg_new_inst();
   inline void set_has_msg_acc_inst();
@@ -964,6 +977,7 @@ class Message : public ::google::protobuf::Message {
   
   int msg_type_;
   ::google::protobuf::uint32 instance_id_;
+  ::std::string* referer_ip_;
   ::reef::Message_New_Inst* msg_new_inst_;
   ::reef::Message_Acc_Inst* msg_acc_inst_;
   ::reef::Message_Find_Inst* msg_find_inst_;
@@ -971,7 +985,7 @@ class Message : public ::google::protobuf::Message {
   bool has_return_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(7 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(8 + 31) / 32];
   
   friend void  protobuf_AddDesc_Message_2eproto();
   friend void protobuf_AssignDesc_Message_2eproto();
@@ -1411,7 +1425,7 @@ Message_Member::mutable_arguments() {
 
 // Message_New_Inst
 
-// optional string new_instance_type = 1;
+// required string new_instance_type = 1;
 inline bool Message_New_Inst::has_new_instance_type() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
@@ -1473,7 +1487,7 @@ inline ::std::string* Message_New_Inst::release_new_instance_type() {
 
 // Message_Find_Inst
 
-// optional string key = 1;
+// required string key = 1;
 inline bool Message_Find_Inst::has_key() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
@@ -1650,15 +1664,73 @@ inline void Message::set_has_return(bool value) {
   has_return_ = value;
 }
 
-// optional .reef.Message_New_Inst msg_new_inst = 4;
-inline bool Message::has_msg_new_inst() const {
+// optional string referer_ip = 4;
+inline bool Message::has_referer_ip() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
-inline void Message::set_has_msg_new_inst() {
+inline void Message::set_has_referer_ip() {
   _has_bits_[0] |= 0x00000008u;
 }
-inline void Message::clear_has_msg_new_inst() {
+inline void Message::clear_has_referer_ip() {
   _has_bits_[0] &= ~0x00000008u;
+}
+inline void Message::clear_referer_ip() {
+  if (referer_ip_ != &::google::protobuf::internal::kEmptyString) {
+    referer_ip_->clear();
+  }
+  clear_has_referer_ip();
+}
+inline const ::std::string& Message::referer_ip() const {
+  return *referer_ip_;
+}
+inline void Message::set_referer_ip(const ::std::string& value) {
+  set_has_referer_ip();
+  if (referer_ip_ == &::google::protobuf::internal::kEmptyString) {
+    referer_ip_ = new ::std::string;
+  }
+  referer_ip_->assign(value);
+}
+inline void Message::set_referer_ip(const char* value) {
+  set_has_referer_ip();
+  if (referer_ip_ == &::google::protobuf::internal::kEmptyString) {
+    referer_ip_ = new ::std::string;
+  }
+  referer_ip_->assign(value);
+}
+inline void Message::set_referer_ip(const char* value, size_t size) {
+  set_has_referer_ip();
+  if (referer_ip_ == &::google::protobuf::internal::kEmptyString) {
+    referer_ip_ = new ::std::string;
+  }
+  referer_ip_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* Message::mutable_referer_ip() {
+  set_has_referer_ip();
+  if (referer_ip_ == &::google::protobuf::internal::kEmptyString) {
+    referer_ip_ = new ::std::string;
+  }
+  return referer_ip_;
+}
+inline ::std::string* Message::release_referer_ip() {
+  clear_has_referer_ip();
+  if (referer_ip_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = referer_ip_;
+    referer_ip_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// optional .reef.Message_New_Inst msg_new_inst = 5;
+inline bool Message::has_msg_new_inst() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void Message::set_has_msg_new_inst() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void Message::clear_has_msg_new_inst() {
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline void Message::clear_msg_new_inst() {
   if (msg_new_inst_ != NULL) msg_new_inst_->::reef::Message_New_Inst::Clear();
@@ -1679,15 +1751,15 @@ inline ::reef::Message_New_Inst* Message::release_msg_new_inst() {
   return temp;
 }
 
-// optional .reef.Message_Acc_Inst msg_acc_inst = 5;
+// optional .reef.Message_Acc_Inst msg_acc_inst = 6;
 inline bool Message::has_msg_acc_inst() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
+  return (_has_bits_[0] & 0x00000020u) != 0;
 }
 inline void Message::set_has_msg_acc_inst() {
-  _has_bits_[0] |= 0x00000010u;
+  _has_bits_[0] |= 0x00000020u;
 }
 inline void Message::clear_has_msg_acc_inst() {
-  _has_bits_[0] &= ~0x00000010u;
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline void Message::clear_msg_acc_inst() {
   if (msg_acc_inst_ != NULL) msg_acc_inst_->::reef::Message_Acc_Inst::Clear();
@@ -1708,15 +1780,15 @@ inline ::reef::Message_Acc_Inst* Message::release_msg_acc_inst() {
   return temp;
 }
 
-// optional .reef.Message_Find_Inst msg_find_inst = 6;
+// optional .reef.Message_Find_Inst msg_find_inst = 7;
 inline bool Message::has_msg_find_inst() const {
-  return (_has_bits_[0] & 0x00000020u) != 0;
+  return (_has_bits_[0] & 0x00000040u) != 0;
 }
 inline void Message::set_has_msg_find_inst() {
-  _has_bits_[0] |= 0x00000020u;
+  _has_bits_[0] |= 0x00000040u;
 }
 inline void Message::clear_has_msg_find_inst() {
-  _has_bits_[0] &= ~0x00000020u;
+  _has_bits_[0] &= ~0x00000040u;
 }
 inline void Message::clear_msg_find_inst() {
   if (msg_find_inst_ != NULL) msg_find_inst_->::reef::Message_Find_Inst::Clear();
@@ -1737,15 +1809,15 @@ inline ::reef::Message_Find_Inst* Message::release_msg_find_inst() {
   return temp;
 }
 
-// optional .reef.Message_Member msg_member = 7;
+// optional .reef.Message_Member msg_member = 8;
 inline bool Message::has_msg_member() const {
-  return (_has_bits_[0] & 0x00000040u) != 0;
+  return (_has_bits_[0] & 0x00000080u) != 0;
 }
 inline void Message::set_has_msg_member() {
-  _has_bits_[0] |= 0x00000040u;
+  _has_bits_[0] |= 0x00000080u;
 }
 inline void Message::clear_has_msg_member() {
-  _has_bits_[0] &= ~0x00000040u;
+  _has_bits_[0] &= ~0x00000080u;
 }
 inline void Message::clear_msg_member() {
   if (msg_member_ != NULL) msg_member_->::reef::Message_Member::Clear();

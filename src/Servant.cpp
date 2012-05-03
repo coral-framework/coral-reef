@@ -135,7 +135,8 @@ void Servant::onGetParam( Decoder& decoder, co::IType* paramType, co::Any& param
     co::Range<co::IPort* const> ports = _object->getComponent()->getFacets();
     
     co::IPort* port = ports[facetIdx];
-    param.set<co::IService*>( instance->getServiceAt( port ) );
+    co::IService* service = instance->getServiceAt( port );
+    param.set<co::IService*>( service );
 }
     
 void Servant::onServiceFirstAccess( co::int32 serviceId )

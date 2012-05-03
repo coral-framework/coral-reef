@@ -7,6 +7,7 @@
 #include "Encoder.h"
 
 #include <reef/IActiveLink.h>
+#include <co/RefPtr.h>
 #include <co/IService.h>
 #include <co/RefVector.h>
 
@@ -59,7 +60,7 @@ private:
     // Awaits a reply from a call. while waiting keeps updating Node.
     void awaitReplyUpdating( std::string& msg );
 private:
-    Node* _node;
+    co::RefPtr<Node> _node;
     
     void* _classPtr;
     

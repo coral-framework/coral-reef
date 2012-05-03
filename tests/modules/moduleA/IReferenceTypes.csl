@@ -1,5 +1,18 @@
 interface IReferenceTypes
 {
+	ISimpleTypes simple;
+	
+	int32 intFromSimple();
+	
+	// These methods cascade one into another until the incremented stored int from \a simple is returned
+	int32 meth1( in IReferenceTypes ref2, in IReferenceTypes ref3, in IReferenceTypes ref4, 
+					in IReferenceTypes ref5, in ISimpleTypes simple );
+	int32 meth2( in IReferenceTypes ref3, in IReferenceTypes ref4, in IReferenceTypes ref5,
+					 in ISimpleTypes simple );
+	int32 meth3( in IReferenceTypes ref4, in IReferenceTypes ref5, in ISimpleTypes simple );
+	int32 meth4( in IReferenceTypes ref5, in ISimpleTypes simple );
+	int32 meth5( in ISimpleTypes simple );
+	
 	int32 callIncrementInt( in ISimpleTypes service, in int32 number );
 	double callDivideDouble( in ISimpleTypes service, in double dividend,  in double divisor );
 	string concatenateString( in ISimpleTypes service, in string str1, in string str2 );

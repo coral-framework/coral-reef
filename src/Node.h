@@ -24,19 +24,19 @@ public:
     
     // INode methods
     co::IObject* newRemoteInstance( const std::string& instanceType, const std::string& address );
-    
+     
+    co::IObject* findRemoteInstance( const std::string& instanceType, const std::string& key, 
+                                    const std::string& address );
+
     void start( const std::string& boundAddress, const std::string& publicAddress );
     
 	void update();
 
     void stop();
-    
-    co::IObject* findRemoteInstance( const std::string& instanceType, const std::string& key, 
-                                    const std::string& address );
-    
+       
 	co::IObject* getInstance( co::int32 instanceID );
     
-	bool getRemoteReferences( co::IObject* instance, std::vector<std::string>& referers );
+    co::int32 getRemoteReferences( co::int32 instanceID );
     
 	co::int32 publishInstance( co::IObject* instance, const std::string& key );
     
@@ -58,6 +58,14 @@ public:
      instance has been sent as a parameter to another host.
      */
     co::int32 publishAnonymousInstance( co::IObject* instance );
+    
+    // Informs the instance owner about a new access to the instance (increase instance's ref count)
+    void requestBeginAccess( const std::string& address, co::int32 instanceID,
+                               const std::string& referer );
+    
+    // Informs the instance owner about a new access to the instance (increase instance's ref count)
+    void requestEndAccess( reef::IActiveLink* link, co::int32 instanceID,
+                            const std::string& referer );
     
     // returns a proxy to the requested remote instance
     co::IObject* getRemoteInstance( const std::string& instanceType, co::int32 instanceID, 

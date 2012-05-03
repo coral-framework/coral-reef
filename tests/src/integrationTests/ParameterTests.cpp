@@ -15,7 +15,7 @@
 namespace reef
 {
     
-TEST( SmokeTests, simpleTypesTest )
+TEST( ParameterTests, simpleTypesTest )
 {
     co::RefPtr<co::IObject> transportObj = co::newInstance( "mockReef.Transport" );
     reef::ITransport* transport = transportObj->getService<reef::ITransport>();
@@ -99,7 +99,7 @@ TEST( SmokeTests, simpleTypesTest )
     EXPECT_STREQ( stringRange[1].c_str(), stringVec2[2].c_str() );
 }
 
-TEST( SmokeTests, refTypeParameterTest )
+TEST( ParameterTests, refTypeParameterTest )
 {
     co::RefPtr<co::IObject> transportObj = co::newInstance( "mockReef.Transport" );
     reef::ITransport* transport = transportObj->getService<reef::ITransport>();
@@ -152,7 +152,6 @@ TEST( SmokeTests, refTypeParameterTest )
     EXPECT_EQ( refTypesServiceInA->callIncrementInt( simpleTypesServiceInB, 3 ), 4 );
     EXPECT_EQ( refTypesServiceInA->callDivideDouble( simpleTypesServiceInB, 15, 5 ), 3 );
     EXPECT_STREQ( refTypesServiceInA->concatenateString( simpleTypesServiceInB, "aaa", "bbb" ).c_str(), "aaabbb" );
-
 }
 
     

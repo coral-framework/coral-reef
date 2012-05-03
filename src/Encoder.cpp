@@ -159,11 +159,13 @@ Encoder::~Encoder()
     delete _message;
 }
     
-void Encoder::encodeNewInstMsg( const std::string& typeName, std::string& msg )
+void Encoder::encodeNewInstMsg( const std::string& typeName, std::string& msg, 
+                               const std::string& referer )
 {
     _message->set_msg_type( Message::MSG_NEW_INST );
     _message->set_instance_id( 0 ); // 0 is always the node channel
     _message->set_has_return( true );
+    _message->set_referer_ip( referer );
 
     
 	Message_New_Inst* msgNewInst = _message->mutable_msg_new_inst();
@@ -173,11 +175,13 @@ void Encoder::encodeNewInstMsg( const std::string& typeName, std::string& msg )
     _message->Clear();
 }
 
-void Encoder::encodeAccessInstMsg( co::int32 instanceID, bool increment, std::string& msg )
+void Encoder::encodeAccessInstMsg( co::int32 instanceID, bool increment, std::string& msg,
+                                   const std::string& referer)
 {
     _message->set_msg_type( Message::MSG_ACCESS_INST );
     _message->set_instance_id( 0 ); // 0 is always the node channel
     _message->set_has_return( false );
+    _message->set_referer_ip( referer );
     
     
 	Message_Acc_Inst* msgAccInst = _message->mutable_msg_acc_inst();
@@ -189,11 +193,13 @@ void Encoder::encodeAccessInstMsg( co::int32 instanceID, bool increment, std::st
     _message->Clear();
 }
     
-void Encoder::encodeFindInstMsg( const std::string& key, std::string& msg )
+void Encoder::encodeFindInstMsg( const std::string& key, std::string& msg,
+                                const std::string& referer )
 {
     _message->set_msg_type( Message::MSG_FIND_INST );
     _message->set_instance_id( 0 ); // 0 is always the node channel
     _message->set_has_return( true );
+    _message->set_referer_ip( referer );
     
     
 	Message_Find_Inst* msgFindInst = _message->mutable_msg_find_inst();

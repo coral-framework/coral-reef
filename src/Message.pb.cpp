@@ -170,10 +170,11 @@ void protobuf_AssignDesc_Message_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Message_Acc_Inst));
   Message_descriptor_ = file->message_type(7);
-  static const int Message_offsets_[7] = {
+  static const int Message_offsets_[8] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, msg_type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, instance_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, has_return_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, referer_ip_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, msg_new_inst_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, msg_acc_inst_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, msg_find_inst_),
@@ -261,18 +262,19 @@ void protobuf_AddDesc_Message_2eproto() {
     "ER\020\002\"Z\n\016Message_Member\022\021\n\tfacet_idx\030\001 \002("
     "\r\022\022\n\nmember_idx\030\002 \002(\r\022!\n\targuments\030\004 \003(\013"
     "2\016.reef.Argument\"-\n\020Message_New_Inst\022\031\n\021"
-    "new_instance_type\030\001 \001(\t\" \n\021Message_Find_"
-    "Inst\022\013\n\003key\030\001 \001(\t\":\n\020Message_Acc_Inst\022\021\n"
-    "\tincrement\030\001 \002(\010\022\023\n\013instance_id\030\002 \002(\r\"\336\002"
+    "new_instance_type\030\001 \002(\t\" \n\021Message_Find_"
+    "Inst\022\013\n\003key\030\001 \002(\t\":\n\020Message_Acc_Inst\022\021\n"
+    "\tincrement\030\001 \002(\010\022\023\n\013instance_id\030\002 \002(\r\"\362\002"
     "\n\007Message\022$\n\010msg_type\030\001 \002(\0162\022.reef.Messa"
     "ge.Type\022\023\n\013instance_id\030\002 \002(\r\022\022\n\nhas_retu"
-    "rn\030\003 \002(\010\022,\n\014msg_new_inst\030\004 \001(\0132\026.reef.Me"
-    "ssage_New_Inst\022,\n\014msg_acc_inst\030\005 \001(\0132\026.r"
-    "eef.Message_Acc_Inst\022.\n\rmsg_find_inst\030\006 "
-    "\001(\0132\027.reef.Message_Find_Inst\022(\n\nmsg_memb"
-    "er\030\007 \001(\0132\024.reef.Message_Member\"N\n\004Type\022\020"
-    "\n\014MSG_NEW_INST\020\000\022\023\n\017MSG_ACCESS_INST\020\001\022\021\n"
-    "\rMSG_FIND_INST\020\002\022\014\n\010MSG_CALL\020\003", 950);
+    "rn\030\003 \002(\010\022\022\n\nreferer_ip\030\004 \001(\t\022,\n\014msg_new_"
+    "inst\030\005 \001(\0132\026.reef.Message_New_Inst\022,\n\014ms"
+    "g_acc_inst\030\006 \001(\0132\026.reef.Message_Acc_Inst"
+    "\022.\n\rmsg_find_inst\030\007 \001(\0132\027.reef.Message_F"
+    "ind_Inst\022(\n\nmsg_member\030\010 \001(\0132\024.reef.Mess"
+    "age_Member\"N\n\004Type\022\020\n\014MSG_NEW_INST\020\000\022\023\n\017"
+    "MSG_ACCESS_INST\020\001\022\021\n\rMSG_FIND_INST\020\002\022\014\n\010"
+    "MSG_CALL\020\003", 970);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "Message.proto", &protobuf_RegisterTypes);
   Data_Container::default_instance_ = new Data_Container();
@@ -1653,7 +1655,7 @@ bool Message_New_Inst::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // optional string new_instance_type = 1;
+      // required string new_instance_type = 1;
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
@@ -1687,7 +1689,7 @@ bool Message_New_Inst::MergePartialFromCodedStream(
 
 void Message_New_Inst::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // optional string new_instance_type = 1;
+  // required string new_instance_type = 1;
   if (has_new_instance_type()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->new_instance_type().data(), this->new_instance_type().length(),
@@ -1704,7 +1706,7 @@ void Message_New_Inst::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* Message_New_Inst::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // optional string new_instance_type = 1;
+  // required string new_instance_type = 1;
   if (has_new_instance_type()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->new_instance_type().data(), this->new_instance_type().length(),
@@ -1725,7 +1727,7 @@ int Message_New_Inst::ByteSize() const {
   int total_size = 0;
   
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // optional string new_instance_type = 1;
+    // required string new_instance_type = 1;
     if (has_new_instance_type()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
@@ -1779,6 +1781,7 @@ void Message_New_Inst::CopyFrom(const Message_New_Inst& from) {
 }
 
 bool Message_New_Inst::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
   
   return true;
 }
@@ -1877,7 +1880,7 @@ bool Message_Find_Inst::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // optional string key = 1;
+      // required string key = 1;
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
@@ -1911,7 +1914,7 @@ bool Message_Find_Inst::MergePartialFromCodedStream(
 
 void Message_Find_Inst::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // optional string key = 1;
+  // required string key = 1;
   if (has_key()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->key().data(), this->key().length(),
@@ -1928,7 +1931,7 @@ void Message_Find_Inst::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* Message_Find_Inst::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // optional string key = 1;
+  // required string key = 1;
   if (has_key()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->key().data(), this->key().length(),
@@ -1949,7 +1952,7 @@ int Message_Find_Inst::ByteSize() const {
   int total_size = 0;
   
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // optional string key = 1;
+    // required string key = 1;
     if (has_key()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
@@ -2003,6 +2006,7 @@ void Message_Find_Inst::CopyFrom(const Message_Find_Inst& from) {
 }
 
 bool Message_Find_Inst::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
   
   return true;
 }
@@ -2302,6 +2306,7 @@ const int Message::Type_ARRAYSIZE;
 const int Message::kMsgTypeFieldNumber;
 const int Message::kInstanceIdFieldNumber;
 const int Message::kHasReturnFieldNumber;
+const int Message::kRefererIpFieldNumber;
 const int Message::kMsgNewInstFieldNumber;
 const int Message::kMsgAccInstFieldNumber;
 const int Message::kMsgFindInstFieldNumber;
@@ -2331,6 +2336,7 @@ void Message::SharedCtor() {
   msg_type_ = 0;
   instance_id_ = 0u;
   has_return_ = false;
+  referer_ip_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   msg_new_inst_ = NULL;
   msg_acc_inst_ = NULL;
   msg_find_inst_ = NULL;
@@ -2343,6 +2349,9 @@ Message::~Message() {
 }
 
 void Message::SharedDtor() {
+  if (referer_ip_ != &::google::protobuf::internal::kEmptyString) {
+    delete referer_ip_;
+  }
   if (this != default_instance_) {
     delete msg_new_inst_;
     delete msg_acc_inst_;
@@ -2376,6 +2385,11 @@ void Message::Clear() {
     msg_type_ = 0;
     instance_id_ = 0u;
     has_return_ = false;
+    if (has_referer_ip()) {
+      if (referer_ip_ != &::google::protobuf::internal::kEmptyString) {
+        referer_ip_->clear();
+      }
+    }
     if (has_msg_new_inst()) {
       if (msg_new_inst_ != NULL) msg_new_inst_->::reef::Message_New_Inst::Clear();
     }
@@ -2447,12 +2461,29 @@ bool Message::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(34)) goto parse_msg_new_inst;
+        if (input->ExpectTag(34)) goto parse_referer_ip;
         break;
       }
       
-      // optional .reef.Message_New_Inst msg_new_inst = 4;
+      // optional string referer_ip = 4;
       case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_referer_ip:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_referer_ip()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->referer_ip().data(), this->referer_ip().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(42)) goto parse_msg_new_inst;
+        break;
+      }
+      
+      // optional .reef.Message_New_Inst msg_new_inst = 5;
+      case 5: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
          parse_msg_new_inst:
@@ -2461,12 +2492,12 @@ bool Message::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(42)) goto parse_msg_acc_inst;
+        if (input->ExpectTag(50)) goto parse_msg_acc_inst;
         break;
       }
       
-      // optional .reef.Message_Acc_Inst msg_acc_inst = 5;
-      case 5: {
+      // optional .reef.Message_Acc_Inst msg_acc_inst = 6;
+      case 6: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
          parse_msg_acc_inst:
@@ -2475,12 +2506,12 @@ bool Message::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(50)) goto parse_msg_find_inst;
+        if (input->ExpectTag(58)) goto parse_msg_find_inst;
         break;
       }
       
-      // optional .reef.Message_Find_Inst msg_find_inst = 6;
-      case 6: {
+      // optional .reef.Message_Find_Inst msg_find_inst = 7;
+      case 7: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
          parse_msg_find_inst:
@@ -2489,12 +2520,12 @@ bool Message::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(58)) goto parse_msg_member;
+        if (input->ExpectTag(66)) goto parse_msg_member;
         break;
       }
       
-      // optional .reef.Message_Member msg_member = 7;
-      case 7: {
+      // optional .reef.Message_Member msg_member = 8;
+      case 8: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
          parse_msg_member:
@@ -2541,28 +2572,37 @@ void Message::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteBool(3, this->has_return(), output);
   }
   
-  // optional .reef.Message_New_Inst msg_new_inst = 4;
+  // optional string referer_ip = 4;
+  if (has_referer_ip()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->referer_ip().data(), this->referer_ip().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      4, this->referer_ip(), output);
+  }
+  
+  // optional .reef.Message_New_Inst msg_new_inst = 5;
   if (has_msg_new_inst()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      4, this->msg_new_inst(), output);
+      5, this->msg_new_inst(), output);
   }
   
-  // optional .reef.Message_Acc_Inst msg_acc_inst = 5;
+  // optional .reef.Message_Acc_Inst msg_acc_inst = 6;
   if (has_msg_acc_inst()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      5, this->msg_acc_inst(), output);
+      6, this->msg_acc_inst(), output);
   }
   
-  // optional .reef.Message_Find_Inst msg_find_inst = 6;
+  // optional .reef.Message_Find_Inst msg_find_inst = 7;
   if (has_msg_find_inst()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      6, this->msg_find_inst(), output);
+      7, this->msg_find_inst(), output);
   }
   
-  // optional .reef.Message_Member msg_member = 7;
+  // optional .reef.Message_Member msg_member = 8;
   if (has_msg_member()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      7, this->msg_member(), output);
+      8, this->msg_member(), output);
   }
   
   if (!unknown_fields().empty()) {
@@ -2589,32 +2629,42 @@ void Message::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(3, this->has_return(), target);
   }
   
-  // optional .reef.Message_New_Inst msg_new_inst = 4;
+  // optional string referer_ip = 4;
+  if (has_referer_ip()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->referer_ip().data(), this->referer_ip().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        4, this->referer_ip(), target);
+  }
+  
+  // optional .reef.Message_New_Inst msg_new_inst = 5;
   if (has_msg_new_inst()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
-        4, this->msg_new_inst(), target);
+        5, this->msg_new_inst(), target);
   }
   
-  // optional .reef.Message_Acc_Inst msg_acc_inst = 5;
+  // optional .reef.Message_Acc_Inst msg_acc_inst = 6;
   if (has_msg_acc_inst()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
-        5, this->msg_acc_inst(), target);
+        6, this->msg_acc_inst(), target);
   }
   
-  // optional .reef.Message_Find_Inst msg_find_inst = 6;
+  // optional .reef.Message_Find_Inst msg_find_inst = 7;
   if (has_msg_find_inst()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
-        6, this->msg_find_inst(), target);
+        7, this->msg_find_inst(), target);
   }
   
-  // optional .reef.Message_Member msg_member = 7;
+  // optional .reef.Message_Member msg_member = 8;
   if (has_msg_member()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
-        7, this->msg_member(), target);
+        8, this->msg_member(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -2646,28 +2696,35 @@ int Message::ByteSize() const {
       total_size += 1 + 1;
     }
     
-    // optional .reef.Message_New_Inst msg_new_inst = 4;
+    // optional string referer_ip = 4;
+    if (has_referer_ip()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->referer_ip());
+    }
+    
+    // optional .reef.Message_New_Inst msg_new_inst = 5;
     if (has_msg_new_inst()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
           this->msg_new_inst());
     }
     
-    // optional .reef.Message_Acc_Inst msg_acc_inst = 5;
+    // optional .reef.Message_Acc_Inst msg_acc_inst = 6;
     if (has_msg_acc_inst()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
           this->msg_acc_inst());
     }
     
-    // optional .reef.Message_Find_Inst msg_find_inst = 6;
+    // optional .reef.Message_Find_Inst msg_find_inst = 7;
     if (has_msg_find_inst()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
           this->msg_find_inst());
     }
     
-    // optional .reef.Message_Member msg_member = 7;
+    // optional .reef.Message_Member msg_member = 8;
     if (has_msg_member()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
@@ -2710,6 +2767,9 @@ void Message::MergeFrom(const Message& from) {
     if (from.has_has_return()) {
       set_has_return(from.has_return());
     }
+    if (from.has_referer_ip()) {
+      set_referer_ip(from.referer_ip());
+    }
     if (from.has_msg_new_inst()) {
       mutable_msg_new_inst()->::reef::Message_New_Inst::MergeFrom(from.msg_new_inst());
     }
@@ -2741,8 +2801,14 @@ void Message::CopyFrom(const Message& from) {
 bool Message::IsInitialized() const {
   if ((_has_bits_[0] & 0x00000007) != 0x00000007) return false;
   
+  if (has_msg_new_inst()) {
+    if (!this->msg_new_inst().IsInitialized()) return false;
+  }
   if (has_msg_acc_inst()) {
     if (!this->msg_acc_inst().IsInitialized()) return false;
+  }
+  if (has_msg_find_inst()) {
+    if (!this->msg_find_inst().IsInitialized()) return false;
   }
   if (has_msg_member()) {
     if (!this->msg_member().IsInitialized()) return false;
@@ -2755,6 +2821,7 @@ void Message::Swap(Message* other) {
     std::swap(msg_type_, other->msg_type_);
     std::swap(instance_id_, other->instance_id_);
     std::swap(has_return_, other->has_return_);
+    std::swap(referer_ip_, other->referer_ip_);
     std::swap(msg_new_inst_, other->msg_new_inst_);
     std::swap(msg_acc_inst_, other->msg_acc_inst_);
     std::swap(msg_find_inst_, other->msg_find_inst_);

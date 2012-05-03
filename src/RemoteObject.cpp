@@ -106,6 +106,8 @@ RemoteObject::~RemoteObject()
         delete _facets[i];
     }
     delete [] _facets;
+    
+    _node->requestEndAccess( _link.get(), _instanceID, "TODO" );
 }
     
 void RemoteObject::setComponent( co::IComponent* component )
@@ -244,6 +246,7 @@ void RemoteObject::onInterfaceParam( co::IService* param )
         }
         else
         {
+            _node->requestBeginAccess( ownerAddress, instanceID, "TODO" );
             _encoder.addRefParam( instanceID, facetIdx, Encoder::RefOwner::ANOTHER, &providerType, 
                                  &ownerAddress );
         }

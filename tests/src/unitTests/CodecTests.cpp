@@ -30,6 +30,7 @@ TEST( CodecTests, simpleTypesTest )
     
     // parameters common to message types
     std::string msg;
+    std::string referer;
     MsgType msgType;
     bool hasReturn;
     co::int32 msgReceiverID;
@@ -39,22 +40,24 @@ TEST( CodecTests, simpleTypesTest )
     // ------ new inst
     std::string typeName;
     
-    encoder.encodeNewInstMsg( "test", msg );
-    decoder.setMsgForDecoding( msg, msgType, msgReceiverID, hasReturn );
+    encoder.encodeNewInstMsg( "test", msg, "address" );
+    decoder.setMsgForDecoding( msg, msgType, msgReceiverID, hasReturn, &referer );
     
     EXPECT_EQ( msgType, MsgType::NEW_INST );
     EXPECT_EQ( msgReceiverID, 0 );
     EXPECT_TRUE( hasReturn );
+    EXPECT_STREQ( referer.c_str(), "address" );
     
     EXPECT_NO_THROW( decoder.decodeNewInstMsg( typeName ) );
     EXPECT_STREQ( typeName.c_str(), "test" );
     
-    encoder.encodeFindInstMsg( "key", msg );
-    decoder.setMsgForDecoding( msg, msgType, msgReceiverID, hasReturn );
+    encoder.encodeFindInstMsg( "key", msg, "address2" );
+    decoder.setMsgForDecoding( msg, msgType, msgReceiverID, hasReturn, &referer );
     
     EXPECT_EQ( msgType, MsgType::FIND_INST );
     EXPECT_EQ( msgReceiverID, 0 );
     EXPECT_TRUE( hasReturn );
+    EXPECT_STREQ( referer.c_str(), "address2" );
 
     std::string key;
     
@@ -64,12 +67,13 @@ TEST( CodecTests, simpleTypesTest )
     // ------ accessinst
     bool increment;
     
-    encoder.encodeAccessInstMsg( 5, true, msg );
-    decoder.setMsgForDecoding( msg, msgType, msgReceiverID, hasReturn );
+    encoder.encodeAccessInstMsg( 5, true, msg, "address3" );
+    decoder.setMsgForDecoding( msg, msgType, msgReceiverID, hasReturn, &referer );
     
     EXPECT_EQ( msgType, MsgType::ACCESS_INST );
     EXPECT_EQ( msgReceiverID, 0 );
     EXPECT_FALSE( hasReturn );
+    EXPECT_STREQ( referer.c_str(), "address3" );
     
     EXPECT_NO_THROW( decoder.decodeAccessInstMsg( instanceID, increment ) );
     EXPECT_EQ( instanceID, 5 );

@@ -6,6 +6,7 @@
 
 #include "TestComponent_Base.h"
 #include <moduleA/MotherStruct.h>
+#include <co/RefPtr.h>
 
 namespace moduleA {
 
@@ -45,6 +46,53 @@ public:
 	}
 
 	// ------ moduleA.IReferenceTypes Methods ------ //
+    
+    void setSimple( moduleA::ISimpleTypes* simple )
+    {
+        _storedSimple = simple;
+    }
+    
+    moduleA::ISimpleTypes* getSimple()
+    {
+        return _storedSimple.get();
+    }
+    
+    co::int32 intFromSimple()
+    {
+        return _storedSimple->getStoredInt();
+    }
+    
+    co::int32 intFromSimpleFromRef( IReferenceTypes* reference, ISimpleTypes* simple )
+    {
+        return reference->getSimple()->getStoredInt() + reference->callIncrementInt( simple, 1 );
+    }
+    
+    co::int32 meth1( IReferenceTypes* ref2, IReferenceTypes* ref3, IReferenceTypes* ref4, 
+                    IReferenceTypes* ref5, ISimpleTypes* simple )
+    {
+        return ref2->meth2( ref3, ref4, ref5, simple );
+    }
+    
+    co::int32 meth2( IReferenceTypes* ref3, IReferenceTypes* ref4, 
+                    IReferenceTypes* ref5, ISimpleTypes* simple )
+    {
+        return ref3->meth3( ref4, ref5, simple );
+    }
+    
+    co::int32 meth3( IReferenceTypes* ref4, IReferenceTypes* ref5, ISimpleTypes* simple )
+    {
+        return ref4->meth4( ref5, simple );
+    }
+    
+    co::int32 meth4( IReferenceTypes* ref5, ISimpleTypes* simple )
+    {
+        return ref5->meth5( simple );
+    }
+    
+    co::int32 meth5( ISimpleTypes* simple )
+    {
+        return simple->incrementInt( simple->getStoredInt() );
+    }
     
 	double callDivideDouble( moduleA::ISimpleTypes* service, double dividend, double divisor )
 	{
@@ -235,6 +283,8 @@ public:
 	}
 
 private:
+    co::RefPtr<moduleA::ISimpleTypes> _storedSimple;
+    
 	// member variables
 	moduleA::StringNativeClass _stringNativeClass;
 	moduleA::MotherStruct _motherStruct;

@@ -39,12 +39,12 @@ message Message_Member
 
 message Message_New_Inst
 {
-	optional string new_instance_type = 1;
+	required string new_instance_type = 1;
 }
 
 message Message_Find_Inst
 {
-	optional string key = 1;
+	required string key = 1;
 }
 
 message Message_Acc_Inst
@@ -70,12 +70,14 @@ message Message
 	
 	required bool has_return = 3;
 	 
-	optional Message_New_Inst msg_new_inst = 4;
+	optional string referer_ip = 4;
 	
-	optional Message_Acc_Inst msg_acc_inst = 5;
+	optional Message_New_Inst msg_new_inst = 5;
 	
-	optional Message_Find_Inst msg_find_inst = 6;
+	optional Message_Acc_Inst msg_acc_inst = 6;
+	
+	optional Message_Find_Inst msg_find_inst = 7;
 		
-	optional Message_Member msg_member = 7;
+	optional Message_Member msg_member = 8;
 }
 

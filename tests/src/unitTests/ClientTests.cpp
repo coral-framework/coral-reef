@@ -29,9 +29,15 @@ TEST( ClientTests, valueTypeCalls )
     Decoder decoder;
     Encoder encoder;
     
+    // Node is needed internally
+    co::RefPtr<Node> node = new reef::Node();
+    reef::ITransport* transport = co::newInstance( "mockReef.Transport" )->getService<reef::ITransport>();
+    node->setService( "transport", transport );
+    node->start( "addressLocal", "addressLocal" );
+
     // create remote object of TestComponent type
 	co::IComponent* TCComponent = co::cast<co::IComponent>( co::getType( "moduleA.TestComponent" ) );
-    co::RefPtr<RemoteObject> TCObject = RemoteObject::getOrCreateRemoteObject( 0, TCComponent, activeLink,
+    co::RefPtr<RemoteObject> TCObject = RemoteObject::getOrCreateRemoteObject( node.get(), TCComponent, activeLink,
                                                                              9 );
 
 	// get the ISimpleTypes port so we can know the index of the port to check later.
@@ -96,7 +102,7 @@ TEST( ClientTests, refTypeCalls )
     mockReef::IFakeLink* fakeLinkB = fakeLinkObjB->getService<mockReef::IFakeLink>();
     fakeLinkB->setAddress( "addressB" );
    
-    // Node is needed by the RemoteObjects to publish the local instances
+    // Node is needed internally
     co::RefPtr<Node> node = new reef::Node();
     reef::ITransport* transport = co::newInstance( "mockReef.Transport" )->getService<reef::ITransport>();
     node->setService( "transport", transport );
@@ -128,7 +134,6 @@ TEST( ClientTests, refTypeCalls )
     co::IPort* RTPort = co::cast<co::IPort>( TCComponent->getMember( "reference" ) );
     
     // get the ISimpleTypes service's interface. Then, get the methods we want to check indices later.
-    co::IInterface* STInterface = STPort->getType();
     co::IInterface* RTInterface = RTPort->getType();
 	co::IMethod* callIncrIntMethod = co::cast<co::IMethod>( RTInterface->getMember( "callIncrementInt" ) );
     

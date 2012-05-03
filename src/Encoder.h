@@ -27,9 +27,10 @@ public:
     ~Encoder();
     
     // ----- New Instance ----- //
-    void encodeNewInstMsg( const std::string& typeName, std::string& msg );
-    void encodeAccessInstMsg( co::int32 instanceID, bool increment, std::string& msg );
-    void encodeFindInstMsg( const std::string& key, std::string& msg );
+    void encodeNewInstMsg( const std::string& typeName, std::string& msg, const std::string& referer );
+    void encodeAccessInstMsg( co::int32 instanceID, bool increment, std::string& msg,
+                             const std::string& referer );
+    void encodeFindInstMsg( const std::string& key, std::string& msg, const std::string& referer );
     
     /*
      Encoder functions for Call/Field msgs. As these messages require different amounts of 

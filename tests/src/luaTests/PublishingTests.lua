@@ -1,7 +1,6 @@
 function publishTest()
 	local transportObj = co.new "mockReef.Transport"
 	local transport = transportObj.transport
-	
 	local serverANodeObj = co.new "reef.Node"
 	serverANodeObj.transport = transport
 	
@@ -56,14 +55,12 @@ function publishTest()
 	EXPECT_EQ( server:getInstance( 1 ), instanceTC )
 	
 	-- Checks if clientA and clientB are referers
-	local isPublic, referers = server:getRemoteReferences( instanceTC )
-	EXPECT_TRUE( isPublic )
-	EXPECT_EQ( referers[1], "addressA" )
-	EXPECT_EQ( referers[2], "addressB" )
+	local references = server:getRemoteReferences( 1 )
+	EXPECT_EQ( references, 3 )
 	
-	-- Checks if returns false in case of a non published instance
-	isPublic = server:getRemoteReferences( transportObj )
-	EXPECT_FALSE( isPublic )
+	-- Checks if returns 0 in case of an invalid id
+	references = server:getRemoteReferences( 3 )
+	EXPECT_EQ( references, 0 )
 	
 	-- Checks if a remotely created instance is accessible locally
 	local newInstProxy = clientA:newRemoteInstance( "moduleA.TestComponent", "addressServer" )
@@ -72,9 +69,8 @@ function publishTest()
 	EXPECT_EQ( newInst.simple.storedInt, 8 )
 	
 	-- Checks if clientA is referer
-	isPublic, referers = server:getRemoteReferences( newInst )
-	EXPECT_TRUE( isPublic )
-	EXPECT_EQ( referers[1], "addressA" )
+	references = server:getRemoteReferences( 2 )
+	EXPECT_EQ( references, 1 )
 	
 	-- Checks if the ID counting is correct
 	clientB:newRemoteInstance( "moduleA.TestComponent", "addressServer" )
@@ -86,8 +82,7 @@ function publishTest()
 	EXPECT_EQ( newInst.simple.storedInt, 9 )
 	
 	-- Checks if clientA is referer
-	isPublic, referers = server:getRemoteReferences( newInst )
-	EXPECT_TRUE( isPublic )
-	EXPECT_EQ( referers[1], "addressB" )
+	references = server:getRemoteReferences( 6 )
+	EXPECT_EQ( references, 1 )
 end
 
