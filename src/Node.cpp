@@ -77,7 +77,7 @@ void Node::stop()
     // fill the empty holes in the servants vector
     for( ; !_freedIds.empty(); _freedIds.pop() )
     {
-        if( _freedIds.top() != _servants.size() )
+        if( _freedIds.top() <= _servants.size() )
             _servants[_freedIds.top()] = _servants.back();
         
         _servants.pop_back();
