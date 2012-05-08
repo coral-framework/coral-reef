@@ -11,6 +11,7 @@ include_directories(
 	${REEF_SOURCE_DIR}/src/reef
 	${CMAKE_CURRENT_BINARY_DIR}/generated
 	${moduleA_BINARY_DIR}/generated
+	${mockReef_BINARY_DIR}/generated
 )
 
 # Gather source files in the current directory

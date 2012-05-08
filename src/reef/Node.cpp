@@ -77,7 +77,7 @@ void Node::stop()
     // fill the empty holes in the invokers vector
     for( ; !_freedIds.empty(); _freedIds.pop() )
     {
-        if( _freedIds.top() != _invokers.size() )
+        if( _freedIds.top() <= _invokers.size() )
             _invokers[_freedIds.top()] = _invokers.back();
         
         _invokers.pop_back();
