@@ -8,7 +8,7 @@ CORAL_GENERATE_MAPPINGS( _GENERATED_MAPPINGS "mockReef.IFakeLink" )
 
 include_directories(
 	${GTEST_INCLUDE_DIRS}
-	${REEF_SOURCE_DIR}/src
+	${REEF_SOURCE_DIR}/src/reef
 	${CMAKE_CURRENT_BINARY_DIR}/generated
 	${moduleA_BINARY_DIR}/generated
 )
@@ -17,8 +17,8 @@ include_directories(
 file( GLOB _HEADERS *.h )
 file( GLOB _SOURCES *.cpp )
 
-# Calcium sources replicated here for testing
-file( GLOB _REPLICATED_MODULE_FILES	${CMAKE_SOURCE_DIR}/src/*.cpp )
+# Reef sources replicated here for testing
+file( GLOB _REPLICATED_MODULE_FILES	${REEF_SOURCE_DIR}/src/reef/*.cpp )
 list( REMOVE_ITEM _GENERATED_REEF_FILES "${CMAKE_CURRENT_BINARY_DIR}/generated/__Bootstrap.cpp" )
 
 add_executable( unitTests EXCLUDE_FROM_ALL ${_REPLICATED_MODULE_FILES} ${_HEADERS} ${_SOURCES} ${_GENERATED_REEF_FILES} ${_GENERATED_MAPPINGS} )

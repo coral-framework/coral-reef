@@ -6,7 +6,7 @@
 #include <reef/IActiveLink.h>
 #include <reef/IPassiveLink.h>
 
-namespace reef {
+namespace zmq {
     
 ZMQTransport::ZMQTransport()
 {
@@ -20,14 +20,14 @@ ZMQTransport::~ZMQTransport()
 
 // ------ reef.ITransport Methods ------ //
 
-IPassiveLink* ZMQTransport::bind( const std::string& addressToListen )
+reef::IPassiveLink* ZMQTransport::bind( const std::string& addressToListen )
 {
     ZMQPassiveLink* link = new ZMQPassiveLink();
     link->bind( addressToListen );
     return link;
 }
 
-IActiveLink* ZMQTransport::connect( const std::string& addressToConnect )
+reef::IActiveLink* ZMQTransport::connect( const std::string& addressToConnect )
 {
     // Tries to find an existing ActiveLink and returns it
     ActiveLinks::iterator it = _activeLinks.find( addressToConnect );
@@ -50,11 +50,11 @@ void ZMQTransport::onLinkDestructor( const std::string& address )
     }
 }
 
-IActiveLink* ZMQTransport::createActiveLink( const std::string& address )
+reef::IActiveLink* ZMQTransport::createActiveLink( const std::string& address )
 {
     ZMQActiveLink* link = new ZMQActiveLink( this );
     link->connect( address );
-    _activeLinks.insert( std::pair<std::string, IActiveLink*>( address, link ) );
+    _activeLinks.insert( std::pair<std::string, reef::IActiveLink*>( address, link ) );
     return link;
 }
      

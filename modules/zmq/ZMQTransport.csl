@@ -1,0 +1,6 @@
+import reef.ITransport;
+
+component ZMQTransport
+{
+	provides reef.ITransport transport;
+};

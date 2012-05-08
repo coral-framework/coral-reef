@@ -2,7 +2,7 @@
 
 #include "ZMQTransport.h"
 
-namespace reef {
+namespace zmq {
 
 ZMQActiveLink::ZMQActiveLink( ZMQTransport* creator ) :
     _context( 1 ), _socket( _context, ZMQ_DEALER ), _creator( creator )

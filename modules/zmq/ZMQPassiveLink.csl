@@ -1,0 +1,6 @@
+import reef.IPassiveLink;
+
+component ZMQPassiveLink
+{
+	provides reef.IPassiveLink passive;
+};

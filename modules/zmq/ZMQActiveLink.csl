@@ -1,0 +1,7 @@
+import reef.IActiveLink;
+
+component ZMQActiveLink
+{
+	provides reef.IActiveLink active;
+
+};

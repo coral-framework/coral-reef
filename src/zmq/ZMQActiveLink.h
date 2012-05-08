@@ -5,7 +5,7 @@
 
 #include <zmq.hpp>
 
-namespace reef {
+namespace zmq {
     
 class ZMQTransport;
 

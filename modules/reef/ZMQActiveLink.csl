@@ -1,5 +1,0 @@
-component ZMQActiveLink
-{
-	provides IActiveLink active;
-
-};

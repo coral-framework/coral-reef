@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-namespace reef {
+namespace zmq {
 
 ZMQPassiveLink::ZMQPassiveLink() : _context( 1 ), _socket( _context, ZMQ_ROUTER )
 {

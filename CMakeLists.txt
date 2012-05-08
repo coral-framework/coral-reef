@@ -18,7 +18,6 @@ set( CMAKE_MODULE_PATH ${CORAL_ROOT}/cmake ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MOD
 
 # Load Coral's CMake package
 find_package( Coral REQUIRED )
-find_package( zmq REQUIRED )
 
 # FindPROTOBUF.cmake looks for PROTOBUF_SRC_ROOT_FOLDER cmake variable instead of an ENV var
 if( WIN32 )
