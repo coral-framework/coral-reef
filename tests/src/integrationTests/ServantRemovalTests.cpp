@@ -15,7 +15,7 @@
 namespace reef
 {
     
-TEST( ServantRemovalTests, simpleTest )
+TEST( InvokerRemovalTests, simpleTest )
 {
     co::RefPtr<co::IObject> transportObj = co::newInstance( "mockReef.Transport" );
     reef::ITransport* transport = transportObj->getService<reef::ITransport>();

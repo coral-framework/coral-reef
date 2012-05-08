@@ -1,10 +1,10 @@
 #ifndef __REMOTEOBJECT_H__
 #define __REMOTEOBJECT_H__
 
-#include "RemoteObject_Base.h"
+#include "ClientProxy_Base.h"
 
-#include "Decoder.h"
-#include "Encoder.h"
+#include "Unmarshaller.h"
+#include "Marshaller.h"
 
 #include <reef/IActiveLink.h>
 #include <co/RefPtr.h>
@@ -16,14 +16,14 @@ namespace reef
     
 class Node;
     
-class RemoteObject : public RemoteObject_Base
+class ClientProxy : public ClientProxy_Base
 {
 public:
     // Gets or creates a remote object pointing to an existing instance. 
-    static RemoteObject* getOrCreateRemoteObject( Node* node, co::IComponent* component, 
+    static ClientProxy* getOrCreateClientProxy( Node* node, co::IComponent* component, 
                                                  IActiveLink* link, co::int32 instanceID );
-    RemoteObject();
-    virtual ~RemoteObject();
+    ClientProxy();
+    virtual ~ClientProxy();
     
     // IComponent
     co::IComponent* getComponent();
@@ -45,11 +45,11 @@ public:
     inline bool isLocalObject( void* obj ) { return *reinterpret_cast<void**>( obj ) != _classPtr; }
     
 private:
-    RemoteObject( Node* node, co::IComponent* component, IActiveLink* connecter, co::int32 instanceID );
+    ClientProxy( Node* node, co::IComponent* component, IActiveLink* connecter, co::int32 instanceID );
     
     /* 
      Treats all possible cases of a TK_INTERFACE param in a call/field msg. 
-     See Reference Values page on reef's wiki for further info. Also add the Ref param in the encoder.
+     See Reference Values page on reef's wiki for further info. Also add the Ref param in the marshaller.
      */
     void onInterfaceParam( co::IService* param );
     
@@ -66,8 +66,8 @@ private:
     
     co::int32 _instanceID;
     
-    Encoder _encoder;
-    Decoder _decoder;
+    Marshaller _marshaller;
+    Unmarshaller _unmarshaller;
     co::RefPtr<IActiveLink> _link;
     co::Any _resultBuffer;    
     

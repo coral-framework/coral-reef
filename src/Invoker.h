@@ -1,7 +1,7 @@
 #ifndef _REEF_SERVANT_H_
 #define _REEF_SERVANT_H_
 
-#include "Decoder.h"
+#include "Unmarshaller.h"
 #include <co/Any.h>
 #include <co/RefPtr.h>
 #include <co/RefVector.h>
@@ -14,15 +14,15 @@ namespace reef
 class Node;
     
 // Server-side implementation of IChannel. Delivers the appropriate calls to the Objects
-class Servant
+class Invoker
 {
 public:
-    Servant( Node* node, co::IObject* object );
+    Invoker( Node* node, co::IObject* object );
     
-     ~Servant();
+     ~Invoker();
     
-    // Expects a decoder in a before-decoding-a-call-msg state (see Decoder).
-    void onCallOrField( Decoder& decoder, co::Any* retValue = 0 );
+    // Expects a unmarshaller in a before-decoding-a-call-msg state (see Unmarshaller).
+    void onCallOrField( Unmarshaller& unmarshaller, co::Any* retValue = 0 );
     
     inline co::IComponent* getComponent() {   return _object->getComponent(); }
     
@@ -31,14 +31,14 @@ public:
        
 private:
 
-    // Called by onCall. Extract the parameters from decoder and call method via reflector
-    void onMethod( Decoder& decoder, co::int32 facetIdx, co::IMethod* method, 
+    // Called by onCall. Extract the parameters from unmarshaller and call method via reflector
+    void onMethod( Unmarshaller& unmarshaller, co::int32 facetIdx, co::IMethod* method, 
                   co::Any* retValue = 0 );
     
-    void onField( Decoder& decoder, co::int32 facetIdx, co::IField* field, co::Any* retValue = 0 );
+    void onField( Unmarshaller& unmarshaller, co::int32 facetIdx, co::IField* field, co::Any* retValue = 0 );
     
     // TODO: remove the last param in coral 0.8
-    void onGetParam( Decoder& decoder, co::IType* paramType, co::Any& param, 
+    void onGetParam( Unmarshaller& unmarshaller, co::IType* paramType, co::Any& param, 
                     co::RefVector<co::IObject>& tempRefs );
    
 private:

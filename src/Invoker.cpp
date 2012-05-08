@@ -1,4 +1,4 @@
-#include "Servant.h"
+#include "Invoker.h"
 
 #include "Node.h"
 #include "Node.h"
@@ -16,7 +16,7 @@
 namespace reef
 {
 
-Servant::Servant( Node* node, co::IObject* object ) : _node( node )
+Invoker::Invoker( Node* node, co::IObject* object ) : _node( node )
 {
     if( object )
     {
@@ -30,16 +30,16 @@ Servant::Servant( Node* node, co::IObject* object ) : _node( node )
     }
 }
     
-Servant::~Servant()
+Invoker::~Invoker()
 {
 
 }
     
-void Servant::onCallOrField( Decoder& decoder, co::Any* retValue )
+void Invoker::onCallOrField( Unmarshaller& unmarshaller, co::Any* retValue )
 {
     co::int32 facetIdx;
     co::int32 memberIdx;
-    decoder.beginDecodingCallMsg( facetIdx, memberIdx );
+    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx );
     
     if( !_openedServices[facetIdx] ) // if already used before access directly
 		onServiceFirstAccess( facetIdx );
@@ -49,15 +49,15 @@ void Servant::onCallOrField( Decoder& decoder, co::Any* retValue )
     
     if( kind == co::MK_METHOD )
     {
-        onMethod( decoder, facetIdx, co::cast<co::IMethod>( member ), retValue );
+        onMethod( unmarshaller, facetIdx, co::cast<co::IMethod>( member ), retValue );
     }
     else if( kind == co::MK_FIELD )
     {
-        onField( decoder, facetIdx, co::cast<co::IField>( member ), retValue );
+        onField( unmarshaller, facetIdx, co::cast<co::IField>( member ), retValue );
     }
 }
 
-void Servant::onMethod( Decoder& decoder, co::int32 facetIdx, co::IMethod* method, 
+void Invoker::onMethod( Unmarshaller& unmarshaller, co::int32 facetIdx, co::IMethod* method, 
                            co::Any* retValue )
 {
     // TODO: remove this and maky the co::any's reference the objects themselves
@@ -70,7 +70,7 @@ void Servant::onMethod( Decoder& decoder, co::int32 facetIdx, co::IMethod* metho
     args.resize( size );
     for( int i = 0; i < size; i++ )
     {
-        onGetParam( decoder, params[i]->getType(), args[i], tempReferences );
+        onGetParam( unmarshaller, params[i]->getType(), args[i], tempReferences );
     }
 
     if( !retValue )
@@ -84,7 +84,7 @@ void Servant::onMethod( Decoder& decoder, co::int32 facetIdx, co::IMethod* metho
     }
 }
     
-void Servant::onField( Decoder& decoder, co::int32 facetIdx, co::IField* field, co::Any* retValue )
+void Invoker::onField( Unmarshaller& unmarshaller, co::int32 facetIdx, co::IField* field, co::Any* retValue )
 {
     // TODO: remove this and maky the co::any's reference the objects themselves
     co::RefVector<co::IObject> tempReferences;
@@ -92,7 +92,7 @@ void Servant::onField( Decoder& decoder, co::int32 facetIdx, co::IField* field, 
     if( !retValue )
     {
         co::Any value;
-        onGetParam( decoder, field->getType(), value, tempReferences );
+        onGetParam( unmarshaller, field->getType(), value, tempReferences );
     
         _openedReflectors[facetIdx]->setField( _openedServices[facetIdx], field, value );
     }
@@ -102,30 +102,30 @@ void Servant::onField( Decoder& decoder, co::int32 facetIdx, co::IField* field, 
     }
 }
  
-void Servant::onGetParam( Decoder& decoder, co::IType* paramType, co::Any& param, 
+void Invoker::onGetParam( Unmarshaller& unmarshaller, co::IType* paramType, co::Any& param, 
                          co::RefVector<co::IObject>& tempRefs )
 {
     if( paramType->getKind() != co::TK_INTERFACE )
     {
-        decoder.getValueParam( param, paramType );
+        unmarshaller.unmarshalValueParam( param, paramType );
         return;
     }
     
     co::int32 instanceID;
     co::int32 facetIdx;
-    Decoder::RefOwner owner;
+    Unmarshaller::RefOwner owner;
     std::string instanceType;
     std::string ownerAddress;
     
-    decoder.getRefParam( instanceID, facetIdx, owner, instanceType, ownerAddress );
+    unmarshaller.unmarshalRefParam( instanceID, facetIdx, owner, instanceType, ownerAddress );
     co::IObject* instance;
     switch( owner )
     {
-        case Decoder::RefOwner::RECEIVER:
+        case Unmarshaller::RefOwner::RECEIVER:
             instance = _node->getInstance( instanceID );
             break;
-        case Decoder::RefOwner::LOCAL:
-        case Decoder::RefOwner::ANOTHER:
+        case Unmarshaller::RefOwner::LOCAL:
+        case Unmarshaller::RefOwner::ANOTHER:
             instance = _node->getRemoteInstance( instanceType, instanceID, 
                                                      ownerAddress );
             break;
@@ -139,7 +139,7 @@ void Servant::onGetParam( Decoder& decoder, co::IType* paramType, co::Any& param
     param.set<co::IService*>( service );
 }
     
-void Servant::onServiceFirstAccess( co::int32 serviceId )
+void Invoker::onServiceFirstAccess( co::int32 serviceId )
 {
 	co::Range<co::IPort* const> ports = _object->getComponent()->getFacets();
     

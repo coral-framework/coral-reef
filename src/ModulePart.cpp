@@ -1,5 +1,5 @@
 /*
- * reeflcium - Domain Model Framework
+ * reef - Remoting Framework
  * See copyright notice in LICENSE.md
  */
 

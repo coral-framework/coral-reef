@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <Encoder.h>
-#include <Decoder.h>
+#include <Marshaller.h>
+#include <Unmarshaller.h>
 
 #include <co/Coral.h>
 #include <co/IField.h>
@@ -21,12 +21,12 @@ static void fillUint8Array( const T value, std::vector<co::uint8>& dest, co::int
     toCast[i] = value;
 }
 
-typedef Decoder::MsgType MsgType;
+typedef Unmarshaller::MsgType MsgType;
     
 TEST( CodecTests, simpleTypesTest )
 {
-    Decoder decoder;
-    Encoder encoder;
+    Unmarshaller unmarshaller;
+    Marshaller marshaller;
     
     // parameters common to message types
     std::string msg;
@@ -40,19 +40,19 @@ TEST( CodecTests, simpleTypesTest )
     // ------ new inst
     std::string typeName;
     
-    encoder.encodeNewInstMsg( "test", msg, "address" );
-    decoder.setMsgForDecoding( msg, msgType, msgReceiverID, hasReturn, &referer );
+    marshaller.marshalNewInstance( "test", "address", msg );
+    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn, &referer );
     
     EXPECT_EQ( msgType, MsgType::NEW_INST );
     EXPECT_EQ( msgReceiverID, 0 );
     EXPECT_TRUE( hasReturn );
     EXPECT_STREQ( referer.c_str(), "address" );
     
-    EXPECT_NO_THROW( decoder.decodeNewInstMsg( typeName ) );
+    EXPECT_NO_THROW( unmarshaller.unmarshalNewInstance( typeName ) );
     EXPECT_STREQ( typeName.c_str(), "test" );
     
-    encoder.encodeFindInstMsg( "key", msg, "address2" );
-    decoder.setMsgForDecoding( msg, msgType, msgReceiverID, hasReturn, &referer );
+    marshaller.marshalFindInstance( "key", "address2", msg );
+    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn, &referer );
     
     EXPECT_EQ( msgType, MsgType::FIND_INST );
     EXPECT_EQ( msgReceiverID, 0 );
@@ -61,21 +61,21 @@ TEST( CodecTests, simpleTypesTest )
 
     std::string key;
     
-    EXPECT_NO_THROW( decoder.decodeFindInstMsg( key ) );
+    EXPECT_NO_THROW( unmarshaller.unmarshalFindInstance( key ) );
     EXPECT_STREQ( key.c_str(), "key" );
    
     // ------ accessinst
     bool increment;
     
-    encoder.encodeAccessInstMsg( 5, true, msg, "address3" );
-    decoder.setMsgForDecoding( msg, msgType, msgReceiverID, hasReturn, &referer );
+    marshaller.marshalAccessInstance( 5, true, "address3", msg );
+    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn, &referer );
     
     EXPECT_EQ( msgType, MsgType::ACCESS_INST );
     EXPECT_EQ( msgReceiverID, 0 );
     EXPECT_FALSE( hasReturn );
     EXPECT_STREQ( referer.c_str(), "address3" );
     
-    EXPECT_NO_THROW( decoder.decodeAccessInstMsg( instanceID, increment ) );
+    EXPECT_NO_THROW( unmarshaller.unmarshalAccessInstance( instanceID, increment ) );
     EXPECT_EQ( instanceID, 5 );
     EXPECT_TRUE( increment );
     
@@ -103,22 +103,22 @@ TEST( CodecTests, simpleTypesTest )
 		fillUint8Array<co::int32>( i, intArray, i );
 	}
     
-    encoder.beginEncodingCallMsg( 3, 4, 5, true );
-    encoder.addValueParam( intParam );
-    encoder.addValueParam( doubleParam );
-    encoder.addValueParam( stringParam );
-    encoder.addValueParam( boolParam );
-    encoder.addValueParam( intArrayParam );
-    encoder.addValueParam( stringArrayParam );
-    encoder.finishEncodingCallMsg( msg );
+    marshaller.beginCallMarshalling( 3, 4, 5, true );
+    marshaller.marshalValueParam( intParam );
+    marshaller.marshalValueParam( doubleParam );
+    marshaller.marshalValueParam( stringParam );
+    marshaller.marshalValueParam( boolParam );
+    marshaller.marshalValueParam( intArrayParam );
+    marshaller.marshalValueParam( stringArrayParam );
+    marshaller.getMarshalledCall( msg );
     
-    decoder.setMsgForDecoding( msg, msgType, msgReceiverID, hasReturn );
+    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
     
     EXPECT_EQ( msgType, MsgType::CALL );
     EXPECT_EQ( msgReceiverID, 3 );
     EXPECT_TRUE( hasReturn );
     
-    decoder.beginDecodingCallMsg( facetIdx, memberIdx );
+    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx );
     EXPECT_EQ( facetIdx, 4 );
     EXPECT_EQ( memberIdx, 5 );
     
@@ -131,18 +131,18 @@ TEST( CodecTests, simpleTypesTest )
     
     
     co::Any param;
-    decoder.getValueParam( param, intType );
+    unmarshaller.unmarshalValueParam( param, intType );
     EXPECT_EQ( param.get<co::int32>(), 6 );
-    decoder.getValueParam( param, doubleType );
+    unmarshaller.unmarshalValueParam( param, doubleType );
     EXPECT_EQ( param.get<double>(), 6.0 );
-    decoder.getValueParam( param, stringType );
+    unmarshaller.unmarshalValueParam( param, stringType );
     EXPECT_STREQ( param.get<const std::string&>().c_str(), "hello" );
-    decoder.getValueParam( param, boolType );
+    unmarshaller.unmarshalValueParam( param, boolType );
     EXPECT_TRUE( param.get<bool>() );
     co::Any intArrayParam2;
-    decoder.getValueParam( intArrayParam2, intArrayType );
+    unmarshaller.unmarshalValueParam( intArrayParam2, intArrayType );
     co::Any stringArrayParam2;
-    decoder.getValueParam( stringArrayParam2, stringArrayType );
+    unmarshaller.unmarshalValueParam( stringArrayParam2, stringArrayType );
     
     const co::Range<const co::int32> intRange = intArrayParam2.get<const co::Range<const co::int32> >();
     const co::Range<const std::string> stringRange = stringArrayParam2.get<const co::Range<const std::string> >();

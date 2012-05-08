@@ -1,4 +1,4 @@
-#include "Encoder.h"
+#include "Marshaller.h"
 
 #include "Message.pb.h"
 
@@ -149,18 +149,18 @@ void anyToPBArg( const co::Any& any, Argument* arg )
     }
 }
 
-Encoder::Encoder()
+Marshaller::Marshaller()
 {
     _message = new Message();
 }
 
-Encoder::~Encoder()
+Marshaller::~Marshaller()
 {
     delete _message;
 }
     
-void Encoder::encodeNewInstMsg( const std::string& typeName, std::string& msg, 
-                               const std::string& referer )
+void Marshaller::marshalNewInstance( const std::string& typeName, const std::string& referer,
+                                    std::string& marshalledRequest )
 {
     _message->set_msg_type( Message::MSG_NEW_INST );
     _message->set_instance_id( 0 ); // 0 is always the node channel
@@ -171,12 +171,12 @@ void Encoder::encodeNewInstMsg( const std::string& typeName, std::string& msg,
 	Message_New_Inst* msgNewInst = _message->mutable_msg_new_inst();
     msgNewInst->set_new_instance_type( typeName );
     
-    _message->SerializeToString( &msg );
+    _message->SerializeToString( &marshalledRequest );
     _message->Clear();
 }
 
-void Encoder::encodeAccessInstMsg( co::int32 instanceID, bool increment, std::string& msg,
-                                   const std::string& referer)
+void Marshaller::marshalAccessInstance( co::int32 instanceID, bool increment, 
+                                       const std::string& referer, std::string& marshalledRequest )
 {
     _message->set_msg_type( Message::MSG_ACCESS_INST );
     _message->set_instance_id( 0 ); // 0 is always the node channel
@@ -189,12 +189,12 @@ void Encoder::encodeAccessInstMsg( co::int32 instanceID, bool increment, std::st
     msgAccInst->set_increment( increment );
     msgAccInst->set_instance_id( instanceID );
     
-    _message->SerializeToString( &msg );
+    _message->SerializeToString( &marshalledRequest );
     _message->Clear();
 }
     
-void Encoder::encodeFindInstMsg( const std::string& key, std::string& msg,
-                                const std::string& referer )
+void Marshaller::marshalFindInstance( const std::string& key, const std::string& referer,
+                                     std::string& marshalledRequest )
 {
     _message->set_msg_type( Message::MSG_FIND_INST );
     _message->set_instance_id( 0 ); // 0 is always the node channel
@@ -205,11 +205,11 @@ void Encoder::encodeFindInstMsg( const std::string& key, std::string& msg,
 	Message_Find_Inst* msgFindInst = _message->mutable_msg_find_inst();
     msgFindInst->set_key( key );
     
-    _message->SerializeToString( &msg );
+    _message->SerializeToString( &marshalledRequest );
     _message->Clear();
 }
     
-void Encoder::beginEncodingCallMsg( co::int32 instanceID, co::int32 facetIdx, co::int32 memberIdx,
+void Marshaller::beginCallMarshalling( co::int32 instanceID, co::int32 facetIdx, co::int32 memberIdx,
                                    bool hasReturn )
 {
     if( instanceID == 0 )
@@ -224,29 +224,14 @@ void Encoder::beginEncodingCallMsg( co::int32 instanceID, co::int32 facetIdx, co
     _msgMember->set_member_idx( memberIdx );
 }
 
-void Encoder::beginEncodingFieldMsg( co::int32 instanceID, co::int32 facetIdx, co::int32 memberIdx,
-                                   bool hasReturn )
-{
-    if( instanceID == 0 )
-        throw new co::Exception( "A call msg can't have an instanceID of 0" );
-    
-    _message->set_msg_type( Message::MSG_CALL );
-    _message->set_instance_id( instanceID );
-    _message->set_has_return( hasReturn );
-    
-    _msgMember = _message->mutable_msg_member();
-    _msgMember->set_facet_idx( facetIdx );
-    _msgMember->set_member_idx( memberIdx );
-}
-
-void Encoder::addValueParam( const co::Any& param )
+void Marshaller::marshalValueParam( const co::Any& param )
 {
     checkIfCallMsg();
     Argument* PBArg = _msgMember->add_arguments();
     anyToPBArg( param, PBArg );
 }
 
-void Encoder::addRefParam( co::int32 instanceID, co::int32 facetIdx, RefOwner owner, 
+void Marshaller::marshalRefParam( co::int32 instanceID, co::int32 facetIdx, RefOwner owner, 
                         const std::string* instanceType, const std::string* ownerAddress )
 {
     checkIfCallMsg();
@@ -277,49 +262,49 @@ void Encoder::addRefParam( co::int32 instanceID, co::int32 facetIdx, RefOwner ow
 }
 
 
-void Encoder::finishEncodingCallMsg( std::string& msg )
+void Marshaller::getMarshalledCall( std::string& marshalledRequest )
 {
-    _message->SerializeToString( &msg );
+    _message->SerializeToString( &marshalledRequest );
     _message->Clear();
     _msgMember = 0;
 }
 
-void Encoder::encodeData( bool value, std::string& msg )
+void Marshaller::marshalData( bool value, std::string& marshalledData )
 {
     Data_Container data;
     data.set_boolean( value );
-    data.SerializeToString( &msg );
+    data.SerializeToString( &marshalledData );
 }
 
-void Encoder::encodeData( double value, std::string& msg )
+void Marshaller::marshalData( double value, std::string& marshalledData )
 {
     Data_Container data;
     data.set_numeric( value );
-    data.SerializeToString( &msg );
+    data.SerializeToString( &marshalledData );
 }
 
-void Encoder::encodeData( co::int32 value, std::string& msg )
+void Marshaller::marshalData( co::int32 value, std::string& marshalledData )
 {
     Data_Container data;
     data.set_numeric( static_cast<co::int32>( value ) );
-    data.SerializeToString( &msg );
+    data.SerializeToString( &marshalledData );
 }
 
-void Encoder::encodeData( const std::string& value, std::string& msg )
+void Marshaller::marshalData( const std::string& value, std::string& marshalledData )
 {
     Data_Container data;
     data.set_str( value );
-    data.SerializeToString( &msg );
+    data.SerializeToString( &marshalledData );
 }
     
-void Encoder::encodeData( const co::Any& value, std::string& msg )
+void Marshaller::marshalData( const co::Any& value, std::string& marshalledData )
 {
     Argument returnArg;
     anyToPBArg( value, &returnArg );
-    returnArg.SerializeToString( &msg );
+    returnArg.SerializeToString( &marshalledData );
 }
     
-void Encoder::checkIfCallMsg()
+void Marshaller::checkIfCallMsg()
 {
     if( !_msgMember )
         throw new co::Exception( "Could not add a Parameter to an empty Message" );

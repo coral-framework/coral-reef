@@ -3,9 +3,9 @@
 
 #include "Node_Base.h"
 
-#include "Servant.h"
-#include "Decoder.h"
-#include "Encoder.h"
+#include "Invoker.h"
+#include "Unmarshaller.h"
+#include "Marshaller.h"
 
 #include <reef/ITransport.h>
 #include <reef/IPassiveLink.h>
@@ -86,7 +86,7 @@ private:
     void onAccessInstMsg(); // increments the instance ref count
     void onFindInstMsg(); // finds an instance published under a key, increment ref and return ID
     
-    void onMsgForServant( co::int32 instanceID, bool hasReturn );
+    void onMsgForInvoker( co::int32 instanceID, bool hasReturn );
        
 private:
     // Add a new reference for an instance. TODO: set referer
@@ -98,14 +98,14 @@ private:
      */
     void closeRemoteReference( co::int32 instanceID ); // TODO clear referer
     
-    // Creates a servant for the instance and returns its new instanceID
+    // Creates a invoker for the instance and returns its new instanceID
     co::int32 startRemoteRefCount( co::IObject* instance );
 
     void releaseInstance( co::int32 instanceID );
     
     co::int32 newVirtualAddress();
     
-    Servant* getServantFor( co::int32 instanceID );
+    Invoker* getInvokerFor( co::int32 instanceID );
     
     // returns -1 if not found
     co::int32 getInstanceID( const co::IObject* instance );
@@ -113,15 +113,15 @@ private:
 private:
     ITransport* _transport;
     co::RefPtr<IPassiveLink> _passiveLink;
-    Decoder _decoder;
-    Encoder _encoder;
+    Unmarshaller _unmarshaller;
+    Marshaller _marshaller;
     
     std::string _myPublicAddress;
 
-    // the servants and the number of remote references for it
-    std::vector<Servant*> _servants;
+    // the invokers and the number of remote references for it
+    std::vector<Invoker*> _invokers;
     std::vector<co::int32> _remoteRefCounting;
-    // TODO: map referers to servants, so they can be queried for maintaining the references
+    // TODO: map referers to invokers, so they can be queried for maintaining the references
     // TODO: remember to set the referer in every place which increment _remoteRefCounting 
     
     // used to map easily an instance to a virtual address

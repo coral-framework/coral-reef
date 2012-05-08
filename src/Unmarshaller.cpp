@@ -1,4 +1,4 @@
-#include "Decoder.h"
+#include "Unmarshaller.h"
 
 #include "Message.pb.h"
 
@@ -129,43 +129,43 @@ void PBArgToAny( const Argument& arg, co::IType* descriptor, co::Any& any )
     }
 }
     
-void Message_Type2MsgType( Message_Type message_type, Decoder::MsgType& msgType )
+void Message_Type2MsgType( Message_Type message_type, Unmarshaller::MsgType& msgType )
 {
     switch( message_type )
     {
         case Message::MSG_NEW_INST:
-            msgType = Decoder::MsgType::NEW_INST;
+            msgType = Unmarshaller::MsgType::NEW_INST;
             break;
         case Message::MSG_ACCESS_INST:
-            msgType = Decoder::MsgType::ACCESS_INST;
+            msgType = Unmarshaller::MsgType::ACCESS_INST;
             break;
         case Message::MSG_FIND_INST:
-            msgType = Decoder::MsgType::FIND_INST;
+            msgType = Unmarshaller::MsgType::FIND_INST;
             break;
         case Message::MSG_CALL:
-            msgType = Decoder::MsgType::CALL;
+            msgType = Unmarshaller::MsgType::CALL;
             break;
     }
 }
     
 
     
-Decoder::Decoder() : _currentParam( 0 )
+Unmarshaller::Unmarshaller() : _currentParam( 0 )
 {
     _message = new Message();
 }
 
-Decoder::~Decoder()
+Unmarshaller::~Unmarshaller()
 {
     delete _message;
 }
     
 // sets the message that will be decoded and return its type and destination
-void Decoder::setMsgForDecoding( const std::string& msg, MsgType& type, co::int32& instanceID, 
+void Unmarshaller::setMarshalledRequest( const std::string& request, MsgType& type, co::int32& instanceID, 
                                 bool& hasReturn, std::string* referer )
 {
     _message->Clear();
-    _message->ParseFromString( msg );
+    _message->ParseFromString( request );
     instanceID = _message->instance_id();
     hasReturn = _message->has_return();
     Message_Type2MsgType( _message->msg_type(), type );
@@ -176,7 +176,7 @@ void Decoder::setMsgForDecoding( const std::string& msg, MsgType& type, co::int3
 }
 
 // if msg type is NEW, then, this function will decode it
-void Decoder::decodeNewInstMsg( std::string& typeName )
+void Unmarshaller::unmarshalNewInstance( std::string& typeName )
 {
     assert( _msgType == MsgType::NEW_INST );
     
@@ -184,7 +184,7 @@ void Decoder::decodeNewInstMsg( std::string& typeName )
     typeName = msgNewInst.new_instance_type();
 }
 
-void Decoder::decodeAccessInstMsg( co::int32& instanceID, bool& increment )
+void Unmarshaller::unmarshalAccessInstance( co::int32& instanceID, bool& increment )
 {
     assert( _msgType == MsgType::ACCESS_INST );
     
@@ -194,7 +194,7 @@ void Decoder::decodeAccessInstMsg( co::int32& instanceID, bool& increment )
     increment = msgAccessInst.increment();
 }
    
-void Decoder::decodeFindInstMsg( std::string& key )
+void Unmarshaller::unmarshalFindInstance( std::string& key )
 {
     assert( _msgType == MsgType::FIND_INST );
     
@@ -205,7 +205,7 @@ void Decoder::decodeFindInstMsg( std::string& key )
  Starts a decoding state of call/field msg. 
  The decoding state will only be reset after all params are decoded.
  */
-void Decoder::beginDecodingCallMsg( co::int32& facetIdx, co::int32& memberIdx )
+void Unmarshaller::beginUnmarshallingCall( co::int32& facetIdx, co::int32& memberIdx )
 {
     assert( _msgType == MsgType::CALL );
     
@@ -215,13 +215,13 @@ void Decoder::beginDecodingCallMsg( co::int32& facetIdx, co::int32& memberIdx )
     memberIdx = _msgMember->member_idx();
 }
 
-void Decoder::getValueParam( co::Any& param, co::IType* descriptor )
+void Unmarshaller::unmarshalValueParam( co::Any& param, co::IType* descriptor )
 {
     assert( _msgMember );
     PBArgToAny( _msgMember->arguments( _currentParam++ ), descriptor, param );
 }
 
-void Decoder::getRefParam( co::int32& instanceID, co::int32& facetIdx, RefOwner& owner,
+void Unmarshaller::unmarshalRefParam( co::int32& instanceID, co::int32& facetIdx, RefOwner& owner,
                   std::string& instanceType, std::string& ownerAddress )
 {
     assert( _msgMember );
@@ -248,38 +248,38 @@ void Decoder::getRefParam( co::int32& instanceID, co::int32& facetIdx, RefOwner&
 }
 
 // ----- Data Container codec ----- //
-void Decoder::decodeData( const std::string& msg, bool& value )
+void Unmarshaller::unmarshalData( const std::string& marshalledData, bool& value )
 {
     Data_Container data;
-    data.ParseFromString( msg );
+    data.ParseFromString( marshalledData );
     value = data.boolean();
 }
 
-void Decoder::decodeData( const std::string& msg, double& value )
+void Unmarshaller::unmarshalData( const std::string& marshalledData, double& value )
 {
     Data_Container data;
-    data.ParseFromString( msg );
+    data.ParseFromString( marshalledData );
     value = data.numeric();
 }
 
-void Decoder::decodeData( const std::string& msg, co::int32& value )
+void Unmarshaller::unmarshalData( const std::string& marshalledData, co::int32& value )
 {
     Data_Container data;
-    data.ParseFromString( msg );
+    data.ParseFromString( marshalledData );
     value = static_cast<co::int32>( data.numeric() );
 }
 
-void Decoder::decodeData( const std::string& msg, std::string& value )
+void Unmarshaller::unmarshalData( const std::string& marshalledData, std::string& value )
 {
     Data_Container data;
-    data.ParseFromString( msg );
+    data.ParseFromString( marshalledData );
     value = data.str();
 }
     
-void Decoder::decodeData( const std::string& msg, co::IType* descriptor, co::Any& value )
+void Unmarshaller::unmarshalData( const std::string& marshalledData, co::IType* descriptor, co::Any& value )
 {
     Argument arg;
-    arg.ParseFromString( msg );
+    arg.ParseFromString( marshalledData );
     PBArgToAny( arg, descriptor, value );
 }
 

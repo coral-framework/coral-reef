@@ -1,4 +1,4 @@
-#include "RemoteObject.h"
+#include "ClientProxy.h"
 
 #include "Node.h"
 
@@ -19,12 +19,12 @@ namespace reef {
 class Host
 {
 public:
-    inline void addInstance( RemoteObject* remoteObj, co::int32 instanceID )
+    inline void addInstance( ClientProxy* remoteObj, co::int32 instanceID )
     {
-        _instances.insert( std::pair<co::int32, RemoteObject*>( instanceID, remoteObj ) );
+        _instances.insert( std::pair<co::int32, ClientProxy*>( instanceID, remoteObj ) );
     }
     
-    inline RemoteObject* getInstance( co::int32 instanceID )
+    inline ClientProxy* getInstance( co::int32 instanceID )
     {
         InstanceMap::iterator it = _instances.find( instanceID );
         return it != _instances.end() ? it->second : 0;
@@ -41,7 +41,7 @@ public:
         return _instances.size() > 0;
     }
 private:
-    typedef std::map<co::int32, RemoteObject*> InstanceMap;
+    typedef std::map<co::int32, ClientProxy*> InstanceMap;
     InstanceMap _instances;
 };
 
@@ -49,11 +49,11 @@ private:
 typedef std::map<IActiveLink*, Host*> Hosts;
 static Hosts _hosts;
     
-RemoteObject* RemoteObject::getOrCreateRemoteObject( Node* node, co::IComponent* component,
+ClientProxy* ClientProxy::getOrCreateClientProxy( Node* node, co::IComponent* component,
                                             IActiveLink* link, co::int32 instanceID )
 {
     Host* host = 0;
-    RemoteObject* retValue = 0;
+    ClientProxy* retValue = 0;
     Hosts::iterator it = _hosts.find( link );
     if( it != _hosts.end() )
     {
@@ -69,17 +69,17 @@ RemoteObject* RemoteObject::getOrCreateRemoteObject( Node* node, co::IComponent*
         _hosts.insert( std::pair<IActiveLink*, Host*>( link, host ) );
     }
     
-    retValue = new RemoteObject( node, component, link, instanceID );
+    retValue = new ClientProxy( node, component, link, instanceID );
     host->addInstance( retValue, instanceID );
     
     return retValue;
 }
     
-RemoteObject::RemoteObject()
+ClientProxy::ClientProxy()
 {
 }
     
-RemoteObject::RemoteObject( Node* node, co::IComponent* component, IActiveLink* link, 
+ClientProxy::ClientProxy( Node* node, co::IComponent* component, IActiveLink* link, 
                            co::int32 instanceID ) : _node( node ), _link( link ),_numFacets( 0 )
 {
     _classPtr = *reinterpret_cast<void**>( this );
@@ -87,7 +87,7 @@ RemoteObject::RemoteObject( Node* node, co::IComponent* component, IActiveLink* 
     _instanceID = instanceID;
 }
     
-RemoteObject::~RemoteObject()
+ClientProxy::~ClientProxy()
 {   
     Hosts::iterator it = _hosts.find( _link.get() );
     assert( it != _hosts.end() );
@@ -110,7 +110,7 @@ RemoteObject::~RemoteObject()
     _node->requestEndAccess( _link.get(), _instanceID, "TODO" );
 }
     
-void RemoteObject::setComponent( co::IComponent* component )
+void ClientProxy::setComponent( co::IComponent* component )
 {    
 	_component = component;
     
@@ -124,12 +124,12 @@ void RemoteObject::setComponent( co::IComponent* component )
 	}
 }
 
-co::IComponent* RemoteObject::getComponent()
+co::IComponent* ClientProxy::getComponent()
 {
     return _component;
 }
     
-co::IService* RemoteObject::getServiceAt( co::IPort* port )
+co::IService* ClientProxy::getServiceAt( co::IPort* port )
 {
     co::ICompositeType* owner = port->getOwner();
     if( owner == _component )
@@ -139,87 +139,87 @@ co::IService* RemoteObject::getServiceAt( co::IPort* port )
         return _facets[portIndex];
     }
     
-    return reef::RemoteObject_Base::getServiceAt( port );
+    return reef::ClientProxy_Base::getServiceAt( port );
 }
 
-void RemoteObject::setServiceAt( co::IPort* receptacle, co::IService* instance )
+void ClientProxy::setServiceAt( co::IPort* receptacle, co::IService* instance )
 {
     // empty: setting remote services not supported yet
 }
 
-co::IPort* RemoteObject::dynamicGetFacet( co::int32 cookie )
+co::IPort* ClientProxy::dynamicGetFacet( co::int32 cookie )
 {
     return _component->getFacets()[cookie];
 }
         
-const co::Any& RemoteObject::dynamicGetField( co::int32 dynFacetId, co::IField* field )
+const co::Any& ClientProxy::dynamicGetField( co::int32 dynFacetId, co::IField* field )
 {
-    _encoder.beginEncodingCallMsg( _instanceID, dynFacetId, field->getIndex(), true );
+    _marshaller.beginCallMarshalling( _instanceID, dynFacetId, field->getIndex(), true );
     std::string msg;
-    _encoder.finishEncodingCallMsg( msg );
+    _marshaller.getMarshalledCall( msg );
     _link->send( msg );
     
     awaitReplyUpdating( msg );
     
-    _decoder.decodeData( msg, field->getType(), _resultBuffer );
+    _unmarshaller.unmarshalData( msg, field->getType(), _resultBuffer );
 
     return _resultBuffer;
 }
     
-void RemoteObject::dynamicSetField( co::int32 dynFacetId, co::IField* field, const co::Any& value )
+void ClientProxy::dynamicSetField( co::int32 dynFacetId, co::IField* field, const co::Any& value )
 {
-    _encoder.beginEncodingCallMsg( _instanceID, dynFacetId, field->getIndex(), false );
+    _marshaller.beginCallMarshalling( _instanceID, dynFacetId, field->getIndex(), false );
     
     if( value.getKind() != co::TK_INTERFACE )
-        _encoder.addValueParam( value );
+        _marshaller.marshalValueParam( value );
     else
         onInterfaceParam( value.get<co::IService*>() );
 
     std::string msg;
-    _encoder.finishEncodingCallMsg( msg );
+    _marshaller.getMarshalledCall( msg );
     _link->send( msg );
 
 }
 
-const co::Any& RemoteObject::dynamicInvoke( co::int32 dynFacetId, co::IMethod* method, 
+const co::Any& ClientProxy::dynamicInvoke( co::int32 dynFacetId, co::IMethod* method, 
                                            co::Range<co::Any const> args )
 {
     co::IType* returnType = method->getReturnType();
     if( returnType )
-        _encoder.beginEncodingCallMsg( _instanceID, dynFacetId, method->getIndex(), true );
+        _marshaller.beginCallMarshalling( _instanceID, dynFacetId, method->getIndex(), true );
     else
-        _encoder.beginEncodingCallMsg( _instanceID, dynFacetId, method->getIndex(), false );
+        _marshaller.beginCallMarshalling( _instanceID, dynFacetId, method->getIndex(), false );
     
     for( ; args; args.popFirst() )
     {
         const co::Any& arg = args.getFirst();
         
         if( arg.getKind() != co::TK_INTERFACE )
-            _encoder.addValueParam( arg );
+            _marshaller.marshalValueParam( arg );
         else
             onInterfaceParam( arg.get<co::IService*>() );
     }
     
     std::string msg;
-    _encoder.finishEncodingCallMsg( msg );
+    _marshaller.getMarshalledCall( msg );
     _link->send( msg );
     
 	if( returnType )
     {
         awaitReplyUpdating( msg );
-        _decoder.decodeData( msg, method->getReturnType(), _resultBuffer );
+        _unmarshaller.unmarshalData( msg, method->getReturnType(), _resultBuffer );
     }
 
     return _resultBuffer;
 }
 
-co::int32 RemoteObject::dynamicRegisterService( co::IService* dynamicServiceProxy )
+co::int32 ClientProxy::dynamicRegisterService( co::IService* dynamicServiceProxy )
 {
     _facets[_numFacets] = dynamicServiceProxy;
 	return _numFacets++;
 }
      
-void RemoteObject::onInterfaceParam( co::IService* param )
+void ClientProxy::onInterfaceParam( co::IService* param )
 {
     co::IObject* provider = param->getProvider();
     std::string providerType = provider->getComponent()->getFullName();
@@ -229,12 +229,12 @@ void RemoteObject::onInterfaceParam( co::IService* param )
     if( isLocalObject( provider ) )
     {
         instanceID = _node->publishAnonymousInstance( provider );
-        _encoder.addRefParam( instanceID, facetIdx, Encoder::RefOwner::LOCAL, &providerType, 
+        _marshaller.marshalRefParam( instanceID, facetIdx, Marshaller::RefOwner::LOCAL, &providerType, 
                              &_node->getPublicAddress() );
     }
     else // is a remote object, so it provides the IInstanceInfo service
     {
-        RemoteObject* providerRO = static_cast<RemoteObject*>( provider );
+        ClientProxy* providerRO = static_cast<ClientProxy*>( provider );
         IInstanceInfo* info = static_cast<IInstanceInfo*>( providerRO );
         
         instanceID = info->getInstanceID();
@@ -242,12 +242,12 @@ void RemoteObject::onInterfaceParam( co::IService* param )
         
         if( ownerAddress == _link->getAddress() ) // Receiver
         {
-            _encoder.addRefParam( instanceID, facetIdx, Encoder::RefOwner::RECEIVER );
+            _marshaller.marshalRefParam( instanceID, facetIdx, Marshaller::RefOwner::RECEIVER );
         }
         else
         {
             _node->requestBeginAccess( ownerAddress, instanceID, "TODO" );
-            _encoder.addRefParam( instanceID, facetIdx, Encoder::RefOwner::ANOTHER, &providerType, 
+            _marshaller.marshalRefParam( instanceID, facetIdx, Marshaller::RefOwner::ANOTHER, &providerType, 
                                  &ownerAddress );
         }
     }
@@ -255,23 +255,23 @@ void RemoteObject::onInterfaceParam( co::IService* param )
 
     // ------ reef.IInstanceInfo Methods ------ //
     
-co::int32 RemoteObject::getInstanceID()
+co::int32 ClientProxy::getInstanceID()
 {
     return _instanceID;
 }
 
-const std::string& RemoteObject::getOwnerAddress()
+const std::string& ClientProxy::getOwnerAddress()
 {
     return _link->getAddress();
 }
     
-void RemoteObject::awaitReplyUpdating( std::string& msg )
+void ClientProxy::awaitReplyUpdating( std::string& msg )
 {
     while( !_link->receiveReply( msg ) )
         _node->update();
 
 }
 
-CORAL_EXPORT_COMPONENT( RemoteObject, RemoteObject );
+CORAL_EXPORT_COMPONENT( ClientProxy, ClientProxy );
     
 } // namespace reef

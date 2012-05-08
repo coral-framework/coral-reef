@@ -1,4 +1,4 @@
-component RemoteObject
+component ClientProxy
 {
 	provides IInstanceInfo info;
 	provides co.IDynamicServiceProvider proxy;
