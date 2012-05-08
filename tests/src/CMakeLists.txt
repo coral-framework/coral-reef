@@ -15,8 +15,8 @@ add_subdirectory( unitTests )
 add_subdirectory( integrationTests )
 add_subdirectory( luaTests )
 
-set( MANUAL_TESTING ON CACHE BOOL "Manual client server testing" )
-if( MANUAL_TESTING )
+set( MANUAL_TESTING_DISABLED ON CACHE BOOL "Manual client server testing" )
+if( NOT MANUAL_TESTING_DISABLED )
 	add_subdirectory( clientTests )
 	add_subdirectory( serverTests )
 	# Add a custom target to build all test artifacts
