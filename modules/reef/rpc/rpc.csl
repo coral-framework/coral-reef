@@ -1,0 +1,5 @@
+// The 'rpc' module defines its own co.IModulePart.
+component rpc
+{
+	provides co.IModulePart part;
+};
