@@ -23,5 +23,5 @@ if( NOT MANUAL_TESTING_DISABLED )
 		manual_client manual_server
 	)
 else()
-	ADD_CUSTOM_TARGET( tests DEPENDS reef mockReef moduleA rpcUnitTests rpcIntegrationTests )
+	ADD_CUSTOM_TARGET( tests DEPENDS rpc mockReef moduleA rpcUnitTests rpcIntegrationTests )
 endif()
