@@ -1,5 +1,5 @@
 local PassiveLink = co.Component( { name = "mockReef.PassiveLink", 
-								provides = { passive = "reef.IPassiveLink" } } )
+								provides = { passive = "reef.rpc.IPassiveLink" } } )
 
 function PassiveLink:sendReply( msg )
 	self.net:sendReply( self.address, msg )

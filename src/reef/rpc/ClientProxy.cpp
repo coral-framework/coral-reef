@@ -2,7 +2,7 @@
 
 #include "Node.h"
 
-#include <reef/IActiveLink.h>
+#include <reef/rpc/IActiveLink.h>
 #include <co/IPort.h>
 #include <co/IField.h>
 #include <co/IMethod.h>
@@ -12,6 +12,8 @@
 #include <map>
 
 namespace reef {
+namespace rpc {
+
 
 /*
  Maps a all the instance Ids belonging to a host to their local Remote objects representations.
@@ -139,7 +141,7 @@ co::IService* ClientProxy::getServiceAt( co::IPort* port )
         return _facets[portIndex];
     }
     
-    return reef::ClientProxy_Base::getServiceAt( port );
+    return reef::rpc::ClientProxy_Base::getServiceAt( port );
 }
 
 void ClientProxy::setServiceAt( co::IPort* receptacle, co::IService* instance )
@@ -253,7 +255,7 @@ void ClientProxy::onInterfaceParam( co::IService* param )
     }
 }
 
-    // ------ reef.IInstanceInfo Methods ------ //
+    // ------ reef.rpc.IInstanceInfo Methods ------ //
     
 co::int32 ClientProxy::getInstanceID()
 {
@@ -274,4 +276,8 @@ void ClientProxy::awaitReplyUpdating( std::string& msg )
 
 CORAL_EXPORT_COMPONENT( ClientProxy, ClientProxy );
     
+    
+}
+    
+ 
 } // namespace reef

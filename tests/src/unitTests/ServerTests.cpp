@@ -18,8 +18,9 @@
 
 #include <iostream>
 
-namespace reef
-{
+namespace reef {
+namespace rpc {
+
 
 typedef Unmarshaller::MsgType MsgType;
     
@@ -64,7 +65,7 @@ TEST( ServerTests, invokerTest )
 TEST( ServerTests, nodeTest )
 {
     // Node is needed by the ClientProxys to publish the local instances
-    co::RefPtr<Node> node = new reef::Node();
+    co::RefPtr<Node> node = new rpc::Node();
     ITransport* transport = co::newInstance( "mockReef.Transport" )->getService<ITransport>();
     node->setService( "transport", transport );
     node->start( "addressLocal", "addressLocal" );
@@ -87,5 +88,7 @@ TEST( ServerTests, nodeTest )
     
     object = node->getRemoteInstance( "moduleA.TestComponent", 4, "address" );    
 }
-        
+    
+}
+            
 }

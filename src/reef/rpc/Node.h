@@ -7,13 +7,15 @@
 #include "Unmarshaller.h"
 #include "Marshaller.h"
 
-#include <reef/ITransport.h>
-#include <reef/IPassiveLink.h>
+#include <reef/rpc/ITransport.h>
+#include <reef/rpc/IPassiveLink.h>
 
 #include <map>
 #include <stack>
 
 namespace reef {
+namespace rpc {
+
     
 class Node : public Node_Base
 {
@@ -43,9 +45,9 @@ public:
     void unpublishInstance( const std::string& key );
     
 protected: // receptacles
-    reef::ITransport* getTransportService();
+    reef::rpc::ITransport* getTransportService();
     
-	void setTransportService( reef::ITransport* transport );
+	void setTransportService( reef::rpc::ITransport* transport );
 
 public:
     
@@ -64,7 +66,7 @@ public:
                                const std::string& referer );
     
     // Informs the instance owner about a new access to the instance (increase instance's ref count)
-    void requestEndAccess( reef::IActiveLink* link, co::int32 instanceID,
+    void requestEndAccess( reef::rpc::IActiveLink* link, co::int32 instanceID,
                             const std::string& referer );
     
     // returns a proxy to the requested remote instance
@@ -134,6 +136,8 @@ private:
     
     std::stack<co::int32> _freedIds;
 };
+    
+}
     
 } // namespace reef
 

@@ -13,8 +13,9 @@
 #include <string>
 #include <iostream>
 
-namespace reef
-{
+namespace reef {
+namespace rpc {
+
 
 Invoker::Invoker( Node* node, co::IObject* object ) : _node( node )
 {
@@ -156,6 +157,8 @@ void Invoker::onServiceFirstAccess( co::int32 serviceId )
 	_openedServices[serviceId] = service;
     _openedInterfaces[serviceId] = itf;
     _openedReflectors[serviceId] = reflector;
+}
+    
 }
     
 } // namespace reef

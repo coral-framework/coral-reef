@@ -1,14 +1,15 @@
 @lua.Scripted( "mockReef.Transport" ) 
-import reef.ITransport;
+import reef.rpc.ITransport;
+import reef.rpc.INode;
 
 component Transport
 {
-	provides reef.ITransport transport;
+	provides ITransport transport;
 	
 	/* 
 	Workaround receptacle. works like a multiple INode setter. Usage: set repeatedly all the nodes 
 	that should be frequently updated and they will be stored internally. Whenever a Links has to
 	wait for a reply, all the provided nodes will be continuously updated until the reply is received
 	 */
-	receives reef.INode node;
+	receives INode node;
 };

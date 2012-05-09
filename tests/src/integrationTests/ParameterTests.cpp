@@ -4,30 +4,31 @@
 #include <moduleA/IComplexTypes.h>
 #include <moduleA/IReferenceTypes.h>
 
-#include <reef/INode.h>
-#include <reef/ITransport.h>
+#include <reef/rpc/INode.h>
+#include <reef/rpc/ITransport.h>
 
 #include <co/Coral.h>
 #include <co/RefPtr.h>
 #include <co/IObject.h>
 #include <co/RefVector.h>
 
-namespace reef
-{
+namespace reef {
+namespace rpc {
+
     
 TEST( ParameterTests, simpleTypesTest )
 {
     co::RefPtr<co::IObject> transportObj = co::newInstance( "mockReef.Transport" );
-    reef::ITransport* transport = transportObj->getService<reef::ITransport>();
+    rpc::ITransport* transport = transportObj->getService<rpc::ITransport>();
     
-    co::RefPtr<co::IObject> serverNodeObj = co::newInstance( "reef.Node" );
+    co::RefPtr<co::IObject> serverNodeObj = co::newInstance( "reef.rpc.Node" );
     serverNodeObj->setService( "transport", transport );
     
-    co::RefPtr<co::IObject> cliNodeObj = co::newInstance( "reef.Node" );
+    co::RefPtr<co::IObject> cliNodeObj = co::newInstance( "reef.rpc.Node" );
     cliNodeObj->setService( "transport", transport );
     
-    reef::INode* server = serverNodeObj->getService<reef::INode>();
-    reef::INode* client = cliNodeObj->getService<reef::INode>();
+    rpc::INode* server = serverNodeObj->getService<rpc::INode>();
+    rpc::INode* client = cliNodeObj->getService<rpc::INode>();
     transportObj->setService( "node", server );
     transportObj->setService( "node", client );
     
@@ -102,20 +103,20 @@ TEST( ParameterTests, simpleTypesTest )
 TEST( ParameterTests, refTypeParameterTest )
 {
     co::RefPtr<co::IObject> transportObj = co::newInstance( "mockReef.Transport" );
-    reef::ITransport* transport = transportObj->getService<reef::ITransport>();
+    rpc::ITransport* transport = transportObj->getService<rpc::ITransport>();
     
-    co::RefPtr<co::IObject> serverANodeObj = co::newInstance( "reef.Node" );
+    co::RefPtr<co::IObject> serverANodeObj = co::newInstance( "reef.rpc.Node" );
     serverANodeObj->setService( "transport", transport );
     
-    co::RefPtr<co::IObject> cliNodeObj = co::newInstance( "reef.Node" );
+    co::RefPtr<co::IObject> cliNodeObj = co::newInstance( "reef.rpc.Node" );
     cliNodeObj->setService( "transport", transport );
     
-    co::RefPtr<co::IObject> serverBNodeObj = co::newInstance( "reef.Node" );
+    co::RefPtr<co::IObject> serverBNodeObj = co::newInstance( "reef.rpc.Node" );
     serverBNodeObj->setService( "transport", transport );
     
-    reef::INode* serverA = serverANodeObj->getService<reef::INode>();
-    reef::INode* client = cliNodeObj->getService<reef::INode>();
-    reef::INode* serverB = serverBNodeObj->getService<reef::INode>();
+    rpc::INode* serverA = serverANodeObj->getService<rpc::INode>();
+    rpc::INode* client = cliNodeObj->getService<rpc::INode>();
+    rpc::INode* serverB = serverBNodeObj->getService<rpc::INode>();
     transportObj->setService( "node", serverA );
     transportObj->setService( "node", client );
     transportObj->setService( "node", serverB );
@@ -154,5 +155,6 @@ TEST( ParameterTests, refTypeParameterTest )
     EXPECT_STREQ( refTypesServiceInA->concatenateString( simpleTypesServiceInB, "aaa", "bbb" ).c_str(), "aaabbb" );
 }
 
-    
+}
+
 }

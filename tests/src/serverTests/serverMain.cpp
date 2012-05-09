@@ -27,9 +27,9 @@ int main( int argc, char** argv )
 	try
 	{
 		co::IObject* node = co::newInstance( "reef.Node" );
-		reef::INode* server = node->getService<reef::INode>();
+		rpc::INode* server = node->getService<rpc::INode>();
         
-        reef::ITransport* transport = co::newInstance( "reef.ZMQTransport" )->getService<reef::ITransport>();
+        rpc::ITransport* transport = co::newInstance( "reef.ZMQTransport" )->getService<rpc::ITransport>();
         node->setService( "transport", transport );
         
 		server->start( "tcp://*:4020", "tcp://localhost:4020" );

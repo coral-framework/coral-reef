@@ -1,13 +1,13 @@
 function publishTest()
 	local transportObj = co.new "mockReef.Transport"
 	local transport = transportObj.transport
-	local serverANodeObj = co.new "reef.Node"
+	local serverANodeObj = co.new "reef.rpc.Node"
 	serverANodeObj.transport = transport
 	
-	local cliNodeObj = co.new "reef.Node"
+	local cliNodeObj = co.new "reef.rpc.Node"
 	cliNodeObj.transport = transport
 	
-	local serverBNodeObj = co.new "reef.Node"
+	local serverBNodeObj = co.new "reef.rpc.Node"
 	serverBNodeObj.transport = transport
 	
 	local server = serverANodeObj.node;

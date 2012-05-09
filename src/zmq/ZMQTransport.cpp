@@ -3,8 +3,8 @@
 #include "ZMQActiveLink.h"
 #include "ZMQPassiveLink.h"
 
-#include <reef/IActiveLink.h>
-#include <reef/IPassiveLink.h>
+#include <reef/rpc/IActiveLink.h>
+#include <reef/rpc/IPassiveLink.h>
 
 namespace zmq {
     
@@ -20,14 +20,14 @@ ZMQTransport::~ZMQTransport()
 
 // ------ reef.ITransport Methods ------ //
 
-reef::IPassiveLink* ZMQTransport::bind( const std::string& addressToListen )
+reef::rpc::IPassiveLink* ZMQTransport::bind( const std::string& addressToListen )
 {
     ZMQPassiveLink* link = new ZMQPassiveLink();
     link->bind( addressToListen );
     return link;
 }
 
-reef::IActiveLink* ZMQTransport::connect( const std::string& addressToConnect )
+reef::rpc::IActiveLink* ZMQTransport::connect( const std::string& addressToConnect )
 {
     // Tries to find an existing ActiveLink and returns it
     ActiveLinks::iterator it = _activeLinks.find( addressToConnect );
@@ -50,11 +50,11 @@ void ZMQTransport::onLinkDestructor( const std::string& address )
     }
 }
 
-reef::IActiveLink* ZMQTransport::createActiveLink( const std::string& address )
+reef::rpc::IActiveLink* ZMQTransport::createActiveLink( const std::string& address )
 {
     ZMQActiveLink* link = new ZMQActiveLink( this );
     link->connect( address );
-    _activeLinks.insert( std::pair<std::string, reef::IActiveLink*>( address, link ) );
+    _activeLinks.insert( std::pair<std::string, reef::rpc::IActiveLink*>( address, link ) );
     return link;
 }
      

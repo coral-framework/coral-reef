@@ -1,19 +1,23 @@
 ################################################################################
-# Build the Module
+# Build the Module RPC
 ################################################################################
 
-CORAL_GENERATE_MODULE( _GENERATED_FILES reef )
+CORAL_GENERATE_MODULE( _GENERATED_FILES reef.rpc )
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/generated )
 
 file( GLOB _SOURCES *.cpp )
 file( GLOB _HEADERS *.h )
 
-add_library( reef MODULE ${_HEADERS} ${_SOURCES} ${_GENERATED_FILES} )
+add_library( rpc MODULE ${_HEADERS} ${_SOURCES} ${_GENERATED_FILES} )
+SET_TARGET_PROPERTIES( rpc PROPERTIES
+	PROJECT_LABEL "rpc"
+	FOLDER "reef"
+)
 
-CORAL_MODULE_TARGET( "reef" reef )
+CORAL_MODULE_TARGET( "reef.rpc" rpc )
 
-target_link_libraries( reef ${CORAL_LIBRARIES} ${PROTOBUF_LIBRARIES} ${PROTOBUF_LIBRARY_DEBUG} )
+target_link_libraries( rpc ${CORAL_LIBRARIES} ${PROTOBUF_LIBRARIES} ${PROTOBUF_LIBRARY_DEBUG} )
 
 ################################################################################
 # Source Groups
@@ -27,21 +31,21 @@ source_group( "Network" FILES ${_NETWORK_SOURCES} ${_NETWORK_HEADERS} )
 ################################################################################
 
 # install shared library
-INSTALL( TARGETS reef
-	DESTINATION "modules/reef"
-	COMPONENT "Reef Module"
+INSTALL( TARGETS rpc
+	DESTINATION "modules/reef/rpc"
+	COMPONENT "Reef RPC Module"
 )
 
-INSTALL( FILES "${CMAKE_BINARY_DIR}/modules/reef/reef_debug.pdb"
+INSTALL( FILES "${CMAKE_BINARY_DIR}/modules/reef/rpc/rpc_debug.pdb"
 	DESTINATION "modules/reef"
 	CONFIGURATIONS Debug
-	COMPONENT "Reef Module"
+	COMPONENT "Reef RPC Module"
 	OPTIONAL
 )
 
 # install module files
-INSTALL( DIRECTORY ${CMAKE_SOURCE_DIR}/modules/reef
-	DESTINATION "modules"
+INSTALL( DIRECTORY ${CMAKE_SOURCE_DIR}/modules/reef/rpc
+	DESTINATION "modules/reef"
 	CONFIGURATIONS Release RelWithDebInfo
-	COMPONENT "Reef Module"
+	COMPONENT "Reef RPC Module"
 )

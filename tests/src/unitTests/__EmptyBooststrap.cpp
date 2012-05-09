@@ -1,7 +1,8 @@
 // Workaround necessary for this test target to replace the __Bootstrap.cpp
 
-namespace reef
-{
+namespace reef {
+namespace rpc {
+
     void moduleRetain()
     {
     }
@@ -9,4 +10,5 @@ namespace reef
     void moduleRelease()
     {
     }
+}
 }

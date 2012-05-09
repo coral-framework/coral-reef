@@ -1,6 +1,6 @@
-import reef.ITransport;
+import reef.rpc.ITransport;
 
 component ZMQTransport
 {
-	provides reef.ITransport transport;
+	provides reef.rpc.ITransport transport;
 };

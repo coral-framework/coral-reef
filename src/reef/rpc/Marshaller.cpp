@@ -6,8 +6,9 @@
 #include <co/IMethod.h>
 #include <co/Exception.h>
 
-namespace reef
-{
+namespace reef {
+namespace rpc {
+
    
     // ------------ Any to Protobuf conversion functions --------------- //
     
@@ -308,6 +309,8 @@ void Marshaller::checkIfCallMsg()
 {
     if( !_msgMember )
         throw new co::Exception( "Could not add a Parameter to an empty Message" );
+}
+    
 }
     
 }

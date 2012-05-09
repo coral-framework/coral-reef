@@ -14,6 +14,8 @@
 // @@protoc_insertion_point(includes)
 
 namespace reef {
+namespace rpc {
+
 
 namespace {
 
@@ -319,7 +321,7 @@ Data_Container::Data_Container()
 }
 
 void Data_Container::InitAsDefaultInstance() {
-  ref_type_ = const_cast< ::reef::Ref_Type*>(&::reef::Ref_Type::default_instance());
+  ref_type_ = const_cast< ::reef::rpc::Ref_Type*>(&::reef::rpc::Ref_Type::default_instance());
 }
 
 Data_Container::Data_Container(const Data_Container& from)
@@ -380,7 +382,7 @@ void Data_Container::Clear() {
     }
     numeric_ = 0;
     if (has_ref_type()) {
-      if (ref_type_ != NULL) ref_type_->::reef::Ref_Type::Clear();
+      if (ref_type_ != NULL) ref_type_->::reef::rpc::Ref_Type::Clear();
     }
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -605,7 +607,7 @@ void Data_Container::MergeFrom(const Data_Container& from) {
       set_numeric(from.numeric());
     }
     if (from.has_ref_type()) {
-      mutable_ref_type()->::reef::Ref_Type::MergeFrom(from.ref_type());
+      mutable_ref_type()->::reef::rpc::Ref_Type::MergeFrom(from.ref_type());
     }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
@@ -983,8 +985,8 @@ bool Ref_Type::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
                  input, &value)));
-          if (::reef::Ref_Type_Owner_IsValid(value)) {
-            set_owner(static_cast< ::reef::Ref_Type_Owner >(value));
+          if (::reef::rpc::Ref_Type_Owner_IsValid(value)) {
+            set_owner(static_cast< ::reef::rpc::Ref_Type_Owner >(value));
           } else {
             mutable_unknown_fields()->AddVarint(1, value);
           }
@@ -2319,10 +2321,10 @@ Message::Message()
 }
 
 void Message::InitAsDefaultInstance() {
-  msg_new_inst_ = const_cast< ::reef::Message_New_Inst*>(&::reef::Message_New_Inst::default_instance());
-  msg_acc_inst_ = const_cast< ::reef::Message_Acc_Inst*>(&::reef::Message_Acc_Inst::default_instance());
-  msg_find_inst_ = const_cast< ::reef::Message_Find_Inst*>(&::reef::Message_Find_Inst::default_instance());
-  msg_member_ = const_cast< ::reef::Message_Member*>(&::reef::Message_Member::default_instance());
+  msg_new_inst_ = const_cast< ::reef::rpc::Message_New_Inst*>(&::reef::rpc::Message_New_Inst::default_instance());
+  msg_acc_inst_ = const_cast< ::reef::rpc::Message_Acc_Inst*>(&::reef::rpc::Message_Acc_Inst::default_instance());
+  msg_find_inst_ = const_cast< ::reef::rpc::Message_Find_Inst*>(&::reef::rpc::Message_Find_Inst::default_instance());
+  msg_member_ = const_cast< ::reef::rpc::Message_Member*>(&::reef::rpc::Message_Member::default_instance());
 }
 
 Message::Message(const Message& from)
@@ -2391,16 +2393,16 @@ void Message::Clear() {
       }
     }
     if (has_msg_new_inst()) {
-      if (msg_new_inst_ != NULL) msg_new_inst_->::reef::Message_New_Inst::Clear();
+      if (msg_new_inst_ != NULL) msg_new_inst_->::reef::rpc::Message_New_Inst::Clear();
     }
     if (has_msg_acc_inst()) {
-      if (msg_acc_inst_ != NULL) msg_acc_inst_->::reef::Message_Acc_Inst::Clear();
+      if (msg_acc_inst_ != NULL) msg_acc_inst_->::reef::rpc::Message_Acc_Inst::Clear();
     }
     if (has_msg_find_inst()) {
-      if (msg_find_inst_ != NULL) msg_find_inst_->::reef::Message_Find_Inst::Clear();
+      if (msg_find_inst_ != NULL) msg_find_inst_->::reef::rpc::Message_Find_Inst::Clear();
     }
     if (has_msg_member()) {
-      if (msg_member_ != NULL) msg_member_->::reef::Message_Member::Clear();
+      if (msg_member_ != NULL) msg_member_->::reef::rpc::Message_Member::Clear();
     }
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -2421,8 +2423,8 @@ bool Message::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
                  input, &value)));
-          if (::reef::Message_Type_IsValid(value)) {
-            set_msg_type(static_cast< ::reef::Message_Type >(value));
+          if (::reef::rpc::Message_Type_IsValid(value)) {
+            set_msg_type(static_cast< ::reef::rpc::Message_Type >(value));
           } else {
             mutable_unknown_fields()->AddVarint(1, value);
           }
@@ -2771,16 +2773,16 @@ void Message::MergeFrom(const Message& from) {
       set_referer_ip(from.referer_ip());
     }
     if (from.has_msg_new_inst()) {
-      mutable_msg_new_inst()->::reef::Message_New_Inst::MergeFrom(from.msg_new_inst());
+      mutable_msg_new_inst()->::reef::rpc::Message_New_Inst::MergeFrom(from.msg_new_inst());
     }
     if (from.has_msg_acc_inst()) {
-      mutable_msg_acc_inst()->::reef::Message_Acc_Inst::MergeFrom(from.msg_acc_inst());
+      mutable_msg_acc_inst()->::reef::rpc::Message_Acc_Inst::MergeFrom(from.msg_acc_inst());
     }
     if (from.has_msg_find_inst()) {
-      mutable_msg_find_inst()->::reef::Message_Find_Inst::MergeFrom(from.msg_find_inst());
+      mutable_msg_find_inst()->::reef::rpc::Message_Find_Inst::MergeFrom(from.msg_find_inst());
     }
     if (from.has_msg_member()) {
-      mutable_msg_member()->::reef::Message_Member::MergeFrom(from.msg_member());
+      mutable_msg_member()->::reef::rpc::Message_Member::MergeFrom(from.msg_member());
     }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
@@ -2842,7 +2844,9 @@ void Message::Swap(Message* other) {
 
 
 // @@protoc_insertion_point(namespace_scope)
-
+    
+}
+    
 }  // namespace reef
 
 // @@protoc_insertion_point(global_scope)

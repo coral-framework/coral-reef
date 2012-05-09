@@ -6,8 +6,9 @@
 
 #include <string>
 
-namespace reef 
-{
+namespace reef {
+namespace rpc {
+
     
 class Message;
 class Message_Member;
@@ -78,6 +79,8 @@ private:
     Message_Member* _msgMember;
     
 };
-
+    
+}
+    
 }
 #endif

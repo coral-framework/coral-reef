@@ -4,14 +4,16 @@
 #include "Invoker.h"
 #include "ClientProxy.h"
 
-#include <reef/IActiveLink.h>
-#include <reef/IPassiveLink.h>
+#include <reef/rpc/IActiveLink.h>
+#include <reef/rpc/IPassiveLink.h>
 #include <co/Exception.h>
 
 #include <iostream>
 #include <map>
 
 namespace reef {
+namespace rpc {
+
 
 Node::Node() : _passiveLink( 0 )
 {
@@ -351,16 +353,18 @@ void Node::releaseInstance( co::int32 instanceID )
     
 }
 
-reef::ITransport* Node::getTransportService()
+reef::rpc::ITransport* Node::getTransportService()
 {
     return _transport;
 }
 
-void Node::setTransportService( reef::ITransport* transport )
+void Node::setTransportService( reef::rpc::ITransport* transport )
 {
     _transport = transport;
 }
     
 CORAL_EXPORT_COMPONENT( Node, Node );
+    
+}
     
 } // namespace reef

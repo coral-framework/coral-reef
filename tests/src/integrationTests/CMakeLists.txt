@@ -7,8 +7,8 @@ project( INTEGRATIONTESTS )
 include_directories(
 	${GTEST_INCLUDE_DIRS}
 	${moduleA_BINARY_DIR}/generated
-	${CMAKE_BINARY_DIR}/src/reef/generated
-	${CMAKE_SOURCE_DIR}/src/reef
+	${CMAKE_BINARY_DIR}/src/reef/rpc/generated
+	${CMAKE_SOURCE_DIR}/src/reef/rpc
 )
 
 # Gather source files in the current directory
@@ -16,7 +16,7 @@ file( GLOB _HEADERS *.h )
 file( GLOB _SOURCES *.cpp )
 
 add_executable( integrationTests EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} )
-add_dependencies( integrationTests moduleA reef )
+add_dependencies( integrationTests moduleA mockReef rpc )
 
 CORAL_TARGET( integrationTests )
 

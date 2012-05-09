@@ -7,16 +7,17 @@
 #include <mockReef/IFakeLink.h>
 #include <moduleA/ISimpleTypes.h>
 #include <moduleA/IReferenceTypes.h>
-#include <reef/ITransport.h>
-#include <reef/IActiveLink.h>
+#include <reef/rpc/ITransport.h>
+#include <reef/rpc/IActiveLink.h>
 #include <co/Coral.h>
 #include <co/IPort.h>
 #include <co/IField.h>
 #include <co/IMethod.h>
 #include <co/IObject.h>
 
-namespace reef
-{
+namespace reef {
+namespace rpc {
+
     
 typedef Unmarshaller::MsgType MsgType;
     
@@ -24,14 +25,14 @@ TEST( ClientTests, valueTypeCalls )
 {
     co::RefPtr<co::IObject> fakeLinkObj = co::newInstance( "mockReef.FakeLink" );
     mockReef::IFakeLink* fakeLink = fakeLinkObj->getService<mockReef::IFakeLink>();
-    reef::IActiveLink* activeLink = fakeLinkObj->getService<reef::IActiveLink>();
+    rpc::IActiveLink* activeLink = fakeLinkObj->getService<rpc::IActiveLink>();
     
     Unmarshaller unmarshaller;
     Marshaller marshaller;
     
     // Node is needed internally
-    co::RefPtr<Node> node = new reef::Node();
-    reef::ITransport* transport = co::newInstance( "mockReef.Transport" )->getService<reef::ITransport>();
+    co::RefPtr<Node> node = new rpc::Node();
+    rpc::ITransport* transport = co::newInstance( "mockReef.Transport" )->getService<rpc::ITransport>();
     node->setService( "transport", transport );
     node->start( "addressLocal", "addressLocal" );
 
@@ -94,17 +95,17 @@ TEST( ClientTests, refTypeCalls )
        ------(refer to reef's wiki for the cases of ref type params)               ------ */
     co::RefPtr<co::IObject> fakeLinkObjA = co::newInstance( "mockReef.FakeLink" );
     mockReef::IFakeLink* fakeLinkA = fakeLinkObjA->getService<mockReef::IFakeLink>();
-    reef::IActiveLink* activeLinkA = fakeLinkObjA->getService<reef::IActiveLink>();
+    rpc::IActiveLink* activeLinkA = fakeLinkObjA->getService<rpc::IActiveLink>();
     fakeLinkA->setAddress( "addressA" );
     
     co::RefPtr<co::IObject> fakeLinkObjB = co::newInstance( "mockReef.FakeLink" );
-    reef::IActiveLink* activeLinkB = fakeLinkObjB->getService<reef::IActiveLink>();
+    rpc::IActiveLink* activeLinkB = fakeLinkObjB->getService<rpc::IActiveLink>();
     mockReef::IFakeLink* fakeLinkB = fakeLinkObjB->getService<mockReef::IFakeLink>();
     fakeLinkB->setAddress( "addressB" );
    
     // Node is needed internally
-    co::RefPtr<Node> node = new reef::Node();
-    reef::ITransport* transport = co::newInstance( "mockReef.Transport" )->getService<reef::ITransport>();
+    co::RefPtr<Node> node = new rpc::Node();
+    rpc::ITransport* transport = co::newInstance( "mockReef.Transport" )->getService<rpc::ITransport>();
     node->setService( "transport", transport );
     node->start( "addressLocal", "addressLocal" );
     
@@ -210,5 +211,7 @@ TEST( ClientTests, refTypeCalls )
     EXPECT_STREQ( instanceType.c_str(), "moduleA.TestComponent" );
     EXPECT_STREQ( ownerAddress.c_str(), "addressB" );
 }
-
+    
+}
+    
 }

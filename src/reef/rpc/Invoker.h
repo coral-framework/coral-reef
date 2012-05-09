@@ -9,8 +9,9 @@
 
 #include <string>
 
-namespace reef
-{
+namespace reef {
+namespace rpc {
+
 class Node;
     
 // Server-side implementation of IChannel. Delivers the appropriate calls to the Objects
@@ -56,7 +57,9 @@ private:
     std::vector<co::IInterface*> _openedInterfaces;
 	std::vector<co::IReflector*> _openedReflectors;    
 };
-
+    
+}
+    
 } // namespace reef
 
 #endif

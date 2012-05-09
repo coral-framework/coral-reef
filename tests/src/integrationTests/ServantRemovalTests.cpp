@@ -4,34 +4,35 @@
 #include <moduleA/IComplexTypes.h>
 #include <moduleA/IReferenceTypes.h>
 
-#include <reef/INode.h>
-#include <reef/ITransport.h>
+#include <reef/rpc/INode.h>
+#include <reef/rpc/ITransport.h>
 
 #include <co/Coral.h>
 #include <co/RefPtr.h>
 #include <co/IObject.h>
 #include <co/RefVector.h>
 
-namespace reef
-{
+namespace reef {
+namespace rpc {
+
     
 TEST( InvokerRemovalTests, simpleTest )
 {
     co::RefPtr<co::IObject> transportObj = co::newInstance( "mockReef.Transport" );
-    reef::ITransport* transport = transportObj->getService<reef::ITransport>();
+    rpc::ITransport* transport = transportObj->getService<rpc::ITransport>();
     
-    co::RefPtr<co::IObject> hostANodeObj = co::newInstance( "reef.Node" );
+    co::RefPtr<co::IObject> hostANodeObj = co::newInstance( "reef.rpc.Node" );
     hostANodeObj->setService( "transport", transport );
     
-    co::RefPtr<co::IObject> hostCNodeObj = co::newInstance( "reef.Node" );
+    co::RefPtr<co::IObject> hostCNodeObj = co::newInstance( "reef.rpc.Node" );
     hostCNodeObj->setService( "transport", transport );
     
-    co::RefPtr<co::IObject> hostBNodeObj = co::newInstance( "reef.Node" );
+    co::RefPtr<co::IObject> hostBNodeObj = co::newInstance( "reef.rpc.Node" );
     hostBNodeObj->setService( "transport", transport );
     
-    reef::INode* hostA = hostANodeObj->getService<reef::INode>();
-    reef::INode* hostC = hostCNodeObj->getService<reef::INode>();
-    reef::INode* hostB = hostBNodeObj->getService<reef::INode>();
+    rpc::INode* hostA = hostANodeObj->getService<rpc::INode>();
+    rpc::INode* hostC = hostCNodeObj->getService<rpc::INode>();
+    rpc::INode* hostB = hostBNodeObj->getService<rpc::INode>();
     transportObj->setService( "node", hostA );
     transportObj->setService( "node", hostC );
     transportObj->setService( "node", hostB );
@@ -95,5 +96,7 @@ TEST( InvokerRemovalTests, simpleTest )
     EXPECT_EQ( hostC->getRemoteReferences( 1 ), 0 );
     EXPECT_EQ( hostC->getRemoteReferences( 2 ), 0 );
 }
-
+    
+}
+    
 }

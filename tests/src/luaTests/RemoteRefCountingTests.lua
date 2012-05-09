@@ -7,7 +7,7 @@ function bulkReferencing()
 	local numHosts = 10
 	-- Create 10 nodes and setup their use of the mockReef transport
 	for i = 1, numHosts do
-		local nodeObj = co.new "reef.Node"
+		local nodeObj = co.new "reef.rpc.Node"
 		nodeObj.transport = transport
 		hosts[i] = {}
 		local host = hosts[i]

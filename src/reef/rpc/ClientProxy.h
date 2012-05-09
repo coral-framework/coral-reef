@@ -6,13 +6,14 @@
 #include "Unmarshaller.h"
 #include "Marshaller.h"
 
-#include <reef/IActiveLink.h>
+#include <reef/rpc/IActiveLink.h>
 #include <co/RefPtr.h>
 #include <co/IService.h>
 #include <co/RefVector.h>
 
-namespace reef
-{
+namespace reef {
+namespace rpc {
+
     
 class Node;
     
@@ -76,6 +77,8 @@ private:
     co::IComponent* _component;
 };
 
+}
+    
 } // namespace reef
 
 #endif

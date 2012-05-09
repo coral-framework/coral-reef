@@ -1,5 +1,0 @@
-// The 'reef' module defines its own co.IModulePart.
-component reef
-{
-	provides co.IModulePart part;
-};

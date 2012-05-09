@@ -6,8 +6,9 @@
 #include <co/IMethod.h>
 #include <co/Exception.h>
 
-namespace reef
-{
+namespace reef {
+namespace rpc {
+
     // -------------- Protobuf to Any conversion functions ------------------//
     
 // Specializes for each Data container's different get function.
@@ -282,6 +283,7 @@ void Unmarshaller::unmarshalData( const std::string& marshalledData, co::IType* 
     arg.ParseFromString( marshalledData );
     PBArgToAny( arg, descriptor, value );
 }
-
+    
+}
     
 }

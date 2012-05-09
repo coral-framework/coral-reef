@@ -3,7 +3,7 @@
  * See copyright notice in LICENSE.md
  */
 
-#include "reef_Base.h"
+#include "rpc_Base.h"
 #include "ModuleInstaller.h"
 #include <co/Coral.h>
 #include <co/ISystem.h>
@@ -12,11 +12,13 @@
 #include "Message.pb.h"
 
 namespace reef {
+namespace rpc {
+
 
 /*!
 	The reef module's co.IModulePart.
  */
-class ModulePart : public reef::reef_Base
+class ModulePart : public reef::rpc::rpc_Base
 {
 public:
     ModulePart()
@@ -32,7 +34,7 @@ public:
 	void initialize( co::IModule* module )
 	{
         GOOGLE_PROTOBUF_VERIFY_VERSION;
-		reef::ModuleInstaller::instance().install();
+		reef::rpc::ModuleInstaller::instance().install();
 	}
 
 	void integrate( co::IModule* )
@@ -52,11 +54,13 @@ public:
 
 	void dispose( co::IModule* )
 	{
-		reef::ModuleInstaller::instance().uninstall();
+		reef::rpc::ModuleInstaller::instance().uninstall();
 	}
 };
 
 CORAL_EXPORT_MODULE_PART( ModulePart );
-CORAL_EXPORT_COMPONENT( ModulePart, reef );
-
+CORAL_EXPORT_COMPONENT( ModulePart, rpc );
+    
+}
+    
 } // namespace reef

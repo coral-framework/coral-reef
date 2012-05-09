@@ -11,8 +11,9 @@
 #include <co/ITypeManager.h>
 
 
-namespace reef
-{
+namespace reef {
+namespace rpc {
+
 
 template<typename T> // expects the uint8 array to be already properly sized
 static void fillUint8Array( const T value, std::vector<co::uint8>& dest, co::int32 i )
@@ -156,5 +157,7 @@ TEST( CodecTests, simpleTypesTest )
     }
 
 }
-
+    
+}
+    
 }

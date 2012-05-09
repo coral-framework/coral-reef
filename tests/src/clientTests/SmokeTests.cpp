@@ -12,13 +12,14 @@
 #include <co/IObject.h>
 #include <co/RefVector.h>
 
-namespace reef
-{
+namespace reef {
+namespace rpc {
+
     
 TEST( SmokeTests, simpleTypesTest )
 {
     co::IObject* transportObj = co::newInstance( "mockReef.Transport" );
-    reef::ITransport* transport = transportObj->getService<reef::ITransport>();
+    rpc::ITransport* transport = transportObj->getService<rpc::ITransport>();
     
     co::IObject* serverNodeObj = co::newInstance( "reef.Node" );
     serverNodeObj->setService( "transport", transport );
@@ -26,8 +27,8 @@ TEST( SmokeTests, simpleTypesTest )
     co::IObject* cliNodeObj = co::newInstance( "reef.Node" );
     cliNodeObj->setService( "transport", transport );
     
-    reef::INode* server = serverNodeObj->getService<reef::INode>();
-    reef::INode* client = cliNodeObj->getService<reef::INode>();
+    rpc::INode* server = serverNodeObj->getService<rpc::INode>();
+    rpc::INode* client = cliNodeObj->getService<rpc::INode>();
     transportObj->setService( "node", server );
     transportObj->setService( "node", client );
     
@@ -102,7 +103,7 @@ TEST( SmokeTests, simpleTypesTest )
 TEST( SmokeTests, refTypeParameterTest )
 {
     co::IObject* transportObj = co::newInstance( "mockReef.Transport" );
-    reef::ITransport* transport = transportObj->getService<reef::ITransport>();
+    rpc::ITransport* transport = transportObj->getService<rpc::ITransport>();
     
     co::IObject* serverNodeObj = co::newInstance( "reef.Node" );
     serverNodeObj->setService( "transport", transport );
@@ -110,8 +111,8 @@ TEST( SmokeTests, refTypeParameterTest )
     co::IObject* cliNodeObj = co::newInstance( "reef.Node" );
     cliNodeObj->setService( "transport", transport );
     
-    reef::INode* server = serverNodeObj->getService<reef::INode>();
-    reef::INode* client = cliNodeObj->getService<reef::INode>();
+    rpc::INode* server = serverNodeObj->getService<rpc::INode>();
+    rpc::INode* client = cliNodeObj->getService<rpc::INode>();
     transportObj->setService( "node", server );
     transportObj->setService( "node", client );
     

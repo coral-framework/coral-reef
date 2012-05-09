@@ -1,9 +1,9 @@
 @lua.Scripted( "mockReef.FakeLink" ) 
-import reef.IActiveLink;
+import reef.rpc.IActiveLink;
 
 component FakeLink
 {
-	provides reef.IActiveLink active;
+	provides IActiveLink active;
 	
 	provides IFakeLink fake;
 };
