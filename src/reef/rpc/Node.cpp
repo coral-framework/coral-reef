@@ -177,13 +177,13 @@ void Node::dispatchMessage( const std::string& msg )
     
     switch( type )
     {
-        case Unmarshaller::MsgType::NEW_INST:
+        case Unmarshaller::NEW_INST:
             onNewInstMsg();
             break;
-        case Unmarshaller::MsgType::ACCESS_INST:
+        case Unmarshaller::ACCESS_INST:
             onAccessInstMsg();
             break;
-        case Unmarshaller::MsgType::FIND_INST:
+        case Unmarshaller::FIND_INST:
             onFindInstMsg();
             break;
         default: // the message isn't destined to the Node. Pass to the appropriate invoker. 

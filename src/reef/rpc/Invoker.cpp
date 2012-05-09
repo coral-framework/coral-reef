@@ -24,7 +24,7 @@ Invoker::Invoker( Node* node, co::IObject* object ) : _node( node )
         _object = object;
         _component = _object->getComponent();
         co::Range<co::IPort* const> ports = _component->getFacets();
-        co::int32 numPorts = ports.getSize();
+        co::int32 numPorts = static_cast<co::int32>( ports.getSize() );
         _openedServices.resize( numPorts );
         _openedInterfaces.resize( numPorts );
         _openedReflectors.resize( numPorts );
@@ -122,11 +122,11 @@ void Invoker::onGetParam( Unmarshaller& unmarshaller, co::IType* paramType, co::
     co::IObject* instance;
     switch( owner )
     {
-        case Unmarshaller::RefOwner::RECEIVER:
+        case Unmarshaller::RECEIVER:
             instance = _node->getInstance( instanceID );
             break;
-        case Unmarshaller::RefOwner::LOCAL:
-        case Unmarshaller::RefOwner::ANOTHER:
+        case Unmarshaller::LOCAL:
+        case Unmarshaller::ANOTHER:
             instance = _node->getRemoteInstance( instanceType, instanceID, 
                                                      ownerAddress );
             break;

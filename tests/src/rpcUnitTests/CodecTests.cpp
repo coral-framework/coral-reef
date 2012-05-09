@@ -44,7 +44,7 @@ TEST( CodecTests, simpleTypesTest )
     marshaller.marshalNewInstance( "test", "address", msg );
     unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn, &referer );
     
-    EXPECT_EQ( msgType, MsgType::NEW_INST );
+    EXPECT_EQ( msgType, Unmarshaller::NEW_INST );
     EXPECT_EQ( msgReceiverID, 0 );
     EXPECT_TRUE( hasReturn );
     EXPECT_STREQ( referer.c_str(), "address" );
@@ -55,7 +55,7 @@ TEST( CodecTests, simpleTypesTest )
     marshaller.marshalFindInstance( "key", "address2", msg );
     unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn, &referer );
     
-    EXPECT_EQ( msgType, MsgType::FIND_INST );
+    EXPECT_EQ( msgType, Unmarshaller::FIND_INST );
     EXPECT_EQ( msgReceiverID, 0 );
     EXPECT_TRUE( hasReturn );
     EXPECT_STREQ( referer.c_str(), "address2" );
@@ -71,7 +71,7 @@ TEST( CodecTests, simpleTypesTest )
     marshaller.marshalAccessInstance( 5, true, "address3", msg );
     unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn, &referer );
     
-    EXPECT_EQ( msgType, MsgType::ACCESS_INST );
+    EXPECT_EQ( msgType, Unmarshaller::ACCESS_INST );
     EXPECT_EQ( msgReceiverID, 0 );
     EXPECT_FALSE( hasReturn );
     EXPECT_STREQ( referer.c_str(), "address3" );
@@ -115,7 +115,7 @@ TEST( CodecTests, simpleTypesTest )
     
     unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
     
-    EXPECT_EQ( msgType, MsgType::CALL );
+    EXPECT_EQ( msgType, Unmarshaller::CALL );
     EXPECT_EQ( msgReceiverID, 3 );
     EXPECT_TRUE( hasReturn );
     
