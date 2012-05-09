@@ -1,8 +1,8 @@
 ################################################################################
-# The 'unitTests' executable
+# The 'rpcUnitTests' executable
 ################################################################################
 
-project( UNITTESTS )
+project( RPCUNITTESTS )
 CORAL_GENERATE_MODULE( _GENERATED_RPC_FILES reef.rpc )
 CORAL_GENERATE_MAPPINGS( _GENERATED_MAPPINGS "mockReef.IFakeLink" )
 
@@ -21,38 +21,38 @@ file( GLOB _SOURCES *.cpp )
 file( GLOB _REPLICATED_MODULE_FILES	${REEF_SOURCE_DIR}/src/reef/rpc/*.cpp )
 list( REMOVE_ITEM _GENERATED_RPC_FILES "${CMAKE_CURRENT_BINARY_DIR}/generated/__Bootstrap.cpp" )
 
-add_executable( unitTests EXCLUDE_FROM_ALL ${_REPLICATED_MODULE_FILES} ${_HEADERS} ${_SOURCES} ${_GENERATED_RPC_FILES} ${_GENERATED_MAPPINGS} )
-add_dependencies( unitTests moduleA mockReef )
+add_executable( rpcUnitTests EXCLUDE_FROM_ALL ${_REPLICATED_MODULE_FILES} ${_HEADERS} ${_SOURCES} ${_GENERATED_RPC_FILES} ${_GENERATED_MAPPINGS} )
+add_dependencies( rpcUnitTests moduleA mockReef )
 
-CORAL_TARGET( unitTests )
+CORAL_TARGET( rpcUnitTests )
 
-set_target_properties( unitTests PROPERTIES
-	PROJECT_LABEL "unitTests"
+set_target_properties( rpcUnitTests PROPERTIES
+	PROJECT_LABEL "rpcUnitTests"
 )
 
-target_link_libraries( unitTests ${CORAL_LIBRARIES} ${GTEST_LIBRARIES} ${ZMQ_LIBRARIES} ${PROTOBUF_LIBRARIES} ${PROTOBUF_LIBRARY_DEBUG} )
+target_link_libraries( rpcUnitTests ${CORAL_LIBRARIES} ${GTEST_LIBRARIES} ${ZMQ_LIBRARIES} ${PROTOBUF_LIBRARIES} ${PROTOBUF_LIBRARY_DEBUG} )
 
 ################################################################################
 # Register the test
 ################################################################################
-file( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/unitTests/output )
+file( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/rpcUnitTests/output )
 add_test(
-	NAME unitTests
-	COMMAND $<TARGET_FILE:unitTests> --gtest_output=xml:../../output/UnitTests$<CONFIGURATION>.xml
+	NAME rpcUnitTests
+	COMMAND $<TARGET_FILE:rpcUnitTests> --gtest_output=xml:../../output/UnitTests$<CONFIGURATION>.xml
 )
-CORAL_TEST_ENVIRONMENT( unitTests )
+CORAL_TEST_ENVIRONMENT( rpcUnitTests )
 
 ################################################################################
 # If Valgrind is available, repeat the test checking for memory leaks
 ################################################################################
 if( VALGRIND_COMMAND )
 	add_test(
-		NAME unitTests_MemoryCheck
+		NAME rpcUnitTests_MemoryCheck
 		COMMAND ${VALGRIND_COMMAND} --leak-check=full --show-reachable=yes --num-callers=5 --dsymutil=yes
-			--gen-suppressions=no --log-file=${CMAKE_BINARY_DIR}/unitTestsValgrind$<CONFIGURATION>.log --error-exitcode=13
-			--track-origins=yes --suppressions=${CMAKE_SOURCE_DIR}/tests/valgrind.supp $<TARGET_FILE:unitTests>
+			--gen-suppressions=no --log-file=${CMAKE_BINARY_DIR}/rpcUnitTestsValgrind$<CONFIGURATION>.log --error-exitcode=13
+			--track-origins=yes --suppressions=${CMAKE_SOURCE_DIR}/tests/valgrind.supp $<TARGET_FILE:rpcUnitTests>
 	)
-	CORAL_TEST_ENVIRONMENT( unitTests_MemoryCheck )
+	CORAL_TEST_ENVIRONMENT( rpcUnitTests_MemoryCheck )
 endif()
 
 ################################################################################

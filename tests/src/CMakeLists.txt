@@ -11,18 +11,17 @@ set_property( DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS "CORAL_PATH=\"${CORA
 
 add_subdirectory( moduleA )
 add_subdirectory( mockReef )
-add_subdirectory( unitTests )
-add_subdirectory( integrationTests )
-add_subdirectory( luaTests )
+add_subdirectory( rpcUnitTests )
+add_subdirectory( rpcIntegrationTests )
 
 set( MANUAL_TESTING_DISABLED ON CACHE BOOL "Manual client server testing" )
 if( NOT MANUAL_TESTING_DISABLED )
-	add_subdirectory( clientTests )
-	add_subdirectory( serverTests )
+	add_subdirectory( manual_client )
+	add_subdirectory( manual_server )
 	# Add a custom target to build all test artifacts
-	ADD_CUSTOM_TARGET( tests DEPENDS reef mockReef moduleA unitTests integrationTests
-		clientTests serverTests
+	ADD_CUSTOM_TARGET( tests DEPENDS reef mockReef moduleA rpcUnitTests rpcIntegrationTests
+		manual_client manual_server
 	)
 else()
-	ADD_CUSTOM_TARGET( tests DEPENDS reef mockReef moduleA unitTests integrationTests )
+	ADD_CUSTOM_TARGET( tests DEPENDS reef mockReef moduleA rpcUnitTests rpcIntegrationTests )
 endif()

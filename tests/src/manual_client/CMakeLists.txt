@@ -15,14 +15,14 @@ include_directories(
 file( GLOB _HEADERS *.h )
 file( GLOB _SOURCES *.cpp )
 
-add_executable( clientTests EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} )
-add_dependencies( clientTests moduleA reef )
+add_executable( manual_client EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} )
+add_dependencies( manual_client moduleA reef )
 
-CORAL_TARGET( clientTests )
+CORAL_TARGET( manual_client )
 
-set_target_properties( clientTests PROPERTIES
-	PROJECT_LABEL "clientTests"
+set_target_properties( manual_client PROPERTIES
+	PROJECT_LABEL "manual_client"
 )
 
-target_link_libraries( clientTests ${CORAL_LIBRARIES} ${GTEST_LIBRARIES} )
+target_link_libraries( manual_client ${CORAL_LIBRARIES} ${GTEST_LIBRARIES} )
 
