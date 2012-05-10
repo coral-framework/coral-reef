@@ -19,9 +19,6 @@ namespace reef {
 namespace rpc {
 
     
-typedef Unmarshaller::MsgType MsgType;
-typedef co::RefPtr<co::IObject> objptr;
-    
 TEST( ClientTests, valueTypeCalls )
 {
     co::RefPtr<co::IObject> fakeLinkObj = co::newInstance( "mockReef.FakeLink" );
@@ -57,7 +54,7 @@ TEST( ClientTests, valueTypeCalls )
     fakeLink->getMsg( msg );
     
     // parameters common to message types
-    MsgType msgType;
+    Unmarshaller::MsgType msgType;
     bool hasReturn;
     co::int32 msgReceiverID;
     
@@ -144,7 +141,7 @@ TEST( ClientTests, refTypeCalls )
     // All the necessary variables for the ref type transmission tests
     co::Any intParam; intParam.set<co::int32>( 5 );
     std::string msg;    
-    MsgType msgType;
+    Unmarshaller::MsgType msgType;
     bool hasReturn;
     co::int32 msgReceiverID;
     co::int32 facetIdx;
@@ -211,9 +208,6 @@ TEST( ClientTests, refTypeCalls )
     EXPECT_EQ( refOwner, Unmarshaller::ANOTHER );
     EXPECT_STREQ( instanceType.c_str(), "moduleA.TestComponent" );
     EXPECT_STREQ( ownerAddress.c_str(), "addressB" );
-
-
-
 }
 
 TEST( ClientTests, refTypeReturns )
@@ -274,6 +268,8 @@ TEST( ClientTests, refTypeReturns )
         
      EXPECT_EQ( info->getInstanceID(), 5 );
 	 EXPECT_STREQ( info->getOwnerAddress().c_str(), "address" );
+
+	 node->unpublishInstance( "irrelevant" );
 }
 
 }

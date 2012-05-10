@@ -176,8 +176,8 @@ void Invoker::onInterfaceReturned( co::IService* returned, std::string& marshall
     if( ClientProxy::isLocalObject( provider ) )
     {
         instanceID = _node->publishAnonymousInstance( provider );
-        _marshaller.addReferenceParam( instanceID, facetIdx, Marshaller::RefOwner::LOCAL, &providerType, 
-                                    &_node->getPublicAddress() );
+        _marshaller.marshalReferenceType( instanceID, facetIdx, Marshaller::RefOwner::LOCAL, 
+							marshalledReturn, &providerType, &_node->getPublicAddress() );
     }
     else // is a remote object, so it provides the IInstanceInfo service
     {
@@ -188,8 +188,8 @@ void Invoker::onInterfaceReturned( co::IService* returned, std::string& marshall
         const std::string& ownerAddress = info->getOwnerAddress();
         
         _node->requestBeginAccess( ownerAddress, instanceID, "TODO" );
-        _marshaller.addReferenceParam( instanceID, facetIdx, Marshaller::RefOwner::ANOTHER, 
-                                      &providerType, &ownerAddress );
+        _marshaller.marshalReferenceType( instanceID, facetIdx, Marshaller::RefOwner::ANOTHER, 
+                                      marshalledReturn, &providerType, &ownerAddress );
     }
 }
 
