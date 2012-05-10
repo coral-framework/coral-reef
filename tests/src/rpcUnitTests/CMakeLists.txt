@@ -48,7 +48,7 @@ CORAL_TEST_ENVIRONMENT( rpcUnitTests )
 if( VALGRIND_COMMAND )
 	add_test(
 		NAME rpcUnitTests_MemoryCheck
-		COMMAND ${VALGRIND_COMMAND} --leak-check=full --show-reachable=yes --num-callers=5 --dsymutil=yes
+		COMMAND ${VALGRIND_COMMAND} --leak-check=full --show-reachable=yes --num-callers=30 --dsymutil=yes
 			--gen-suppressions=no --log-file=${CMAKE_BINARY_DIR}/rpcUnitTestsValgrind$<CONFIGURATION>.log --error-exitcode=13
 			--track-origins=yes --suppressions=${CMAKE_SOURCE_DIR}/tests/valgrind.supp $<TARGET_FILE:rpcUnitTests>
 	)

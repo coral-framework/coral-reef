@@ -161,7 +161,7 @@ Marshaller::~Marshaller()
 }
     
 void Marshaller::marshalNewInstance( const std::string& typeName, const std::string& referer,
-                                    std::string& marshalledRequest )
+                                    std::string& request )
 {
     _message->set_msg_type( Message::MSG_NEW_INST );
     _message->set_instance_id( 0 ); // 0 is always the node channel
@@ -172,12 +172,12 @@ void Marshaller::marshalNewInstance( const std::string& typeName, const std::str
 	Message_New_Inst* msgNewInst = _message->mutable_msg_new_inst();
     msgNewInst->set_new_instance_type( typeName );
     
-    _message->SerializeToString( &marshalledRequest );
+    _message->SerializeToString( &request );
     _message->Clear();
 }
 
 void Marshaller::marshalAccessInstance( co::int32 instanceID, bool increment, 
-                                       const std::string& referer, std::string& marshalledRequest )
+                                       const std::string& referer, std::string& request )
 {
     _message->set_msg_type( Message::MSG_ACCESS_INST );
     _message->set_instance_id( 0 ); // 0 is always the node channel
@@ -190,12 +190,12 @@ void Marshaller::marshalAccessInstance( co::int32 instanceID, bool increment,
     msgAccInst->set_increment( increment );
     msgAccInst->set_instance_id( instanceID );
     
-    _message->SerializeToString( &marshalledRequest );
+    _message->SerializeToString( &request );
     _message->Clear();
 }
     
 void Marshaller::marshalFindInstance( const std::string& key, const std::string& referer,
-                                     std::string& marshalledRequest )
+                                     std::string& request )
 {
     _message->set_msg_type( Message::MSG_FIND_INST );
     _message->set_instance_id( 0 ); // 0 is always the node channel
@@ -206,7 +206,7 @@ void Marshaller::marshalFindInstance( const std::string& key, const std::string&
 	Message_Find_Inst* msgFindInst = _message->mutable_msg_find_inst();
     msgFindInst->set_key( key );
     
-    _message->SerializeToString( &marshalledRequest );
+    _message->SerializeToString( &request );
     _message->Clear();
 }
     
@@ -225,86 +225,101 @@ void Marshaller::beginCallMarshalling( co::int32 instanceID, co::int32 facetIdx,
     _msgMember->set_member_idx( memberIdx );
 }
 
-void Marshaller::marshalValueParam( const co::Any& param )
+void Marshaller::addValueParam( const co::Any& param )
 {
     checkIfCallMsg();
     Argument* PBArg = _msgMember->add_arguments();
     anyToPBArg( param, PBArg );
 }
 
-void Marshaller::marshalRefParam( co::int32 instanceID, co::int32 facetIdx, RefOwner owner, 
+void Marshaller::addReferenceParam( co::int32 instanceID, co::int32 facetIdx, RefOwner owner, 
                         const std::string* instanceType, const std::string* ownerAddress )
 {
     checkIfCallMsg();
     Argument* PBArg = _msgMember->add_arguments();
+    reference2PBArg( instanceID, facetIdx, owner, PBArg, instanceType, ownerAddress );
+}
+
+void Marshaller::marshalReferenceType( co::int32 instanceID, co::int32 facetIdx, RefOwner owner, 
+                                      std::string& reference, const std::string* instanceType, 
+                                          const std::string* ownerAddress )
+{
+    Argument* PBArg = new Argument();
+    reference2PBArg( instanceID, facetIdx, owner, PBArg, instanceType, ownerAddress );
+    PBArg->SerializeToString( &reference );
+}
+    
+void Marshaller::reference2PBArg( co::int32 instanceID, co::int32 facetIdx, RefOwner owner, 
+                                    Argument*& PBArg, const std::string* instanceType, 
+                                    const std::string* ownerAddress )
+{
     Data_Container* dc = PBArg->add_data();
     Ref_Type* refType = dc->mutable_ref_type();
     
     refType->set_instance_id( instanceID );
     refType->set_facet_idx( facetIdx );
     
-
+    
     switch( owner )
     {
-    case RefOwner::LOCAL:
+        case RefOwner::LOCAL:
             refType->set_owner( Ref_Type::OWNER_LOCAL );
             refType->set_owner_ip( *ownerAddress );
             refType->set_instance_type( *instanceType );
             break;
-    case RefOwner::RECEIVER:
+        case RefOwner::RECEIVER:
             refType->set_owner( Ref_Type::OWNER_RECEIVER );
             break;
-    case RefOwner::ANOTHER:
+        case RefOwner::ANOTHER:
             refType->set_owner( Ref_Type::OWNER_ANOTHER );
             refType->set_owner_ip( *ownerAddress );
             refType->set_instance_type( *instanceType );
             break;        
     }
 }
-
-
-void Marshaller::getMarshalledCall( std::string& marshalledRequest )
+    
+void Marshaller::marshalValueType( const co::Any& unmarshalledValue, std::string& marshalledValue )
 {
-    _message->SerializeToString( &marshalledRequest );
+    Argument returnArg;
+    anyToPBArg( unmarshalledValue, &returnArg );
+    returnArg.SerializeToString( &marshalledValue );
+}
+    
+void Marshaller::getMarshalledCall( std::string& request )
+{
+    _message->SerializeToString( &request );
     _message->Clear();
     _msgMember = 0;
 }
 
-void Marshaller::marshalData( bool value, std::string& marshalledData )
+void Marshaller::marshalData( bool value, std::string& data )
 {
-    Data_Container data;
-    data.set_boolean( value );
-    data.SerializeToString( &marshalledData );
+    Data_Container dataContainer;
+    dataContainer.set_boolean( value );
+    dataContainer.SerializeToString( &data );
 }
 
-void Marshaller::marshalData( double value, std::string& marshalledData )
+void Marshaller::marshalData( double value, std::string& data )
 {
-    Data_Container data;
-    data.set_numeric( value );
-    data.SerializeToString( &marshalledData );
+    Data_Container dataContainer;
+    dataContainer.set_numeric( value );
+    dataContainer.SerializeToString( &data );
 }
 
-void Marshaller::marshalData( co::int32 value, std::string& marshalledData )
+void Marshaller::marshalData( co::int32 value, std::string& data )
 {
-    Data_Container data;
-    data.set_numeric( static_cast<co::int32>( value ) );
-    data.SerializeToString( &marshalledData );
+    Data_Container dataContainer;
+    dataContainer.set_numeric( static_cast<co::int32>( value ) );
+    dataContainer.SerializeToString( &data );
 }
 
-void Marshaller::marshalData( const std::string& value, std::string& marshalledData )
+void Marshaller::marshalData( const std::string& value, std::string& data )
 {
-    Data_Container data;
-    data.set_str( value );
-    data.SerializeToString( &marshalledData );
+    Data_Container dataContainer;
+    dataContainer.set_str( value );
+    dataContainer.SerializeToString( &data );
 }
-    
-void Marshaller::marshalData( const co::Any& value, std::string& marshalledData )
-{
-    Argument returnArg;
-    anyToPBArg( value, &returnArg );
-    returnArg.SerializeToString( &marshalledData );
-}
-    
+
 void Marshaller::checkIfCallMsg()
 {
     if( !_msgMember )

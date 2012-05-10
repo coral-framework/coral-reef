@@ -51,6 +51,8 @@ private:
 typedef std::map<IActiveLink*, Host*> Hosts;
 static Hosts _hosts;
     
+void* ClientProxy::s_classPtr = 0;
+    
 ClientProxy* ClientProxy::getOrCreateClientProxy( Node* node, co::IComponent* component,
                                             IActiveLink* link, co::int32 instanceID )
 {
@@ -84,7 +86,7 @@ ClientProxy::ClientProxy()
 ClientProxy::ClientProxy( Node* node, co::IComponent* component, IActiveLink* link, 
                            co::int32 instanceID ) : _node( node ), _link( link ),_numFacets( 0 )
 {
-    _classPtr = *reinterpret_cast<void**>( this );
+    s_classPtr = *reinterpret_cast<void**>( this );
     setComponent( component );
     _instanceID = instanceID;
 }
@@ -163,7 +165,7 @@ const co::Any& ClientProxy::dynamicGetField( co::int32 dynFacetId, co::IField* f
     
     awaitReplyUpdating( msg );
     
-    _unmarshaller.unmarshalData( msg, field->getType(), _resultBuffer );
+    unmarshalReturn( msg, field->getType(), _resultBuffer );
 
     return _resultBuffer;
 }
@@ -173,7 +175,7 @@ void ClientProxy::dynamicSetField( co::int32 dynFacetId, co::IField* field, cons
     _marshaller.beginCallMarshalling( _instanceID, dynFacetId, field->getIndex(), false );
     
     if( value.getKind() != co::TK_INTERFACE )
-        _marshaller.marshalValueParam( value );
+        _marshaller.addValueParam( value );
     else
         onInterfaceParam( value.get<co::IService*>() );
 
@@ -197,7 +199,7 @@ const co::Any& ClientProxy::dynamicInvoke( co::int32 dynFacetId, co::IMethod* me
         const co::Any& arg = args.getFirst();
         
         if( arg.getKind() != co::TK_INTERFACE )
-            _marshaller.marshalValueParam( arg );
+            _marshaller.addValueParam( arg );
         else
             onInterfaceParam( arg.get<co::IService*>() );
     }
@@ -209,7 +211,7 @@ const co::Any& ClientProxy::dynamicInvoke( co::int32 dynFacetId, co::IMethod* me
 	if( returnType )
     {
         awaitReplyUpdating( msg );
-        _unmarshaller.unmarshalData( msg, method->getReturnType(), _resultBuffer );
+        unmarshalReturn( msg, method->getReturnType(), _resultBuffer );
     }
 
     return _resultBuffer;
@@ -220,7 +222,44 @@ co::int32 ClientProxy::dynamicRegisterService( co::IService* dynamicServiceProxy
     _facets[_numFacets] = dynamicServiceProxy;
 	return _numFacets++;
 }
-     
+
+void ClientProxy::unmarshalReturn( const std::string& data, co::IType* returnedType, 
+                                  co::Any& returned )
+{
+    if( returnedType->getKind() != co::TK_INTERFACE )
+    {
+        _unmarshaller.unmarshalValue( data, returnedType, returned );
+        return;
+    }
+    
+    co::int32 instanceID;
+    co::int32 facetIdx;
+    Unmarshaller::RefOwner owner;
+    std::string instanceType;
+    std::string ownerAddress;
+    
+    _unmarshaller.unmarshalReference( data, instanceID, facetIdx, owner, instanceType, ownerAddress );
+    co::IObject* instance;
+    switch( owner )
+    {
+        case Unmarshaller::RefOwner::RECEIVER:
+            instance = _node->getInstance( instanceID );
+            break;
+        case Unmarshaller::RefOwner::LOCAL:
+        case Unmarshaller::RefOwner::ANOTHER:
+            instance = _node->getRemoteInstance( instanceType, instanceID, 
+                                                ownerAddress );
+            break;
+    }
+    _tempRef = instance; // TODO: remove
+    
+    co::Range<co::IPort* const> ports = instance->getComponent()->getFacets();
+    
+    co::IPort* port = ports[facetIdx];
+    co::IService* service = instance->getServiceAt( port );
+    returned.set<co::IService*>( service );
+}
+
 void ClientProxy::onInterfaceParam( co::IService* param )
 {
     co::IObject* provider = param->getProvider();
@@ -231,7 +270,7 @@ void ClientProxy::onInterfaceParam( co::IService* param )
     if( isLocalObject( provider ) )
     {
         instanceID = _node->publishAnonymousInstance( provider );
-        _marshaller.marshalRefParam( instanceID, facetIdx, Marshaller::RefOwner::LOCAL, &providerType, 
+        _marshaller.addReferenceParam( instanceID, facetIdx, Marshaller::RefOwner::LOCAL, &providerType, 
                              &_node->getPublicAddress() );
     }
     else // is a remote object, so it provides the IInstanceInfo service
@@ -244,12 +283,12 @@ void ClientProxy::onInterfaceParam( co::IService* param )
         
         if( ownerAddress == _link->getAddress() ) // Receiver
         {
-            _marshaller.marshalRefParam( instanceID, facetIdx, Marshaller::RefOwner::RECEIVER );
+            _marshaller.addReferenceParam( instanceID, facetIdx, Marshaller::RefOwner::RECEIVER );
         }
         else
         {
             _node->requestBeginAccess( ownerAddress, instanceID, "TODO" );
-            _marshaller.marshalRefParam( instanceID, facetIdx, Marshaller::RefOwner::ANOTHER, &providerType, 
+            _marshaller.addReferenceParam( instanceID, facetIdx, Marshaller::RefOwner::ANOTHER, &providerType, 
                                  &ownerAddress );
         }
     }

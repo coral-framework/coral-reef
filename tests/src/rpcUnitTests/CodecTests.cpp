@@ -105,12 +105,12 @@ TEST( CodecTests, simpleTypesTest )
 	}
     
     marshaller.beginCallMarshalling( 3, 4, 5, true );
-    marshaller.marshalValueParam( intParam );
-    marshaller.marshalValueParam( doubleParam );
-    marshaller.marshalValueParam( stringParam );
-    marshaller.marshalValueParam( boolParam );
-    marshaller.marshalValueParam( intArrayParam );
-    marshaller.marshalValueParam( stringArrayParam );
+    marshaller.addValueParam( intParam );
+    marshaller.addValueParam( doubleParam );
+    marshaller.addValueParam( stringParam );
+    marshaller.addValueParam( boolParam );
+    marshaller.addValueParam( intArrayParam );
+    marshaller.addValueParam( stringArrayParam );
     marshaller.getMarshalledCall( msg );
     
     unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );

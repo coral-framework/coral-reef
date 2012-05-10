@@ -154,11 +154,13 @@ void Message_Type2MsgType( Message_Type message_type, Unmarshaller::MsgType& msg
 Unmarshaller::Unmarshaller() : _currentParam( 0 )
 {
     _message = new Message();
+    _argument = new Argument();
 }
 
 Unmarshaller::~Unmarshaller()
 {
     delete _message;
+    delete _argument;
 }
     
 // sets the message that will be decoded and return its type and destination
@@ -222,7 +224,7 @@ void Unmarshaller::unmarshalValueParam( co::Any& param, co::IType* descriptor )
     PBArgToAny( _msgMember->arguments( _currentParam++ ), descriptor, param );
 }
 
-void Unmarshaller::unmarshalRefParam( co::int32& instanceID, co::int32& facetIdx, RefOwner& owner,
+void Unmarshaller::unmarshalReferenceParam( co::int32& instanceID, co::int32& facetIdx, RefOwner& owner,
                   std::string& instanceType, std::string& ownerAddress )
 {
     assert( _msgMember );
@@ -247,43 +249,73 @@ void Unmarshaller::unmarshalRefParam( co::int32& instanceID, co::int32& facetIdx
             return;
     }
 }
-
-// ----- Data Container codec ----- //
-void Unmarshaller::unmarshalData( const std::string& marshalledData, bool& value )
+    
+void Unmarshaller::unmarshalReference( const std::string& data, co::int32& instanceID, 
+                                           co::int32& facetIdx, RefOwner& owner, 
+                                           std::string& instanceType, std::string& ownerAddress )
 {
-    Data_Container data;
-    data.ParseFromString( marshalledData );
-    value = data.boolean();
-}
-
-void Unmarshaller::unmarshalData( const std::string& marshalledData, double& value )
-{
-    Data_Container data;
-    data.ParseFromString( marshalledData );
-    value = data.numeric();
-}
-
-void Unmarshaller::unmarshalData( const std::string& marshalledData, co::int32& value )
-{
-    Data_Container data;
-    data.ParseFromString( marshalledData );
-    value = static_cast<co::int32>( data.numeric() );
-}
-
-void Unmarshaller::unmarshalData( const std::string& marshalledData, std::string& value )
-{
-    Data_Container data;
-    data.ParseFromString( marshalledData );
-    value = data.str();
+    _argument->Clear();
+    _argument->ParseFromString( data );
+    
+    Ref_Type* refType = _argument->mutable_data( 0 )->mutable_ref_type();
+    
+    instanceID = refType->instance_id();
+    facetIdx = refType->facet_idx();
+    
+    switch( refType->owner() )
+    {
+        case Ref_Type::OWNER_LOCAL:
+            owner = RefOwner::LOCAL;
+            ownerAddress = refType->owner_ip();
+            instanceType = refType->instance_type();
+            return;
+        case Ref_Type::OWNER_RECEIVER:
+            owner = RefOwner::RECEIVER;
+            return;
+        case Ref_Type::OWNER_ANOTHER:
+            owner = RefOwner::ANOTHER;
+            ownerAddress = refType->owner_ip();
+            instanceType = refType->instance_type();
+            return;
+    }
 }
     
-void Unmarshaller::unmarshalData( const std::string& marshalledData, co::IType* descriptor, co::Any& value )
+void Unmarshaller::unmarshalValue( const std::string& data, co::IType* descriptor, co::Any& value )
 {
     Argument arg;
-    arg.ParseFromString( marshalledData );
+    arg.ParseFromString( data );
     PBArgToAny( arg, descriptor, value );
 }
     
+// ----- Data Container codec ----- //
+void Unmarshaller::unmarshalData( const std::string& data, bool& value )
+{
+    Data_Container dataContainer;
+    dataContainer.ParseFromString( data );
+    value = dataContainer.boolean();
+}
+
+void Unmarshaller::unmarshalData( const std::string& data, double& value )
+{
+    Data_Container dataContainer;
+    dataContainer.ParseFromString( data );
+    value = dataContainer.numeric();
+}
+
+void Unmarshaller::unmarshalData( const std::string& data, co::int32& value )
+{
+    Data_Container dataContainer;
+    dataContainer.ParseFromString( data );
+    value = static_cast<co::int32>( dataContainer.numeric() );
+}
+
+void Unmarshaller::unmarshalData( const std::string& data, std::string& value )
+{
+    Data_Container dataContainer;
+    dataContainer.ParseFromString( data );
+    value = dataContainer.str();
+}
+
 }
     
 }

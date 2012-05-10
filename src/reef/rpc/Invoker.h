@@ -1,6 +1,7 @@
 #ifndef _REEF_SERVANT_H_
 #define _REEF_SERVANT_H_
 
+#include "Marshaller.h"
 #include "Unmarshaller.h"
 #include <co/Any.h>
 #include <co/RefPtr.h>
@@ -22,8 +23,13 @@ public:
     
      ~Invoker();
     
-    // Expects a unmarshaller in a before-decoding-a-call-msg state (see Unmarshaller).
-    void onCallOrField( Unmarshaller& unmarshaller, co::Any* retValue = 0 );
+    /*
+        Expects a unmarshaller in a before-decoding-a-call-msg state (see Unmarshaller).
+        Returns an already marshalled return value in the marshalledReturn parameter.
+    */
+    void asynchCall( Unmarshaller& unmarshaller );
+    
+    void synchCall( Unmarshaller& unmarshaller, std::string& marshalledReturn );
     
     inline co::IComponent* getComponent() {   return _object->getComponent(); }
     
@@ -34,13 +40,19 @@ private:
 
     // Called by onCall. Extract the parameters from unmarshaller and call method via reflector
     void onMethod( Unmarshaller& unmarshaller, co::int32 facetIdx, co::IMethod* method, 
-                  co::Any* retValue = 0 );
+                  co::Any& returned );
     
-    void onField( Unmarshaller& unmarshaller, co::int32 facetIdx, co::IField* field, co::Any* retValue = 0 );
+    void onGetField( Unmarshaller& unmarshaller, co::int32 facetIdx, co::IField* field, 
+                             co::Any& returned );
+    
+    void onSetField( Unmarshaller& unmarshaller, co::int32 facetIdx, co::IField* field );
     
     // TODO: remove the last param in coral 0.8
-    void onGetParam( Unmarshaller& unmarshaller, co::IType* paramType, co::Any& param, 
+    void unmarshalParameter( Unmarshaller& unmarshaller, co::IType* paramType, co::Any& param, 
                     co::RefVector<co::IObject>& tempRefs );
+    
+    // Identify and marshals an interface that has been returned from an invoke
+    void onInterfaceReturned( co::IService* returned, std::string& marshalledReturn );
    
 private:
     co::RefPtr<co::IObject> _object;
@@ -50,6 +62,8 @@ private:
     co::IComponent* _component;
     
     Node* _node;
+    
+    Marshaller _marshaller;
     
     // initializes _openedService's and Reflector's index for the accessed service
 	void onServiceFirstAccess( co::int32 serviceId );

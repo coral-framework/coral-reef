@@ -43,7 +43,8 @@ public:
 	co::int32 getInstanceID();
 	const std::string& getOwnerAddress();
     
-    inline bool isLocalObject( void* obj ) { return *reinterpret_cast<void**>( obj ) != _classPtr; }
+    static inline bool isLocalObject( void* obj ) 
+        { return *reinterpret_cast<void**>( obj ) != s_classPtr; }
     
 private:
     ClientProxy( Node* node, co::IComponent* component, IActiveLink* connecter, co::int32 instanceID );
@@ -58,19 +59,22 @@ private:
     
     void setComponent( co::IComponent* component );
 
+    void unmarshalReturn( const std::string& data, co::IType* returnedType, 
+                                      co::Any& returned );
     // Awaits a reply from a call. while waiting keeps updating Node.
     void awaitReplyUpdating( std::string& msg );
 private:
     co::RefPtr<Node> _node;
     
-    void* _classPtr;
+    static void* s_classPtr;
     
     co::int32 _instanceID;
     
     Marshaller _marshaller;
     Unmarshaller _unmarshaller;
     co::RefPtr<IActiveLink> _link;
-    co::Any _resultBuffer;    
+    co::Any _resultBuffer;
+    co::RefPtr<co::IObject> _tempRef; //TODO remove
     
     co::int32 _numFacets;
     co::IService** _facets;

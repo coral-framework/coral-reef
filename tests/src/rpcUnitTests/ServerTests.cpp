@@ -48,8 +48,8 @@ TEST( ServerTests, invokerTest )
     co::Any intParam; intParam.set<co::int32>( 4 );
     std::string msg;
     
-    marshaller.beginCallMarshalling( 1, STPort->getIndex(), incrIntMethod->getIndex(), false );
-    marshaller.marshalValueParam( intParam );
+    marshaller.beginCallMarshalling( 1, STPort->getIndex(), incrIntMethod->getIndex(), true );
+    marshaller.addValueParam( intParam );
     marshaller.getMarshalledCall( msg );
     
     MsgType msgType;
@@ -57,7 +57,8 @@ TEST( ServerTests, invokerTest )
     co::int32 msgReceiverID;
 
     unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
-    invoker.onCallOrField( unmarshaller, &intParam );
+    invoker.synchCall( unmarshaller, msg );
+    unmarshaller.unmarshalValue( msg, co::getType( "int32" ), intParam );
     EXPECT_EQ( intParam.get<co::int32>(), 5 );
     
 }

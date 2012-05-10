@@ -11,6 +11,7 @@ namespace rpc {
 
     
 class Message;
+class Argument;
 class Message_Member;
 
     
@@ -65,30 +66,37 @@ public:
      */
     void beginUnmarshallingCall( co::int32& facetIdx, co::int32& memberIdx );
     
-    // Unmarshals a value type parameter
+    // Unmarshals a value type parameter from the current call 
     void unmarshalValueParam( co::Any& param, co::IType* descriptor );
     
-    // Unmarshals a reference type parameter
-    void unmarshalRefParam( co::int32& instanceID, co::int32& facetIdx, RefOwner& owner,
+    // Unmarshals a reference type parameter from the current call
+    void unmarshalReferenceParam( co::int32& instanceID, co::int32& facetIdx, RefOwner& owner,
                      std::string& instanceType, std::string& ownerAddress );
+
     
+    // Unmarshals a rogue reference type
+    void unmarshalReference( const std::string& data, co::int32& instanceID, co::int32& facetIdx, 
+                            RefOwner& owner, std::string& instanceType, std::string& ownerAddress );
+    
+    // Unmarshals a rogue value type
+    void unmarshalValue( const std::string& data, co::IType* descriptor, co::Any& value );
     
     // ----- Just for plain simple types data, so message structure with it ----- //
-    void unmarshalData( const std::string& marshalledData, bool& value );
+    void unmarshalData( const std::string& data, bool& value );
     
-    void unmarshalData( const std::string& marshalledData, double& value );
+    void unmarshalData( const std::string& data, double& value );
     
-    void unmarshalData( const std::string& marshalledData, co::int32& value );
+    void unmarshalData( const std::string& data, co::int32& value );
     
-    void unmarshalData( const std::string& marshalledData, std::string& value );
+    void unmarshalData( const std::string& data, std::string& value );
     
-    void unmarshalData( const std::string& marshalledData, co::IType* descriptor, co::Any& value );
 private:
     void checkIfCallMsg();
     
 private:
     Message* _message;
     MsgType _msgType;
+    Argument* _argument;
     const Message_Member* _msgMember;
     co::int32 _currentParam;
     

@@ -80,7 +80,7 @@ TEST( ClientTests, valueTypeCalls )
     
     // Test the reply
     intParam.set<co::int32>( 4 );
-    marshaller.marshalData( intParam, msg );
+    marshaller.marshalValueType( intParam, msg );
     fakeLink->setReply( msg );
     
     EXPECT_EQ( STService->getStoredInt(), 4 );
@@ -154,7 +154,7 @@ TEST( ClientTests, refTypeCalls )
     std::string ownerAddress;
     
     // ------ Transmission of a Local Object ------ //
-    marshaller.marshalData( intParam, msg );
+    marshaller.marshalValueType( intParam, msg );
     fakeLinkA->setReply( msg );
     EXPECT_EQ( refTypes->callIncrementInt( simpleTypesLocal, 1 ), 5 );
     fakeLinkA->getMsg( msg );
@@ -167,7 +167,7 @@ TEST( ClientTests, refTypeCalls )
     EXPECT_EQ( facetIdx, RTPort->getIndex() );
     EXPECT_EQ( memberIdx, callIncrIntMethod->getIndex() );
     
-    unmarshaller.unmarshalRefParam( instanceID, facetIdx, refOwner, instanceType, ownerAddress );
+    unmarshaller.unmarshalReferenceParam( instanceID, facetIdx, refOwner, instanceType, ownerAddress );
     EXPECT_EQ( instanceID, 1 );
     EXPECT_EQ( facetIdx, STPort->getIndex() );
     EXPECT_EQ( refOwner, Unmarshaller::RefOwner::LOCAL );
@@ -176,7 +176,7 @@ TEST( ClientTests, refTypeCalls )
     
     // ------ Transmission of an Object belonging to the receiver ------ //
     ownerAddress = "notUsedWhenReceiverIsOwner";
-    marshaller.marshalData( intParam, msg );
+    marshaller.marshalValueType( intParam, msg );
     fakeLinkA->setReply( msg );
     refTypes->callIncrementInt( simpleTypesA2, 1 );
     fakeLinkA->getMsg( msg );
@@ -186,7 +186,7 @@ TEST( ClientTests, refTypeCalls )
     EXPECT_EQ( facetIdx, RTPort->getIndex() );
     EXPECT_EQ( memberIdx, callIncrIntMethod->getIndex() );
     
-    unmarshaller.unmarshalRefParam( instanceID, facetIdx, refOwner, instanceType, ownerAddress );
+    unmarshaller.unmarshalReferenceParam( instanceID, facetIdx, refOwner, instanceType, ownerAddress );
     EXPECT_EQ( instanceID, 3 );
     EXPECT_EQ( facetIdx, STPort->getIndex() );
     EXPECT_EQ( refOwner, Unmarshaller::RefOwner::RECEIVER );
@@ -194,7 +194,7 @@ TEST( ClientTests, refTypeCalls )
     EXPECT_STREQ( ownerAddress.c_str(), "notUsedWhenReceiverIsOwner" );
     
     // ------ Transmission of an Object belonging to another owner ------ //
-    marshaller.marshalData( intParam, msg );
+    marshaller.marshalValueType( intParam, msg );
     fakeLinkA->setReply( msg );
     refTypes->callIncrementInt( simpleTypesB, 1 );
     fakeLinkA->getMsg( msg );
@@ -204,7 +204,7 @@ TEST( ClientTests, refTypeCalls )
     EXPECT_EQ( facetIdx, RTPort->getIndex() );
     EXPECT_EQ( memberIdx, callIncrIntMethod->getIndex() );
     
-    unmarshaller.unmarshalRefParam( instanceID, facetIdx, refOwner, instanceType, ownerAddress );
+    unmarshaller.unmarshalReferenceParam( instanceID, facetIdx, refOwner, instanceType, ownerAddress );
     EXPECT_EQ( instanceID, 3 );
     EXPECT_EQ( facetIdx, STPort->getIndex() );
     EXPECT_EQ( refOwner, Unmarshaller::RefOwner::ANOTHER );

@@ -1,7 +1,7 @@
 #include "Invoker.h"
 
 #include "Node.h"
-#include "Node.h"
+#include "ClientProxy.h"
 
 #include <co/IPort.h>
 #include <co/IField.h>
@@ -36,10 +36,11 @@ Invoker::~Invoker()
 
 }
     
-void Invoker::onCallOrField( Unmarshaller& unmarshaller, co::Any* retValue )
+void Invoker::asynchCall( Unmarshaller& unmarshaller )
 {
     co::int32 facetIdx;
     co::int32 memberIdx;
+    
     unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx );
     
     if( !_openedServices[facetIdx] ) // if already used before access directly
@@ -50,16 +51,47 @@ void Invoker::onCallOrField( Unmarshaller& unmarshaller, co::Any* retValue )
     
     if( kind == co::MK_METHOD )
     {
-        onMethod( unmarshaller, facetIdx, co::cast<co::IMethod>( member ), retValue );
+        co::Any dummy;
+        onMethod( unmarshaller, facetIdx, co::cast<co::IMethod>( member ), dummy );
     }
     else if( kind == co::MK_FIELD )
     {
-        onField( unmarshaller, facetIdx, co::cast<co::IField>( member ), retValue );
+        onSetField( unmarshaller, facetIdx, co::cast<co::IField>( member ) );
+    }    
+}
+       
+void Invoker::synchCall( Unmarshaller& unmarshaller, std::string& marshalledReturn )
+{
+    co::int32 facetIdx;
+    co::int32 memberIdx;
+    co::Any returned;
+    
+    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx );
+    
+    if( !_openedServices[facetIdx] ) // if already used before access directly
+        onServiceFirstAccess( facetIdx );
+    
+    co::IMember* member = _openedInterfaces[facetIdx]->getMembers()[memberIdx];
+    co::MemberKind kind = member->getKind();
+    
+    if( kind == co::MK_METHOD )
+    {
+        onMethod( unmarshaller, facetIdx, co::cast<co::IMethod>( member ), returned );
     }
+    else if( kind == co::MK_FIELD )
+    {
+        onGetField( unmarshaller, facetIdx, co::cast<co::IField>( member ), returned );
+    }
+   
+    // Marshals the return from the call
+    if( returned.getKind() != co::TK_INTERFACE )
+        _marshaller.marshalValueType( returned, marshalledReturn );
+    else
+        onInterfaceReturned( returned.get<co::IService*>(), marshalledReturn );
 }
 
 void Invoker::onMethod( Unmarshaller& unmarshaller, co::int32 facetIdx, co::IMethod* method, 
-                           co::Any* retValue )
+                           co::Any& returned )
 {
     // TODO: remove this and maky the co::any's reference the objects themselves
     co::RefVector<co::IObject> tempReferences;
@@ -71,39 +103,33 @@ void Invoker::onMethod( Unmarshaller& unmarshaller, co::int32 facetIdx, co::IMet
     args.resize( size );
     for( int i = 0; i < size; i++ )
     {
-        onGetParam( unmarshaller, params[i]->getType(), args[i], tempReferences );
+        unmarshalParameter( unmarshaller, params[i]->getType(), args[i], tempReferences );
     }
 
-    if( !retValue )
-    {
-        co::Any dummy;
-        _openedReflectors[facetIdx]->invoke( _openedServices[facetIdx], method, args, dummy );
-    }
-    else
-    {
-        _openedReflectors[facetIdx]->invoke( _openedServices[facetIdx], method, args, *retValue );
-    }
+    _openedReflectors[facetIdx]->invoke( _openedServices[facetIdx], method, args, returned );
 }
     
-void Invoker::onField( Unmarshaller& unmarshaller, co::int32 facetIdx, co::IField* field, co::Any* retValue )
+void Invoker::onGetField( Unmarshaller& unmarshaller, co::int32 facetIdx, co::IField* field, 
+                      co::Any& returned )
 {
     // TODO: remove this and maky the co::any's reference the objects themselves
     co::RefVector<co::IObject> tempReferences;
     
-    if( !retValue )
-    {
-        co::Any value;
-        onGetParam( unmarshaller, field->getType(), value, tempReferences );
-    
-        _openedReflectors[facetIdx]->setField( _openedServices[facetIdx], field, value );
-    }
-    else
-    {
-        _openedReflectors[facetIdx]->getField( _openedServices[facetIdx], field, *retValue );
-    }
+    _openedReflectors[facetIdx]->getField( _openedServices[facetIdx], field, returned );
 }
- 
-void Invoker::onGetParam( Unmarshaller& unmarshaller, co::IType* paramType, co::Any& param, 
+
+void Invoker::onSetField( Unmarshaller& unmarshaller, co::int32 facetIdx, co::IField* field )
+{
+    // TODO: remove this and maky the co::any's reference the objects themselves
+    co::RefVector<co::IObject> tempReferences;
+    
+    co::Any value;
+    unmarshalParameter( unmarshaller, field->getType(), value, tempReferences );
+    
+    _openedReflectors[facetIdx]->setField( _openedServices[facetIdx], field, value );
+}
+    
+void Invoker::unmarshalParameter( Unmarshaller& unmarshaller, co::IType* paramType, co::Any& param, 
                          co::RefVector<co::IObject>& tempRefs )
 {
     if( paramType->getKind() != co::TK_INTERFACE )
@@ -118,7 +144,7 @@ void Invoker::onGetParam( Unmarshaller& unmarshaller, co::IType* paramType, co::
     std::string instanceType;
     std::string ownerAddress;
     
-    unmarshaller.unmarshalRefParam( instanceID, facetIdx, owner, instanceType, ownerAddress );
+    unmarshaller.unmarshalReferenceParam( instanceID, facetIdx, owner, instanceType, ownerAddress );
     co::IObject* instance;
     switch( owner )
     {
@@ -133,13 +159,40 @@ void Invoker::onGetParam( Unmarshaller& unmarshaller, co::IType* paramType, co::
     }
     tempRefs.push_back( instance ); // TODO: remove
     
-    co::Range<co::IPort* const> ports = _object->getComponent()->getFacets();
+    co::Range<co::IPort* const> ports = instance->getComponent()->getFacets();
     
     co::IPort* port = ports[facetIdx];
     co::IService* service = instance->getServiceAt( port );
     param.set<co::IService*>( service );
 }
+
+void Invoker::onInterfaceReturned( co::IService* returned, std::string& marshalledReturn )
+{
+    co::IObject* provider = returned->getProvider();
+    std::string providerType = provider->getComponent()->getFullName();
+    co::int32 facetIdx = returned->getFacet()->getIndex();
+    co::int32 instanceID;
     
+    if( ClientProxy::isLocalObject( provider ) )
+    {
+        instanceID = _node->publishAnonymousInstance( provider );
+        _marshaller.addReferenceParam( instanceID, facetIdx, Marshaller::RefOwner::LOCAL, &providerType, 
+                                    &_node->getPublicAddress() );
+    }
+    else // is a remote object, so it provides the IInstanceInfo service
+    {
+        ClientProxy* providerRO = static_cast<ClientProxy*>( provider );
+        IInstanceInfo* info = static_cast<IInstanceInfo*>( providerRO );
+        
+        instanceID = info->getInstanceID();
+        const std::string& ownerAddress = info->getOwnerAddress();
+        
+        _node->requestBeginAccess( ownerAddress, instanceID, "TODO" );
+        _marshaller.addReferenceParam( instanceID, facetIdx, Marshaller::RefOwner::ANOTHER, 
+                                      &providerType, &ownerAddress );
+    }
+}
+
 void Invoker::onServiceFirstAccess( co::int32 serviceId )
 {
 	co::Range<co::IPort* const> ports = _object->getComponent()->getFacets();

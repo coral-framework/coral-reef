@@ -246,18 +246,14 @@ void Node::onMsgForInvoker( co::int32 instanceID, bool hasReturn )
     Invoker* invoker = getInvokerFor( instanceID );
     if( !hasReturn )
     {
-        invoker->onCallOrField( _unmarshaller );
+        invoker->asynchCall( _unmarshaller );
         return;
     }
     
-    co::Any retValue;
-    retValue.set<co::int32>( 42 );
-    invoker->onCallOrField( _unmarshaller, &retValue );
+    std::string returned;
+    invoker->synchCall( _unmarshaller, returned );
     
-    std::string msg;
-    _marshaller.marshalData( retValue, msg );
-    
-    _passiveLink->sendReply( msg );
+    _passiveLink->sendReply( returned );
 }
 
 co::int32 Node::publishAnonymousInstance( co::IObject* instance )
