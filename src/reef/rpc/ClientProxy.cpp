@@ -270,7 +270,7 @@ void ClientProxy::onInterfaceParam( co::IService* param )
     if( isLocalObject( provider ) )
     {
         instanceID = _node->publishAnonymousInstance( provider );
-        _marshaller.addReferenceParam( instanceID, facetIdx, Marshaller::RefOwner::LOCAL, &providerType, 
+        _marshaller.addReferenceParam( instanceID, facetIdx, Marshaller::LOCAL, &providerType, 
                              &_node->getPublicAddress() );
     }
     else // is a remote object, so it provides the IInstanceInfo service
@@ -283,12 +283,12 @@ void ClientProxy::onInterfaceParam( co::IService* param )
         
         if( ownerAddress == _link->getAddress() ) // Receiver
         {
-            _marshaller.addReferenceParam( instanceID, facetIdx, Marshaller::RefOwner::RECEIVER );
+            _marshaller.addReferenceParam( instanceID, facetIdx, Marshaller::RECEIVER );
         }
         else
         {
             _node->requestBeginAccess( ownerAddress, instanceID, "TODO" );
-            _marshaller.addReferenceParam( instanceID, facetIdx, Marshaller::RefOwner::ANOTHER, &providerType, 
+            _marshaller.addReferenceParam( instanceID, facetIdx, Marshaller::ANOTHER, &providerType,
                                  &ownerAddress );
         }
     }

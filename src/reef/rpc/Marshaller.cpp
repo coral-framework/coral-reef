@@ -262,15 +262,15 @@ void Marshaller::reference2PBArg( co::int32 instanceID, co::int32 facetIdx, RefO
     
     switch( owner )
     {
-        case RefOwner::LOCAL:
+    case LOCAL:
             refType->set_owner( Ref_Type::OWNER_LOCAL );
             refType->set_owner_ip( *ownerAddress );
             refType->set_instance_type( *instanceType );
             break;
-        case RefOwner::RECEIVER:
+    case RECEIVER:
             refType->set_owner( Ref_Type::OWNER_RECEIVER );
             break;
-        case RefOwner::ANOTHER:
+    case ANOTHER:
             refType->set_owner( Ref_Type::OWNER_ANOTHER );
             refType->set_owner_ip( *ownerAddress );
             refType->set_instance_type( *instanceType );

@@ -135,16 +135,16 @@ void Message_Type2MsgType( Message_Type message_type, Unmarshaller::MsgType& msg
     switch( message_type )
     {
         case Message::MSG_NEW_INST:
-            msgType = Unmarshaller::MsgType::NEW_INST;
+            msgType = Unmarshaller::NEW_INST;
             break;
         case Message::MSG_ACCESS_INST:
-            msgType = Unmarshaller::MsgType::ACCESS_INST;
+            msgType = Unmarshaller::ACCESS_INST;
             break;
         case Message::MSG_FIND_INST:
-            msgType = Unmarshaller::MsgType::FIND_INST;
+            msgType = Unmarshaller::FIND_INST;
             break;
         case Message::MSG_CALL:
-            msgType = Unmarshaller::MsgType::CALL;
+            msgType = Unmarshaller::CALL;
             break;
     }
 }
@@ -174,14 +174,14 @@ void Unmarshaller::setMarshalledRequest( const std::string& request, MsgType& ty
     Message_Type2MsgType( _message->msg_type(), type );
     _msgType = type;
     
-    if( type != MsgType::CALL )
+    if( type != CALL )
         *referer = _message->referer_ip();
 }
 
 // if msg type is NEW, then, this function will decode it
 void Unmarshaller::unmarshalNewInstance( std::string& typeName )
 {
-    assert( _msgType == MsgType::NEW_INST );
+    assert( _msgType == NEW_INST );
     
     const Message_New_Inst& msgNewInst = _message->msg_new_inst();
     typeName = msgNewInst.new_instance_type();
@@ -189,7 +189,7 @@ void Unmarshaller::unmarshalNewInstance( std::string& typeName )
 
 void Unmarshaller::unmarshalAccessInstance( co::int32& instanceID, bool& increment )
 {
-    assert( _msgType == MsgType::ACCESS_INST );
+    assert( _msgType == ACCESS_INST );
     
     const Message_Acc_Inst& msgAccessInst = _message->msg_acc_inst();
     // refererIP = msgAccessInst.referer_ip();
@@ -199,7 +199,7 @@ void Unmarshaller::unmarshalAccessInstance( co::int32& instanceID, bool& increme
    
 void Unmarshaller::unmarshalFindInstance( std::string& key )
 {
-    assert( _msgType == MsgType::FIND_INST );
+    assert( _msgType == FIND_INST );
     
     const Message_Find_Inst& msgFindInst = _message->msg_find_inst();
     key = msgFindInst.key();
@@ -210,7 +210,7 @@ void Unmarshaller::unmarshalFindInstance( std::string& key )
  */
 void Unmarshaller::beginUnmarshallingCall( co::int32& facetIdx, co::int32& memberIdx )
 {
-    assert( _msgType == MsgType::CALL );
+    assert( _msgType == CALL );
     
     _msgMember = &_message->msg_member();
     _currentParam = 0;
@@ -235,15 +235,15 @@ void Unmarshaller::unmarshalReferenceParam( co::int32& instanceID, co::int32& fa
     switch( refType.owner() )
     {
         case Ref_Type::OWNER_LOCAL:
-            owner = RefOwner::LOCAL;
+            owner = LOCAL;
             ownerAddress = refType.owner_ip();
             instanceType = refType.instance_type();
             return;
         case Ref_Type::OWNER_RECEIVER:
-            owner = RefOwner::RECEIVER;
+            owner = RECEIVER;
             return;
         case Ref_Type::OWNER_ANOTHER:
-            owner = RefOwner::ANOTHER;
+            owner = ANOTHER;
             ownerAddress = refType.owner_ip();
             instanceType = refType.instance_type();
             return;

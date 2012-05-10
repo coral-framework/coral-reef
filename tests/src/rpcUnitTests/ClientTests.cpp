@@ -62,7 +62,7 @@ TEST( ClientTests, valueTypeCalls )
     
     unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
     
-    EXPECT_EQ( msgType, MsgType::CALL );
+    EXPECT_EQ( msgType, Unmarshaller::CALL );
     EXPECT_EQ( msgReceiverID, 9 );
     EXPECT_FALSE( hasReturn );
     
@@ -160,7 +160,7 @@ TEST( ClientTests, refTypeCalls )
     fakeLinkA->getMsg( msg );
 
     unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
-    EXPECT_EQ( msgType, MsgType::CALL );
+    EXPECT_EQ( msgType, Unmarshaller::CALL );
     EXPECT_EQ( msgReceiverID, 3 );
     EXPECT_TRUE( hasReturn );
     unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx );
@@ -170,7 +170,7 @@ TEST( ClientTests, refTypeCalls )
     unmarshaller.unmarshalReferenceParam( instanceID, facetIdx, refOwner, instanceType, ownerAddress );
     EXPECT_EQ( instanceID, 1 );
     EXPECT_EQ( facetIdx, STPort->getIndex() );
-    EXPECT_EQ( refOwner, Unmarshaller::RefOwner::LOCAL );
+    EXPECT_EQ( refOwner, Unmarshaller::LOCAL );
     EXPECT_STREQ( instanceType.c_str(), "moduleA.TestComponent" );
     EXPECT_STREQ( ownerAddress.c_str(), "addressLocal" );
     
@@ -189,7 +189,7 @@ TEST( ClientTests, refTypeCalls )
     unmarshaller.unmarshalReferenceParam( instanceID, facetIdx, refOwner, instanceType, ownerAddress );
     EXPECT_EQ( instanceID, 3 );
     EXPECT_EQ( facetIdx, STPort->getIndex() );
-    EXPECT_EQ( refOwner, Unmarshaller::RefOwner::RECEIVER );
+    EXPECT_EQ( refOwner, Unmarshaller::RECEIVER );
     EXPECT_STREQ( instanceType.c_str(), "moduleA.TestComponent" );
     EXPECT_STREQ( ownerAddress.c_str(), "notUsedWhenReceiverIsOwner" );
     
@@ -207,7 +207,7 @@ TEST( ClientTests, refTypeCalls )
     unmarshaller.unmarshalReferenceParam( instanceID, facetIdx, refOwner, instanceType, ownerAddress );
     EXPECT_EQ( instanceID, 3 );
     EXPECT_EQ( facetIdx, STPort->getIndex() );
-    EXPECT_EQ( refOwner, Unmarshaller::RefOwner::ANOTHER );
+    EXPECT_EQ( refOwner, Unmarshaller::ANOTHER );
     EXPECT_STREQ( instanceType.c_str(), "moduleA.TestComponent" );
     EXPECT_STREQ( ownerAddress.c_str(), "addressB" );
 }
