@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 #include "Node.h"
-#include <ClientProxy.h>
+#include "ClientProxy.h"
 
 #include <mockReef/IFakeLink.h>
 #include <moduleA/ISimpleTypes.h>
@@ -20,6 +20,7 @@ namespace rpc {
 
     
 typedef Unmarshaller::MsgType MsgType;
+typedef co::RefPtr<co::IObject> objptr;
     
 TEST( ClientTests, valueTypeCalls )
 {
@@ -210,8 +211,71 @@ TEST( ClientTests, refTypeCalls )
     EXPECT_EQ( refOwner, Unmarshaller::ANOTHER );
     EXPECT_STREQ( instanceType.c_str(), "moduleA.TestComponent" );
     EXPECT_STREQ( ownerAddress.c_str(), "addressB" );
+
+
+
 }
+
+TEST( ClientTests, refTypeReturns )
+{
+	Unmarshaller unmarshaller;
+    Marshaller marshaller;
+
+	/* ------ Initialization of remote objects for Testing all cases of ref type parameter
+       ------(refer to reef's wiki for the cases of ref type params)               ------ */
+    co::RefPtr<co::IObject> fakeLinkObjA = co::newInstance( "mockReef.FakeLink" );
+    mockReef::IFakeLink* fakeLinkA = fakeLinkObjA->getService<mockReef::IFakeLink>();
+    rpc::IActiveLink* activeLinkA = fakeLinkObjA->getService<rpc::IActiveLink>();
+    fakeLinkA->setAddress( "addressA" );
+   
+    // Node is needed internally
+    co::RefPtr<Node> node = new rpc::Node();
+    rpc::ITransport* transport = co::newInstance( "mockReef.Transport" )->getService<rpc::ITransport>();
+    node->setService( "transport", transport );
+    node->start( "addressLocal", "addressLocal" );
     
+	co::IComponent* TCComponent = co::cast<co::IComponent>( co::getType( "moduleA.TestComponent" ) );
+	
+	// get the ISimpleTypes port so we can know the index of the port to check later.
+	co::IPort* STPort = co::cast<co::IPort>( TCComponent->getMember( "simple" ) );
+    co::IPort* RTPort = co::cast<co::IPort>( TCComponent->getMember( "reference" ) );
+    
+    // A supposedly remote object for a TC in host "A"
+    co::RefPtr<co::IObject> remoteObjectA = ClientProxy::getOrCreateClientProxy( 
+                                                            node.get(), TCComponent, activeLinkA, 3 );
+   
+	moduleA::IReferenceTypes* refTypes = remoteObjectA->getService<moduleA::IReferenceTypes>();
+
+	// Creating a local object that will be used internally when its id is returned
+	co::RefPtr<co::IObject> localObj = co::newInstance( "moduleA.TestComponent" );
+	// Publishing the local object so when its id is returned, the CLientProxy can access it
+	node->publishInstance( localObj.get(), "irrelevant" );
+	moduleA::ISimpleTypes* localSimple = localObj->getService<moduleA::ISimpleTypes>();
+	localSimple->setStoredInt( 5 );
+
+	// Incept the local object's id as a to-be-returned value into the fakelink 
+	std::string reference;
+	marshaller.marshalReferenceType( 1, STPort->getIndex(), Marshaller::RECEIVER, reference );
+	fakeLinkA->setReply( reference );
+
+	// Call a method that will receive the incepted local obj id as return value
+	EXPECT_EQ( refTypes->getSimple()->getStoredInt(), 5 );
+
+	std::string instanceType = "moduleA.TestComponent";
+	std::string ownerAddress = "address";
+	marshaller.marshalReferenceType( 5, STPort->getIndex(), Marshaller::ANOTHER, reference,
+								&instanceType, &ownerAddress );
+	fakeLinkA->setReply( reference );
+
+	// Call a method that will receive the incepted local obj id as return value
+	co::RefPtr<moduleA::ISimpleTypes> simple = refTypes->getSimple();
+	ClientProxy* providerRO = static_cast<ClientProxy*>( simple->getProvider() );
+    IInstanceInfo* info = static_cast<IInstanceInfo*>( providerRO );
+        
+     EXPECT_EQ( info->getInstanceID(), 5 );
+	 EXPECT_STREQ( info->getOwnerAddress().c_str(), "address" );
+}
+
 }
     
 }

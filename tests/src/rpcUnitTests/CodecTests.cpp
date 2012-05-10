@@ -85,16 +85,16 @@ TEST( CodecTests, simpleTypesTest )
     co::int32 memberIdx;
     
     // all the possible parameter types
-    co::Any intParam; intParam.set<co::int32>( 6 );
-    co::Any doubleParam; doubleParam.set<double>( 6.0 );
+    co::Any intAny; intAny.set<co::int32>( 6 );
+    co::Any doubleAny; doubleAny.set<double>( 6.0 );
     co::Any stringParam;
     std::string& stringParamString = stringParam.createString();
     stringParamString = "hello";
-    co::Any boolParam; boolParam.set<bool>( true );
-    co::Any intArrayParam;
-    co::Any stringArrayParam;
-    std::vector<co::uint8>& intArray = intArrayParam.createArray( co::getType( "int32" ), 10 );
-    std::vector<co::uint8>& stringArray = stringArrayParam.createArray( co::getType( "string" ), 10 );
+    co::Any boolAny; boolAny.set<bool>( true );
+    co::Any intArrayAny;
+    co::Any stringArrayAny;
+    std::vector<co::uint8>& intArray = intArrayAny.createArray( co::getType( "int32" ), 10 );
+    std::vector<co::uint8>& stringArray = stringArrayAny.createArray( co::getType( "string" ), 10 );
     for( int i = 0; i < 10; i++ )
 	{
         char letter[2];
@@ -105,12 +105,12 @@ TEST( CodecTests, simpleTypesTest )
 	}
     
     marshaller.beginCallMarshalling( 3, 4, 5, true );
-    marshaller.addValueParam( intParam );
-    marshaller.addValueParam( doubleParam );
+    marshaller.addValueParam( intAny );
+    marshaller.addValueParam( doubleAny );
     marshaller.addValueParam( stringParam );
-    marshaller.addValueParam( boolParam );
-    marshaller.addValueParam( intArrayParam );
-    marshaller.addValueParam( stringArrayParam );
+    marshaller.addValueParam( boolAny );
+    marshaller.addValueParam( intArrayAny );
+    marshaller.addValueParam( stringArrayAny );
     marshaller.getMarshalledCall( msg );
     
     unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
@@ -140,13 +140,13 @@ TEST( CodecTests, simpleTypesTest )
     EXPECT_STREQ( param.get<const std::string&>().c_str(), "hello" );
     unmarshaller.unmarshalValueParam( param, boolType );
     EXPECT_TRUE( param.get<bool>() );
-    co::Any intArrayParam2;
-    unmarshaller.unmarshalValueParam( intArrayParam2, intArrayType );
-    co::Any stringArrayParam2;
-    unmarshaller.unmarshalValueParam( stringArrayParam2, stringArrayType );
+    co::Any intArrayParam;
+    unmarshaller.unmarshalValueParam( intArrayParam, intArrayType );
+    co::Any stringArrayParam;
+    unmarshaller.unmarshalValueParam( stringArrayParam, stringArrayType );
     
-    const co::Range<const co::int32> intRange = intArrayParam2.get<const co::Range<const co::int32> >();
-    const co::Range<const std::string> stringRange = stringArrayParam2.get<const co::Range<const std::string> >();
+    const co::Range<const co::int32> intRange = intArrayParam.get<const co::Range<const co::int32> >();
+    const co::Range<const std::string> stringRange = stringArrayParam.get<const co::Range<const std::string> >();
     for( int i = 0; i < 10; i++ )
     {
         char letter[2];
@@ -156,6 +156,41 @@ TEST( CodecTests, simpleTypesTest )
         EXPECT_EQ( intRange[i], i );
     }
 
+	// Test rogue values methods
+	co::Any value;
+    marshaller.marshalValueType( intAny, msg );
+	unmarshaller.unmarshalValue( msg, intType, value );
+	EXPECT_EQ( value.get<co::int32>(), 6 );
+
+	marshaller.marshalValueType( doubleAny, msg );
+	unmarshaller.unmarshalValue( msg, doubleType, value );
+	EXPECT_EQ( value.get<double>(), 6.0 );
+
+	marshaller.marshalValueType( stringParam, msg );
+	unmarshaller.unmarshalValue( msg, stringType, value );
+	EXPECT_STREQ( value.get<const std::string&>().c_str(), "hello" );
+
+	marshaller.marshalValueType( boolAny, msg );
+	unmarshaller.unmarshalValue( msg, boolType, value );
+	EXPECT_TRUE( value.get<bool>() );
+
+	co::Any intArrayValue;
+	marshaller.marshalValueType( intArrayAny, msg );
+	unmarshaller.unmarshalValue( msg, intArrayType, intArrayValue );
+	co::Any stringArrayValue;
+	marshaller.marshalValueType( stringArrayAny, msg );
+	unmarshaller.unmarshalValue( msg, stringArrayType, stringArrayValue );
+
+	const co::Range<const co::int32> intRange2 = intArrayValue.get<const co::Range<const co::int32> >();
+    const co::Range<const std::string> stringRange2 = stringArrayValue.get<const co::Range<const std::string> >();
+    for( int i = 0; i < 10; i++ )
+    {
+        char letter[2];
+		letter[0] = 65 + i;
+		letter[1] = '\0';
+        EXPECT_STREQ( stringRange2[i].c_str(), letter );
+        EXPECT_EQ( intRange2[i], i );
+    }
 }
     
 }

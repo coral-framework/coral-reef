@@ -24,7 +24,7 @@ public:
      ~Invoker();
     
     /*
-        Expects a unmarshaller in a before-decoding-a-call-msg state (see Unmarshaller).
+        Expects a unmarshaller in a before-unmarshalling-a-call-msg state (see Unmarshaller).
         Returns an already marshalled return value in the marshalledReturn parameter.
     */
     void asynchCall( Unmarshaller& unmarshaller );
