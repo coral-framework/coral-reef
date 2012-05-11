@@ -244,13 +244,13 @@ void Marshaller::marshalReferenceType( co::int32 instanceID, co::int32 facetIdx,
                                       std::string& reference, const std::string* instanceType, 
                                           const std::string* ownerAddress )
 {
-    Argument* PBArg = new Argument();
-    reference2PBArg( instanceID, facetIdx, owner, PBArg, instanceType, ownerAddress );
-    PBArg->SerializeToString( &reference );
+    Argument PBArg;
+    reference2PBArg( instanceID, facetIdx, owner, &PBArg, instanceType, ownerAddress );
+    PBArg.SerializeToString( &reference );
 }
     
 void Marshaller::reference2PBArg( co::int32 instanceID, co::int32 facetIdx, RefOwner owner, 
-                                    Argument*& PBArg, const std::string* instanceType, 
+                                    Argument* PBArg, const std::string* instanceType, 
                                     const std::string* ownerAddress )
 {
     Data_Container* dc = PBArg->add_data();

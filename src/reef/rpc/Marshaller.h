@@ -80,7 +80,7 @@ public:
     
 private:
     void reference2PBArg( co::int32 instanceID, co::int32 facetIdx, RefOwner owner, 
-                         Argument*& PBArg, const std::string* instanceType = 0, 
+                         Argument* PBArg, const std::string* instanceType = 0, 
                          const std::string* ownerAddress = 0 );
     
     void checkIfCallMsg();
