@@ -279,7 +279,7 @@ void ClientProxy::onInterfaceParam( co::IService* param )
         IInstanceInfo* info = static_cast<IInstanceInfo*>( providerRO );
         
         instanceID = info->getInstanceID();
-        const std::string& ownerAddress = info->getOwnerAddress();
+        const std::string ownerAddress = info->getOwnerAddress();
         
         if( ownerAddress == _link->getAddress() ) // Receiver
         {

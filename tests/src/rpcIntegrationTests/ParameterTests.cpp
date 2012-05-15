@@ -153,6 +153,17 @@ TEST( ParameterTests, refTypeParameterTest )
     EXPECT_EQ( refTypesServiceInA->callIncrementInt( simpleTypesServiceInB, 3 ), 4 );
     EXPECT_EQ( refTypesServiceInA->callDivideDouble( simpleTypesServiceInB, 15, 5 ), 3 );
     EXPECT_STREQ( refTypesServiceInA->concatenateString( simpleTypesServiceInB, "aaa", "bbb" ).c_str(), "aaabbb" );
+    /*
+    refTypesServiceInA->setSimple( simpleTypesServiceInB );
+    EXPECT_EQ( simpleTypesServiceInB, refTypesServiceInA->getSimple() );
+    
+    moduleA::ISimpleTypes* simple = serverB->getInstance( 1 )->getService<moduleA::ISimpleTypes>();
+    
+    EXPECT_NE( simpleTypesServiceInB, simple );
+    
+    simple->setStoredInt( 7 );
+    
+    EXPECT_EQ( simple->getStoredInt(), simpleTypesServiceInB->getStoredInt() );*/
 }
 
 }

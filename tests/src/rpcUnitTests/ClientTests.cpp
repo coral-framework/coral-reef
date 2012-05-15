@@ -232,7 +232,6 @@ TEST( ClientTests, refTypeReturns )
 	
 	// get the ISimpleTypes port so we can know the index of the port to check later.
 	co::IPort* STPort = co::cast<co::IPort>( TCComponent->getMember( "simple" ) );
-    co::IPort* RTPort = co::cast<co::IPort>( TCComponent->getMember( "reference" ) );
     
     // A supposedly remote object for a TC in host "A"
     co::RefPtr<co::IObject> remoteObjectA = ClientProxy::getOrCreateClientProxy( 

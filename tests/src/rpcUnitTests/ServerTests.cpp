@@ -32,7 +32,6 @@ TEST( ServerTests, invokerValueTypeTest )
     
 	// get the ports so we can know the index of the port to check later.
 	co::IPort* STPort = co::cast<co::IPort>( TCComponent->getMember( "simple" ) );
-	co::IPort* RTPort = co::cast<co::IPort>( TCComponent->getMember( "reference" ) );
     
 	// get the ISimpleTypes service of TestComponent
 	moduleA::ISimpleTypes* STService = TCObject->getService<moduleA::ISimpleTypes>();

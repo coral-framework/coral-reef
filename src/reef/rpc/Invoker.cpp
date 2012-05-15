@@ -185,7 +185,7 @@ void Invoker::onInterfaceReturned( co::IService* returned, std::string& marshall
         IInstanceInfo* info = static_cast<IInstanceInfo*>( providerRO );
         
         instanceID = info->getInstanceID();
-        const std::string& ownerAddress = info->getOwnerAddress();
+        std::string ownerAddress = info->getOwnerAddress();
         
         _node->requestBeginAccess( ownerAddress, instanceID, "TODO" );
         _marshaller.marshalReferenceType( instanceID, facetIdx, Marshaller::RefOwner::ANOTHER, 

@@ -35,6 +35,7 @@ end
 
 function Transport:__init()
 	self.net = setmetatable( { msgs = {}, replies = {}, nodes = {} }, { __index = net__index } )
+	self.openLinks = {}
 end
 
 function Transport:bind( address )
@@ -42,6 +43,12 @@ function Transport:bind( address )
 end
 
 function Transport:connect( address )
+	local link = self.openLinks[address]
+	
+	if not link then
+		link = ActiveLink { net = self.net, address = address }.active
+		self.openLinks[address] = link
+	end
 	return ActiveLink { net = self.net, address = address }.active
 end
 
