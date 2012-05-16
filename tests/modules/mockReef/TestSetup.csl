@@ -1,0 +1,6 @@
+@lua.Scripted( "mockReef.TestSetup" )
+
+component TestSetup
+{
+	provides ITestSetup setup;
+};

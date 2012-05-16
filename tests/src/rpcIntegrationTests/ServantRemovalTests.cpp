@@ -3,6 +3,7 @@
 #include <moduleA/ISimpleTypes.h>
 #include <moduleA/IComplexTypes.h>
 #include <moduleA/IReferenceTypes.h>
+#include <mockReef/ITestSetup.h>
 
 #include <reef/rpc/INode.h>
 #include <reef/rpc/ITransport.h>
@@ -18,38 +19,21 @@ namespace rpc {
     
 TEST( InvokerRemovalTests, simpleTest )
 {
-    co::RefPtr<co::IObject> transportObj = co::newInstance( "mockReef.Transport" );
-    rpc::ITransport* transport = transportObj->getService<rpc::ITransport>();
+    co::RefPtr<co::IObject> testSetup = co::newInstance( "mockReef.TestSetup" );
+    mockReef::ITestSetup* setup = testSetup->getService<mockReef::ITestSetup>();
+    setup->initTest( 3 );
     
-    co::RefPtr<co::IObject> hostANodeObj = co::newInstance( "reef.rpc.Node" );
-    hostANodeObj->setService( "transport", transport );
-    
-    co::RefPtr<co::IObject> hostCNodeObj = co::newInstance( "reef.rpc.Node" );
-    hostCNodeObj->setService( "transport", transport );
-    
-    co::RefPtr<co::IObject> hostBNodeObj = co::newInstance( "reef.rpc.Node" );
-    hostBNodeObj->setService( "transport", transport );
-    
-    rpc::INode* hostA = hostANodeObj->getService<rpc::INode>();
-    rpc::INode* hostC = hostCNodeObj->getService<rpc::INode>();
-    rpc::INode* hostB = hostBNodeObj->getService<rpc::INode>();
-    transportObj->setService( "node", hostA );
-    transportObj->setService( "node", hostC );
-    transportObj->setService( "node", hostB );
-    
-    hostA->start( "addressA", "addressA" );    
-    
-    hostC->start( "addressC", "addressC" );
-    
-    hostB->start( "addressB", "addressB" );
+    reef::rpc::INode* hostA = setup->getNode( 1 );
+    reef::rpc::INode* hostB = setup->getNode( 2 );
+    reef::rpc::INode* hostC = setup->getNode( 3 );
     
     co::RefVector<co::IObject> objects;
-    objects.push_back( hostC->newRemoteInstance( "moduleA.TestComponent", "addressA" ) );
-    objects.push_back( hostC->newRemoteInstance( "moduleA.TestComponent", "addressB" ) );
-    objects.push_back( hostB->newRemoteInstance( "moduleA.TestComponent", "addressA" ) );
-    objects.push_back( hostB->newRemoteInstance( "moduleA.TestComponent", "addressC" ) );
-    objects.push_back( hostA->newRemoteInstance( "moduleA.TestComponent", "addressC" ) );
-    objects.push_back( hostA->newRemoteInstance( "moduleA.TestComponent", "addressB" ) );
+    objects.push_back( hostC->newRemoteInstance( "moduleA.TestComponent", "address1" ) );
+    objects.push_back( hostC->newRemoteInstance( "moduleA.TestComponent", "address2" ) );
+    objects.push_back( hostB->newRemoteInstance( "moduleA.TestComponent", "address1" ) );
+    objects.push_back( hostB->newRemoteInstance( "moduleA.TestComponent", "address3" ) );
+    objects.push_back( hostA->newRemoteInstance( "moduleA.TestComponent", "address3" ) );
+    objects.push_back( hostA->newRemoteInstance( "moduleA.TestComponent", "address2" ) );
     
     // Each host should have 2 instances with 1 reference each.
     EXPECT_EQ( hostA->getRemoteReferences( 1 ), 1 );
@@ -95,6 +79,8 @@ TEST( InvokerRemovalTests, simpleTest )
     EXPECT_EQ( hostB->getRemoteReferences( 2 ), 0 );
     EXPECT_EQ( hostC->getRemoteReferences( 1 ), 0 );
     EXPECT_EQ( hostC->getRemoteReferences( 2 ), 0 );
+    
+    setup->tearDown();
 }
     
 }

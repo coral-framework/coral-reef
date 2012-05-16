@@ -1,0 +1,34 @@
+import reef.rpc.INode;
+
+/*
+	Creates a mock transportLayer with the provided number of Nodes bound to it.
+	The Node's addresses follow a addressX pattern, where X is its index in the Node list.
+*/
+interface ITestSetup
+{
+	/*
+		Starts the transport layer, creates nodes and binds them
+	*/
+	void initTest( in int32 numNodes );
+	
+	/*
+		Get the node in position \a index starting at 1 (lua style)
+	*/
+	INode getNode( in int32 index );
+	
+	/*
+		Deletes a node at \a index position. The index will be lost and never reused.
+	*/
+	void removeNode( in int32 index );
+	
+	/*
+		Creates a new node and binds it to the transport with \a address address. If \a address is
+		"" then the node's address will follow the same pattern of addressX where X is its index.
+	*/
+	INode spawnNode( in string address );
+	
+	/*
+		Clear all the internal message queues and nodes.
+	*/
+	void tearDown();
+};

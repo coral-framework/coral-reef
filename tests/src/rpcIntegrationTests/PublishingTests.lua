@@ -1,27 +1,10 @@
 function publishTest()
-	local transportObj = co.new "mockReef.Transport"
-	local transport = transportObj.transport
-	local serverANodeObj = co.new "reef.rpc.Node"
-	serverANodeObj.transport = transport
+	local setup = co.new "mockReef.TestSetup".setup
+	setup:initTest( 3 )
 	
-	local cliNodeObj = co.new "reef.rpc.Node"
-	cliNodeObj.transport = transport
-	
-	local serverBNodeObj = co.new "reef.rpc.Node"
-	serverBNodeObj.transport = transport
-	
-	local server = serverANodeObj.node;
-	local clientA = cliNodeObj.node
-	local clientB = serverBNodeObj.node
-	transportObj.node = server
-	transportObj.node = clientA
-	transportObj.node = clientB
-	
-	server:start( "addressServer", "addressServer" )   
-	
-	clientA:start( "addressA", "addressA" )
-	
-	clientB:start( "addressB", "addressB" )
+	local clientA = setup:getNode( 1 )
+	local clientB = setup:getNode( 2 )
+	local server = setup:getNode( 3 )
 	
 	--[[ Testes the access to the published instance ]]
 	
@@ -32,8 +15,8 @@ function publishTest()
 	simpleTypes.storedInt = 5
 	
 	-- Gets the published instance proxy in the clients
-	local instanceTCinA = clientA:findRemoteInstance( "moduleA.TestComponent", "key", "addressServer" )
-	local instanceTCinB = clientB:findRemoteInstance( "moduleA.TestComponent", "key", "addressServer" )
+	local instanceTCinA = clientA:findRemoteInstance( "moduleA.TestComponent", "key", "address3" )
+	local instanceTCinB = clientB:findRemoteInstance( "moduleA.TestComponent", "key", "address3" )
 	
 	-- tests if the value matches in client A and changes it
 	ASSERT_TRUE( instanceTCinA and instanceTCinB )
@@ -63,7 +46,7 @@ function publishTest()
 	EXPECT_EQ( references, 0 )
 	
 	-- Checks if a remotely created instance is accessible locally
-	local newInstProxy = clientA:newRemoteInstance( "moduleA.TestComponent", "addressServer" )
+	local newInstProxy = clientA:newRemoteInstance( "moduleA.TestComponent", "address3" )
 	newInstProxy.simple.storedInt = 8
 	local newInst = server:getInstance( 2 )
 	EXPECT_EQ( newInst.simple.storedInt, 8 )
@@ -73,10 +56,10 @@ function publishTest()
 	EXPECT_EQ( references, 1 )
 	
 	-- Checks if the ID counting is correct
-	clientB:newRemoteInstance( "moduleA.TestComponent", "addressServer" )
-	clientB:newRemoteInstance( "moduleA.TestComponent", "addressServer" )
-	clientB:newRemoteInstance( "moduleA.TestComponent", "addressServer" )
-	newInstProxy = clientB:newRemoteInstance( "moduleA.TestComponent", "addressServer" )
+	clientB:newRemoteInstance( "moduleA.TestComponent", "address3" )
+	clientB:newRemoteInstance( "moduleA.TestComponent", "address3" )
+	clientB:newRemoteInstance( "moduleA.TestComponent", "address3" )
+	newInstProxy = clientB:newRemoteInstance( "moduleA.TestComponent", "address3" )
 	newInstProxy.simple.storedInt = 9
 	newInst = server:getInstance( 6 )
 	EXPECT_EQ( newInst.simple.storedInt, 9 )
@@ -84,5 +67,7 @@ function publishTest()
 	-- Checks if clientA is referer
 	references = server:getRemoteReferences( 6 )
 	EXPECT_EQ( references, 1 )
+	
+	setup:tearDown()
 end
 

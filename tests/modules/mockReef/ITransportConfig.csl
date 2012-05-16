@@ -1,0 +1,4 @@
+interface ITransportConfig
+{
+	void clearNetwork();
+};

@@ -33,30 +33,49 @@ function net__index:check( address )
 	return msg
 end
 
+local net = setmetatable( { msgs = {}, replies = {}, nodes = {} }, { __index = net__index } )
+
 function Transport:__init()
-	self.net = setmetatable( { msgs = {}, replies = {}, nodes = {} }, { __index = net__index } )
 	self.openLinks = {}
 end
 
 function Transport:bind( address )
-	return PassiveLink { net = self.net, address = address }.passive
+	return PassiveLink { net = net, address = address }.passive
 end
 
 function Transport:connect( address )
 	local link = self.openLinks[address]
 	
 	if not link then
-		link = ActiveLink { net = self.net, address = address }.active
+		link = ActiveLink { net = net, address = address }.active
 		self.openLinks[address] = link
 	end
-	return ActiveLink { net = self.net, address = address }.active
+	return link
 end
 
 function Transport:setNodeService( node )
-	self.net.nodes[#self.net.nodes+1] = node
+ 	if not self.addedNodes then
+ 		self.addedNodes = {}
+ 	end
+ 	local index = #net.nodes+1
+ 	table.insert( self.addedNodes, index )
+ 	
+	net.nodes[index] = node
 end
 
 function Transport:getNodeService()
 	return nil
 end
+
+function Transport:clearNetwork()
+	net = setmetatable( { msgs = {}, replies = {}, nodes = {} }, { __index = net__index } )
+end
+
+function Transport:removeNodesFromNetwork()
+	for i,v in ipairs( self.addedNodes ) do
+		table.remove( net.nodes, index )
+	end
+end
+
+
 return Transport

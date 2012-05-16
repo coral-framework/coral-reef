@@ -2,7 +2,6 @@ local ActiveLink = co.Component( { name = "mockReef.ActiveLink",
 								provides = { active = "reef.rpc.IActiveLink" } } )
 
 function ActiveLink:send( msg )
-	--print( "ActiveLink of address ".. self.address .. " sent: " .. tostring( msg ) )
 	self.net:send( self.address, msg )
 	self.net:updateAll()
 end

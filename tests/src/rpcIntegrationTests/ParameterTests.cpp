@@ -3,6 +3,7 @@
 #include <moduleA/ISimpleTypes.h>
 #include <moduleA/IComplexTypes.h>
 #include <moduleA/IReferenceTypes.h>
+#include <mockReef/ITestSetup.h>
 
 #include <reef/rpc/INode.h>
 #include <reef/rpc/ITransport.h>
@@ -18,26 +19,14 @@ namespace rpc {
     
 TEST( ParameterTests, simpleTypesTest )
 {
-    co::RefPtr<co::IObject> transportObj = co::newInstance( "mockReef.Transport" );
-    rpc::ITransport* transport = transportObj->getService<rpc::ITransport>();
+    co::RefPtr<co::IObject> testSetup = co::newInstance( "mockReef.TestSetup" );
+    mockReef::ITestSetup* setup = testSetup->getService<mockReef::ITestSetup>();
+    setup->initTest( 2 );
     
-    co::RefPtr<co::IObject> serverNodeObj = co::newInstance( "reef.rpc.Node" );
-    serverNodeObj->setService( "transport", transport );
-    
-    co::RefPtr<co::IObject> cliNodeObj = co::newInstance( "reef.rpc.Node" );
-    cliNodeObj->setService( "transport", transport );
-    
-    rpc::INode* server = serverNodeObj->getService<rpc::INode>();
-    rpc::INode* client = cliNodeObj->getService<rpc::INode>();
-    transportObj->setService( "node", server );
-    transportObj->setService( "node", client );
-    
-    server->start( "address1", "address1" );    
-    
-    client->start( "address2", "address2" );
+    reef::rpc::INode* client = setup->getNode( 1 );
     
     co::RefPtr<co::IObject> remoteInstance = client->newRemoteInstance( "moduleA.TestComponent",
-                                                            "address1" );
+                                                            "address2" );
     moduleA::ISimpleTypes* simple = remoteInstance->getService<moduleA::ISimpleTypes>();
     
     simple->setDouble( 0.1 );
@@ -98,43 +87,26 @@ TEST( ParameterTests, simpleTypesTest )
     
     EXPECT_STREQ( stringRange[0].c_str(), stringVec[2].c_str() );
     EXPECT_STREQ( stringRange[1].c_str(), stringVec2[2].c_str() );
+    
+    setup->tearDown();
 }
 
 TEST( ParameterTests, refTypeParameterTest )
 {
-    co::RefPtr<co::IObject> transportObj = co::newInstance( "mockReef.Transport" );
-    rpc::ITransport* transport = transportObj->getService<rpc::ITransport>();
+    co::RefPtr<co::IObject> testSetup = co::newInstance( "mockReef.TestSetup" );
+    mockReef::ITestSetup* setup = testSetup->getService<mockReef::ITestSetup>();
+    setup->initTest( 3 );
     
-    co::RefPtr<co::IObject> serverANodeObj = co::newInstance( "reef.rpc.Node" );
-    serverANodeObj->setService( "transport", transport );
-    
-    co::RefPtr<co::IObject> cliNodeObj = co::newInstance( "reef.rpc.Node" );
-    cliNodeObj->setService( "transport", transport );
-    
-    co::RefPtr<co::IObject> serverBNodeObj = co::newInstance( "reef.rpc.Node" );
-    serverBNodeObj->setService( "transport", transport );
-    
-    rpc::INode* serverA = serverANodeObj->getService<rpc::INode>();
-    rpc::INode* client = cliNodeObj->getService<rpc::INode>();
-    rpc::INode* serverB = serverBNodeObj->getService<rpc::INode>();
-    transportObj->setService( "node", serverA );
-    transportObj->setService( "node", client );
-    transportObj->setService( "node", serverB );
-    
-    serverA->start( "addressA", "addressA" );    
-    
-    client->start( "addressClient", "addressClient" );
-    
-    serverB->start( "addressB", "addressB" );
-
+    reef::rpc::INode* serverB = setup->getNode( 2 );
+    reef::rpc::INode* client = setup->getNode( 3 );
 
     co::RefPtr<co::IObject> instanceInA = client->newRemoteInstance( "moduleA.TestComponent",
-                                                                "addressA" );
+                                                                "address1" );
     moduleA::IReferenceTypes* refTypesServiceInA = instanceInA->getService<moduleA::IReferenceTypes>();
     moduleA::ISimpleTypes* simpleTypesServiceInA = instanceInA->getService<moduleA::ISimpleTypes>();
     
     co::RefPtr<co::IObject> instanceInB = client->newRemoteInstance( "moduleA.TestComponent",
-                                                                    "addressB" );
+                                                                    "address2" );
     moduleA::ISimpleTypes* simpleTypesServiceInB = instanceInB->getService<moduleA::ISimpleTypes>();
 
     
@@ -153,7 +125,7 @@ TEST( ParameterTests, refTypeParameterTest )
     EXPECT_EQ( refTypesServiceInA->callIncrementInt( simpleTypesServiceInB, 3 ), 4 );
     EXPECT_EQ( refTypesServiceInA->callDivideDouble( simpleTypesServiceInB, 15, 5 ), 3 );
     EXPECT_STREQ( refTypesServiceInA->concatenateString( simpleTypesServiceInB, "aaa", "bbb" ).c_str(), "aaabbb" );
-    /*
+    
     refTypesServiceInA->setSimple( simpleTypesServiceInB );
     EXPECT_EQ( simpleTypesServiceInB, refTypesServiceInA->getSimple() );
     
@@ -163,7 +135,9 @@ TEST( ParameterTests, refTypeParameterTest )
     
     simple->setStoredInt( 7 );
     
-    EXPECT_EQ( simple->getStoredInt(), simpleTypesServiceInB->getStoredInt() );*/
+    EXPECT_EQ( simple->getStoredInt(), simpleTypesServiceInB->getStoredInt() );
+    
+    setup->tearDown();
 }
 
 }

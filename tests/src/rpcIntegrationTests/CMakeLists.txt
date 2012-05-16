@@ -4,18 +4,21 @@
 
 project( RPCINTEGRATIONTESTS )
 
+CORAL_GENERATE_MAPPINGS( _GENERATED_MAPPINGS "mockReef.ITestSetup" )
+
 include_directories(
 	${GTEST_INCLUDE_DIRS}
 	${moduleA_BINARY_DIR}/generated
 	${CMAKE_BINARY_DIR}/src/reef/rpc/generated
 	${CMAKE_SOURCE_DIR}/src/reef/rpc
+	${CMAKE_CURRENT_BINARY_DIR}/generated
 )
 
 # Gather source files in the current directory
 file( GLOB _HEADERS *.h )
 file( GLOB _SOURCES *.cpp )
 
-add_executable( rpcIntegrationTests EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} )
+add_executable( rpcIntegrationTests EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} ${_GENERATED_MAPPINGS} )
 add_dependencies( rpcIntegrationTests moduleA mockReef rpc )
 
 CORAL_TARGET( rpcIntegrationTests )
@@ -50,3 +53,6 @@ if( VALGRIND_COMMAND )
 	)
 	CORAL_TEST_ENVIRONMENT( rpcIntegrationTests_MemoryCheck )
 endif()
+
+
+source_group( "@Generated" FILES ${_GENERATED_MAPPINGS} )
