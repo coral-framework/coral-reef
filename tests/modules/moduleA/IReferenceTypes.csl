@@ -1,4 +1,4 @@
-interface IReferenceTypes
+interface IReferenceTypes extends IRefParent
 {
 	ISimpleTypes simple;
 	

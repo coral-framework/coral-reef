@@ -52,9 +52,19 @@ public:
         _storedSimple = simple;
     }
     
+    void setParentSimple( moduleA::ISimpleTypes* simple )
+    {
+        _storedParentSimple = simple;
+    }
+    
     moduleA::ISimpleTypes* getSimple()
     {
         return _storedSimple.get();
+    }
+    
+    moduleA::ISimpleTypes* getParentSimple()
+    {
+        return _storedParentSimple.get();
     }
     
     co::int32 intFromSimple()
@@ -104,6 +114,11 @@ public:
 		return service->incrementInt( number );
 	}
     
+    co::int32 parentCall( moduleA::ISimpleTypes* service, co::int32 number )
+	{
+		return service->incrementInt( number );
+	}
+    
 	const std::string& concatenateString( moduleA::ISimpleTypes* service, const std::string& str1, const std::string& str2 )
 	{
 		_storedString = service->concatenateString( str1, str2 );
@@ -141,6 +156,16 @@ public:
 	{
 		_storedInt = storedInt;
 	}
+    
+    co::int32 getParentInt()
+	{
+		return _storedParentInt;
+	}
+    
+	void setParentInt( co::int32 parentInt )
+	{
+		_storedParentInt = parentInt;
+	}
 
 	co::Range<co::int32 const> getStoredIntList()
 	{
@@ -172,6 +197,16 @@ public:
 		co::assign( storedStringList, _storedStringList );
 	}
 
+    co::Range<std::string const> getParentStringList()
+	{
+		return _storedParentStringList;
+	}
+    
+	void setParentStringList( co::Range<std::string const> parentStringList )
+	{
+		co::assign( parentStringList, _storedParentStringList );
+	}
+    
 	// -------------------- Methods --------------------- //
 
 	const std::string& concatenateString( const std::string& str1, const std::string& str2 )
@@ -257,6 +292,25 @@ public:
 		return _storedDoubleList;
 	}
 
+    co::Range<double const> parentMergeLists( co::Range<double const> list1, co::Range<double const> list2 )
+	{
+		_storedParentDoubleList.clear();
+        
+		co::assign( list1, _storedParentDoubleList );
+        
+		for( ; list2; list2.popFirst() )
+		{
+			_storedParentDoubleList.push_back( list2.getFirst() );
+		}
+        
+		return _storedParentDoubleList;
+	}
+    
+    double parentMultiply( double number, co::int32 times )
+    {
+        return number * times;
+    }
+    
 	void setDouble( double number )
 	{
 		_storedDouble = number;
@@ -284,6 +338,7 @@ public:
 
 private:
     co::RefPtr<moduleA::ISimpleTypes> _storedSimple;
+    co::RefPtr<moduleA::ISimpleTypes> _storedParentSimple;
     
 	// member variables
 	moduleA::StringNativeClass _stringNativeClass;
@@ -291,10 +346,13 @@ private:
 	co::int32 _dummy;
 	double _storedDouble;
 	std::vector<double> _storedDoubleList;
+    std::vector<double> _storedParentDoubleList;
 	co::int32 _storedInt;
+    co::int32 _storedParentInt;
 	std::vector<co::int32> _storedIntList;
 	std::string _storedString;
 	std::vector<std::string> _storedStringList;
+    std::vector<std::string> _storedParentStringList;
 };
 
 CORAL_EXPORT_COMPONENT( TestComponent, TestComponent );

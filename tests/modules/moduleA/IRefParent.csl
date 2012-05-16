@@ -1,0 +1,13 @@
+/*
+	Reference types parent interface used for testing inheritance
+*/
+
+interface IRefParent
+{
+	ISimpleTypes parentSimple;
+	
+	/*
+	Calls the increment int method on \a service passing \a number as parameter. Returns the result
+	*/
+	int32 parentCall( in ISimpleTypes service, in int32 number );
+};

@@ -3,7 +3,7 @@
 	In order to test, call a method, check values, then call another method.
 */
 
-interface ISimpleTypes
+interface ISimpleTypes extends ISimpleParent
 {
 	// simple types fields
 	int32 storedInt;

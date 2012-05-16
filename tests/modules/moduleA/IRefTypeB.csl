@@ -1,6 +1,0 @@
-interface IRefTypeB
-{
-	double doubleField;
-	
-	double divide( in double dividend, in double divisor );
-};

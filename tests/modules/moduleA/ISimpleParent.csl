@@ -1,0 +1,15 @@
+/*
+	Simple types parent interface used for testing inheritance
+*/
+
+interface ISimpleParent
+{
+	int32 parentInt;
+	
+	string[] parentStringList;
+	
+		// synchronous functions to test parameters and return
+	double parentMultiply( in double number, in int32 times );
+	
+	double[] parentMergeLists( in double[] list1, in double[] list2 );
+};
