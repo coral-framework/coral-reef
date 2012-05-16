@@ -5,27 +5,38 @@ function test()
 	
 	local client = setup:getNode( 3 )
 	
-	local instanceInA = client:newRemoteInstance( "moduleA.TestComponent",	"address1" )
-	local refTypesServiceInA = instanceInA.reference
-	local simpleTypesServiceInA = instanceInA.simple
+	local instanceIn1 = client:newRemoteInstance( "moduleA.TestComponent",	"address1" )
+	local refTypesServiceIn1 = instanceIn1.reference
+	local simpleTypesServiceIn1 = instanceIn1.simple
 	
-	local instanceInB = client:newRemoteInstance( "moduleA.TestComponent", "address2" )
-	local simpleTypesServiceInB = instanceInB.simple
+	local instanceIn2 = client:newRemoteInstance( "moduleA.TestComponent", "address2" )
+	local simpleTypesServiceIn2 = instanceIn2.simple
+	local refTypesServiceIn2 = instanceIn2.reference
 	
 	local instanceLocal = co.new "moduleA.TestComponent"
 	local simpleTypesServiceLocal = instanceLocal.simple
 	
-	EXPECT_EQ( refTypesServiceInA:callIncrementInt( simpleTypesServiceInA, 3 ), 4 )
-	EXPECT_EQ( refTypesServiceInA:callDivideDouble( simpleTypesServiceInA, 15, 5 ), 3 )
-	EXPECT_EQ( refTypesServiceInA:concatenateString( simpleTypesServiceInA, "aaa", "bbb" ), "aaabbb" )
+	EXPECT_EQ( refTypesServiceIn1:callIncrementInt( simpleTypesServiceIn1, 3 ), 4 )
+	EXPECT_EQ( refTypesServiceIn1:callDivideDouble( simpleTypesServiceIn1, 15, 5 ), 3 )
+	EXPECT_EQ( refTypesServiceIn1:concatenateString( simpleTypesServiceIn1, "aaa", "bbb" ), "aaabbb" )
 	
-	EXPECT_EQ( refTypesServiceInA:callIncrementInt( simpleTypesServiceLocal, 3 ), 4 )
-	EXPECT_EQ( refTypesServiceInA:callDivideDouble( simpleTypesServiceLocal, 15, 5 ), 3 )
-	EXPECT_EQ( refTypesServiceInA:concatenateString( simpleTypesServiceLocal, "aaa", "bbb" ), "aaabbb" )
+	EXPECT_EQ( refTypesServiceIn1:callIncrementInt( simpleTypesServiceLocal, 3 ), 4 )
+	EXPECT_EQ( refTypesServiceIn1:callDivideDouble( simpleTypesServiceLocal, 15, 5 ), 3 )
+	EXPECT_EQ( refTypesServiceIn1:concatenateString( simpleTypesServiceLocal, "aaa", "bbb" ), "aaabbb" )
 	
-	EXPECT_EQ( refTypesServiceInA:callIncrementInt( simpleTypesServiceInB, 3 ), 4 )
-	EXPECT_EQ( refTypesServiceInA:callDivideDouble( simpleTypesServiceInB, 15, 5 ), 3 )
-	EXPECT_EQ( refTypesServiceInA:concatenateString( simpleTypesServiceInB, "aaa", "bbb" ), "aaabbb" )
+	EXPECT_EQ( refTypesServiceIn1:callIncrementInt( simpleTypesServiceIn2, 3 ), 4 )
+	EXPECT_EQ( refTypesServiceIn1:callDivideDouble( simpleTypesServiceIn2, 15, 5 ), 3 )
+	EXPECT_EQ( refTypesServiceIn1:concatenateString( simpleTypesServiceIn2, "aaa", "bbb" ), "aaabbb" )
+	
+	refTypesServiceIn1.simple = simpleTypesServiceIn2
+	refTypesServiceIn2.simple = simpleTypesServiceIn1
+	
+	EXPECT_EQ( refTypesServiceIn1.simple, simpleTypesServiceIn2 )
+	
+	local localInstanceIn1 = setup:getNode( 1 ):getInstance( 1 )
+	localInstanceIn1.simple.storedInt = 10
+	
+	EXPECT_EQ( refTypesServiceIn2.simple.storedInt, 10 )
 	
 	setup:tearDown()
 end
