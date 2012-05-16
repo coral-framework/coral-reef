@@ -31,6 +31,15 @@ function TestSetup:deleteNode( index )
 	self.transports[index] = "empty"
 end
 
+function TestSetup:publishForAll( componentType, keyPrefix )
+	for i,v in ipairs( self.nodes ) do
+		if type(v) == "userdata" then
+			local instance = co.new( componentType )
+			v.node:publishInstance( instance, keyPrefix .. tostring( i ) )
+		end
+	end
+end
+
 function TestSetup:spawnNode( address )
 	local i = #self.nodes + 1
 

@@ -28,6 +28,12 @@ interface ITestSetup
 	INode spawnNode( in string address );
 	
 	/*
+		Instantiates a new component of \a componentType and publishes in every node under key 
+		\a keyPrefix concatenated with the node index
+	*/
+	void publishForAll( in string componentType, in string keyPrefix );
+	
+	/*
 		Clear all the internal message queues and nodes.
 	*/
 	void tearDown();
