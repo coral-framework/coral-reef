@@ -36,9 +36,9 @@ public:
 
     void stop();
        
-	co::IObject* getInstance( co::int32 instanceID );
+	co::IObject* getInstance( co::int32 instanceId );
     
-    co::int32 getRemoteReferences( co::int32 instanceID );
+    co::int32 getRemoteReferences( co::int32 instanceId );
     
 	co::int32 publishInstance( co::IObject* instance, const std::string& key );
     
@@ -62,15 +62,15 @@ public:
     co::int32 publishAnonymousInstance( co::IObject* instance );
     
     // Informs the instance owner about a new access to the instance (increase instance's ref count)
-    void requestBeginAccess( const std::string& address, co::int32 instanceID,
+    void requestBeginAccess( const std::string& address, co::int32 instanceId,
                                const std::string& referer );
     
     // Informs the instance owner about a new access to the instance (increase instance's ref count)
-    void requestEndAccess( reef::rpc::IActiveLink* link, co::int32 instanceID,
+    void requestEndAccess( reef::rpc::IActiveLink* link, co::int32 instanceId,
                             const std::string& referer );
     
     // returns a proxy to the requested remote instance
-    co::IObject* getRemoteInstance( const std::string& instanceType, co::int32 instanceID, 
+    co::IObject* getRemoteInstance( const std::string& instanceType, co::int32 instanceId, 
                                           const std::string& ownerAddress );
     
 private:
@@ -84,33 +84,33 @@ private:
     void dispatchMessage( const std::string& msg );
     
     // If a message is destined to the own Node it will be dispatched to these methods.
-    void onNewInstMsg(); // creates instance, start its ref counting and replies the instanceID
+    void onNewInstMsg(); // creates instance, start its ref counting and replies the instanceId
     void onAccessInstMsg(); // increments the instance ref count
     void onFindInstMsg(); // finds an instance published under a key, increment ref and return ID
     
-    void onMsgForInvoker( co::int32 instanceID, bool hasReturn );
+    void onMsgForInvoker( co::int32 instanceId, bool hasReturn );
        
 private:
     // Add a new reference for an instance. TODO: set referer
-    void openRemoteReference( co::int32 instanceID );
+    void openRemoteReference( co::int32 instanceId );
     
     /*
      Remove a remote reference to the instance. If there are no more references,
      remove the internal reference to it and cleear the virtual address.
      */
-    void closeRemoteReference( co::int32 instanceID ); // TODO clear referer
+    void closeRemoteReference( co::int32 instanceId ); // TODO clear referer
     
-    // Creates a invoker for the instance and returns its new instanceID
+    // Creates a invoker for the instance and returns its new instanceId
     co::int32 startRemoteRefCount( co::IObject* instance );
 
-    void releaseInstance( co::int32 instanceID );
+    void releaseInstance( co::int32 instanceId );
     
     co::int32 newVirtualAddress();
     
-    Invoker* getInvokerFor( co::int32 instanceID );
+    Invoker* getInvokerFor( co::int32 instanceId );
     
     // returns -1 if not found
-    co::int32 getInstanceID( const co::IObject* instance );
+    co::int32 getinstanceId( const co::IObject* instance );
     
 private:
     ITransport* _transport;

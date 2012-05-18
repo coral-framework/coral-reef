@@ -22,7 +22,7 @@ class ClientProxy : public ClientProxy_Base
 public:
     // Gets or creates a remote object pointing to an existing instance. 
     static ClientProxy* getOrCreateClientProxy( Node* node, co::IComponent* component, 
-                                                 IActiveLink* link, co::int32 instanceID );
+                                                 IActiveLink* link, co::int32 instanceId );
     ClientProxy();
     virtual ~ClientProxy();
     
@@ -39,15 +39,14 @@ public:
     co::int32 dynamicRegisterService( co::IService* dynamicServiceProxy );
     void dynamicSetField( co::int32 dynFacetId, co::IField* field, const co::Any& value );
     
-    // IInstanceInfo
-	co::int32 getInstanceID();
+	co::int32 getInstanceId();
 	const std::string& getOwnerAddress();
     
     static inline bool isLocalObject( void* obj ) 
         { return *reinterpret_cast<void**>( obj ) != s_classPtr; }
     
 private:
-    ClientProxy( Node* node, co::IComponent* component, IActiveLink* connecter, co::int32 instanceID );
+    ClientProxy( Node* node, co::IComponent* component, IActiveLink* connecter, co::int32 instanceId );
     
     /* 
      Treats all possible cases of a TK_INTERFACE param in a call/field msg. 
@@ -63,21 +62,27 @@ private:
                                       co::Any& returned );
     // Awaits a reply from a call. while waiting keeps updating Node.
     void awaitReplyUpdating( std::string& msg );
+    
+    /* Returns the depth in the hierarchy of \memberOwner among the supertypes of \facet. 
+       Returns -1 in case memberOwner is the facet */
+    co::int32 findDepth( co::IInterface* facet, co::ICompositeType* memberOwner );
 private:
     co::RefPtr<Node> _node;
     
     static void* s_classPtr;
     
-    co::int32 _instanceID;
+    co::int32 _instanceId;
     
     Marshaller _marshaller;
     Unmarshaller _unmarshaller;
     co::RefPtr<IActiveLink> _link;
+    std::string _address; //!< the address of the host that own the actual object proxied by this.
     co::Any _resultBuffer;
     co::RefPtr<co::IObject> _tempRef; //TODO remove
     
     co::int32 _numFacets;
     co::IService** _facets;
+    co::IInterface** _interfaces;
     co::IComponent* _component;
 };
 

@@ -24,6 +24,7 @@ TEST( ClientTests, valueTypeCalls )
     co::RefPtr<co::IObject> fakeLinkObj = co::newInstance( "mockReef.FakeLink" );
     mockReef::IFakeLink* fakeLink = fakeLinkObj->getService<mockReef::IFakeLink>();
     rpc::IActiveLink* activeLink = fakeLinkObj->getService<rpc::IActiveLink>();
+    fakeLink->setAddress( "address" );
     
     Unmarshaller unmarshaller;
     Marshaller marshaller;
@@ -47,8 +48,20 @@ TEST( ClientTests, valueTypeCalls )
     
     // get the ISimpleTypes service's interface. Then, get the methods we want to check indices later.
     co::IInterface* STInterface = STService->getInterface();
-	co::IMethod* setIntMethod = co::cast<co::IMethod>( STInterface->getMember( "setInt" ) );
+    co::IInterface* parent = STInterface->getBaseType();
+    co::IInterface* gParent = parent->getBaseType();
     
+    EXPECT_EQ( parent, STInterface->getSuperTypes()[0] );
+    EXPECT_EQ( gParent, STInterface->getSuperTypes()[1] );
+    
+    // If this assert fails, coral's internal type hierarchy has changed.
+    ASSERT_EQ( 3, STInterface->getSuperTypes().getSize() );
+    
+	co::IMethod* setIntMethod = co::cast<co::IMethod>( STInterface->getMember( "setInt" ) );
+    co::IField* parentIntField = co::cast<co::IField>( parent->getMember( "parentInt" ) );
+    co::IField* gParentIntField = co::cast<co::IField>( gParent->getMember( "grandParentInt" ) );
+    
+    // Testing a regular method //
     STService->setInt( 3 );
     std::string msg;
     fakeLink->getMsg( msg );
@@ -67,10 +80,12 @@ TEST( ClientTests, valueTypeCalls )
     // ------ call value types TODO:Complex types
     co::int32 facetIdx;
     co::int32 memberIdx;
+    co::int32 memberOwner;
     
-    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx );
+    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, memberOwner );
     EXPECT_EQ( facetIdx, STPort->getIndex() );
     EXPECT_EQ( memberIdx, setIntMethod->getIndex() );
+    EXPECT_EQ( memberOwner, -1 );
     
     co::Any intParam;
     unmarshaller.unmarshalValueParam( intParam, co::getType( "int32" ) );
@@ -82,6 +97,52 @@ TEST( ClientTests, valueTypeCalls )
     fakeLink->setReply( msg );
     
     EXPECT_EQ( STService->getStoredInt(), 4 );
+    
+    // Testing an inherited method //
+    STService->setParentInt( 4 );
+    fakeLink->getMsg( msg );
+    
+    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
+    
+    EXPECT_FALSE( hasReturn );
+    
+    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, memberOwner );
+    EXPECT_EQ( facetIdx, STPort->getIndex() );
+    EXPECT_EQ( memberIdx, parentIntField->getIndex() );
+    EXPECT_EQ( memberOwner, 0 );
+    
+    unmarshaller.unmarshalValueParam( intParam, co::getType( "int32" ) );
+    EXPECT_EQ( intParam.get<co::int32>(), 4 );
+    
+    // Test the reply
+    intParam.set<co::int32>( 5 );
+    marshaller.marshalValueType( intParam, msg );
+    fakeLink->setReply( msg );
+    
+    EXPECT_EQ( STService->getParentInt(), 5 );
+    
+    // Testing a method inherited from grandparent //
+    STService->setGrandParentInt( 5 );
+    fakeLink->getMsg( msg );
+    
+    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
+    
+    EXPECT_FALSE( hasReturn );
+    
+    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, memberOwner );
+    EXPECT_EQ( facetIdx, STPort->getIndex() );
+    EXPECT_EQ( memberIdx, gParentIntField->getIndex() );
+    EXPECT_EQ( memberOwner, 1 );
+    
+    unmarshaller.unmarshalValueParam( intParam, co::getType( "int32" ) );
+    EXPECT_EQ( intParam.get<co::int32>(), 5 );
+    
+    // Test the reply
+    intParam.set<co::int32>( 6 );
+    marshaller.marshalValueType( intParam, msg );
+    fakeLink->setReply( msg );
+    
+    EXPECT_EQ( STService->getGrandParentInt(), 6 );
 }
     
 TEST( ClientTests, refTypeCalls )
@@ -134,9 +195,11 @@ TEST( ClientTests, refTypeCalls )
     
     // get the ISimpleTypes service's interface. Then, get the methods we want to check indices later.
     co::IInterface* RTInterface = RTPort->getType();
+    co::IInterface* parent = RTInterface->getBaseType();
 	co::IMethod* callIncrIntMethod = co::cast<co::IMethod>( RTInterface->getMember( "callIncrementInt" ) );
+    co::IMethod* parentCall = co::cast<co::IMethod>( parent->getMember( "parentCall" ) );
     
-    // ------ test the transmission of a objects ------ //
+    // ------ test the transmission of objects ------ //
     
     // All the necessary variables for the ref type transmission tests
     co::Any intParam; intParam.set<co::int32>( 5 );
@@ -146,7 +209,8 @@ TEST( ClientTests, refTypeCalls )
     co::int32 msgReceiverID;
     co::int32 facetIdx;
     co::int32 memberIdx;
-    co::int32 instanceID;
+    co::int32 instanceId;
+    co::int32 typeDepth;
     Unmarshaller::RefOwner refOwner;
     std::string instanceType;
     std::string ownerAddress;
@@ -154,19 +218,20 @@ TEST( ClientTests, refTypeCalls )
     // ------ Transmission of a Local Object ------ //
     marshaller.marshalValueType( intParam, msg );
     fakeLinkA->setReply( msg );
-    EXPECT_EQ( refTypes->callIncrementInt( simpleTypesLocal, 1 ), 5 );
+    EXPECT_EQ( refTypes->parentCall( simpleTypesLocal, 1 ), 5 );
     fakeLinkA->getMsg( msg );
 
     unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
     EXPECT_EQ( msgType, Unmarshaller::CALL );
     EXPECT_EQ( msgReceiverID, 3 );
     EXPECT_TRUE( hasReturn );
-    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx );
+    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, typeDepth );
     EXPECT_EQ( facetIdx, RTPort->getIndex() );
-    EXPECT_EQ( memberIdx, callIncrIntMethod->getIndex() );
+    EXPECT_EQ( memberIdx, parentCall->getIndex() );
+    EXPECT_EQ( typeDepth, 0 );
     
-    unmarshaller.unmarshalReferenceParam( instanceID, facetIdx, refOwner, instanceType, ownerAddress );
-    EXPECT_EQ( instanceID, 1 );
+    unmarshaller.unmarshalReferenceParam( instanceId, facetIdx, refOwner, instanceType, ownerAddress );
+    EXPECT_EQ( instanceId, 1 );
     EXPECT_EQ( facetIdx, STPort->getIndex() );
     EXPECT_EQ( refOwner, Unmarshaller::LOCAL );
     EXPECT_STREQ( instanceType.c_str(), "moduleA.TestComponent" );
@@ -180,12 +245,12 @@ TEST( ClientTests, refTypeCalls )
     fakeLinkA->getMsg( msg );
     
     unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
-    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx );
+    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, typeDepth );
     EXPECT_EQ( facetIdx, RTPort->getIndex() );
     EXPECT_EQ( memberIdx, callIncrIntMethod->getIndex() );
     
-    unmarshaller.unmarshalReferenceParam( instanceID, facetIdx, refOwner, instanceType, ownerAddress );
-    EXPECT_EQ( instanceID, 3 );
+    unmarshaller.unmarshalReferenceParam( instanceId, facetIdx, refOwner, instanceType, ownerAddress );
+    EXPECT_EQ( instanceId, 3 );
     EXPECT_EQ( facetIdx, STPort->getIndex() );
     EXPECT_EQ( refOwner, Unmarshaller::RECEIVER );
     EXPECT_STREQ( instanceType.c_str(), "moduleA.TestComponent" );
@@ -198,12 +263,12 @@ TEST( ClientTests, refTypeCalls )
     fakeLinkA->getMsg( msg );
     
     unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
-    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx );
+    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, typeDepth );
     EXPECT_EQ( facetIdx, RTPort->getIndex() );
     EXPECT_EQ( memberIdx, callIncrIntMethod->getIndex() );
     
-    unmarshaller.unmarshalReferenceParam( instanceID, facetIdx, refOwner, instanceType, ownerAddress );
-    EXPECT_EQ( instanceID, 3 );
+    unmarshaller.unmarshalReferenceParam( instanceId, facetIdx, refOwner, instanceType, ownerAddress );
+    EXPECT_EQ( instanceId, 3 );
     EXPECT_EQ( facetIdx, STPort->getIndex() );
     EXPECT_EQ( refOwner, Unmarshaller::ANOTHER );
     EXPECT_STREQ( instanceType.c_str(), "moduleA.TestComponent" );
@@ -261,12 +326,11 @@ TEST( ClientTests, refTypeReturns )
 	fakeLinkA->setReply( reference );
 
 	// Call a method that will receive the incepted local obj id as return value
-	co::RefPtr<moduleA::ISimpleTypes> simple = refTypes->getSimple();
-	ClientProxy* providerRO = static_cast<ClientProxy*>( simple->getProvider() );
-    IInstanceInfo* info = static_cast<IInstanceInfo*>( providerRO );
+	co::RefPtr<moduleA::ISimpleTypes> simple = refTypes->getParentSimple();
+	ClientProxy* providerCP = static_cast<ClientProxy*>( simple->getProvider() );
         
-     EXPECT_EQ( info->getInstanceID(), 5 );
-	 EXPECT_STREQ( info->getOwnerAddress().c_str(), "address" );
+     EXPECT_EQ( providerCP->getInstanceId(), 5 );
+	 EXPECT_STREQ( providerCP->getOwnerAddress().c_str(), "address" );
 
 	 node->unpublishInstance( "irrelevant" );
 }

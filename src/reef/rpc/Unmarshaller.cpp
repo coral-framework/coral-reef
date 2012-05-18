@@ -164,12 +164,12 @@ Unmarshaller::~Unmarshaller()
 }
     
 // sets the message that will be decoded and return its type and destination
-void Unmarshaller::setMarshalledRequest( const std::string& request, MsgType& type, co::int32& instanceID, 
+void Unmarshaller::setMarshalledRequest( const std::string& request, MsgType& type, co::int32& instanceId, 
                                 bool& hasReturn, std::string* referer )
 {
     _message->Clear();
     _message->ParseFromString( request );
-    instanceID = _message->instance_id();
+    instanceId = _message->instance_id();
     hasReturn = _message->has_return();
     Message_Type2MsgType( _message->msg_type(), type );
     _msgType = type;
@@ -187,13 +187,13 @@ void Unmarshaller::unmarshalNewInstance( std::string& typeName )
     typeName = msgNewInst.new_instance_type();
 }
 
-void Unmarshaller::unmarshalAccessInstance( co::int32& instanceID, bool& increment )
+void Unmarshaller::unmarshalAccessInstance( co::int32& instanceId, bool& increment )
 {
     assert( _msgType == ACCESS_INST );
     
     const Message_Acc_Inst& msgAccessInst = _message->msg_acc_inst();
     // refererIP = msgAccessInst.referer_ip();
-    instanceID = msgAccessInst.instance_id();
+    instanceId = msgAccessInst.instance_id();
     increment = msgAccessInst.increment();
 }
    
@@ -208,7 +208,8 @@ void Unmarshaller::unmarshalFindInstance( std::string& key )
  Starts a decoding state of call/field msg. 
  The decoding state will only be reset after all params are decoded.
  */
-void Unmarshaller::beginUnmarshallingCall( co::int32& facetIdx, co::int32& memberIdx )
+void Unmarshaller::beginUnmarshallingCall( co::int32& facetIdx, co::int32& memberIdx, 
+                                          co::int32& typeDepth )
 {
     assert( _msgType == CALL );
     
@@ -216,6 +217,7 @@ void Unmarshaller::beginUnmarshallingCall( co::int32& facetIdx, co::int32& membe
     _currentParam = 0;
     facetIdx = _msgMember->facet_idx();
     memberIdx = _msgMember->member_idx();
+    typeDepth = _msgMember->type_depth();
 }
 
 void Unmarshaller::unmarshalValueParam( co::Any& param, co::IType* descriptor )
@@ -224,12 +226,12 @@ void Unmarshaller::unmarshalValueParam( co::Any& param, co::IType* descriptor )
     PBArgToAny( _msgMember->arguments( _currentParam++ ), descriptor, param );
 }
 
-void Unmarshaller::unmarshalReferenceParam( co::int32& instanceID, co::int32& facetIdx, RefOwner& owner,
+void Unmarshaller::unmarshalReferenceParam( co::int32& instanceId, co::int32& facetIdx, RefOwner& owner,
                   std::string& instanceType, std::string& ownerAddress )
 {
     assert( _msgMember );
     const Ref_Type& refType = _msgMember->arguments( _currentParam++ ).data( 0 ).ref_type();
-    instanceID = refType.instance_id();
+    instanceId = refType.instance_id();
     facetIdx = refType.facet_idx();
     
     switch( refType.owner() )
@@ -250,7 +252,7 @@ void Unmarshaller::unmarshalReferenceParam( co::int32& instanceID, co::int32& fa
     }
 }
     
-void Unmarshaller::unmarshalReference( const std::string& data, co::int32& instanceID, 
+void Unmarshaller::unmarshalReference( const std::string& data, co::int32& instanceId, 
                                            co::int32& facetIdx, RefOwner& owner, 
                                            std::string& instanceType, std::string& ownerAddress )
 {
@@ -259,7 +261,7 @@ void Unmarshaller::unmarshalReference( const std::string& data, co::int32& insta
     
     Ref_Type* refType = _argument->mutable_data( 0 )->mutable_ref_type();
     
-    instanceID = refType->instance_id();
+    instanceId = refType->instance_id();
     facetIdx = refType->facet_idx();
     
     switch( refType->owner() )

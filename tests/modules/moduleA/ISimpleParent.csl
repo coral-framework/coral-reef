@@ -2,7 +2,7 @@
 	Simple types parent interface used for testing inheritance
 */
 
-interface ISimpleParent
+interface ISimpleParent extends IGrandParent
 {
 	int32 parentInt;
 	

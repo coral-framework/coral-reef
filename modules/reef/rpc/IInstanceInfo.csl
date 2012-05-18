@@ -1,5 +1,0 @@
-interface IInstanceInfo
-{
-	readonly int32 instanceID;
-	readonly string ownerAddress;
-};

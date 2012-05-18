@@ -162,6 +162,16 @@ public:
 		return _storedParentInt;
 	}
     
+	void setGrandParentInt( co::int32 gParentInt )
+	{
+		_storedGParentInt = gParentInt;
+	}
+    
+    co::int32 getGrandParentInt()
+	{
+		return _storedGParentInt;
+	}
+    
 	void setParentInt( co::int32 parentInt )
 	{
 		_storedParentInt = parentInt;
@@ -294,15 +304,20 @@ public:
 
     co::Range<double const> parentMergeLists( co::Range<double const> list1, co::Range<double const> list2 )
 	{
+        
 		_storedParentDoubleList.clear();
         
 		co::assign( list1, _storedParentDoubleList );
-        
-		for( ; list2; list2.popFirst() )
+        int size = list1.getSize();
+        int size2 = list2.getSize();
+		for( int i = 0; i < size, i < size2; i++ )
 		{
-			_storedParentDoubleList.push_back( list2.getFirst() );
+			_storedParentDoubleList.push_back( list2[i] );
 		}
         
+        for( int i = 0; i < _storedParentDoubleList.size(); i++ )
+            printf( "\nstored value for i = %d : %f",i, _storedParentDoubleList[i] );
+            
 		return _storedParentDoubleList;
 	}
     
@@ -349,6 +364,7 @@ private:
     std::vector<double> _storedParentDoubleList;
 	co::int32 _storedInt;
     co::int32 _storedParentInt;
+    co::int32 _storedGParentInt;
 	std::vector<co::int32> _storedIntList;
 	std::string _storedString;
 	std::vector<std::string> _storedStringList;

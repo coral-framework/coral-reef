@@ -16,7 +16,6 @@
 namespace reef {
 namespace rpc {
 
-
 namespace {
 
 const ::google::protobuf::Descriptor* Data_Container_descriptor_ = NULL;
@@ -109,9 +108,10 @@ void protobuf_AssignDesc_Message_2eproto() {
       sizeof(Ref_Type));
   Ref_Type_Owner_descriptor_ = Ref_Type_descriptor_->enum_type(0);
   Message_Member_descriptor_ = file->message_type(3);
-  static const int Message_Member_offsets_[3] = {
+  static const int Message_Member_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message_Member, facet_idx_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message_Member, member_idx_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message_Member, type_depth_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message_Member, arguments_),
   };
   Message_Member_reflection_ =
@@ -252,31 +252,32 @@ void protobuf_AddDesc_Message_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\rMessage.proto\022\004reef\"a\n\016Data_Container\022"
-    "\017\n\007boolean\030\001 \001(\010\022\013\n\003str\030\002 \001(\t\022\017\n\007numeric"
-    "\030\003 \001(\001\022 \n\010ref_type\030\004 \001(\0132\016.reef.Ref_Type"
-    "\".\n\010Argument\022\"\n\004data\030\001 \003(\0132\024.reef.Data_C"
-    "ontainer\"\301\001\n\010Ref_Type\022#\n\005owner\030\001 \002(\0162\024.r"
-    "eef.Ref_Type.Owner\022\023\n\013instance_id\030\002 \002(\r\022"
-    "\021\n\tfacet_idx\030\003 \002(\r\022\025\n\rinstance_type\030\004 \001("
-    "\t\022\020\n\010owner_ip\030\005 \001(\t\"\?\n\005Owner\022\017\n\013OWNER_LO"
-    "CAL\020\000\022\022\n\016OWNER_RECEIVER\020\001\022\021\n\rOWNER_ANOTH"
-    "ER\020\002\"Z\n\016Message_Member\022\021\n\tfacet_idx\030\001 \002("
-    "\r\022\022\n\nmember_idx\030\002 \002(\r\022!\n\targuments\030\004 \003(\013"
-    "2\016.reef.Argument\"-\n\020Message_New_Inst\022\031\n\021"
+    "\n\rMessage.proto\022\010reef.rpc\"e\n\016Data_Contai"
+    "ner\022\017\n\007boolean\030\001 \001(\010\022\013\n\003str\030\002 \001(\t\022\017\n\007num"
+    "eric\030\003 \001(\001\022$\n\010ref_type\030\004 \001(\0132\022.reef.rpc."
+    "Ref_Type\"2\n\010Argument\022&\n\004data\030\001 \003(\0132\030.ree"
+    "f.rpc.Data_Container\"\305\001\n\010Ref_Type\022\'\n\005own"
+    "er\030\001 \002(\0162\030.reef.rpc.Ref_Type.Owner\022\023\n\013in"
+    "stance_id\030\002 \002(\r\022\021\n\tfacet_idx\030\003 \002(\r\022\025\n\rin"
+    "stance_type\030\004 \001(\t\022\020\n\010owner_ip\030\005 \001(\t\"\?\n\005O"
+    "wner\022\017\n\013OWNER_LOCAL\020\000\022\022\n\016OWNER_RECEIVER\020"
+    "\001\022\021\n\rOWNER_ANOTHER\020\002\"r\n\016Message_Member\022\021"
+    "\n\tfacet_idx\030\001 \002(\r\022\022\n\nmember_idx\030\002 \002(\r\022\022\n"
+    "\ntype_depth\030\003 \002(\005\022%\n\targuments\030\004 \003(\0132\022.r"
+    "eef.rpc.Argument\"-\n\020Message_New_Inst\022\031\n\021"
     "new_instance_type\030\001 \002(\t\" \n\021Message_Find_"
     "Inst\022\013\n\003key\030\001 \002(\t\":\n\020Message_Acc_Inst\022\021\n"
-    "\tincrement\030\001 \002(\010\022\023\n\013instance_id\030\002 \002(\r\"\362\002"
-    "\n\007Message\022$\n\010msg_type\030\001 \002(\0162\022.reef.Messa"
-    "ge.Type\022\023\n\013instance_id\030\002 \002(\r\022\022\n\nhas_retu"
-    "rn\030\003 \002(\010\022\022\n\nreferer_ip\030\004 \001(\t\022,\n\014msg_new_"
-    "inst\030\005 \001(\0132\026.reef.Message_New_Inst\022,\n\014ms"
-    "g_acc_inst\030\006 \001(\0132\026.reef.Message_Acc_Inst"
-    "\022.\n\rmsg_find_inst\030\007 \001(\0132\027.reef.Message_F"
-    "ind_Inst\022(\n\nmsg_member\030\010 \001(\0132\024.reef.Mess"
-    "age_Member\"N\n\004Type\022\020\n\014MSG_NEW_INST\020\000\022\023\n\017"
-    "MSG_ACCESS_INST\020\001\022\021\n\rMSG_FIND_INST\020\002\022\014\n\010"
-    "MSG_CALL\020\003", 970);
+    "\tincrement\030\001 \002(\010\022\023\n\013instance_id\030\002 \002(\r\"\206\003"
+    "\n\007Message\022(\n\010msg_type\030\001 \002(\0162\026.reef.rpc.M"
+    "essage.Type\022\023\n\013instance_id\030\002 \002(\r\022\022\n\nhas_"
+    "return\030\003 \002(\010\022\022\n\nreferer_ip\030\004 \001(\t\0220\n\014msg_"
+    "new_inst\030\005 \001(\0132\032.reef.rpc.Message_New_In"
+    "st\0220\n\014msg_acc_inst\030\006 \001(\0132\032.reef.rpc.Mess"
+    "age_Acc_Inst\0222\n\rmsg_find_inst\030\007 \001(\0132\033.re"
+    "ef.rpc.Message_Find_Inst\022,\n\nmsg_member\030\010"
+    " \001(\0132\030.reef.rpc.Message_Member\"N\n\004Type\022\020"
+    "\n\014MSG_NEW_INST\020\000\022\023\n\017MSG_ACCESS_INST\020\001\022\021\n"
+    "\rMSG_FIND_INST\020\002\022\014\n\010MSG_CALL\020\003", 1030);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "Message.proto", &protobuf_RegisterTypes);
   Data_Container::default_instance_ = new Data_Container();
@@ -443,7 +444,7 @@ bool Data_Container::MergePartialFromCodedStream(
         break;
       }
       
-      // optional .reef.Ref_Type ref_type = 4;
+      // optional .reef.rpc.Ref_Type ref_type = 4;
       case 4: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
@@ -494,7 +495,7 @@ void Data_Container::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteDouble(3, this->numeric(), output);
   }
   
-  // optional .reef.Ref_Type ref_type = 4;
+  // optional .reef.rpc.Ref_Type ref_type = 4;
   if (has_ref_type()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       4, this->ref_type(), output);
@@ -528,7 +529,7 @@ void Data_Container::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(3, this->numeric(), target);
   }
   
-  // optional .reef.Ref_Type ref_type = 4;
+  // optional .reef.rpc.Ref_Type ref_type = 4;
   if (has_ref_type()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
@@ -563,7 +564,7 @@ int Data_Container::ByteSize() const {
       total_size += 1 + 8;
     }
     
-    // optional .reef.Ref_Type ref_type = 4;
+    // optional .reef.rpc.Ref_Type ref_type = 4;
     if (has_ref_type()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
@@ -720,7 +721,7 @@ bool Argument::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // repeated .reef.Data_Container data = 1;
+      // repeated .reef.rpc.Data_Container data = 1;
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
@@ -753,7 +754,7 @@ bool Argument::MergePartialFromCodedStream(
 
 void Argument::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // repeated .reef.Data_Container data = 1;
+  // repeated .reef.rpc.Data_Container data = 1;
   for (int i = 0; i < this->data_size(); i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       1, this->data(i), output);
@@ -767,7 +768,7 @@ void Argument::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* Argument::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // repeated .reef.Data_Container data = 1;
+  // repeated .reef.rpc.Data_Container data = 1;
   for (int i = 0; i < this->data_size(); i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
@@ -784,7 +785,7 @@ void Argument::SerializeWithCachedSizes(
 int Argument::ByteSize() const {
   int total_size = 0;
   
-  // repeated .reef.Data_Container data = 1;
+  // repeated .reef.rpc.Data_Container data = 1;
   total_size += 1 * this->data_size();
   for (int i = 0; i < this->data_size(); i++) {
     total_size +=
@@ -977,7 +978,7 @@ bool Ref_Type::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // required .reef.Ref_Type.Owner owner = 1;
+      // required .reef.rpc.Ref_Type.Owner owner = 1;
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
@@ -1081,7 +1082,7 @@ bool Ref_Type::MergePartialFromCodedStream(
 
 void Ref_Type::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // required .reef.Ref_Type.Owner owner = 1;
+  // required .reef.rpc.Ref_Type.Owner owner = 1;
   if (has_owner()) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
       1, this->owner(), output);
@@ -1123,7 +1124,7 @@ void Ref_Type::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* Ref_Type::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // required .reef.Ref_Type.Owner owner = 1;
+  // required .reef.rpc.Ref_Type.Owner owner = 1;
   if (has_owner()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
       1, this->owner(), target);
@@ -1170,7 +1171,7 @@ int Ref_Type::ByteSize() const {
   int total_size = 0;
   
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // required .reef.Ref_Type.Owner owner = 1;
+    // required .reef.rpc.Ref_Type.Owner owner = 1;
     if (has_owner()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::EnumSize(this->owner());
@@ -1295,6 +1296,7 @@ void Ref_Type::Swap(Ref_Type* other) {
 #ifndef _MSC_VER
 const int Message_Member::kFacetIdxFieldNumber;
 const int Message_Member::kMemberIdxFieldNumber;
+const int Message_Member::kTypeDepthFieldNumber;
 const int Message_Member::kArgumentsFieldNumber;
 #endif  // !_MSC_VER
 
@@ -1316,6 +1318,7 @@ void Message_Member::SharedCtor() {
   _cached_size_ = 0;
   facet_idx_ = 0u;
   member_idx_ = 0u;
+  type_depth_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1352,6 +1355,7 @@ void Message_Member::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     facet_idx_ = 0u;
     member_idx_ = 0u;
+    type_depth_ = 0;
   }
   arguments_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -1391,11 +1395,27 @@ bool Message_Member::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(24)) goto parse_type_depth;
+        break;
+      }
+      
+      // required int32 type_depth = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_type_depth:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &type_depth_)));
+          set_has_type_depth();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectTag(34)) goto parse_arguments;
         break;
       }
       
-      // repeated .reef.Argument arguments = 4;
+      // repeated .reef.rpc.Argument arguments = 4;
       case 4: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
@@ -1438,7 +1458,12 @@ void Message_Member::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(2, this->member_idx(), output);
   }
   
-  // repeated .reef.Argument arguments = 4;
+  // required int32 type_depth = 3;
+  if (has_type_depth()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->type_depth(), output);
+  }
+  
+  // repeated .reef.rpc.Argument arguments = 4;
   for (int i = 0; i < this->arguments_size(); i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       4, this->arguments(i), output);
@@ -1462,7 +1487,12 @@ void Message_Member::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(2, this->member_idx(), target);
   }
   
-  // repeated .reef.Argument arguments = 4;
+  // required int32 type_depth = 3;
+  if (has_type_depth()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->type_depth(), target);
+  }
+  
+  // repeated .reef.rpc.Argument arguments = 4;
   for (int i = 0; i < this->arguments_size(); i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
@@ -1494,8 +1524,15 @@ int Message_Member::ByteSize() const {
           this->member_idx());
     }
     
+    // required int32 type_depth = 3;
+    if (has_type_depth()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->type_depth());
+    }
+    
   }
-  // repeated .reef.Argument arguments = 4;
+  // repeated .reef.rpc.Argument arguments = 4;
   total_size += 1 * this->arguments_size();
   for (int i = 0; i < this->arguments_size(); i++) {
     total_size +=
@@ -1536,6 +1573,9 @@ void Message_Member::MergeFrom(const Message_Member& from) {
     if (from.has_member_idx()) {
       set_member_idx(from.member_idx());
     }
+    if (from.has_type_depth()) {
+      set_type_depth(from.type_depth());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -1553,7 +1593,7 @@ void Message_Member::CopyFrom(const Message_Member& from) {
 }
 
 bool Message_Member::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+  if ((_has_bits_[0] & 0x00000007) != 0x00000007) return false;
   
   for (int i = 0; i < arguments_size(); i++) {
     if (!this->arguments(i).IsInitialized()) return false;
@@ -1565,6 +1605,7 @@ void Message_Member::Swap(Message_Member* other) {
   if (other != this) {
     std::swap(facet_idx_, other->facet_idx_);
     std::swap(member_idx_, other->member_idx_);
+    std::swap(type_depth_, other->type_depth_);
     arguments_.Swap(&other->arguments_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
@@ -2415,7 +2456,7 @@ bool Message::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // required .reef.Message.Type msg_type = 1;
+      // required .reef.rpc.Message.Type msg_type = 1;
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
@@ -2484,7 +2525,7 @@ bool Message::MergePartialFromCodedStream(
         break;
       }
       
-      // optional .reef.Message_New_Inst msg_new_inst = 5;
+      // optional .reef.rpc.Message_New_Inst msg_new_inst = 5;
       case 5: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
@@ -2498,7 +2539,7 @@ bool Message::MergePartialFromCodedStream(
         break;
       }
       
-      // optional .reef.Message_Acc_Inst msg_acc_inst = 6;
+      // optional .reef.rpc.Message_Acc_Inst msg_acc_inst = 6;
       case 6: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
@@ -2512,7 +2553,7 @@ bool Message::MergePartialFromCodedStream(
         break;
       }
       
-      // optional .reef.Message_Find_Inst msg_find_inst = 7;
+      // optional .reef.rpc.Message_Find_Inst msg_find_inst = 7;
       case 7: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
@@ -2526,7 +2567,7 @@ bool Message::MergePartialFromCodedStream(
         break;
       }
       
-      // optional .reef.Message_Member msg_member = 8;
+      // optional .reef.rpc.Message_Member msg_member = 8;
       case 8: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
@@ -2558,7 +2599,7 @@ bool Message::MergePartialFromCodedStream(
 
 void Message::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // required .reef.Message.Type msg_type = 1;
+  // required .reef.rpc.Message.Type msg_type = 1;
   if (has_msg_type()) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
       1, this->msg_type(), output);
@@ -2583,25 +2624,25 @@ void Message::SerializeWithCachedSizes(
       4, this->referer_ip(), output);
   }
   
-  // optional .reef.Message_New_Inst msg_new_inst = 5;
+  // optional .reef.rpc.Message_New_Inst msg_new_inst = 5;
   if (has_msg_new_inst()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       5, this->msg_new_inst(), output);
   }
   
-  // optional .reef.Message_Acc_Inst msg_acc_inst = 6;
+  // optional .reef.rpc.Message_Acc_Inst msg_acc_inst = 6;
   if (has_msg_acc_inst()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       6, this->msg_acc_inst(), output);
   }
   
-  // optional .reef.Message_Find_Inst msg_find_inst = 7;
+  // optional .reef.rpc.Message_Find_Inst msg_find_inst = 7;
   if (has_msg_find_inst()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       7, this->msg_find_inst(), output);
   }
   
-  // optional .reef.Message_Member msg_member = 8;
+  // optional .reef.rpc.Message_Member msg_member = 8;
   if (has_msg_member()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       8, this->msg_member(), output);
@@ -2615,7 +2656,7 @@ void Message::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* Message::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // required .reef.Message.Type msg_type = 1;
+  // required .reef.rpc.Message.Type msg_type = 1;
   if (has_msg_type()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
       1, this->msg_type(), target);
@@ -2641,28 +2682,28 @@ void Message::SerializeWithCachedSizes(
         4, this->referer_ip(), target);
   }
   
-  // optional .reef.Message_New_Inst msg_new_inst = 5;
+  // optional .reef.rpc.Message_New_Inst msg_new_inst = 5;
   if (has_msg_new_inst()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         5, this->msg_new_inst(), target);
   }
   
-  // optional .reef.Message_Acc_Inst msg_acc_inst = 6;
+  // optional .reef.rpc.Message_Acc_Inst msg_acc_inst = 6;
   if (has_msg_acc_inst()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         6, this->msg_acc_inst(), target);
   }
   
-  // optional .reef.Message_Find_Inst msg_find_inst = 7;
+  // optional .reef.rpc.Message_Find_Inst msg_find_inst = 7;
   if (has_msg_find_inst()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         7, this->msg_find_inst(), target);
   }
   
-  // optional .reef.Message_Member msg_member = 8;
+  // optional .reef.rpc.Message_Member msg_member = 8;
   if (has_msg_member()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
@@ -2680,7 +2721,7 @@ int Message::ByteSize() const {
   int total_size = 0;
   
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // required .reef.Message.Type msg_type = 1;
+    // required .reef.rpc.Message.Type msg_type = 1;
     if (has_msg_type()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::EnumSize(this->msg_type());
@@ -2705,28 +2746,28 @@ int Message::ByteSize() const {
           this->referer_ip());
     }
     
-    // optional .reef.Message_New_Inst msg_new_inst = 5;
+    // optional .reef.rpc.Message_New_Inst msg_new_inst = 5;
     if (has_msg_new_inst()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
           this->msg_new_inst());
     }
     
-    // optional .reef.Message_Acc_Inst msg_acc_inst = 6;
+    // optional .reef.rpc.Message_Acc_Inst msg_acc_inst = 6;
     if (has_msg_acc_inst()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
           this->msg_acc_inst());
     }
     
-    // optional .reef.Message_Find_Inst msg_find_inst = 7;
+    // optional .reef.rpc.Message_Find_Inst msg_find_inst = 7;
     if (has_msg_find_inst()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
           this->msg_find_inst());
     }
     
-    // optional .reef.Message_Member msg_member = 8;
+    // optional .reef.rpc.Message_Member msg_member = 8;
     if (has_msg_member()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
@@ -2844,9 +2885,8 @@ void Message::Swap(Message* other) {
 
 
 // @@protoc_insertion_point(namespace_scope)
-    
-}
-    
+
+}  // namespace rpc
 }  // namespace reef
 
 // @@protoc_insertion_point(global_scope)

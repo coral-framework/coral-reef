@@ -2,7 +2,7 @@
 	Reference types parent interface used for testing inheritance
 */
 
-interface IRefParent
+interface IRefParent extends IGrandParent
 {
 	ISimpleTypes parentSimple;
 	

@@ -28,7 +28,6 @@
 namespace reef {
 namespace rpc {
 
-
 // Internal implementation detail -- do not call these.
 void  protobuf_AddDesc_Message_2eproto();
 void protobuf_AssignDesc_Message_2eproto();
@@ -165,7 +164,7 @@ class Data_Container : public ::google::protobuf::Message {
   inline double numeric() const;
   inline void set_numeric(double value);
   
-  // optional .reef.Ref_Type ref_type = 4;
+  // optional .reef.rpc.Ref_Type ref_type = 4;
   inline bool has_ref_type() const;
   inline void clear_ref_type();
   static const int kRefTypeFieldNumber = 4;
@@ -173,7 +172,7 @@ class Data_Container : public ::google::protobuf::Message {
   inline ::reef::rpc::Ref_Type* mutable_ref_type();
   inline ::reef::rpc::Ref_Type* release_ref_type();
   
-  // @@protoc_insertion_point(class_scope:reef.Data_Container)
+  // @@protoc_insertion_point(class_scope:reef.rpc.Data_Container)
  private:
   inline void set_has_boolean();
   inline void clear_has_boolean();
@@ -257,7 +256,7 @@ class Argument : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // repeated .reef.Data_Container data = 1;
+  // repeated .reef.rpc.Data_Container data = 1;
   inline int data_size() const;
   inline void clear_data();
   static const int kDataFieldNumber = 1;
@@ -269,7 +268,7 @@ class Argument : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Data_Container >*
       mutable_data();
   
-  // @@protoc_insertion_point(class_scope:reef.Argument)
+  // @@protoc_insertion_point(class_scope:reef.rpc.Argument)
  private:
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
@@ -367,7 +366,7 @@ class Ref_Type : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // required .reef.Ref_Type.Owner owner = 1;
+  // required .reef.rpc.Ref_Type.Owner owner = 1;
   inline bool has_owner() const;
   inline void clear_owner();
   static const int kOwnerFieldNumber = 1;
@@ -410,7 +409,7 @@ class Ref_Type : public ::google::protobuf::Message {
   inline ::std::string* mutable_owner_ip();
   inline ::std::string* release_owner_ip();
   
-  // @@protoc_insertion_point(class_scope:reef.Ref_Type)
+  // @@protoc_insertion_point(class_scope:reef.rpc.Ref_Type)
  private:
   inline void set_has_owner();
   inline void clear_has_owner();
@@ -511,7 +510,14 @@ class Message_Member : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 member_idx() const;
   inline void set_member_idx(::google::protobuf::uint32 value);
   
-  // repeated .reef.Argument arguments = 4;
+  // required int32 type_depth = 3;
+  inline bool has_type_depth() const;
+  inline void clear_type_depth();
+  static const int kTypeDepthFieldNumber = 3;
+  inline ::google::protobuf::int32 type_depth() const;
+  inline void set_type_depth(::google::protobuf::int32 value);
+  
+  // repeated .reef.rpc.Argument arguments = 4;
   inline int arguments_size() const;
   inline void clear_arguments();
   static const int kArgumentsFieldNumber = 4;
@@ -523,21 +529,24 @@ class Message_Member : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Argument >*
       mutable_arguments();
   
-  // @@protoc_insertion_point(class_scope:reef.Message_Member)
+  // @@protoc_insertion_point(class_scope:reef.rpc.Message_Member)
  private:
   inline void set_has_facet_idx();
   inline void clear_has_facet_idx();
   inline void set_has_member_idx();
   inline void clear_has_member_idx();
+  inline void set_has_type_depth();
+  inline void clear_has_type_depth();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint32 facet_idx_;
   ::google::protobuf::uint32 member_idx_;
   ::google::protobuf::RepeatedPtrField< ::reef::rpc::Argument > arguments_;
+  ::google::protobuf::int32 type_depth_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
   
   friend void  protobuf_AddDesc_Message_2eproto();
   friend void protobuf_AssignDesc_Message_2eproto();
@@ -613,7 +622,7 @@ class Message_New_Inst : public ::google::protobuf::Message {
   inline ::std::string* mutable_new_instance_type();
   inline ::std::string* release_new_instance_type();
   
-  // @@protoc_insertion_point(class_scope:reef.Message_New_Inst)
+  // @@protoc_insertion_point(class_scope:reef.rpc.Message_New_Inst)
  private:
   inline void set_has_new_instance_type();
   inline void clear_has_new_instance_type();
@@ -699,7 +708,7 @@ class Message_Find_Inst : public ::google::protobuf::Message {
   inline ::std::string* mutable_key();
   inline ::std::string* release_key();
   
-  // @@protoc_insertion_point(class_scope:reef.Message_Find_Inst)
+  // @@protoc_insertion_point(class_scope:reef.rpc.Message_Find_Inst)
  private:
   inline void set_has_key();
   inline void clear_has_key();
@@ -788,7 +797,7 @@ class Message_Acc_Inst : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 instance_id() const;
   inline void set_instance_id(::google::protobuf::uint32 value);
   
-  // @@protoc_insertion_point(class_scope:reef.Message_Acc_Inst)
+  // @@protoc_insertion_point(class_scope:reef.rpc.Message_Acc_Inst)
  private:
   inline void set_has_increment();
   inline void clear_has_increment();
@@ -892,7 +901,7 @@ class Message : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // required .reef.Message.Type msg_type = 1;
+  // required .reef.rpc.Message.Type msg_type = 1;
   inline bool has_msg_type() const;
   inline void clear_msg_type();
   static const int kMsgTypeFieldNumber = 1;
@@ -924,7 +933,7 @@ class Message : public ::google::protobuf::Message {
   inline ::std::string* mutable_referer_ip();
   inline ::std::string* release_referer_ip();
   
-  // optional .reef.Message_New_Inst msg_new_inst = 5;
+  // optional .reef.rpc.Message_New_Inst msg_new_inst = 5;
   inline bool has_msg_new_inst() const;
   inline void clear_msg_new_inst();
   static const int kMsgNewInstFieldNumber = 5;
@@ -932,7 +941,7 @@ class Message : public ::google::protobuf::Message {
   inline ::reef::rpc::Message_New_Inst* mutable_msg_new_inst();
   inline ::reef::rpc::Message_New_Inst* release_msg_new_inst();
   
-  // optional .reef.Message_Acc_Inst msg_acc_inst = 6;
+  // optional .reef.rpc.Message_Acc_Inst msg_acc_inst = 6;
   inline bool has_msg_acc_inst() const;
   inline void clear_msg_acc_inst();
   static const int kMsgAccInstFieldNumber = 6;
@@ -940,7 +949,7 @@ class Message : public ::google::protobuf::Message {
   inline ::reef::rpc::Message_Acc_Inst* mutable_msg_acc_inst();
   inline ::reef::rpc::Message_Acc_Inst* release_msg_acc_inst();
   
-  // optional .reef.Message_Find_Inst msg_find_inst = 7;
+  // optional .reef.rpc.Message_Find_Inst msg_find_inst = 7;
   inline bool has_msg_find_inst() const;
   inline void clear_msg_find_inst();
   static const int kMsgFindInstFieldNumber = 7;
@@ -948,7 +957,7 @@ class Message : public ::google::protobuf::Message {
   inline ::reef::rpc::Message_Find_Inst* mutable_msg_find_inst();
   inline ::reef::rpc::Message_Find_Inst* release_msg_find_inst();
   
-  // optional .reef.Message_Member msg_member = 8;
+  // optional .reef.rpc.Message_Member msg_member = 8;
   inline bool has_msg_member() const;
   inline void clear_msg_member();
   static const int kMsgMemberFieldNumber = 8;
@@ -956,7 +965,7 @@ class Message : public ::google::protobuf::Message {
   inline ::reef::rpc::Message_Member* mutable_msg_member();
   inline ::reef::rpc::Message_Member* release_msg_member();
   
-  // @@protoc_insertion_point(class_scope:reef.Message)
+  // @@protoc_insertion_point(class_scope:reef.rpc.Message)
  private:
   inline void set_has_msg_type();
   inline void clear_has_msg_type();
@@ -1105,7 +1114,7 @@ inline void Data_Container::set_numeric(double value) {
   numeric_ = value;
 }
 
-// optional .reef.Ref_Type ref_type = 4;
+// optional .reef.rpc.Ref_Type ref_type = 4;
 inline bool Data_Container::has_ref_type() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
@@ -1138,7 +1147,7 @@ inline ::reef::rpc::Ref_Type* Data_Container::release_ref_type() {
 
 // Argument
 
-// repeated .reef.Data_Container data = 1;
+// repeated .reef.rpc.Data_Container data = 1;
 inline int Argument::data_size() const {
   return data_.size();
 }
@@ -1167,7 +1176,7 @@ Argument::mutable_data() {
 
 // Ref_Type
 
-// required .reef.Ref_Type.Owner owner = 1;
+// required .reef.rpc.Ref_Type.Owner owner = 1;
 inline bool Ref_Type::has_owner() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
@@ -1398,7 +1407,29 @@ inline void Message_Member::set_member_idx(::google::protobuf::uint32 value) {
   member_idx_ = value;
 }
 
-// repeated .reef.Argument arguments = 4;
+// required int32 type_depth = 3;
+inline bool Message_Member::has_type_depth() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void Message_Member::set_has_type_depth() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void Message_Member::clear_has_type_depth() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void Message_Member::clear_type_depth() {
+  type_depth_ = 0;
+  clear_has_type_depth();
+}
+inline ::google::protobuf::int32 Message_Member::type_depth() const {
+  return type_depth_;
+}
+inline void Message_Member::set_type_depth(::google::protobuf::int32 value) {
+  set_has_type_depth();
+  type_depth_ = value;
+}
+
+// repeated .reef.rpc.Argument arguments = 4;
 inline int Message_Member::arguments_size() const {
   return arguments_.size();
 }
@@ -1599,7 +1630,7 @@ inline void Message_Acc_Inst::set_instance_id(::google::protobuf::uint32 value) 
 
 // Message
 
-// required .reef.Message.Type msg_type = 1;
+// required .reef.rpc.Message.Type msg_type = 1;
 inline bool Message::has_msg_type() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
@@ -1724,7 +1755,7 @@ inline ::std::string* Message::release_referer_ip() {
   }
 }
 
-// optional .reef.Message_New_Inst msg_new_inst = 5;
+// optional .reef.rpc.Message_New_Inst msg_new_inst = 5;
 inline bool Message::has_msg_new_inst() const {
   return (_has_bits_[0] & 0x00000010u) != 0;
 }
@@ -1753,7 +1784,7 @@ inline ::reef::rpc::Message_New_Inst* Message::release_msg_new_inst() {
   return temp;
 }
 
-// optional .reef.Message_Acc_Inst msg_acc_inst = 6;
+// optional .reef.rpc.Message_Acc_Inst msg_acc_inst = 6;
 inline bool Message::has_msg_acc_inst() const {
   return (_has_bits_[0] & 0x00000020u) != 0;
 }
@@ -1782,7 +1813,7 @@ inline ::reef::rpc::Message_Acc_Inst* Message::release_msg_acc_inst() {
   return temp;
 }
 
-// optional .reef.Message_Find_Inst msg_find_inst = 7;
+// optional .reef.rpc.Message_Find_Inst msg_find_inst = 7;
 inline bool Message::has_msg_find_inst() const {
   return (_has_bits_[0] & 0x00000040u) != 0;
 }
@@ -1811,7 +1842,7 @@ inline ::reef::rpc::Message_Find_Inst* Message::release_msg_find_inst() {
   return temp;
 }
 
-// optional .reef.Message_Member msg_member = 8;
+// optional .reef.rpc.Message_Member msg_member = 8;
 inline bool Message::has_msg_member() const {
   return (_has_bits_[0] & 0x00000080u) != 0;
 }
@@ -1842,9 +1873,8 @@ inline ::reef::rpc::Message_Member* Message::release_msg_member() {
 
 
 // @@protoc_insertion_point(namespace_scope)
-    
-}
-    
+
+}  // namespace rpc
 }  // namespace reef
 
 #ifndef SWIG

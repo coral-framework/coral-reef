@@ -55,18 +55,22 @@ TEST( ParameterTests, simpleTypesTest )
     }
     
     simple->setStoredIntList( intVec );
-    simple->setStoredStringList( stringVec );
-    simple->setStoredDoubleList( doubleVec );
+    simple->setParentStringList( stringVec );
     
     co::Range<const co::int32> intRange = simple->getStoredIntList();
     for( int i = 0; i < intVec.size(); i++ )
         EXPECT_EQ( intVec[i], intRange[i] );
     
-    co::Range<const double> doubleRange = simple->getStoredDoubleList();
-    for( int i = 0; i < intVec.size(); i++ )
-        EXPECT_EQ( doubleVec[i], doubleRange[i] );
+    co::Range<const double> doubleRange = simple->parentMergeLists( doubleVec, doubleVec );
+    int size = doubleRange.getSize();
+    for( int i = 0; i < size; i++ )
+    {
+        double comparison = i % 10;
+        double value = doubleRange[i];
+        EXPECT_DOUBLE_EQ( comparison, value );
+    }
     
-    co::Range<const std::string> stringRange = simple->getStoredStringList();
+    co::Range<const std::string> stringRange = simple->getParentStringList();
     for( int i = 0; i < intVec.size(); i++ )
         EXPECT_STREQ( stringVec[i].c_str(), stringRange[i].c_str() );
     
@@ -117,7 +121,7 @@ TEST( ParameterTests, refTypeParameterTest )
     EXPECT_EQ( refTypesServiceInA->callDivideDouble( simpleTypesServiceInA, 15, 5 ), 3 );
     EXPECT_STREQ( refTypesServiceInA->concatenateString( simpleTypesServiceInA, "aaa", "bbb" ).c_str(), "aaabbb" );
     
-    EXPECT_EQ( refTypesServiceInA->callIncrementInt( simpleTypesServiceLocal, 3 ), 4 );
+    EXPECT_EQ( refTypesServiceInA->parentCall( simpleTypesServiceLocal, 3 ), 4 );
     EXPECT_EQ( refTypesServiceInA->callDivideDouble( simpleTypesServiceLocal, 15, 5 ), 3 );
     EXPECT_STREQ( refTypesServiceInA->concatenateString( simpleTypesServiceLocal, "aaa", "bbb" ).c_str(), "aaabbb" );
     

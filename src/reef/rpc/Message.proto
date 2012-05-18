@@ -1,4 +1,4 @@
-package reef;
+package reef.rpc;
 
 // Data types (information transfer):
 message Data_Container
@@ -34,6 +34,7 @@ message Message_Member
 {
 	required uint32 facet_idx = 1;
 	required uint32 member_idx = 2;
+	required int32 type_depth = 3;
 	repeated Argument arguments = 4;
 }
 

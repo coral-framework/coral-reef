@@ -15,37 +15,42 @@ namespace rpc {
 
 class Node;
     
-// Server-side implementation of IChannel. Delivers the appropriate calls to the Objects
+//! Delivers the appropriate calls to an Object
 class Invoker
 {
 public:
+    /*!
+        Constructor
+        \param node The node that is creating the Invoker. The invoker needs the node to request 
+        proxys for reference parameters
+        \param object The object that will be controlled by this Invoker
+    */
     Invoker( Node* node, co::IObject* object );
     
      ~Invoker();
     
-    /*
-        Expects a unmarshaller in a before-unmarshalling-a-call-msg state (see Unmarshaller).
-        Returns an already marshalled return value in the marshalledReturn parameter.
+    /*!
+        Makes an invocation in the actual object based on the to-be-unmarshalled data inside the
+        parameter \unmarshaller (the unmarshalling methods will be called)
+        \param unmarshaller An unmarshaller with a call request already set ofr unmarshalling.
+        \param isSynch True if it is a synchronous call, and a return is expected
+        \param returned What the invocation returned. Already marshalled and ready to send.     
     */
-    void asynchCall( Unmarshaller& unmarshaller );
+    void invoke( Unmarshaller& unmarshaller, bool isSynch, std::string& returned );
     
-    void synchCall( Unmarshaller& unmarshaller, std::string& marshalledReturn );
-    
-    inline co::IComponent* getComponent() {   return _object->getComponent(); }
-    
+    //! returns the object controlled by this Invoker
     inline co::IObject* getObject() { return _object.get(); }
-
        
 private:
 
-    // Called by onCall. Extract the parameters from unmarshaller and call method via reflector
-    void onMethod( Unmarshaller& unmarshaller, co::int32 facetIdx, co::IMethod* method, 
-                  co::Any& returned );
+    void onMethod( Unmarshaller& unmarshaller, co::IService* facet, co::IMethod* method, 
+                  co::IReflector* refl, co::Any& returned );
     
-    void onGetField( Unmarshaller& unmarshaller, co::int32 facetIdx, co::IField* field, 
-                             co::Any& returned );
+    void onGetField( Unmarshaller& unmarshaller, co::IService* facet, co::IField* field, 
+                    co::IReflector* refl, co::Any& returned );
     
-    void onSetField( Unmarshaller& unmarshaller, co::int32 facetIdx, co::IField* field );
+    void onSetField( Unmarshaller& unmarshaller, co::IService* facet, co::IField* field, 
+                    co::IReflector* refl );
     
     // TODO: remove the last param in coral 0.8
     void unmarshalParameter( Unmarshaller& unmarshaller, co::IType* paramType, co::Any& param, 

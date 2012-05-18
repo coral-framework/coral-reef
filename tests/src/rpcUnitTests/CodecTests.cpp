@@ -35,7 +35,7 @@ TEST( CodecTests, simpleTypesTest )
     MsgType msgType;
     bool hasReturn;
     co::int32 msgReceiverID;
-    co::int32 instanceID;
+    co::int32 instanceId;
     
     
     // ------ new inst
@@ -76,13 +76,14 @@ TEST( CodecTests, simpleTypesTest )
     EXPECT_FALSE( hasReturn );
     EXPECT_STREQ( referer.c_str(), "address3" );
     
-    EXPECT_NO_THROW( unmarshaller.unmarshalAccessInstance( instanceID, increment ) );
-    EXPECT_EQ( instanceID, 5 );
+    EXPECT_NO_THROW( unmarshaller.unmarshalAccessInstance( instanceId, increment ) );
+    EXPECT_EQ( instanceId, 5 );
     EXPECT_TRUE( increment );
     
     // ------ call value types TODO:Complex types
     co::int32 facetIdx;
     co::int32 memberIdx;
+    co::int32 memberOwner;
     
     // all the possible parameter types
     co::Any intAny; intAny.set<co::int32>( 6 );
@@ -104,7 +105,7 @@ TEST( CodecTests, simpleTypesTest )
 		fillUint8Array<co::int32>( i, intArray, i );
 	}
     
-    marshaller.beginCallMarshalling( 3, 4, 5, true );
+    marshaller.beginCallMarshalling( 3, 4, 5, 6, true );
     marshaller.addValueParam( intAny );
     marshaller.addValueParam( doubleAny );
     marshaller.addValueParam( stringParam );
@@ -119,9 +120,10 @@ TEST( CodecTests, simpleTypesTest )
     EXPECT_EQ( msgReceiverID, 3 );
     EXPECT_TRUE( hasReturn );
     
-    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx );
+    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, memberOwner );
     EXPECT_EQ( facetIdx, 4 );
     EXPECT_EQ( memberIdx, 5 );
+    EXPECT_EQ( memberOwner, 6 );
     
     co::IType* intType = co::getType( "int32" );
     co::IType* doubleType = co::getType( "double" );

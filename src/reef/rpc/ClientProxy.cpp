@@ -21,20 +21,20 @@ namespace rpc {
 class Host
 {
 public:
-    inline void addInstance( ClientProxy* remoteObj, co::int32 instanceID )
+    inline void addInstance( ClientProxy* remoteObj, co::int32 instanceId )
     {
-        _instances.insert( std::pair<co::int32, ClientProxy*>( instanceID, remoteObj ) );
+        _instances.insert( std::pair<co::int32, ClientProxy*>( instanceId, remoteObj ) );
     }
     
-    inline ClientProxy* getInstance( co::int32 instanceID )
+    inline ClientProxy* getInstance( co::int32 instanceId )
     {
-        InstanceMap::iterator it = _instances.find( instanceID );
+        InstanceMap::iterator it = _instances.find( instanceId );
         return it != _instances.end() ? it->second : 0;
     }
     
-    inline void removeInstance( co::int32 instanceID )
+    inline void removeInstance( co::int32 instanceId )
     {
-        InstanceMap::iterator it = _instances.find( instanceID );
+        InstanceMap::iterator it = _instances.find( instanceId );
         _instances.erase( it );
     }
     
@@ -54,7 +54,7 @@ static Hosts _hosts;
 void* ClientProxy::s_classPtr = 0;
     
 ClientProxy* ClientProxy::getOrCreateClientProxy( Node* node, co::IComponent* component,
-                                            IActiveLink* link, co::int32 instanceID )
+                                            IActiveLink* link, co::int32 instanceId )
 {
     Host* host = 0;
     ClientProxy* retValue = 0;
@@ -62,7 +62,7 @@ ClientProxy* ClientProxy::getOrCreateClientProxy( Node* node, co::IComponent* co
     if( it != _hosts.end() )
     {
         host = it->second;
-        retValue = host->getInstance( instanceID );
+        retValue = host->getInstance( instanceId );
         
         if( retValue )
             return retValue;
@@ -73,8 +73,8 @@ ClientProxy* ClientProxy::getOrCreateClientProxy( Node* node, co::IComponent* co
         _hosts.insert( std::pair<IActiveLink*, Host*>( link, host ) );
     }
     
-    retValue = new ClientProxy( node, component, link, instanceID );
-    host->addInstance( retValue, instanceID );
+    retValue = new ClientProxy( node, component, link, instanceId );
+    host->addInstance( retValue, instanceId );
     
     return retValue;
 }
@@ -84,11 +84,12 @@ ClientProxy::ClientProxy()
 }
     
 ClientProxy::ClientProxy( Node* node, co::IComponent* component, IActiveLink* link, 
-                           co::int32 instanceID ) : _node( node ), _link( link ),_numFacets( 0 )
+                           co::int32 instanceId ) : _node( node ), _link( link ), 
+                                _address( link->getAddress() ), _numFacets( 0 )
 {
     s_classPtr = *reinterpret_cast<void**>( this );
     setComponent( component );
-    _instanceID = instanceID;
+    _instanceId = instanceId;
 }
     
 ClientProxy::~ClientProxy()
@@ -97,7 +98,7 @@ ClientProxy::~ClientProxy()
     assert( it != _hosts.end() );
     
     Host* host = it->second;
-    host->removeInstance( _instanceID );
+    host->removeInstance( _instanceId );
     
     if( !host->hasInstance() )
     {
@@ -109,9 +110,10 @@ ClientProxy::~ClientProxy()
     {
         delete _facets[i];
     }
+    delete [] _interfaces;
     delete [] _facets;
     
-    _node->requestEndAccess( _link.get(), _instanceID, "TODO" );
+    _node->requestEndAccess( _link.get(), _instanceId, "TODO" );
 }
     
 void ClientProxy::setComponent( co::IComponent* component )
@@ -122,9 +124,11 @@ void ClientProxy::setComponent( co::IComponent* component )
 	co::Range<co::IPort* const> facets = _component->getFacets();
 	int numFacets = static_cast<int>( facets.getSize() );
     _facets = new co::IService*[numFacets];
+    _interfaces = new co::IInterface*[numFacets];
 	for( int i = 0; i < numFacets; ++i )
 	{
 		facets[i]->getType()->getReflector()->newDynamicProxy( this );
+        _interfaces[i] = facets[i]->getType();
 	}
 }
 
@@ -158,7 +162,9 @@ co::IPort* ClientProxy::dynamicGetFacet( co::int32 cookie )
         
 const co::Any& ClientProxy::dynamicGetField( co::int32 dynFacetId, co::IField* field )
 {
-    _marshaller.beginCallMarshalling( _instanceID, dynFacetId, field->getIndex(), true );
+    co::int32 depth = findDepth( _interfaces[dynFacetId], field->getOwner() );
+    
+    _marshaller.beginCallMarshalling( _instanceId, dynFacetId, field->getIndex(), depth, true );
     std::string msg;
     _marshaller.getMarshalledCall( msg );
     _link->send( msg );
@@ -172,7 +178,9 @@ const co::Any& ClientProxy::dynamicGetField( co::int32 dynFacetId, co::IField* f
     
 void ClientProxy::dynamicSetField( co::int32 dynFacetId, co::IField* field, const co::Any& value )
 {
-    _marshaller.beginCallMarshalling( _instanceID, dynFacetId, field->getIndex(), false );
+    co::int32 depth = findDepth( _interfaces[dynFacetId], field->getOwner() );
+    
+    _marshaller.beginCallMarshalling( _instanceId, dynFacetId, field->getIndex(), depth, false );
     
     if( value.getKind() != co::TK_INTERFACE )
         _marshaller.addValueParam( value );
@@ -188,11 +196,13 @@ void ClientProxy::dynamicSetField( co::int32 dynFacetId, co::IField* field, cons
 const co::Any& ClientProxy::dynamicInvoke( co::int32 dynFacetId, co::IMethod* method, 
                                            co::Range<co::Any const> args )
 {
+    co::int32 depth = findDepth( _interfaces[dynFacetId], method->getOwner() );
+    
     co::IType* returnType = method->getReturnType();
     if( returnType )
-        _marshaller.beginCallMarshalling( _instanceID, dynFacetId, method->getIndex(), true );
+        _marshaller.beginCallMarshalling( _instanceId, dynFacetId, method->getIndex(), depth, true );
     else
-        _marshaller.beginCallMarshalling( _instanceID, dynFacetId, method->getIndex(), false );
+        _marshaller.beginCallMarshalling( _instanceId, dynFacetId, method->getIndex(), depth, false );
     
     for( ; args; args.popFirst() )
     {
@@ -232,22 +242,22 @@ void ClientProxy::unmarshalReturn( const std::string& data, co::IType* returnedT
         return;
     }
     
-    co::int32 instanceID;
+    co::int32 instanceId;
     co::int32 facetIdx;
     Unmarshaller::RefOwner owner;
     std::string instanceType;
     std::string ownerAddress;
     
-    _unmarshaller.unmarshalReference( data, instanceID, facetIdx, owner, instanceType, ownerAddress );
+    _unmarshaller.unmarshalReference( data, instanceId, facetIdx, owner, instanceType, ownerAddress );
     co::IObject* instance;
     switch( owner )
     {
         case Unmarshaller::RefOwner::RECEIVER:
-            instance = _node->getInstance( instanceID );
+            instance = _node->getInstance( instanceId );
             break;
         case Unmarshaller::RefOwner::LOCAL:
         case Unmarshaller::RefOwner::ANOTHER:
-            instance = _node->getRemoteInstance( instanceType, instanceID, 
+            instance = _node->getRemoteInstance( instanceType, instanceId, 
                                                 ownerAddress );
             break;
     }
@@ -265,30 +275,29 @@ void ClientProxy::onInterfaceParam( co::IService* param )
     co::IObject* provider = param->getProvider();
     std::string providerType = provider->getComponent()->getFullName();
     co::int32 facetIdx = param->getFacet()->getIndex();
-    co::int32 instanceID;
+    co::int32 instanceId;
     
     if( isLocalObject( provider ) )
     {
-        instanceID = _node->publishAnonymousInstance( provider );
-        _marshaller.addReferenceParam( instanceID, facetIdx, Marshaller::LOCAL, &providerType, 
+        instanceId = _node->publishAnonymousInstance( provider );
+        _marshaller.addReferenceParam( instanceId, facetIdx, Marshaller::LOCAL, &providerType, 
                              &_node->getPublicAddress() );
     }
     else // is a remote object, so it provides the IInstanceInfo service
     {
-        ClientProxy* providerRO = static_cast<ClientProxy*>( provider );
-        IInstanceInfo* info = static_cast<IInstanceInfo*>( providerRO );
+        ClientProxy* providerCP = static_cast<ClientProxy*>( provider );
         
-        instanceID = info->getInstanceID();
-        const std::string ownerAddress = info->getOwnerAddress();
+        instanceId = providerCP->getInstanceId();
+        const std::string ownerAddress = providerCP->getOwnerAddress();
         
         if( ownerAddress == _link->getAddress() ) // Receiver
         {
-            _marshaller.addReferenceParam( instanceID, facetIdx, Marshaller::RECEIVER );
+            _marshaller.addReferenceParam( instanceId, facetIdx, Marshaller::RECEIVER );
         }
         else
         {
-            _node->requestBeginAccess( ownerAddress, instanceID, "TODO" );
-            _marshaller.addReferenceParam( instanceID, facetIdx, Marshaller::ANOTHER, &providerType,
+            _node->requestBeginAccess( ownerAddress, instanceId, "TODO" );
+            _marshaller.addReferenceParam( instanceId, facetIdx, Marshaller::ANOTHER, &providerType,
                                  &ownerAddress );
         }
     }
@@ -296,14 +305,14 @@ void ClientProxy::onInterfaceParam( co::IService* param )
 
     // ------ reef.rpc.IInstanceInfo Methods ------ //
     
-co::int32 ClientProxy::getInstanceID()
+co::int32 ClientProxy::getInstanceId()
 {
-    return _instanceID;
+    return _instanceId;
 }
 
 const std::string& ClientProxy::getOwnerAddress()
 {
-    return _link->getAddress();
+    return _address;
 }
     
 void ClientProxy::awaitReplyUpdating( std::string& msg )
@@ -313,6 +322,20 @@ void ClientProxy::awaitReplyUpdating( std::string& msg )
 
 }
 
+co::int32 ClientProxy::findDepth( co::IInterface* facet, co::ICompositeType* memberOwner )
+{
+    if( memberOwner == facet )
+        return -1;
+
+    co::Range<co::IInterface* const> superTypes( facet->getSuperTypes() );
+    for( int i = 0; superTypes; superTypes.popFirst(), i++ )
+    {
+        if( superTypes.getFirst() == memberOwner )
+            return i;
+    }
+    return -2;
+}
+    
 CORAL_EXPORT_COMPONENT( ClientProxy, ClientProxy );
     
     

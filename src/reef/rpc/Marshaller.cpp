@@ -176,7 +176,7 @@ void Marshaller::marshalNewInstance( const std::string& typeName, const std::str
     _message->Clear();
 }
 
-void Marshaller::marshalAccessInstance( co::int32 instanceID, bool increment, 
+void Marshaller::marshalAccessInstance( co::int32 instanceId, bool increment, 
                                        const std::string& referer, std::string& request )
 {
     _message->set_msg_type( Message::MSG_ACCESS_INST );
@@ -188,7 +188,7 @@ void Marshaller::marshalAccessInstance( co::int32 instanceID, bool increment,
 	Message_Acc_Inst* msgAccInst = _message->mutable_msg_acc_inst();
     //TODO: set referer as self
     msgAccInst->set_increment( increment );
-    msgAccInst->set_instance_id( instanceID );
+    msgAccInst->set_instance_id( instanceId );
     
     _message->SerializeToString( &request );
     _message->Clear();
@@ -210,19 +210,20 @@ void Marshaller::marshalFindInstance( const std::string& key, const std::string&
     _message->Clear();
 }
     
-void Marshaller::beginCallMarshalling( co::int32 instanceID, co::int32 facetIdx, co::int32 memberIdx,
-                                   bool hasReturn )
+void Marshaller::beginCallMarshalling( co::int32 instanceId, co::int32 facetIdx, co::int32 memberIdx,
+                                      co::int32 typeDepth, bool hasReturn )
 {
-    if( instanceID == 0 )
-        throw new co::Exception( "A call msg can't have an instanceID of 0" );
+    if( instanceId == 0 )
+        throw new co::Exception( "A call msg can't have an instanceId of 0" );
     
     _message->set_msg_type( Message::MSG_CALL );
-    _message->set_instance_id( instanceID );
+    _message->set_instance_id( instanceId );
     _message->set_has_return( hasReturn );
     
     _msgMember = _message->mutable_msg_member();
     _msgMember->set_facet_idx( facetIdx );
     _msgMember->set_member_idx( memberIdx );
+    _msgMember->set_type_depth( typeDepth );
 }
 
 void Marshaller::addValueParam( const co::Any& param )
@@ -232,31 +233,31 @@ void Marshaller::addValueParam( const co::Any& param )
     anyToPBArg( param, PBArg );
 }
 
-void Marshaller::addReferenceParam( co::int32 instanceID, co::int32 facetIdx, RefOwner owner, 
+void Marshaller::addReferenceParam( co::int32 instanceId, co::int32 facetIdx, RefOwner owner, 
                         const std::string* instanceType, const std::string* ownerAddress )
 {
     checkIfCallMsg();
     Argument* PBArg = _msgMember->add_arguments();
-    reference2PBArg( instanceID, facetIdx, owner, PBArg, instanceType, ownerAddress );
+    reference2PBArg( instanceId, facetIdx, owner, PBArg, instanceType, ownerAddress );
 }
 
-void Marshaller::marshalReferenceType( co::int32 instanceID, co::int32 facetIdx, RefOwner owner, 
+void Marshaller::marshalReferenceType( co::int32 instanceId, co::int32 facetIdx, RefOwner owner, 
                                       std::string& reference, const std::string* instanceType, 
                                           const std::string* ownerAddress )
 {
     Argument PBArg;
-    reference2PBArg( instanceID, facetIdx, owner, &PBArg, instanceType, ownerAddress );
+    reference2PBArg( instanceId, facetIdx, owner, &PBArg, instanceType, ownerAddress );
     PBArg.SerializeToString( &reference );
 }
     
-void Marshaller::reference2PBArg( co::int32 instanceID, co::int32 facetIdx, RefOwner owner, 
+void Marshaller::reference2PBArg( co::int32 instanceId, co::int32 facetIdx, RefOwner owner, 
                                     Argument* PBArg, const std::string* instanceType, 
                                     const std::string* ownerAddress )
 {
     Data_Container* dc = PBArg->add_data();
     Ref_Type* refType = dc->mutable_ref_type();
     
-    refType->set_instance_id( instanceID );
+    refType->set_instance_id( instanceId );
     refType->set_facet_idx( facetIdx );
     
     

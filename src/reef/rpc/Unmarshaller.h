@@ -16,6 +16,7 @@ class Message_Member;
 
     
 /*
+    Refer to Marshaller class in order to understand the parameters of the methods.
     Unmarshals remote requests and data messages. Requests are disassembled in multiple steps. 
     First, a request is set. Then, by using the request's meta information returned by the set method,
     the actual request is unmarshalled and its information returned through 1+nArguments calls.
@@ -44,16 +45,17 @@ public:
     
     /* 
         Sets a request for unmarshalling. Returns request meta information. User must call the 
-        appropriate method for unmarshaling based on meta information. Each case is explained below. 
+        appropriate method for unmarshaling based on meta information. Each case is explained below.
+        \type Set implicitly by the Marshaller depending on the type of request.
      */
-    void setMarshalledRequest( const std::string& request, MsgType& type, co::int32& instanceID,
+    void setMarshalledRequest( const std::string& request, MsgType& type, co::int32& instanceId,
                            bool& hasReturn, std::string* referer = 0 );
     
     // Unmarshals a new instance request. typeName is the instance's component name return value
     void unmarshalNewInstance( std::string& typeName );
     
     // Unmarshals an access instance request.  Increment means if requesting or revoking access 
-    void unmarshalAccessInstance( co::int32& instanceID, bool& increment );
+    void unmarshalAccessInstance( co::int32& instanceId, bool& increment );
     
     // Unmarshals a find instance request. A local instance must be published under key.
     void unmarshalFindInstance( std::string& key );
@@ -64,18 +66,18 @@ public:
      begin method starts an internal state of call unmarshalling, then, each parameter must be 
      unmarshalled with an appropriate call.
      */
-    void beginUnmarshallingCall( co::int32& facetIdx, co::int32& memberIdx );
+    void beginUnmarshallingCall( co::int32& facetIdx, co::int32& memberIdx, co::int32& typeDepth );
     
     // Unmarshals a value type parameter from the current call 
     void unmarshalValueParam( co::Any& param, co::IType* descriptor );
     
     // Unmarshals a reference type parameter from the current call
-    void unmarshalReferenceParam( co::int32& instanceID, co::int32& facetIdx, RefOwner& owner,
+    void unmarshalReferenceParam( co::int32& instanceId, co::int32& facetIdx, RefOwner& owner,
                      std::string& instanceType, std::string& ownerAddress );
 
     
     // Unmarshals a rogue reference type
-    void unmarshalReference( const std::string& data, co::int32& instanceID, co::int32& facetIdx, 
+    void unmarshalReference( const std::string& data, co::int32& instanceId, co::int32& facetIdx, 
                             RefOwner& owner, std::string& instanceType, std::string& ownerAddress );
     
     // Unmarshals a rogue value type
