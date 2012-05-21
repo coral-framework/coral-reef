@@ -1,0 +1,8 @@
+/*
+	Reference types parent interface used for testing inheritance
+*/
+
+interface IGrandParent
+{
+	int32 grandParentInt;
+};
