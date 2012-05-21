@@ -63,6 +63,7 @@ TEST( ParameterTests, simpleTypesTest )
     
     co::Range<const double> doubleRange = simple->parentMergeLists( doubleVec, doubleVec );
     int size = doubleRange.getSize();
+
     for( int i = 0; i < size; i++ )
     {
         double comparison = i % 10;

@@ -304,21 +304,16 @@ public:
 
     co::Range<double const> parentMergeLists( co::Range<double const> list1, co::Range<double const> list2 )
 	{
-        
 		_storedParentDoubleList.clear();
         
 		co::assign( list1, _storedParentDoubleList );
-        int size = list1.getSize();
-        int size2 = list2.getSize();
-		for( int i = 0; i < size, i < size2; i++ )
+        
+		for( ; list2; list2.popFirst() )
 		{
-			_storedParentDoubleList.push_back( list2[i] );
+			_storedParentDoubleList.push_back( list2.getFirst() );
 		}
         
-        for( int i = 0; i < _storedParentDoubleList.size(); i++ )
-            printf( "\nstored value for i = %d : %f",i, _storedParentDoubleList[i] );
-            
-		return _storedParentDoubleList;
+        return _storedParentDoubleList;
 	}
     
     double parentMultiply( double number, co::int32 times )
