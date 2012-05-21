@@ -73,8 +73,9 @@ void protobuf_AssignDesc_Message_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Data_Container));
   Argument_descriptor_ = file->message_type(1);
-  static const int Argument_offsets_[1] = {
+  static const int Argument_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Argument, data_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Argument, coany_type_),
   };
   Argument_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -255,29 +256,30 @@ void protobuf_AddDesc_Message_2eproto() {
     "\n\rMessage.proto\022\010reef.rpc\"e\n\016Data_Contai"
     "ner\022\017\n\007boolean\030\001 \001(\010\022\013\n\003str\030\002 \001(\t\022\017\n\007num"
     "eric\030\003 \001(\001\022$\n\010ref_type\030\004 \001(\0132\022.reef.rpc."
-    "Ref_Type\"2\n\010Argument\022&\n\004data\030\001 \003(\0132\030.ree"
-    "f.rpc.Data_Container\"\305\001\n\010Ref_Type\022\'\n\005own"
-    "er\030\001 \002(\0162\030.reef.rpc.Ref_Type.Owner\022\023\n\013in"
-    "stance_id\030\002 \002(\r\022\021\n\tfacet_idx\030\003 \002(\r\022\025\n\rin"
-    "stance_type\030\004 \001(\t\022\020\n\010owner_ip\030\005 \001(\t\"\?\n\005O"
-    "wner\022\017\n\013OWNER_LOCAL\020\000\022\022\n\016OWNER_RECEIVER\020"
-    "\001\022\021\n\rOWNER_ANOTHER\020\002\"r\n\016Message_Member\022\021"
-    "\n\tfacet_idx\030\001 \002(\r\022\022\n\nmember_idx\030\002 \002(\r\022\022\n"
-    "\ntype_depth\030\003 \002(\005\022%\n\targuments\030\004 \003(\0132\022.r"
-    "eef.rpc.Argument\"-\n\020Message_New_Inst\022\031\n\021"
-    "new_instance_type\030\001 \002(\t\" \n\021Message_Find_"
-    "Inst\022\013\n\003key\030\001 \002(\t\":\n\020Message_Acc_Inst\022\021\n"
-    "\tincrement\030\001 \002(\010\022\023\n\013instance_id\030\002 \002(\r\"\206\003"
-    "\n\007Message\022(\n\010msg_type\030\001 \002(\0162\026.reef.rpc.M"
-    "essage.Type\022\023\n\013instance_id\030\002 \002(\r\022\022\n\nhas_"
-    "return\030\003 \002(\010\022\022\n\nreferer_ip\030\004 \001(\t\0220\n\014msg_"
-    "new_inst\030\005 \001(\0132\032.reef.rpc.Message_New_In"
-    "st\0220\n\014msg_acc_inst\030\006 \001(\0132\032.reef.rpc.Mess"
-    "age_Acc_Inst\0222\n\rmsg_find_inst\030\007 \001(\0132\033.re"
-    "ef.rpc.Message_Find_Inst\022,\n\nmsg_member\030\010"
-    " \001(\0132\030.reef.rpc.Message_Member\"N\n\004Type\022\020"
-    "\n\014MSG_NEW_INST\020\000\022\023\n\017MSG_ACCESS_INST\020\001\022\021\n"
-    "\rMSG_FIND_INST\020\002\022\014\n\010MSG_CALL\020\003", 1030);
+    "Ref_Type\"F\n\010Argument\022&\n\004data\030\001 \003(\0132\030.ree"
+    "f.rpc.Data_Container\022\022\n\ncoany_type\030\002 \001(\r"
+    "\"\305\001\n\010Ref_Type\022\'\n\005owner\030\001 \002(\0162\030.reef.rpc."
+    "Ref_Type.Owner\022\023\n\013instance_id\030\002 \002(\r\022\021\n\tf"
+    "acet_idx\030\003 \002(\r\022\025\n\rinstance_type\030\004 \001(\t\022\020\n"
+    "\010owner_ip\030\005 \001(\t\"\?\n\005Owner\022\017\n\013OWNER_LOCAL\020"
+    "\000\022\022\n\016OWNER_RECEIVER\020\001\022\021\n\rOWNER_ANOTHER\020\002"
+    "\"r\n\016Message_Member\022\021\n\tfacet_idx\030\001 \002(\r\022\022\n"
+    "\nmember_idx\030\002 \002(\r\022\022\n\ntype_depth\030\003 \002(\005\022%\n"
+    "\targuments\030\004 \003(\0132\022.reef.rpc.Argument\"-\n\020"
+    "Message_New_Inst\022\031\n\021new_instance_type\030\001 "
+    "\002(\t\" \n\021Message_Find_Inst\022\013\n\003key\030\001 \002(\t\":\n"
+    "\020Message_Acc_Inst\022\021\n\tincrement\030\001 \002(\010\022\023\n\013"
+    "instance_id\030\002 \002(\r\"\206\003\n\007Message\022(\n\010msg_typ"
+    "e\030\001 \002(\0162\026.reef.rpc.Message.Type\022\023\n\013insta"
+    "nce_id\030\002 \002(\r\022\022\n\nhas_return\030\003 \002(\010\022\022\n\nrefe"
+    "rer_ip\030\004 \001(\t\0220\n\014msg_new_inst\030\005 \001(\0132\032.ree"
+    "f.rpc.Message_New_Inst\0220\n\014msg_acc_inst\030\006"
+    " \001(\0132\032.reef.rpc.Message_Acc_Inst\0222\n\rmsg_"
+    "find_inst\030\007 \001(\0132\033.reef.rpc.Message_Find_"
+    "Inst\022,\n\nmsg_member\030\010 \001(\0132\030.reef.rpc.Mess"
+    "age_Member\"N\n\004Type\022\020\n\014MSG_NEW_INST\020\000\022\023\n\017"
+    "MSG_ACCESS_INST\020\001\022\021\n\rMSG_FIND_INST\020\002\022\014\n\010"
+    "MSG_CALL\020\003", 1050);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "Message.proto", &protobuf_RegisterTypes);
   Data_Container::default_instance_ = new Data_Container();
@@ -659,6 +661,7 @@ void Data_Container::Swap(Data_Container* other) {
 
 #ifndef _MSC_VER
 const int Argument::kDataFieldNumber;
+const int Argument::kCoanyTypeFieldNumber;
 #endif  // !_MSC_VER
 
 Argument::Argument()
@@ -677,6 +680,7 @@ Argument::Argument(const Argument& from)
 
 void Argument::SharedCtor() {
   _cached_size_ = 0;
+  coany_type_ = 0u;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -710,6 +714,9 @@ Argument* Argument::New() const {
 }
 
 void Argument::Clear() {
+  if (_has_bits_[1 / 32] & (0xffu << (1 % 32))) {
+    coany_type_ = 0u;
+  }
   data_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -732,6 +739,22 @@ bool Argument::MergePartialFromCodedStream(
           goto handle_uninterpreted;
         }
         if (input->ExpectTag(10)) goto parse_data;
+        if (input->ExpectTag(16)) goto parse_coany_type;
+        break;
+      }
+      
+      // optional uint32 coany_type = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_coany_type:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &coany_type_)));
+          set_has_coany_type();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -760,6 +783,11 @@ void Argument::SerializeWithCachedSizes(
       1, this->data(i), output);
   }
   
+  // optional uint32 coany_type = 2;
+  if (has_coany_type()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(2, this->coany_type(), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -775,6 +803,11 @@ void Argument::SerializeWithCachedSizes(
         1, this->data(i), target);
   }
   
+  // optional uint32 coany_type = 2;
+  if (has_coany_type()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(2, this->coany_type(), target);
+  }
+  
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -785,6 +818,15 @@ void Argument::SerializeWithCachedSizes(
 int Argument::ByteSize() const {
   int total_size = 0;
   
+  if (_has_bits_[1 / 32] & (0xffu << (1 % 32))) {
+    // optional uint32 coany_type = 2;
+    if (has_coany_type()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->coany_type());
+    }
+    
+  }
   // repeated .reef.rpc.Data_Container data = 1;
   total_size += 1 * this->data_size();
   for (int i = 0; i < this->data_size(); i++) {
@@ -819,6 +861,11 @@ void Argument::MergeFrom(const ::google::protobuf::Message& from) {
 void Argument::MergeFrom(const Argument& from) {
   GOOGLE_CHECK_NE(&from, this);
   data_.MergeFrom(from.data_);
+  if (from._has_bits_[1 / 32] & (0xffu << (1 % 32))) {
+    if (from.has_coany_type()) {
+      set_coany_type(from.coany_type());
+    }
+  }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
@@ -845,6 +892,7 @@ bool Argument::IsInitialized() const {
 void Argument::Swap(Argument* other) {
   if (other != this) {
     data_.Swap(&other->data_);
+    std::swap(coany_type_, other->coany_type_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

@@ -76,6 +76,27 @@ void PBArgWithTypeToAny<std::string>( const Argument& arg, co::Any& any, co::ITy
     }
 }
 
+// Will be removed with all the coral 0.7 workarounds
+co::IType* kind2Type( co::TypeKind kind )
+{
+    switch( kind )
+    {
+        case co::TK_BOOLEAN:
+            return co::getType( "bool" );
+        case co::TK_INT32:
+            return co::getType( "int32" );
+        case co::TK_UINT32:
+            return co::getType( "uint32" );
+        case co::TK_FLOAT:
+            return co::getType( "float" );
+        case co::TK_DOUBLE:
+            return co::getType( "double" );
+        case co::TK_STRING:
+            return co::getType( "string" );
+    }
+    return 0;
+}
+    
 void PBArgToAny( const Argument& arg, co::IType* descriptor, co::Any& any )
 {
     co::TypeKind kind = descriptor->getKind();
@@ -125,6 +146,13 @@ void PBArgToAny( const Argument& arg, co::IType* descriptor, co::Any& any )
         case co::TK_STRING:
             PBArgWithTypeToAny<std::string>( arg, any, elementType );
             break;
+        case co::TK_ANY:
+        {
+            static co::Any internalAny; // TODO remove
+            PBArgToAny( arg, kind2Type( static_cast<co::TypeKind>( arg.coany_type() ) ), internalAny );
+            any.set<const co::Any&>( internalAny );
+            break;
+        }
         default:
             assert( false );
     }

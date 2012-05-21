@@ -302,6 +302,31 @@ public:
 		return _storedDoubleList;
 	}
 
+    const co::Any& addDoublesFromAny( const co::Any& d1, const co::Any& d2 )
+	{
+		static co::Any anyDouble;
+        anyDouble.set<double>( d1.get<double>() + d2.get<double>() );
+		return anyDouble;
+	}
+    
+	const co::Any& concatenateFromAny( const co::Any& str1, const co::Any& str2 )
+	{
+		static co::Any anyString;
+        std::string& temp = anyString.createString();
+        temp = str1.get<const std::string&>();
+		temp.append( str2.get<const std::string&>() );
+        anyString.set<const std::string&>( temp );
+		return anyString;
+	}
+    
+    const co::Any& mergeListsFromAny( const co::Any& l1, const co::Any& l2 )
+	{
+        // NYI
+        assert( false );
+        static co::Any dummy;
+		return dummy;
+	}
+    
     co::Range<double const> parentMergeLists( co::Range<double const> list1, co::Range<double const> list2 )
 	{
 		_storedParentDoubleList.clear();

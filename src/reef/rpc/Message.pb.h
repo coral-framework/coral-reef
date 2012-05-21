@@ -268,15 +268,25 @@ class Argument : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Data_Container >*
       mutable_data();
   
+  // optional uint32 coany_type = 2;
+  inline bool has_coany_type() const;
+  inline void clear_coany_type();
+  static const int kCoanyTypeFieldNumber = 2;
+  inline ::google::protobuf::uint32 coany_type() const;
+  inline void set_coany_type(::google::protobuf::uint32 value);
+  
   // @@protoc_insertion_point(class_scope:reef.rpc.Argument)
  private:
+  inline void set_has_coany_type();
+  inline void clear_has_coany_type();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::RepeatedPtrField< ::reef::rpc::Data_Container > data_;
+  ::google::protobuf::uint32 coany_type_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
   
   friend void  protobuf_AddDesc_Message_2eproto();
   friend void protobuf_AssignDesc_Message_2eproto();
@@ -1170,6 +1180,28 @@ Argument::data() const {
 inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Data_Container >*
 Argument::mutable_data() {
   return &data_;
+}
+
+// optional uint32 coany_type = 2;
+inline bool Argument::has_coany_type() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void Argument::set_has_coany_type() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void Argument::clear_has_coany_type() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void Argument::clear_coany_type() {
+  coany_type_ = 0u;
+  clear_has_coany_type();
+}
+inline ::google::protobuf::uint32 Argument::coany_type() const {
+  return coany_type_;
+}
+inline void Argument::set_coany_type(::google::protobuf::uint32 value) {
+  set_has_coany_type();
+  coany_type_ = value;
 }
 
 // -------------------------------------------------------------------

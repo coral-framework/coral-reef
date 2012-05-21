@@ -12,6 +12,7 @@ message Data_Container
 message Argument
 {
 	repeated Data_Container data = 1;
+	optional uint32 coany_type = 2; // If the argument is an any, then this is its internal type 
 }
 
 message Ref_Type

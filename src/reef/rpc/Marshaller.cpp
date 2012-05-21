@@ -106,6 +106,7 @@ void anyToPBArg( const co::Any& any, Argument* arg )
     
     if( kind == co::TK_ARRAY )
         kind = any.getType()->getKind();
+        
     
     switch( kind )
     {
@@ -145,6 +146,13 @@ void anyToPBArg( const co::Any& any, Argument* arg )
         case co::TK_STRING:
             anyWithTypeToPBArg<std::string>( any, arg );
             break;
+        case co::TK_ANY:
+        {
+            const co::Any& internalAny =  any.get<const co::Any&>();
+            arg->set_coany_type( static_cast<co::uint32>( internalAny.getKind() ) );
+            anyToPBArg( internalAny, arg );
+            break;
+        }
         default:
             assert( false );
     }

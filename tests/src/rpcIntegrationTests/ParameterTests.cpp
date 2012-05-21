@@ -29,6 +29,7 @@ TEST( ParameterTests, simpleTypesTest )
                                                             "address2" );
     moduleA::ISimpleTypes* simple = remoteInstance->getService<moduleA::ISimpleTypes>();
     
+    // ------ Simple value types ------
     simple->setDouble( 0.1 );
     EXPECT_EQ( simple->getStoredDouble(), 0.1 );
     
@@ -41,6 +42,18 @@ TEST( ParameterTests, simpleTypesTest )
     simple->setString( testString );
     EXPECT_STREQ( testString.c_str() , simple->getStoredString().c_str() );
     
+    // ------ Simple values stored inside Any ------ //
+    co::Any d1; d1.set<double>( 4 );
+    const co::Any& dResult = simple->addDoublesFromAny( d1, d1 ); // Cannot pass different anys now
+    EXPECT_DOUBLE_EQ( 8, dResult.get<double>() );
+    
+    co::Any str1Any; 
+    std::string& str1 = str1Any.createString();
+    str1 = "test";
+    const co::Any& strResult = simple->concatenateFromAny( str1Any, str1Any );
+    EXPECT_STREQ( "testtest", strResult.get<const std::string&>().c_str() );
+    
+    // ------ Simple value Types Arrays ------ //
     std::vector<co::int32> intVec;
     std::vector<double> doubleVec;
     std::vector<std::string> stringVec;
