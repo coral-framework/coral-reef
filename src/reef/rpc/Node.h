@@ -16,6 +16,7 @@
 namespace reef {
 namespace rpc {
 
+class Client;
     
 class Node : public Node_Base
 {
@@ -112,6 +113,11 @@ private:
     // returns -1 if not found
     co::int32 getinstanceId( const co::IObject* instance );
     
+    //! returns the Client indexed by \param ip or null if there is not client indexed.
+    Client* searchReferer( const std::string& ip );
+    
+    void addReferer( const std::string& ip, Client* client );
+    
 private:
     ITransport* _transport;
     co::RefPtr<IPassiveLink> _passiveLink;
@@ -123,8 +129,8 @@ private:
     // the invokers and the number of remote references for it
     std::vector<Invoker*> _invokers;
     std::vector<co::int32> _remoteRefCounting;
-    // TODO: map referers to invokers, so they can be queried for maintaining the references
-    // TODO: remember to set the referer in every place which increment _remoteRefCounting 
+    
+    std::map<std::string, Client*> _referers; //!< maps a ip to a client and its references
     
     // used to map easily an instance to a virtual address
     typedef std::pair<co::IObject*, co::int32> objToAddress;
@@ -134,7 +140,7 @@ private:
     // Instances that have been published not anonymously (through a key) will have their IDs here
     std::map<std::string, co::int32> _publicInstances;
     
-    std::stack<co::int32> _freedIds;
+    std::stack<co::int32> _freedIds; //!< auxiliary array for recicling deleted Ids
 };
     
 }

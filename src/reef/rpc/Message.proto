@@ -53,7 +53,6 @@ message Message_Acc_Inst
 {
 	required bool increment = 1;
 	required uint32 instance_id = 2;
-	// TODO required string referer_ip = 3;
 }
 
 message Message 

@@ -16,7 +16,7 @@ namespace rpc {
 
 
 /*
- Maps a all the instance Ids belonging to a host to their local Remote objects representations.
+ Maps a all the instance Ids belonging to a host to their local ClientProxies representations.
  */
 class Host
 {

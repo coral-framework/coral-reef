@@ -193,7 +193,7 @@ Unmarshaller::~Unmarshaller()
     
 // sets the message that will be decoded and return its type and destination
 void Unmarshaller::setMarshalledRequest( const std::string& request, MsgType& type, co::int32& instanceId, 
-                                bool& hasReturn, std::string* referer )
+                                bool& hasReturn )
 {
     _message->Clear();
     _message->ParseFromString( request );
@@ -201,21 +201,19 @@ void Unmarshaller::setMarshalledRequest( const std::string& request, MsgType& ty
     hasReturn = _message->has_return();
     Message_Type2MsgType( _message->msg_type(), type );
     _msgType = type;
-    
-    if( type != CALL )
-        *referer = _message->referer_ip();
 }
 
 // if msg type is NEW, then, this function will decode it
-void Unmarshaller::unmarshalNewInstance( std::string& typeName )
+void Unmarshaller::unmarshalNewInstance( std::string& typeName, std::string& referer )
 {
     assert( _msgType == NEW_INST );
     
     const Message_New_Inst& msgNewInst = _message->msg_new_inst();
     typeName = msgNewInst.new_instance_type();
+    referer = _message->referer_ip();
 }
 
-void Unmarshaller::unmarshalAccessInstance( co::int32& instanceId, bool& increment )
+void Unmarshaller::unmarshalAccessInstance( co::int32& instanceId, bool& increment, std::string& referer )
 {
     assert( _msgType == ACCESS_INST );
     
@@ -223,14 +221,16 @@ void Unmarshaller::unmarshalAccessInstance( co::int32& instanceId, bool& increme
     // refererIP = msgAccessInst.referer_ip();
     instanceId = msgAccessInst.instance_id();
     increment = msgAccessInst.increment();
+    referer = _message->referer_ip();
 }
    
-void Unmarshaller::unmarshalFindInstance( std::string& key )
+void Unmarshaller::unmarshalFindInstance( std::string& key, std::string& referer )
 {
     assert( _msgType == FIND_INST );
     
     const Message_Find_Inst& msgFindInst = _message->msg_find_inst();
     key = msgFindInst.key();
+    referer = _message->referer_ip();
 }
 /* 
  Starts a decoding state of call/field msg. 

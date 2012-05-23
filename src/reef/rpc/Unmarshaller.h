@@ -49,16 +49,16 @@ public:
         \type Set implicitly by the Marshaller depending on the type of request.
      */
     void setMarshalledRequest( const std::string& request, MsgType& type, co::int32& instanceId,
-                           bool& hasReturn, std::string* referer = 0 );
+                           bool& hasReturn );
     
     // Unmarshals a new instance request. typeName is the instance's component name return value
-    void unmarshalNewInstance( std::string& typeName );
+    void unmarshalNewInstance( std::string& typeName, std::string& referer );
     
     // Unmarshals an access instance request.  Increment means if requesting or revoking access 
-    void unmarshalAccessInstance( co::int32& instanceId, bool& increment );
+    void unmarshalAccessInstance( co::int32& instanceId, bool& increment, std::string& referer );
     
     // Unmarshals a find instance request. A local instance must be published under key.
-    void unmarshalFindInstance( std::string& key );
+    void unmarshalFindInstance( std::string& key, std::string& referer );
 
     /*
      Unmarshaller functions for Call/Field requests. As these requests require different amounts of 

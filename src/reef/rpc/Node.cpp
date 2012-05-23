@@ -14,6 +14,53 @@
 namespace reef {
 namespace rpc {
 
+/*!
+ \brief Internal class that maps a Client Node to all the local instance's Ids. 
+ 
+ This mapping is purely informative (for usage in algorithms that need to know a reference owner). 
+ The actual reference counting that manages the instances' lifecycle happens elsewhere.
+ */
+class Client
+{
+public:
+    Client();
+    
+    /*
+        Adds the Id of a local instance to the list of Ids that this client refers. This method is
+        merely add the ID to the list for usage in algorithms that need to consult the owner of a
+        reference.
+     */
+    inline void addReferredId( co::int32 instanceId )
+    {
+        _ids.insert( instanceId );
+    }
+    
+    /*
+        Analogous to addRefferedID but removes the id.
+    */
+    inline void removeReferredId( co::int32 instanceId )
+    {
+        _ids.erase( instanceId );
+    }
+    
+    /*
+        Searches this client references for \param instanceId , returns true if found, false if not.
+    */
+    inline bool searchReference( co::int32 instanceId )
+    {
+        _it = _ids.find( instanceId );
+        return _it != _ids.end() ? true : false;
+    }
+    
+    inline bool isEmpty()
+    {
+        return _ids.empty();
+    }
+    
+private:
+    std::set<co::int32> _ids;
+    std::set<co::int32>::iterator _it;
+};
 
 Node::Node() : _passiveLink( 0 )
 {
@@ -169,11 +216,10 @@ co::int32 Node::requestFindInstance( IActiveLink* link, const std::string& key )
 
 void Node::dispatchMessage( const std::string& msg )
 {
-    co::int32 destinstanceId;
+    co::int32 destInstanceId;
     Unmarshaller::MsgType type;
     bool hasReturn;
-    std::string referer;
-    _unmarshaller.setMarshalledRequest( msg, type, destinstanceId, hasReturn, &referer );
+    _unmarshaller.setMarshalledRequest( msg, type, destInstanceId, hasReturn );
     
     switch( type )
     {
@@ -194,7 +240,8 @@ void Node::dispatchMessage( const std::string& msg )
 void Node::onNewInstMsg() 
 {
     std::string instanceTypeName;
-    _unmarshaller.unmarshalNewInstance( instanceTypeName );
+    std::string referer;
+    _unmarshaller.unmarshalNewInstance( instanceTypeName, referer );
     
 	co::IObject* instance = co::newInstance( instanceTypeName );
     co::int32 instanceId = startRemoteRefCount( instance );
@@ -210,7 +257,8 @@ void Node::onNewInstMsg()
 void Node::onFindInstMsg() 
 {
     std::string key;
-    _unmarshaller.unmarshalFindInstance( key );
+    std::string referer;
+    _unmarshaller.unmarshalFindInstance( key, referer );
     
     std::map<std::string, co::int32>::iterator it = _publicInstances.find( key );
     co::int32 instanceId = 0;
@@ -232,8 +280,9 @@ void Node::onAccessInstMsg()
 {
     co::int32 instanceId;
     bool increment;
+    std::string referer;
     
-    _unmarshaller.unmarshalAccessInstance( instanceId, increment );
+    _unmarshaller.unmarshalAccessInstance( instanceId, increment, referer );
     
     if( increment )
         openRemoteReference( instanceId );
@@ -354,6 +403,13 @@ void Node::setTransportService( reef::rpc::ITransport* transport )
 {
     _transport = transport;
 }
+    
+Client* getReferer( const std::string& ip )
+{
+    std::map<std::string, Client*>::iterator it = _referers.find( ip );
+    return  it == _referers.end() ? 0: *it;
+}
+
     
 CORAL_EXPORT_COMPONENT( Node, Node );
     
