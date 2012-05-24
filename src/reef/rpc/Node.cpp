@@ -9,6 +9,7 @@
 #include <co/Exception.h>
 
 #include <iostream>
+#include <cassert>
 #include <map>
 #include <set>
 
@@ -467,7 +468,10 @@ bool Node::tryRemoveReferer( const std::string& ip, co::int32 instanceId )
     assert( it != _referers.end() ); //REMOTINGERROR There is no Client associated with ip
     
     Client* client = it->second;
-    assert( client->removeReferredId( instanceId ) ); //REMOTINGERROR There is no reference to the Id
+    if( client->removeReferredId( instanceId ) )
+    {
+        //REMOTINGERROR There is no reference to the Id
+    }
     
     if( !client->isEmpty() )
         return false;
