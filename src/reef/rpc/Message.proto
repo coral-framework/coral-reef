@@ -71,7 +71,7 @@ message Message
 	
 	required bool has_return = 3;
 	 
-	optional string referer_ip = 4;
+	required string referer_ip = 4;
 	
 	optional Message_New_Inst msg_new_inst = 5;
 	

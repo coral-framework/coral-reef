@@ -81,8 +81,9 @@ TEST( ClientTests, valueTypeCalls )
     co::int32 facetIdx;
     co::int32 memberIdx;
     co::int32 memberOwner;
+    std::string caller;
     
-    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, memberOwner );
+    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, memberOwner, caller );
     EXPECT_EQ( facetIdx, STPort->getIndex() );
     EXPECT_EQ( memberIdx, setIntMethod->getIndex() );
     EXPECT_EQ( memberOwner, -1 );
@@ -106,7 +107,7 @@ TEST( ClientTests, valueTypeCalls )
     
     EXPECT_FALSE( hasReturn );
     
-    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, memberOwner );
+    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, memberOwner, caller );
     EXPECT_EQ( facetIdx, STPort->getIndex() );
     EXPECT_EQ( memberIdx, parentIntField->getIndex() );
     EXPECT_EQ( memberOwner, 0 );
@@ -129,7 +130,7 @@ TEST( ClientTests, valueTypeCalls )
     
     EXPECT_FALSE( hasReturn );
     
-    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, memberOwner );
+    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, memberOwner, caller );
     EXPECT_EQ( facetIdx, STPort->getIndex() );
     EXPECT_EQ( memberIdx, gParentIntField->getIndex() );
     EXPECT_EQ( memberOwner, 1 );
@@ -214,6 +215,7 @@ TEST( ClientTests, refTypeCalls )
     Unmarshaller::RefOwner refOwner;
     std::string instanceType;
     std::string ownerAddress;
+    std::string caller;
     
     // ------ Transmission of a Local Object ------ //
     marshaller.marshalValueType( intParam, msg );
@@ -225,7 +227,7 @@ TEST( ClientTests, refTypeCalls )
     EXPECT_EQ( msgType, Unmarshaller::CALL );
     EXPECT_EQ( msgReceiverID, 3 );
     EXPECT_TRUE( hasReturn );
-    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, typeDepth );
+    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, typeDepth, caller );
     EXPECT_EQ( facetIdx, RTPort->getIndex() );
     EXPECT_EQ( memberIdx, parentCall->getIndex() );
     EXPECT_EQ( typeDepth, 0 );
@@ -245,7 +247,7 @@ TEST( ClientTests, refTypeCalls )
     fakeLinkA->getMsg( msg );
     
     unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
-    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, typeDepth );
+    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, typeDepth, caller );
     EXPECT_EQ( facetIdx, RTPort->getIndex() );
     EXPECT_EQ( memberIdx, callIncrIntMethod->getIndex() );
     
@@ -263,7 +265,7 @@ TEST( ClientTests, refTypeCalls )
     fakeLinkA->getMsg( msg );
     
     unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
-    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, typeDepth );
+    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, typeDepth, caller );
     EXPECT_EQ( facetIdx, RTPort->getIndex() );
     EXPECT_EQ( memberIdx, callIncrIntMethod->getIndex() );
     

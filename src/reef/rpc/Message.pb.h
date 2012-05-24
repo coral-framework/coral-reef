@@ -932,7 +932,7 @@ class Message : public ::google::protobuf::Message {
   inline bool has_return() const;
   inline void set_has_return(bool value);
   
-  // optional string referer_ip = 4;
+  // required string referer_ip = 4;
   inline bool has_referer_ip() const;
   inline void clear_referer_ip();
   static const int kRefererIpFieldNumber = 4;
@@ -1729,7 +1729,7 @@ inline void Message::set_has_return(bool value) {
   has_return_ = value;
 }
 
-// optional string referer_ip = 4;
+// required string referer_ip = 4;
 inline bool Message::has_referer_ip() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }

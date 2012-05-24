@@ -6,7 +6,7 @@ function bulkReferencing()
 	setup:publishForAll( "moduleA.TestComponent", "key" )
 	
 	-- Cascade calling test
-	ref = {}
+	local ref = {}
 	local client = setup:getNode( 1 )
 	for i = 2, 10 do
 		ref[i] = client:findRemoteInstance( "moduleA.TestComponent", "key"..i, "address"..i ).reference

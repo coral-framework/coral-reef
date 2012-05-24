@@ -66,7 +66,8 @@ public:
      begin method starts an internal state of call unmarshalling, then, each parameter must be 
      unmarshalled with an appropriate call.
      */
-    void beginUnmarshallingCall( co::int32& facetIdx, co::int32& memberIdx, co::int32& typeDepth );
+    void beginUnmarshallingCall( co::int32& facetIdx, co::int32& memberIdx, co::int32& typeDepth,
+                                std::string& caller );
     
     // Unmarshals a value type parameter from the current call 
     void unmarshalValueParam( co::Any& param, co::IType* descriptor );

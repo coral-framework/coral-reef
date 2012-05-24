@@ -60,15 +60,28 @@ public:
      Makes an instance available for remote usage but only through its ID. Only used when the
      instance has been sent as a parameter to another host.
      */
-    co::int32 publishAnonymousInstance( co::IObject* instance );
+    co::int32 publishAnonymousInstance( co::IObject* instance, const std::string& referer );
     
-    // Informs the instance owner about a new access to the instance (increase instance's ref count)
+    /* 
+        Informs the instance owner about a new access to the instance (increase instance's ref count)
+        Notice that this method does not require a referer to be
+        provider as a parameter. The reason is that an "end access" request is always issue by the
+        very node that is accessing. Whereas in a "Begin access" the accessor may not be the one
+        issuing the request. See Marshaller for a complete explanation of request types and their
+        differences.
+    */
     void requestBeginAccess( const std::string& address, co::int32 instanceId,
                                const std::string& referer );
     
-    // Informs the instance owner about a new access to the instance (increase instance's ref count)
-    void requestEndAccess( reef::rpc::IActiveLink* link, co::int32 instanceId,
-                            const std::string& referer );
+    /*! 
+        Informs the instance owner that this node is not accessing to the instance anymore 
+        (decrease instance's ref count). Notice that this method does not require a referer to be
+        provider as a parameter. The reason is that an "end access" request is always issue by the
+        very node that is accessing. Whereas in a "Begin access" the accessor may not be the one
+        issuing the request. See Marshaller for a complete explanation of request types and their
+        differences.
+     */
+    void requestEndAccess( reef::rpc::IActiveLink* link, co::int32 instanceId );
     
     // returns a proxy to the requested remote instance
     co::IObject* getRemoteInstance( const std::string& instanceType, co::int32 instanceId, 
@@ -80,6 +93,9 @@ private:
     
     // Sends a message to another node to search for an instance published under "key", blocking.
     co::int32 requestFindInstance( IActiveLink* link, const std::string& key );
+    
+    //! Inform a client node that possess referece to instances here that this node is shutting down
+    void requestDisconnection( const std::string& ip );
     
     // Dispatches the msg received during an update()
     void dispatchMessage( const std::string& msg );
@@ -114,9 +130,20 @@ private:
     co::int32 getinstanceId( const co::IObject* instance );
     
     //! returns the Client indexed by \param ip or null if there is not client indexed.
-    Client* searchReferer( const std::string& ip );
+    Client* findReferer( const std::string& ip );
     
-    void addReferer( const std::string& ip, Client* client );
+    //! Creates or gets an existing Client associated to \param ip
+    Client* tryAddReferer( const std::string& ip );
+    
+    /*!
+        Finds a Client associated with \param ip and try to remove its reference to \param instanceId.
+        After removing the reference, checks if the Client has any other references. If not, then
+        deletes the Client and disassociate it with \param ip.
+        Asserts if there is a Client associated with \param ip and if \param instanceId is actually 
+        referenced by the Client.
+        Returns true if the Client got empty and was removed and false if it still has references.
+     */
+    bool tryRemoveReferer( const std::string& ip, co::int32 instanceId );
     
 private:
     ITransport* _transport;

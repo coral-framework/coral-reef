@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <map>
+#include <set>
 
 namespace reef {
 namespace rpc {
@@ -23,24 +24,29 @@ namespace rpc {
 class Client
 {
 public:
-    Client();
+    Client()
+    {
+        
+    }
     
     /*
         Adds the Id of a local instance to the list of Ids that this client refers. This method is
         merely add the ID to the list for usage in algorithms that need to consult the owner of a
         reference.
+        returns true if the Id was added and false if the Id already exists inside the client.
      */
-    inline void addReferredId( co::int32 instanceId )
+    inline bool addReferredId( co::int32 instanceId )
     {
-        _ids.insert( instanceId );
+        std::pair<std::set<co::int32>::iterator, bool> res = _ids.insert( instanceId );
+        return res.second;
     }
     
     /*
         Analogous to addRefferedID but removes the id.
     */
-    inline void removeReferredId( co::int32 instanceId )
+    inline bool removeReferredId( co::int32 instanceId )
     {
-        _ids.erase( instanceId );
+        return _ids.erase( instanceId );
     }
     
     /*
@@ -139,6 +145,14 @@ void Node::stop()
         delete _invokers[i];
     }
     
+    // Delete all referers
+    for( std::map<std::string, Client*>::iterator clientIt = _referers.begin(); 
+        clientIt != _referers.end(); clientIt++ )
+    {
+        requestDisconnection( clientIt->first );
+        delete clientIt->second;
+    }
+    
     _passiveLink = 0;
 }
 
@@ -155,7 +169,7 @@ co::int32 Node::getRemoteReferences( co::int32 instanceId )
 co::int32 Node::publishInstance( co::IObject* instance, const std::string& key )
 {
     // Makes the instance available for remote usage as any other instance
-    co::int32 instanceId = publishAnonymousInstance( instance );
+    co::int32 instanceId = publishAnonymousInstance( instance, "self" );
     
     _publicInstances.insert( std::pair<std::string, co::int32>( key, instanceId ) );
     
@@ -214,6 +228,11 @@ co::int32 Node::requestFindInstance( IActiveLink* link, const std::string& key )
     return instanceId;
 }
 
+void Node::requestDisconnection( const std::string& ip )
+{
+    // TODO
+}
+    
 void Node::dispatchMessage( const std::string& msg )
 {
     co::int32 destInstanceId;
@@ -233,7 +252,7 @@ void Node::dispatchMessage( const std::string& msg )
             onFindInstMsg();
             break;
         default: // the message isn't destined to the Node. Pass to the appropriate invoker. 
-            onMsgForInvoker( destinstanceId, hasReturn );
+            onMsgForInvoker( destInstanceId, hasReturn );
     }  
 }
     
@@ -245,6 +264,9 @@ void Node::onNewInstMsg()
     
 	co::IObject* instance = co::newInstance( instanceTypeName );
     co::int32 instanceId = startRemoteRefCount( instance );
+    
+    Client* client = tryAddReferer( referer );
+    client->addReferredId( instanceId );
     
     // Encode the new instanceId as reply message
     std::string msg;
@@ -266,6 +288,8 @@ void Node::onFindInstMsg()
     {
         instanceId = it->second;
         openRemoteReference( instanceId );
+        Client* client = tryAddReferer( referer );
+        client->addReferredId( instanceId );
     }
     
     // Encode the instanceId (or 0 if not found) as reply message
@@ -282,12 +306,21 @@ void Node::onAccessInstMsg()
     bool increment;
     std::string referer;
     
+    // REMOTINGERROR: if no instance found with the id
     _unmarshaller.unmarshalAccessInstance( instanceId, increment, referer );
     
     if( increment )
-        openRemoteReference( instanceId );
+    {
+        Client* client = tryAddReferer( referer );
+        if( client->addReferredId( instanceId ) ) // If there isn't already a reference
+            openRemoteReference( instanceId );
+    }
     else
+    {
+        tryRemoveReferer( referer, instanceId );
+                
         closeRemoteReference( instanceId );
+    }
 }
   
 void Node::onMsgForInvoker( co::int32 instanceId, bool hasReturn )
@@ -301,13 +334,19 @@ void Node::onMsgForInvoker( co::int32 instanceId, bool hasReturn )
         _passiveLink->sendReply( returned );
 }
 
-co::int32 Node::publishAnonymousInstance( co::IObject* instance )
+co::int32 Node::publishAnonymousInstance( co::IObject* instance, const std::string& referer )
 {
     co::int32 instanceId = getinstanceId( instance );
     if( instanceId != -1 )
-        openRemoteReference( instanceId ); // TODO set referer
+        openRemoteReference( instanceId );
     else
         instanceId = startRemoteRefCount( instance );
+    
+    if( referer != "self" )
+    {
+        Client* client = tryAddReferer( referer );
+        client->addReferredId( instanceId );
+    }
     
     return instanceId;
 }
@@ -322,10 +361,10 @@ void Node::requestBeginAccess( const std::string& address, co::int32 instanceId,
     link->send( msg );
 }
   
-void Node::requestEndAccess( IActiveLink* link, co::int32 instanceId, const std::string& referer )
+void Node::requestEndAccess( IActiveLink* link, co::int32 instanceId )
 {    
     std::string msg;
-    _marshaller.marshalAccessInstance( instanceId, false, referer, msg );
+    _marshaller.marshalAccessInstance( instanceId, false, _myPublicAddress, msg );
     link->send( msg );
 }
     
@@ -404,12 +443,39 @@ void Node::setTransportService( reef::rpc::ITransport* transport )
     _transport = transport;
 }
     
-Client* getReferer( const std::string& ip )
+Client* Node::findReferer( const std::string& ip )
 {
     std::map<std::string, Client*>::iterator it = _referers.find( ip );
-    return  it == _referers.end() ? 0: *it;
+    return  it == _referers.end() ? 0: it->second;
 }
 
+Client* Node::tryAddReferer( const std::string& ip )
+{
+    Client* client = findReferer( ip );
+
+    if( client )
+        return client;
+    
+    client = new Client();
+    _referers.insert( std::pair<std::string, Client*>( ip, client ) );
+    return client;
+}
+  
+bool Node::tryRemoveReferer( const std::string& ip, co::int32 instanceId )
+{
+    std::map<std::string, Client*>::iterator it = _referers.find( ip );
+    assert( it != _referers.end() ); //REMOTINGERROR There is no Client associated with ip
+    
+    Client* client = it->second;
+    assert( client->removeReferredId( instanceId ) ); //REMOTINGERROR There is no reference to the Id
+    
+    if( !client->isEmpty() )
+        return false;
+
+    _referers.erase( it );
+    delete client;
+    return true;
+}
     
 CORAL_EXPORT_COMPONENT( Node, Node );
     

@@ -42,8 +42,9 @@ void Invoker::invoke( Unmarshaller& unmarshaller, bool isSynch, std::string& ret
     co::int32 memberIdx;
     co::Any parameter;
     co::int32 depth;
+    std::string caller;
     
-    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, depth );
+    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, depth, caller );
     
     if( !_openedServices[facetIdx] ) // if already used before access directly
         onServiceFirstAccess( facetIdx );
@@ -82,7 +83,7 @@ void Invoker::invoke( Unmarshaller& unmarshaller, bool isSynch, std::string& ret
     if( parameter.getKind() != co::TK_INTERFACE )
         _marshaller.marshalValueType( parameter, returned );
     else
-        onInterfaceReturned( parameter.get<co::IService*>(), returned );
+        onInterfaceReturned( parameter.get<co::IService*>(), caller, returned );
 }
 
 void Invoker::onMethod( Unmarshaller& unmarshaller, co::IService* facet, co::IMethod* method, 
@@ -159,7 +160,8 @@ void Invoker::unmarshalParameter( Unmarshaller& unmarshaller, co::IType* paramTy
     param.set<co::IService*>( service );
 }
 
-void Invoker::onInterfaceReturned( co::IService* returned, std::string& marshalledReturn )
+void Invoker::onInterfaceReturned( co::IService* returned, std::string& caller, 
+                                      std::string& marshalledReturn )
 {
     co::IObject* provider = returned->getProvider();
     std::string providerType = provider->getComponent()->getFullName();
@@ -168,7 +170,7 @@ void Invoker::onInterfaceReturned( co::IService* returned, std::string& marshall
     
     if( ClientProxy::isLocalObject( provider ) )
     {
-        instanceId = _node->publishAnonymousInstance( provider );
+        instanceId = _node->publishAnonymousInstance( provider, caller );
         _marshaller.marshalReferenceType( instanceId, facetIdx, Marshaller::RefOwner::LOCAL, 
 							marshalledReturn, &providerType, &_node->getPublicAddress() );
     }
@@ -179,7 +181,7 @@ void Invoker::onInterfaceReturned( co::IService* returned, std::string& marshall
         instanceId = providerCP->getInstanceId();
         std::string ownerAddress = providerCP->getOwnerAddress();
         
-        _node->requestBeginAccess( ownerAddress, instanceId, "TODO" );
+        _node->requestBeginAccess( ownerAddress, instanceId, caller );
         _marshaller.marshalReferenceType( instanceId, facetIdx, Marshaller::RefOwner::ANOTHER, 
                                       marshalledReturn, &providerType, &ownerAddress );
     }

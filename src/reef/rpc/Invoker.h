@@ -57,7 +57,8 @@ private:
                     co::RefVector<co::IObject>& tempRefs );
     
     // Identify and marshals an interface that has been returned from an invoke
-    void onInterfaceReturned( co::IService* returned, std::string& marshalledReturn );
+    void onInterfaceReturned( co::IService* returned, std::string& caller, 
+                             std::string& marshalledReturn );
    
 private:
     co::RefPtr<co::IObject> _object;

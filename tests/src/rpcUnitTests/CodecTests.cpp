@@ -42,41 +42,41 @@ TEST( CodecTests, simpleTypesTest )
     std::string typeName;
     
     marshaller.marshalNewInstance( "test", "address", msg );
-    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn, &referer );
+    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
     
     EXPECT_EQ( msgType, Unmarshaller::NEW_INST );
     EXPECT_EQ( msgReceiverID, 0 );
     EXPECT_TRUE( hasReturn );
-    EXPECT_STREQ( referer.c_str(), "address" );
     
-    EXPECT_NO_THROW( unmarshaller.unmarshalNewInstance( typeName ) );
+    EXPECT_NO_THROW( unmarshaller.unmarshalNewInstance( typeName , referer ) );
+    EXPECT_STREQ( referer.c_str(), "address" );
     EXPECT_STREQ( typeName.c_str(), "test" );
     
     marshaller.marshalFindInstance( "key", "address2", msg );
-    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn, &referer );
+    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
     
     EXPECT_EQ( msgType, Unmarshaller::FIND_INST );
     EXPECT_EQ( msgReceiverID, 0 );
     EXPECT_TRUE( hasReturn );
-    EXPECT_STREQ( referer.c_str(), "address2" );
 
     std::string key;
     
-    EXPECT_NO_THROW( unmarshaller.unmarshalFindInstance( key ) );
+    EXPECT_NO_THROW( unmarshaller.unmarshalFindInstance( key, referer ) );
+    EXPECT_STREQ( referer.c_str(), "address2" );
     EXPECT_STREQ( key.c_str(), "key" );
    
     // ------ accessinst
     bool increment;
     
     marshaller.marshalAccessInstance( 5, true, "address3", msg );
-    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn, &referer );
+    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
     
     EXPECT_EQ( msgType, Unmarshaller::ACCESS_INST );
     EXPECT_EQ( msgReceiverID, 0 );
     EXPECT_FALSE( hasReturn );
-    EXPECT_STREQ( referer.c_str(), "address3" );
     
-    EXPECT_NO_THROW( unmarshaller.unmarshalAccessInstance( instanceId, increment ) );
+    EXPECT_NO_THROW( unmarshaller.unmarshalAccessInstance( instanceId, increment, referer ) );
+    EXPECT_STREQ( referer.c_str(), "address3" );
     EXPECT_EQ( instanceId, 5 );
     EXPECT_TRUE( increment );
     
@@ -84,6 +84,7 @@ TEST( CodecTests, simpleTypesTest )
     co::int32 facetIdx;
     co::int32 memberIdx;
     co::int32 memberOwner;
+    std::string caller;
     
     // all the possible parameter types
     co::Any intAny; intAny.set<co::int32>( 6 );
@@ -105,7 +106,7 @@ TEST( CodecTests, simpleTypesTest )
 		fillUint8Array<co::int32>( i, intArray, i );
 	}
     
-    marshaller.beginCallMarshalling( 3, 4, 5, 6, true );
+    marshaller.beginCallMarshalling( 3, 4, 5, 6, true, caller );
     marshaller.addValueParam( intAny );
     marshaller.addValueParam( doubleAny );
     marshaller.addValueParam( stringParam );
@@ -120,7 +121,7 @@ TEST( CodecTests, simpleTypesTest )
     EXPECT_EQ( msgReceiverID, 3 );
     EXPECT_TRUE( hasReturn );
     
-    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, memberOwner );
+    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, memberOwner, caller );
     EXPECT_EQ( facetIdx, 4 );
     EXPECT_EQ( memberIdx, 5 );
     EXPECT_EQ( memberOwner, 6 );

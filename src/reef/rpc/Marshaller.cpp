@@ -219,7 +219,7 @@ void Marshaller::marshalFindInstance( const std::string& key, const std::string&
 }
     
 void Marshaller::beginCallMarshalling( co::int32 instanceId, co::int32 facetIdx, co::int32 memberIdx,
-                                      co::int32 typeDepth, bool hasReturn )
+                            co::int32 typeDepth, bool hasReturn, const std::string& callerAddress )
 {
     if( instanceId == 0 )
         throw new co::Exception( "A call msg can't have an instanceId of 0" );
@@ -227,6 +227,7 @@ void Marshaller::beginCallMarshalling( co::int32 instanceId, co::int32 facetIdx,
     _message->set_msg_type( Message::MSG_CALL );
     _message->set_instance_id( instanceId );
     _message->set_has_return( hasReturn );
+    _message->set_referer_ip( callerAddress ); // In case a reference is returned this is the referer
     
     _msgMember = _message->mutable_msg_member();
     _msgMember->set_facet_idx( facetIdx );

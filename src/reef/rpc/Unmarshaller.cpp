@@ -237,7 +237,7 @@ void Unmarshaller::unmarshalFindInstance( std::string& key, std::string& referer
  The decoding state will only be reset after all params are decoded.
  */
 void Unmarshaller::beginUnmarshallingCall( co::int32& facetIdx, co::int32& memberIdx, 
-                                          co::int32& typeDepth )
+                                          co::int32& typeDepth, std::string& caller )
 {
     assert( _msgType == CALL );
     
@@ -246,6 +246,7 @@ void Unmarshaller::beginUnmarshallingCall( co::int32& facetIdx, co::int32& membe
     facetIdx = _msgMember->facet_idx();
     memberIdx = _msgMember->member_idx();
     typeDepth = _msgMember->type_depth();
+    caller = _message->referer_ip();
 }
 
 void Unmarshaller::unmarshalValueParam( co::Any& param, co::IType* descriptor )

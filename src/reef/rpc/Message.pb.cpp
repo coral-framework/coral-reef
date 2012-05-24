@@ -272,7 +272,7 @@ void protobuf_AddDesc_Message_2eproto() {
     "instance_id\030\002 \002(\r\"\206\003\n\007Message\022(\n\010msg_typ"
     "e\030\001 \002(\0162\026.reef.rpc.Message.Type\022\023\n\013insta"
     "nce_id\030\002 \002(\r\022\022\n\nhas_return\030\003 \002(\010\022\022\n\nrefe"
-    "rer_ip\030\004 \001(\t\0220\n\014msg_new_inst\030\005 \001(\0132\032.ree"
+    "rer_ip\030\004 \002(\t\0220\n\014msg_new_inst\030\005 \001(\0132\032.ree"
     "f.rpc.Message_New_Inst\0220\n\014msg_acc_inst\030\006"
     " \001(\0132\032.reef.rpc.Message_Acc_Inst\0222\n\rmsg_"
     "find_inst\030\007 \001(\0132\033.reef.rpc.Message_Find_"
@@ -2556,7 +2556,7 @@ bool Message::MergePartialFromCodedStream(
         break;
       }
       
-      // optional string referer_ip = 4;
+      // required string referer_ip = 4;
       case 4: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
@@ -2663,7 +2663,7 @@ void Message::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteBool(3, this->has_return(), output);
   }
   
-  // optional string referer_ip = 4;
+  // required string referer_ip = 4;
   if (has_referer_ip()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->referer_ip().data(), this->referer_ip().length(),
@@ -2720,7 +2720,7 @@ void Message::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(3, this->has_return(), target);
   }
   
-  // optional string referer_ip = 4;
+  // required string referer_ip = 4;
   if (has_referer_ip()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->referer_ip().data(), this->referer_ip().length(),
@@ -2787,7 +2787,7 @@ int Message::ByteSize() const {
       total_size += 1 + 1;
     }
     
-    // optional string referer_ip = 4;
+    // required string referer_ip = 4;
     if (has_referer_ip()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
@@ -2890,7 +2890,7 @@ void Message::CopyFrom(const Message& from) {
 }
 
 bool Message::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000007) != 0x00000007) return false;
+  if ((_has_bits_[0] & 0x0000000f) != 0x0000000f) return false;
   
   if (has_msg_new_inst()) {
     if (!this->msg_new_inst().IsInitialized()) return false;

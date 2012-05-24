@@ -113,7 +113,7 @@ ClientProxy::~ClientProxy()
     delete [] _interfaces;
     delete [] _facets;
     
-    _node->requestEndAccess( _link.get(), _instanceId, "TODO" );
+    _node->requestEndAccess( _link.get(), _instanceId );
 }
     
 void ClientProxy::setComponent( co::IComponent* component )
@@ -164,7 +164,8 @@ const co::Any& ClientProxy::dynamicGetField( co::int32 dynFacetId, co::IField* f
 {
     co::int32 depth = findDepth( _interfaces[dynFacetId], field->getOwner() );
     
-    _marshaller.beginCallMarshalling( _instanceId, dynFacetId, field->getIndex(), depth, true );
+    _marshaller.beginCallMarshalling( _instanceId, dynFacetId, field->getIndex(), depth, true,
+                                     _node->getPublicAddress() );
     std::string msg;
     _marshaller.getMarshalledCall( msg );
     _link->send( msg );
@@ -180,7 +181,9 @@ void ClientProxy::dynamicSetField( co::int32 dynFacetId, co::IField* field, cons
 {
     co::int32 depth = findDepth( _interfaces[dynFacetId], field->getOwner() );
     
-    _marshaller.beginCallMarshalling( _instanceId, dynFacetId, field->getIndex(), depth, false );
+    _marshaller.beginCallMarshalling( _instanceId, dynFacetId, field->getIndex(), depth, false ,
+                                     _node->getPublicAddress() );
+
     
     if( value.getKind() != co::TK_INTERFACE )
         _marshaller.addValueParam( value );
@@ -199,11 +202,10 @@ const co::Any& ClientProxy::dynamicInvoke( co::int32 dynFacetId, co::IMethod* me
     co::int32 depth = findDepth( _interfaces[dynFacetId], method->getOwner() );
     
     co::IType* returnType = method->getReturnType();
-    if( returnType )
-        _marshaller.beginCallMarshalling( _instanceId, dynFacetId, method->getIndex(), depth, true );
-    else
-        _marshaller.beginCallMarshalling( _instanceId, dynFacetId, method->getIndex(), depth, false );
-    
+
+    _marshaller.beginCallMarshalling( _instanceId, dynFacetId, method->getIndex(), depth, returnType,
+                                         _node->getPublicAddress() );
+     
     for( ; args; args.popFirst() )
     {
         const co::Any& arg = args.getFirst();
@@ -279,7 +281,7 @@ void ClientProxy::onInterfaceParam( co::IService* param )
     
     if( isLocalObject( provider ) )
     {
-        instanceId = _node->publishAnonymousInstance( provider );
+        instanceId = _node->publishAnonymousInstance( provider, _address );
         _marshaller.addReferenceParam( instanceId, facetIdx, Marshaller::LOCAL, &providerType, 
                              &_node->getPublicAddress() );
     }
@@ -288,17 +290,17 @@ void ClientProxy::onInterfaceParam( co::IService* param )
         ClientProxy* providerCP = static_cast<ClientProxy*>( provider );
         
         instanceId = providerCP->getInstanceId();
-        const std::string ownerAddress = providerCP->getOwnerAddress();
+        const std::string instanceOwnerAddress = providerCP->getOwnerAddress();
         
-        if( ownerAddress == _link->getAddress() ) // Receiver
+        if( instanceOwnerAddress == _address ) // Receiver
         {
             _marshaller.addReferenceParam( instanceId, facetIdx, Marshaller::RECEIVER );
         }
         else
         {
-            _node->requestBeginAccess( ownerAddress, instanceId, "TODO" );
+            _node->requestBeginAccess( instanceOwnerAddress, instanceId, _address );
             _marshaller.addReferenceParam( instanceId, facetIdx, Marshaller::ANOTHER, &providerType,
-                                 &ownerAddress );
+                                 &instanceOwnerAddress );
         }
     }
 }

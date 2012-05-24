@@ -48,9 +48,10 @@ TEST( ServerTests, invokerValueTypeTest )
 
     co::Any intParam; intParam.set<co::int32>( 4 );
     std::string msg;
+    std::string caller = "irrelevant";
     
 	// ------ Simple value types ------ //
-    marshaller.beginCallMarshalling( 1, STPort->getIndex(), incrIntMethod->getIndex(), -1, true );
+    marshaller.beginCallMarshalling( 1, STPort->getIndex(), incrIntMethod->getIndex(), -1, true, caller );
     marshaller.addValueParam( intParam );
     marshaller.getMarshalledCall( msg );
     
@@ -64,7 +65,7 @@ TEST( ServerTests, invokerValueTypeTest )
     EXPECT_EQ( intParam.get<co::int32>(), 5 );
     
     // ------ Inherited Simple value types ------ //
-    marshaller.beginCallMarshalling( 1, STPort->getIndex(), parentMultiply->getIndex(), 0, true );
+    marshaller.beginCallMarshalling( 1, STPort->getIndex(), parentMultiply->getIndex(), 0, true, caller );
     co::Any doubleParam; doubleParam.set<double>( 5 );
     intParam.set<co::int32>( 2 );
     marshaller.addValueParam( doubleParam );
@@ -78,7 +79,7 @@ TEST( ServerTests, invokerValueTypeTest )
         
     // ------ Inherited from grandparent Simple value types ------ //
     STService->setGrandParentInt( 2 );
-    marshaller.beginCallMarshalling( 1, STPort->getIndex(), gParentIntField->getIndex(), 1, true );
+    marshaller.beginCallMarshalling( 1, STPort->getIndex(), gParentIntField->getIndex(), 1, true, caller );
     marshaller.getMarshalledCall( msg );
     intParam.set<co::int32>( 2 );
     unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
@@ -116,10 +117,13 @@ TEST( ServerTests, invokerReceivesRefTypeTests )
 
 	// Create the invoker
 	Invoker invoker( node.get(), TCObj.get() );
+    
+    std::string caller = "irrelevant";
 
 	// ------ Receiving and returning reference to a local object ------ //
 	// Receiving //
-	marshaller.beginCallMarshalling( 1, RTPort->getIndex(), simpleField->getIndex(), -1, false );
+	marshaller.beginCallMarshalling( 1, RTPort->getIndex(), simpleField->getIndex(), -1, false,
+                                    caller );
 	marshaller.addReferenceParam( 1, STPort->getIndex(), Marshaller::RECEIVER );
 	std::string request;
     marshaller.getMarshalledCall( request );
@@ -134,7 +138,8 @@ TEST( ServerTests, invokerReceivesRefTypeTests )
 	EXPECT_EQ( TCObj2->getService<moduleA::ISimpleTypes>(), reference->getSimple() );
 
 	// Returning //
-	marshaller.beginCallMarshalling( 1, RTPort->getIndex(), simpleField->getIndex(), -1, true );
+	marshaller.beginCallMarshalling( 1, RTPort->getIndex(), simpleField->getIndex(), -1, true, 
+                                    caller );
     marshaller.getMarshalledCall( request );
 
 	unmarshaller.setMarshalledRequest( request, msgType, msgReceiverID, hasReturn );
@@ -158,7 +163,8 @@ TEST( ServerTests, invokerReceivesRefTypeTests )
 	// Receiving: A call setParentSimple invocation will be simulated. This is an inherited field.
     
     // irrelevant, ReferenceTypes Port index, parentSimple field index, parent depth (0), not synch
-	marshaller.beginCallMarshalling( 1, RTPort->getIndex(), parentSimple->getIndex(), 0, false );
+	marshaller.beginCallMarshalling( 1, RTPort->getIndex(), parentSimple->getIndex(), 0, false, 
+                                    caller );
 
 	instanceType = "moduleA.TestComponent";
 	ownerAddress = "addressRemote";
@@ -181,7 +187,8 @@ TEST( ServerTests, invokerReceivesRefTypeTests )
 
 	// Returning reference to local object
 	// Returning //
-	marshaller.beginCallMarshalling( 1, RTPort->getIndex(), parentSimple->getIndex(), 0, true );
+	marshaller.beginCallMarshalling( 1, RTPort->getIndex(), parentSimple->getIndex(), 0, true, 
+                                    caller );
     marshaller.getMarshalledCall( request );
 
 	unmarshaller.setMarshalledRequest( request, msgType, msgReceiverID, hasReturn );
@@ -211,14 +218,16 @@ TEST( ServerTests, nodeTest )
     co::RefPtr<co::IObject> TCObject2 = co::newInstance( "moduleA.TestComponent" );
     co::RefPtr<co::IObject> TCObject3 = co::newInstance( "moduleA.TestComponent" );
     
-    co::int32 instanceId = node->publishAnonymousInstance( TCObject1.get() );
+    std::string caller = "irrelevant";
+    
+    co::int32 instanceId = node->publishAnonymousInstance( TCObject1.get(), caller );
     EXPECT_EQ( instanceId, 1 );
     instanceId = 2;
-    instanceId = node->publishAnonymousInstance( TCObject1.get() );
+    instanceId = node->publishAnonymousInstance( TCObject1.get(), caller );
     EXPECT_EQ( instanceId, 1 );
-    instanceId = node->publishAnonymousInstance( TCObject2.get() );
+    instanceId = node->publishAnonymousInstance( TCObject2.get(), caller );
     EXPECT_EQ( instanceId, 2 );
-    instanceId = node->publishAnonymousInstance( TCObject3.get() );
+    instanceId = node->publishAnonymousInstance( TCObject3.get(), caller );
     EXPECT_EQ( instanceId, 3 );
     
     co::RefPtr<co::IObject> object = node->getInstance( 1 );

@@ -91,9 +91,10 @@ public:
      \param typeDepth is the depth of the member owner into the facet's hierarchy, starting at -1 if the
      facets type is the memberowner and increasing for each level above in the inheritance tree.
      \param hasReturn is necessary to know if we are dealing 
+     \param callerAddress is necessary until there is a way to retrieve the address of a msg sender.
     */
     void beginCallMarshalling( co::int32 instanceId, co::int32 facetIdx, co::int32 memberIdx,
-                              co::int32 typeDepth, bool hasReturn );
+                            co::int32 typeDepth, bool hasReturn, const std::string& callerAddress );
     
     //! adds a Value Type parameter
     void addValueParam( const co::Any& param );
