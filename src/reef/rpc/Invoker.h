@@ -2,7 +2,7 @@
 #define _REEF_SERVANT_H_
 
 #include "Marshaller.h"
-#include "Unmarshaller.h"
+#include "Demarshaller.h"
 #include <co/Any.h>
 #include <co/RefPtr.h>
 #include <co/RefVector.h>
@@ -30,30 +30,31 @@ public:
      ~Invoker();
     
     /*!
-        Makes an invocation in the actual object based on the to-be-unmarshalled data inside the
-        parameter \unmarshaller (the unmarshalling methods will be called)
-        \param unmarshaller An unmarshaller with a call request already set ofr unmarshalling.
+        Makes an invocation in the actual object based on the to-be-demarshalled data inside the
+        parameter \demarshaller (the demarshalling methods will be called)
+        \param demarshaller An demarshaller with a call request already set ofr demarshalling.
         \param isSynch True if it is a synchronous call, and a return is expected
         \param returned What the invocation returned. Already marshalled and ready to send.     
     */
-    void invoke( Unmarshaller& unmarshaller, bool isSynch, std::string& returned );
+    void invoke( Demarshaller& demarshaller, bool isSynch, std::string& returned );
     
     //! returns the object controlled by this Invoker
     inline co::IObject* getObject() { return _object.get(); }
        
 private:
 
-    void onMethod( Unmarshaller& unmarshaller, co::IService* facet, co::IMethod* method, 
+    // TODO REMOTINGERROR when mismatching parameter types/return facetIds ...
+    void onMethod( Demarshaller& demarshaller, co::IService* facet, co::IMethod* method, 
                   co::IReflector* refl, co::Any& returned );
     
-    void onGetField( Unmarshaller& unmarshaller, co::IService* facet, co::IField* field, 
+    void onGetField( Demarshaller& demarshaller, co::IService* facet, co::IField* field, 
                     co::IReflector* refl, co::Any& returned );
     
-    void onSetField( Unmarshaller& unmarshaller, co::IService* facet, co::IField* field, 
+    void onSetField( Demarshaller& demarshaller, co::IService* facet, co::IField* field, 
                     co::IReflector* refl );
     
     // TODO: remove the last param in coral 0.8
-    void unmarshalParameter( Unmarshaller& unmarshaller, co::IType* paramType, co::Any& param, 
+    void demarshalParameter( Demarshaller& demarshaller, co::IType* paramType, co::Any& param, 
                     co::RefVector<co::IObject>& tempRefs );
     
     // Identify and marshals an interface that has been returned from an invoke

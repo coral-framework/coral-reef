@@ -4,7 +4,7 @@
 #include "Node_Base.h"
 
 #include "Invoker.h"
-#include "Unmarshaller.h"
+#include "Demarshaller.h"
 #include "Marshaller.h"
 
 #include <reef/rpc/ITransport.h>
@@ -148,7 +148,7 @@ private:
 private:
     ITransport* _transport;
     co::RefPtr<IPassiveLink> _passiveLink;
-    Unmarshaller _unmarshaller;
+    Demarshaller _demarshaller;
     Marshaller _marshaller;
     
     std::string _myPublicAddress;

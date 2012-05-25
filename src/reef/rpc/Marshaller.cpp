@@ -288,10 +288,10 @@ void Marshaller::reference2PBArg( co::int32 instanceId, co::int32 facetIdx, RefO
     }
 }
     
-void Marshaller::marshalValueType( const co::Any& unmarshalledValue, std::string& marshalledValue )
+void Marshaller::marshalValueType( const co::Any& demarshalledValue, std::string& marshalledValue )
 {
     Argument returnArg;
-    anyToPBArg( unmarshalledValue, &returnArg );
+    anyToPBArg( demarshalledValue, &returnArg );
     returnArg.SerializeToString( &marshalledValue );
 }
     

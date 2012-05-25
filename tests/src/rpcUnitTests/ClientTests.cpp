@@ -26,7 +26,7 @@ TEST( ClientTests, valueTypeCalls )
     rpc::IActiveLink* activeLink = fakeLinkObj->getService<rpc::IActiveLink>();
     fakeLink->setAddress( "address" );
     
-    Unmarshaller unmarshaller;
+    Demarshaller demarshaller;
     Marshaller marshaller;
     
     // Node is needed internally
@@ -67,13 +67,13 @@ TEST( ClientTests, valueTypeCalls )
     fakeLink->getMsg( msg );
     
     // parameters common to message types
-    Unmarshaller::MsgType msgType;
+    Demarshaller::MsgType msgType;
     bool hasReturn;
     co::int32 msgReceiverID;
     
-    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
+    demarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
     
-    EXPECT_EQ( msgType, Unmarshaller::CALL );
+    EXPECT_EQ( msgType, Demarshaller::CALL );
     EXPECT_EQ( msgReceiverID, 9 );
     EXPECT_FALSE( hasReturn );
     
@@ -83,13 +83,13 @@ TEST( ClientTests, valueTypeCalls )
     co::int32 memberOwner;
     std::string caller;
     
-    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, memberOwner, caller );
+    demarshaller.beginDemarshallingCall( facetIdx, memberIdx, memberOwner, caller );
     EXPECT_EQ( facetIdx, STPort->getIndex() );
     EXPECT_EQ( memberIdx, setIntMethod->getIndex() );
     EXPECT_EQ( memberOwner, -1 );
     
     co::Any intParam;
-    unmarshaller.unmarshalValueParam( intParam, co::getType( "int32" ) );
+    demarshaller.demarshalValueParam( intParam, co::getType( "int32" ) );
     EXPECT_EQ( intParam.get<co::int32>(), 3 );
     
     // Test the reply
@@ -103,16 +103,16 @@ TEST( ClientTests, valueTypeCalls )
     STService->setParentInt( 4 );
     fakeLink->getMsg( msg );
     
-    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
+    demarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
     
     EXPECT_FALSE( hasReturn );
     
-    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, memberOwner, caller );
+    demarshaller.beginDemarshallingCall( facetIdx, memberIdx, memberOwner, caller );
     EXPECT_EQ( facetIdx, STPort->getIndex() );
     EXPECT_EQ( memberIdx, parentIntField->getIndex() );
     EXPECT_EQ( memberOwner, 0 );
     
-    unmarshaller.unmarshalValueParam( intParam, co::getType( "int32" ) );
+    demarshaller.demarshalValueParam( intParam, co::getType( "int32" ) );
     EXPECT_EQ( intParam.get<co::int32>(), 4 );
     
     // Test the reply
@@ -126,16 +126,16 @@ TEST( ClientTests, valueTypeCalls )
     STService->setGrandParentInt( 5 );
     fakeLink->getMsg( msg );
     
-    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
+    demarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
     
     EXPECT_FALSE( hasReturn );
     
-    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, memberOwner, caller );
+    demarshaller.beginDemarshallingCall( facetIdx, memberIdx, memberOwner, caller );
     EXPECT_EQ( facetIdx, STPort->getIndex() );
     EXPECT_EQ( memberIdx, gParentIntField->getIndex() );
     EXPECT_EQ( memberOwner, 1 );
     
-    unmarshaller.unmarshalValueParam( intParam, co::getType( "int32" ) );
+    demarshaller.demarshalValueParam( intParam, co::getType( "int32" ) );
     EXPECT_EQ( intParam.get<co::int32>(), 5 );
     
     // Test the reply
@@ -148,7 +148,7 @@ TEST( ClientTests, valueTypeCalls )
     
 TEST( ClientTests, refTypeCalls )
 {
-    Unmarshaller unmarshaller;
+    Demarshaller demarshaller;
     Marshaller marshaller;
     
     /* ------ Initialization of remote objects for Testing all cases of ref type parameter
@@ -205,14 +205,14 @@ TEST( ClientTests, refTypeCalls )
     // All the necessary variables for the ref type transmission tests
     co::Any intParam; intParam.set<co::int32>( 5 );
     std::string msg;    
-    Unmarshaller::MsgType msgType;
+    Demarshaller::MsgType msgType;
     bool hasReturn;
     co::int32 msgReceiverID;
     co::int32 facetIdx;
     co::int32 memberIdx;
     co::int32 instanceId;
     co::int32 typeDepth;
-    Unmarshaller::RefOwner refOwner;
+    Demarshaller::RefOwner refOwner;
     std::string instanceType;
     std::string ownerAddress;
     std::string caller;
@@ -223,19 +223,19 @@ TEST( ClientTests, refTypeCalls )
     EXPECT_EQ( refTypes->parentCall( simpleTypesLocal, 1 ), 5 );
     fakeLinkA->getMsg( msg );
 
-    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
-    EXPECT_EQ( msgType, Unmarshaller::CALL );
+    demarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
+    EXPECT_EQ( msgType, Demarshaller::CALL );
     EXPECT_EQ( msgReceiverID, 3 );
     EXPECT_TRUE( hasReturn );
-    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, typeDepth, caller );
+    demarshaller.beginDemarshallingCall( facetIdx, memberIdx, typeDepth, caller );
     EXPECT_EQ( facetIdx, RTPort->getIndex() );
     EXPECT_EQ( memberIdx, parentCall->getIndex() );
     EXPECT_EQ( typeDepth, 0 );
     
-    unmarshaller.unmarshalReferenceParam( instanceId, facetIdx, refOwner, instanceType, ownerAddress );
+    demarshaller.demarshalReferenceParam( instanceId, facetIdx, refOwner, instanceType, ownerAddress );
     EXPECT_EQ( instanceId, 1 );
     EXPECT_EQ( facetIdx, STPort->getIndex() );
-    EXPECT_EQ( refOwner, Unmarshaller::LOCAL );
+    EXPECT_EQ( refOwner, Demarshaller::LOCAL );
     EXPECT_STREQ( instanceType.c_str(), "moduleA.TestComponent" );
     EXPECT_STREQ( ownerAddress.c_str(), "addressLocal" );
     
@@ -246,15 +246,15 @@ TEST( ClientTests, refTypeCalls )
     refTypes->callIncrementInt( simpleTypesA2, 1 );
     fakeLinkA->getMsg( msg );
     
-    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
-    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, typeDepth, caller );
+    demarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
+    demarshaller.beginDemarshallingCall( facetIdx, memberIdx, typeDepth, caller );
     EXPECT_EQ( facetIdx, RTPort->getIndex() );
     EXPECT_EQ( memberIdx, callIncrIntMethod->getIndex() );
     
-    unmarshaller.unmarshalReferenceParam( instanceId, facetIdx, refOwner, instanceType, ownerAddress );
+    demarshaller.demarshalReferenceParam( instanceId, facetIdx, refOwner, instanceType, ownerAddress );
     EXPECT_EQ( instanceId, 3 );
     EXPECT_EQ( facetIdx, STPort->getIndex() );
-    EXPECT_EQ( refOwner, Unmarshaller::RECEIVER );
+    EXPECT_EQ( refOwner, Demarshaller::RECEIVER );
     EXPECT_STREQ( instanceType.c_str(), "moduleA.TestComponent" );
     EXPECT_STREQ( ownerAddress.c_str(), "notUsedWhenReceiverIsOwner" );
     
@@ -264,22 +264,22 @@ TEST( ClientTests, refTypeCalls )
     refTypes->callIncrementInt( simpleTypesB, 1 );
     fakeLinkA->getMsg( msg );
     
-    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
-    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, typeDepth, caller );
+    demarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
+    demarshaller.beginDemarshallingCall( facetIdx, memberIdx, typeDepth, caller );
     EXPECT_EQ( facetIdx, RTPort->getIndex() );
     EXPECT_EQ( memberIdx, callIncrIntMethod->getIndex() );
     
-    unmarshaller.unmarshalReferenceParam( instanceId, facetIdx, refOwner, instanceType, ownerAddress );
+    demarshaller.demarshalReferenceParam( instanceId, facetIdx, refOwner, instanceType, ownerAddress );
     EXPECT_EQ( instanceId, 3 );
     EXPECT_EQ( facetIdx, STPort->getIndex() );
-    EXPECT_EQ( refOwner, Unmarshaller::ANOTHER );
+    EXPECT_EQ( refOwner, Demarshaller::ANOTHER );
     EXPECT_STREQ( instanceType.c_str(), "moduleA.TestComponent" );
     EXPECT_STREQ( ownerAddress.c_str(), "addressB" );
 }
 
 TEST( ClientTests, refTypeReturns )
 {
-	Unmarshaller unmarshaller;
+	Demarshaller demarshaller;
     Marshaller marshaller;
 
 	/* ------ Initialization of remote objects for Testing all cases of ref type parameter

@@ -1,6 +1,6 @@
 #include "Node.h"
 
-#include "Unmarshaller.h"
+#include "Demarshaller.h"
 #include "Invoker.h"
 #include "ClientProxy.h"
 
@@ -208,7 +208,7 @@ co::int32 Node::requestNewInstance( IActiveLink* link, const std::string& compon
         update();
     
     co::int32 instanceId;
-    _unmarshaller.unmarshalData( msg, instanceId );
+    _demarshaller.demarshalData( msg, instanceId );
     
     return instanceId;
 }
@@ -224,7 +224,7 @@ co::int32 Node::requestFindInstance( IActiveLink* link, const std::string& key )
         update();
     
     co::int32 instanceId;
-    _unmarshaller.unmarshalData( msg, instanceId );
+    _demarshaller.demarshalData( msg, instanceId );
     
     return instanceId;
 }
@@ -237,19 +237,19 @@ void Node::requestDisconnection( const std::string& ip )
 void Node::dispatchMessage( const std::string& msg )
 {
     co::int32 destInstanceId;
-    Unmarshaller::MsgType type;
+    Demarshaller::MsgType type;
     bool hasReturn;
-    _unmarshaller.setMarshalledRequest( msg, type, destInstanceId, hasReturn );
+    _demarshaller.setMarshalledRequest( msg, type, destInstanceId, hasReturn );
     
     switch( type )
     {
-        case Unmarshaller::NEW_INST:
+        case Demarshaller::NEW_INST:
             onNewInstMsg();
             break;
-        case Unmarshaller::ACCESS_INST:
+        case Demarshaller::ACCESS_INST:
             onAccessInstMsg();
             break;
-        case Unmarshaller::FIND_INST:
+        case Demarshaller::FIND_INST:
             onFindInstMsg();
             break;
         default: // the message isn't destined to the Node. Pass to the appropriate invoker. 
@@ -261,7 +261,7 @@ void Node::onNewInstMsg()
 {
     std::string instanceTypeName;
     std::string referer;
-    _unmarshaller.unmarshalNewInstance( instanceTypeName, referer );
+    _demarshaller.demarshalNewInstance( instanceTypeName, referer );
     
 	co::IObject* instance = co::newInstance( instanceTypeName );
     co::int32 instanceId = startRemoteRefCount( instance );
@@ -281,7 +281,7 @@ void Node::onFindInstMsg()
 {
     std::string key;
     std::string referer;
-    _unmarshaller.unmarshalFindInstance( key, referer );
+    _demarshaller.demarshalFindInstance( key, referer );
     
     std::map<std::string, co::int32>::iterator it = _publicInstances.find( key );
     co::int32 instanceId = 0;
@@ -308,7 +308,7 @@ void Node::onAccessInstMsg()
     std::string referer;
     
     // REMOTINGERROR: if no instance found with the id
-    _unmarshaller.unmarshalAccessInstance( instanceId, increment, referer );
+    _demarshaller.demarshalAccessInstance( instanceId, increment, referer );
     
     if( increment )
     {
@@ -329,7 +329,7 @@ void Node::onMsgForInvoker( co::int32 instanceId, bool hasReturn )
     Invoker* invoker = getInvokerFor( instanceId );
     
     std::string returned;
-    invoker->invoke( _unmarshaller, hasReturn, returned );
+    invoker->invoke( _demarshaller, hasReturn, returned );
     
     if( hasReturn )
         _passiveLink->sendReply( returned );
@@ -470,7 +470,7 @@ bool Node::tryRemoveReferer( const std::string& ip, co::int32 instanceId )
     Client* client = it->second;
     if( client->removeReferredId( instanceId ) )
     {
-        //REMOTINGERROR There is no reference to the Id
+        assert( false ); //REMOTINGERROR There is no reference to the Id
     }
     
     if( !client->isEmpty() )
