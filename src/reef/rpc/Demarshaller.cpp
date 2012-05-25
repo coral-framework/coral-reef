@@ -1,4 +1,4 @@
-#include "Unmarshaller.h"
+#include "Demarshaller.h"
 
 #include "Message.pb.h"
 
@@ -158,41 +158,41 @@ void PBArgToAny( const Argument& arg, co::IType* descriptor, co::Any& any )
     }
 }
     
-void Message_Type2MsgType( Message_Type message_type, Unmarshaller::MsgType& msgType )
+void Message_Type2MsgType( Message_Type message_type, Demarshaller::MsgType& msgType )
 {
     switch( message_type )
     {
         case Message::MSG_NEW_INST:
-            msgType = Unmarshaller::NEW_INST;
+            msgType = Demarshaller::NEW_INST;
             break;
         case Message::MSG_ACCESS_INST:
-            msgType = Unmarshaller::ACCESS_INST;
+            msgType = Demarshaller::ACCESS_INST;
             break;
         case Message::MSG_FIND_INST:
-            msgType = Unmarshaller::FIND_INST;
+            msgType = Demarshaller::FIND_INST;
             break;
         case Message::MSG_CALL:
-            msgType = Unmarshaller::CALL;
+            msgType = Demarshaller::CALL;
             break;
     }
 }
     
 
     
-Unmarshaller::Unmarshaller() : _currentParam( 0 )
+Demarshaller::Demarshaller() : _currentParam( 0 )
 {
     _message = new Message();
     _argument = new Argument();
 }
 
-Unmarshaller::~Unmarshaller()
+Demarshaller::~Demarshaller()
 {
     delete _message;
     delete _argument;
 }
     
 // sets the message that will be decoded and return its type and destination
-void Unmarshaller::setMarshalledRequest( const std::string& request, MsgType& type, co::int32& instanceId, 
+void Demarshaller::setMarshalledRequest( const std::string& request, MsgType& type, co::int32& instanceId, 
                                 bool& hasReturn )
 {
     _message->Clear();
@@ -204,7 +204,7 @@ void Unmarshaller::setMarshalledRequest( const std::string& request, MsgType& ty
 }
 
 // if msg type is NEW, then, this function will decode it
-void Unmarshaller::unmarshalNewInstance( std::string& typeName, std::string& referer )
+void Demarshaller::demarshalNewInstance( std::string& typeName, std::string& referer )
 {
     assert( _msgType == NEW_INST );
     
@@ -213,7 +213,7 @@ void Unmarshaller::unmarshalNewInstance( std::string& typeName, std::string& ref
     referer = _message->referer_ip();
 }
 
-void Unmarshaller::unmarshalAccessInstance( co::int32& instanceId, bool& increment, std::string& referer )
+void Demarshaller::demarshalAccessInstance( co::int32& instanceId, bool& increment, std::string& referer )
 {
     assert( _msgType == ACCESS_INST );
     
@@ -224,7 +224,7 @@ void Unmarshaller::unmarshalAccessInstance( co::int32& instanceId, bool& increme
     referer = _message->referer_ip();
 }
    
-void Unmarshaller::unmarshalFindInstance( std::string& key, std::string& referer )
+void Demarshaller::demarshalFindInstance( std::string& key, std::string& referer )
 {
     assert( _msgType == FIND_INST );
     
@@ -236,7 +236,7 @@ void Unmarshaller::unmarshalFindInstance( std::string& key, std::string& referer
  Starts a decoding state of call/field msg. 
  The decoding state will only be reset after all params are decoded.
  */
-void Unmarshaller::beginUnmarshallingCall( co::int32& facetIdx, co::int32& memberIdx, 
+void Demarshaller::beginDemarshallingCall( co::int32& facetIdx, co::int32& memberIdx, 
                                           co::int32& typeDepth, std::string& caller )
 {
     assert( _msgType == CALL );
@@ -249,13 +249,13 @@ void Unmarshaller::beginUnmarshallingCall( co::int32& facetIdx, co::int32& membe
     caller = _message->referer_ip();
 }
 
-void Unmarshaller::unmarshalValueParam( co::Any& param, co::IType* descriptor )
+void Demarshaller::demarshalValueParam( co::Any& param, co::IType* descriptor )
 {
     assert( _msgMember );
     PBArgToAny( _msgMember->arguments( _currentParam++ ), descriptor, param );
 }
 
-void Unmarshaller::unmarshalReferenceParam( co::int32& instanceId, co::int32& facetIdx, RefOwner& owner,
+void Demarshaller::demarshalReferenceParam( co::int32& instanceId, co::int32& facetIdx, RefOwner& owner,
                   std::string& instanceType, std::string& ownerAddress )
 {
     assert( _msgMember );
@@ -281,7 +281,7 @@ void Unmarshaller::unmarshalReferenceParam( co::int32& instanceId, co::int32& fa
     }
 }
     
-void Unmarshaller::unmarshalReference( const std::string& data, co::int32& instanceId, 
+void Demarshaller::demarshalReference( const std::string& data, co::int32& instanceId, 
                                            co::int32& facetIdx, RefOwner& owner, 
                                            std::string& instanceType, std::string& ownerAddress )
 {
@@ -311,7 +311,7 @@ void Unmarshaller::unmarshalReference( const std::string& data, co::int32& insta
     }
 }
     
-void Unmarshaller::unmarshalValue( const std::string& data, co::IType* descriptor, co::Any& value )
+void Demarshaller::demarshalValue( const std::string& data, co::IType* descriptor, co::Any& value )
 {
     Argument arg;
     arg.ParseFromString( data );
@@ -319,28 +319,28 @@ void Unmarshaller::unmarshalValue( const std::string& data, co::IType* descripto
 }
     
 // ----- Data Container codec ----- //
-void Unmarshaller::unmarshalData( const std::string& data, bool& value )
+void Demarshaller::demarshalData( const std::string& data, bool& value )
 {
     Data_Container dataContainer;
     dataContainer.ParseFromString( data );
     value = dataContainer.boolean();
 }
 
-void Unmarshaller::unmarshalData( const std::string& data, double& value )
+void Demarshaller::demarshalData( const std::string& data, double& value )
 {
     Data_Container dataContainer;
     dataContainer.ParseFromString( data );
     value = dataContainer.numeric();
 }
 
-void Unmarshaller::unmarshalData( const std::string& data, co::int32& value )
+void Demarshaller::demarshalData( const std::string& data, co::int32& value )
 {
     Data_Container dataContainer;
     dataContainer.ParseFromString( data );
     value = static_cast<co::int32>( dataContainer.numeric() );
 }
 
-void Unmarshaller::unmarshalData( const std::string& data, std::string& value )
+void Demarshaller::demarshalData( const std::string& data, std::string& value )
 {
     Data_Container dataContainer;
     dataContainer.ParseFromString( data );

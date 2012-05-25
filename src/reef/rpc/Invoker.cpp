@@ -36,7 +36,7 @@ Invoker::~Invoker()
 
 }
     
-void Invoker::invoke( Unmarshaller& unmarshaller, bool isSynch, std::string& returned )
+void Invoker::invoke( Demarshaller& demarshaller, bool isSynch, std::string& returned )
 {
     co::int32 facetIdx;
     co::int32 memberIdx;
@@ -44,7 +44,7 @@ void Invoker::invoke( Unmarshaller& unmarshaller, bool isSynch, std::string& ret
     co::int32 depth;
     std::string caller;
     
-    unmarshaller.beginUnmarshallingCall( facetIdx, memberIdx, depth, caller );
+    demarshaller.beginDemarshallingCall( facetIdx, memberIdx, depth, caller );
     
     if( !_openedServices[facetIdx] ) // if already used before access directly
         onServiceFirstAccess( facetIdx );
@@ -62,7 +62,7 @@ void Invoker::invoke( Unmarshaller& unmarshaller, bool isSynch, std::string& ret
     
     if( kind == co::MK_METHOD )
     {
-        onMethod( unmarshaller, facet, co::cast<co::IMethod>( member ), reflector, parameter );
+        onMethod( demarshaller, facet, co::cast<co::IMethod>( member ), reflector, parameter );
         if( !isSynch )
             return;
     }   
@@ -70,12 +70,12 @@ void Invoker::invoke( Unmarshaller& unmarshaller, bool isSynch, std::string& ret
     {
         if( !isSynch )
         {
-            onSetField( unmarshaller, facet, co::cast<co::IField>( member ), reflector );
+            onSetField( demarshaller, facet, co::cast<co::IField>( member ), reflector );
             return;
         }
         else
         {
-            onGetField( unmarshaller, facet, co::cast<co::IField>( member ), reflector, parameter );
+            onGetField( demarshaller, facet, co::cast<co::IField>( member ), reflector, parameter );
         }
     }
    
@@ -86,7 +86,7 @@ void Invoker::invoke( Unmarshaller& unmarshaller, bool isSynch, std::string& ret
         onInterfaceReturned( parameter.get<co::IService*>(), caller, returned );
 }
 
-void Invoker::onMethod( Unmarshaller& unmarshaller, co::IService* facet, co::IMethod* method, 
+void Invoker::onMethod( Demarshaller& demarshaller, co::IService* facet, co::IMethod* method, 
                            co::IReflector* refl, co::Any& returned )
 {
     // TODO: remove this and maky the co::any's reference the objects themselves
@@ -99,54 +99,54 @@ void Invoker::onMethod( Unmarshaller& unmarshaller, co::IService* facet, co::IMe
     args.resize( size );
     for( int i = 0; i < size; i++ )
     {
-        unmarshalParameter( unmarshaller, params[i]->getType(), args[i], tempReferences );
+        demarshalParameter( demarshaller, params[i]->getType(), args[i], tempReferences );
     }
 
     refl->invoke( facet, method, args, returned );
 }
     
-void Invoker::onGetField( Unmarshaller& unmarshaller, co::IService* facet, co::IField* field, 
+void Invoker::onGetField( Demarshaller& demarshaller, co::IService* facet, co::IField* field, 
                              co::IReflector* refl, co::Any& returned )
 {
     refl->getField( facet, field, returned );
 }
 
-void Invoker::onSetField(  Unmarshaller& unmarshaller, co::IService* facet, co::IField* field, 
+void Invoker::onSetField(  Demarshaller& demarshaller, co::IService* facet, co::IField* field, 
                              co::IReflector* refl )
 {
     // TODO: remove this and maky the co::any's reference the objects themselves
     co::RefVector<co::IObject> tempReferences;
     
     co::Any value;
-    unmarshalParameter( unmarshaller, field->getType(), value, tempReferences );
+    demarshalParameter( demarshaller, field->getType(), value, tempReferences );
     
     refl->setField( facet, field, value );
 }
     
-void Invoker::unmarshalParameter( Unmarshaller& unmarshaller, co::IType* paramType, co::Any& param, 
+void Invoker::demarshalParameter( Demarshaller& demarshaller, co::IType* paramType, co::Any& param, 
                          co::RefVector<co::IObject>& tempRefs )
 {
     if( paramType->getKind() != co::TK_INTERFACE )
     {
-        unmarshaller.unmarshalValueParam( param, paramType );
+        demarshaller.demarshalValueParam( param, paramType );
         return;
     }
     
     co::int32 instanceId;
     co::int32 facetIdx;
-    Unmarshaller::RefOwner owner;
+    Demarshaller::RefOwner owner;
     std::string instanceType;
     std::string ownerAddress;
     
-    unmarshaller.unmarshalReferenceParam( instanceId, facetIdx, owner, instanceType, ownerAddress );
+    demarshaller.demarshalReferenceParam( instanceId, facetIdx, owner, instanceType, ownerAddress );
     co::IObject* instance;
     switch( owner )
     {
-        case Unmarshaller::RECEIVER:
+        case Demarshaller::RECEIVER:
             instance = _node->getInstance( instanceId );
             break;
-        case Unmarshaller::LOCAL:
-        case Unmarshaller::ANOTHER:
+        case Demarshaller::LOCAL:
+        case Demarshaller::ANOTHER:
             instance = _node->getRemoteInstance( instanceType, instanceId, 
                                                      ownerAddress );
             break;

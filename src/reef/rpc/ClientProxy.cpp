@@ -172,7 +172,7 @@ const co::Any& ClientProxy::dynamicGetField( co::int32 dynFacetId, co::IField* f
     
     awaitReplyUpdating( msg );
     
-    unmarshalReturn( msg, field->getType(), _resultBuffer );
+    demarshalReturn( msg, field->getType(), _resultBuffer );
 
     return _resultBuffer;
 }
@@ -223,7 +223,7 @@ const co::Any& ClientProxy::dynamicInvoke( co::int32 dynFacetId, co::IMethod* me
 	if( returnType )
     {
         awaitReplyUpdating( msg );
-        unmarshalReturn( msg, method->getReturnType(), _resultBuffer );
+        demarshalReturn( msg, method->getReturnType(), _resultBuffer );
     }
 
     return _resultBuffer;
@@ -235,30 +235,30 @@ co::int32 ClientProxy::dynamicRegisterService( co::IService* dynamicServiceProxy
 	return _numFacets++;
 }
 
-void ClientProxy::unmarshalReturn( const std::string& data, co::IType* returnedType, 
+void ClientProxy::demarshalReturn( const std::string& data, co::IType* returnedType, 
                                   co::Any& returned )
 {
     if( returnedType->getKind() != co::TK_INTERFACE )
     {
-        _unmarshaller.unmarshalValue( data, returnedType, returned );
+        _demarshaller.demarshalValue( data, returnedType, returned );
         return;
     }
     
     co::int32 instanceId;
     co::int32 facetIdx;
-    Unmarshaller::RefOwner owner;
+    Demarshaller::RefOwner owner;
     std::string instanceType;
     std::string ownerAddress;
     
-    _unmarshaller.unmarshalReference( data, instanceId, facetIdx, owner, instanceType, ownerAddress );
+    _demarshaller.demarshalReference( data, instanceId, facetIdx, owner, instanceType, ownerAddress );
     co::IObject* instance;
     switch( owner )
     {
-        case Unmarshaller::RefOwner::RECEIVER:
+        case Demarshaller::RefOwner::RECEIVER:
             instance = _node->getInstance( instanceId );
             break;
-        case Unmarshaller::RefOwner::LOCAL:
-        case Unmarshaller::RefOwner::ANOTHER:
+        case Demarshaller::RefOwner::LOCAL:
+        case Demarshaller::RefOwner::ANOTHER:
             instance = _node->getRemoteInstance( instanceType, instanceId, 
                                                 ownerAddress );
             break;

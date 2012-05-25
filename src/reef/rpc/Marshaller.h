@@ -119,7 +119,7 @@ public:
      Marshals a rogue value type. Works the same way of addReferenceParam, but returns the 
      marshalled value instead of adding it as a parameter to a call request.
     */
-    void marshalValueType( const co::Any& unmarshalledValue, std::string& marshalledValue );
+    void marshalValueType( const co::Any& demarshalledValue, std::string& marshalledValue );
     
     /*!
      Marshals a rogue reference type. Works the same way of addReferenceParam, but returns the 

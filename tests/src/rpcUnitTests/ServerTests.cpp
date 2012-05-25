@@ -2,7 +2,7 @@
 
 #include "Node.h"
 #include "Marshaller.h"
-#include "Unmarshaller.h"
+#include "Demarshaller.h"
 #include <ClientProxy.h>
 #include <Message.pb.h>
 #include "Invoker.h"
@@ -23,7 +23,7 @@ namespace rpc {
     
 TEST( ServerTests, invokerValueTypeTest )
 {
-    Unmarshaller unmarshaller;
+    Demarshaller demarshaller;
     Marshaller marshaller;
 
     // create remote object of TestComponent type
@@ -55,13 +55,13 @@ TEST( ServerTests, invokerValueTypeTest )
     marshaller.addValueParam( intParam );
     marshaller.getMarshalledCall( msg );
     
-    Unmarshaller::MsgType msgType;
+    Demarshaller::MsgType msgType;
     bool hasReturn;
     co::int32 msgReceiverID;
 
-    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
-    invoker.invoke( unmarshaller, true, msg );
-    unmarshaller.unmarshalValue( msg, co::getType( "int32" ), intParam );
+    demarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
+    invoker.invoke( demarshaller, true, msg );
+    demarshaller.demarshalValue( msg, co::getType( "int32" ), intParam );
     EXPECT_EQ( intParam.get<co::int32>(), 5 );
     
     // ------ Inherited Simple value types ------ //
@@ -72,9 +72,9 @@ TEST( ServerTests, invokerValueTypeTest )
     marshaller.addValueParam( intParam );
     marshaller.getMarshalledCall( msg );
     
-    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
-    invoker.invoke( unmarshaller, true, msg );
-    unmarshaller.unmarshalValue( msg, co::getType( "int32" ), intParam );
+    demarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
+    invoker.invoke( demarshaller, true, msg );
+    demarshaller.demarshalValue( msg, co::getType( "int32" ), intParam );
     EXPECT_EQ( intParam.get<co::int32>(), 10 );
         
     // ------ Inherited from grandparent Simple value types ------ //
@@ -82,15 +82,15 @@ TEST( ServerTests, invokerValueTypeTest )
     marshaller.beginCallMarshalling( 1, STPort->getIndex(), gParentIntField->getIndex(), 1, true, caller );
     marshaller.getMarshalledCall( msg );
     intParam.set<co::int32>( 2 );
-    unmarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
-    invoker.invoke( unmarshaller, true, msg );
-    unmarshaller.unmarshalValue( msg, co::getType( "int32" ), intParam );
+    demarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
+    invoker.invoke( demarshaller, true, msg );
+    demarshaller.demarshalValue( msg, co::getType( "int32" ), intParam );
     EXPECT_EQ( intParam.get<co::int32>(), 2 );
 }
 
 TEST( ServerTests, invokerReceivesRefTypeTests )
 {
-	Unmarshaller unmarshaller;
+	Demarshaller demarshaller;
     Marshaller marshaller;
 
 	// Node is needed internally
@@ -128,11 +128,11 @@ TEST( ServerTests, invokerReceivesRefTypeTests )
 	std::string request;
     marshaller.getMarshalledCall( request );
 
-	Unmarshaller::MsgType msgType;
+	Demarshaller::MsgType msgType;
     bool hasReturn;
     co::int32 msgReceiverID;
-	unmarshaller.setMarshalledRequest( request, msgType, msgReceiverID, hasReturn );
-	invoker.invoke( unmarshaller, false, request );
+	demarshaller.setMarshalledRequest( request, msgType, msgReceiverID, hasReturn );
+	invoker.invoke( demarshaller, false, request );
 
 	moduleA::IReferenceTypes* reference = TCObj->getService<moduleA::IReferenceTypes>();
 	EXPECT_EQ( TCObj2->getService<moduleA::ISimpleTypes>(), reference->getSimple() );
@@ -142,20 +142,20 @@ TEST( ServerTests, invokerReceivesRefTypeTests )
                                     caller );
     marshaller.getMarshalledCall( request );
 
-	unmarshaller.setMarshalledRequest( request, msgType, msgReceiverID, hasReturn );
+	demarshaller.setMarshalledRequest( request, msgType, msgReceiverID, hasReturn );
 	std::string returned;
-	invoker.invoke( unmarshaller, true, returned );
+	invoker.invoke( demarshaller, true, returned );
 
 	co::int32 returnedinstanceId;
 	co::int32 facetIdx;
-	Unmarshaller::RefOwner refOwner;
+	Demarshaller::RefOwner refOwner;
 	std::string instanceType;
 	std::string ownerAddress;
-	unmarshaller.unmarshalReference( returned, returnedinstanceId, facetIdx, refOwner, instanceType, ownerAddress );
+	demarshaller.demarshalReference( returned, returnedinstanceId, facetIdx, refOwner, instanceType, ownerAddress );
 
 	EXPECT_EQ( returnedinstanceId, 1 );
 	EXPECT_EQ( facetIdx, STPort->getIndex() );
-	EXPECT_EQ( refOwner, Unmarshaller::LOCAL );
+	EXPECT_EQ( refOwner, Demarshaller::LOCAL );
 	EXPECT_STREQ( instanceType.c_str(), "moduleA.TestComponent" );
 	EXPECT_STREQ( ownerAddress.c_str(), "addressLocal" );
 
@@ -173,11 +173,11 @@ TEST( ServerTests, invokerReceivesRefTypeTests )
 
     marshaller.getMarshalledCall( request );
 
-    // Sets the unmarshaller to the correct state to be passed to the invoker.
-	unmarshaller.setMarshalledRequest( request, msgType, msgReceiverID, hasReturn );
+    // Sets the demarshaller to the correct state to be passed to the invoker.
+	demarshaller.setMarshalledRequest( request, msgType, msgReceiverID, hasReturn );
     /* The invoker will set the field parentSimple in its controlled object. For that, a new 
      ClientProxy to addressRemote's instance 2 will be created. */
-	invoker.invoke( unmarshaller, false, request );
+	invoker.invoke( demarshaller, false, request );
 
     // Now checks if the ClientProxy was created correctly
 	co::RefPtr<moduleA::ISimpleTypes> simple = reference->getParentSimple();
@@ -191,17 +191,17 @@ TEST( ServerTests, invokerReceivesRefTypeTests )
                                     caller );
     marshaller.getMarshalledCall( request );
 
-	unmarshaller.setMarshalledRequest( request, msgType, msgReceiverID, hasReturn );
-	invoker.invoke( unmarshaller, true, returned );
+	demarshaller.setMarshalledRequest( request, msgType, msgReceiverID, hasReturn );
+	invoker.invoke( demarshaller, true, returned );
 
 	returnedinstanceId = -1;
 	facetIdx = -1;
 	instanceType = "";
-	unmarshaller.unmarshalReference( returned, returnedinstanceId, facetIdx, refOwner, instanceType, ownerAddress );
+	demarshaller.demarshalReference( returned, returnedinstanceId, facetIdx, refOwner, instanceType, ownerAddress );
 
 	EXPECT_EQ( returnedinstanceId, 2 );
 	EXPECT_EQ( facetIdx, STPort->getIndex() );
-	EXPECT_EQ( refOwner, Unmarshaller::ANOTHER );
+	EXPECT_EQ( refOwner, Demarshaller::ANOTHER );
 	EXPECT_STREQ( instanceType.c_str(), "moduleA.TestComponent" );
 	EXPECT_STREQ( ownerAddress.c_str(), "addressRemote" );
 	

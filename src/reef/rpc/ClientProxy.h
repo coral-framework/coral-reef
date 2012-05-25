@@ -3,7 +3,7 @@
 
 #include "ClientProxy_Base.h"
 
-#include "Unmarshaller.h"
+#include "Demarshaller.h"
 #include "Marshaller.h"
 
 #include <reef/rpc/IActiveLink.h>
@@ -58,7 +58,7 @@ private:
     
     void setComponent( co::IComponent* component );
 
-    void unmarshalReturn( const std::string& data, co::IType* returnedType, 
+    void demarshalReturn( const std::string& data, co::IType* returnedType, 
                                       co::Any& returned );
     // Awaits a reply from a call. while waiting keeps updating Node.
     void awaitReplyUpdating( std::string& msg );
@@ -74,7 +74,7 @@ private:
     co::int32 _instanceId;
     
     Marshaller _marshaller;
-    Unmarshaller _unmarshaller;
+    Demarshaller _demarshaller;
     co::RefPtr<IActiveLink> _link;
     std::string _address; //!< the address of the host that own the actual object proxied by this.
     co::Any _resultBuffer;
