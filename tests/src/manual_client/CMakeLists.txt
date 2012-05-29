@@ -7,8 +7,8 @@ project( CLIENTTESTS )
 include_directories(
 	${GTEST_INCLUDE_DIRS}
 	${moduleA_BINARY_DIR}/generated
-	${CMAKE_BINARY_DIR}/src/generated
-	${CMAKE_SOURCE_DIR}/src
+	${CMAKE_BINARY_DIR}/src/reef/rpc/generated
+	${CMAKE_SOURCE_DIR}/src/reef/rpc
 )
 
 # Gather source files in the current directory
