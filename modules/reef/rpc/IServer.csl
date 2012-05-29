@@ -1,0 +1,52 @@
+/*
+	This interface is this node's access point for remote nodes.
+	There is no point in using it locally, it is instantiated inside the RPC upon start and listens
+	to requests. Any remote node that wishes to use an object from this node must have a ClientProxy
+	pointing to the provider of this interface, so the methods can be called remotely.
+*/
+interface IServer
+{
+	/*
+		Creates a new instance of \a componentType, mark it as a reference from \a refererEndpoint.
+		\throws IllegalArgumentException if componentName is not a valid component name.
+	*/
+	co.IObject newInstance( in string componentName, in string refererEndpoint ) 
+			raises co.IllegalArgumentException;
+	
+	/*
+		Gets an instance published under \a key, mark it as reference from \a refererEndpoint.
+		\throws IllegalArgumentException if \a key is not a valid published key.
+	*/
+	co.IObject getInstance( in string key, in string refererEndpoint )
+			raises co.IllegalArgumentException;
+	
+	/*
+		Creates a lease for \a instance, i.e. this instance will be accessed by a new node on 
+		\a refererEndpoint. Marks \a instance as a reference from \a refererEndpoint.
+		
+		Creating leases can be quite confusing so a thorough explanation follows:	
+		The case is when A pass a reference parameter R to B, and that reference is to an object in C.
+		Therefore, C needs to increment R's refcounting before A sends R to B, else there could be an
+		inconsistent state if A removed its reference to R before B got the chance to increase it, C
+		would delete the object and B would get an invalid reference. 
+		Moreover, this request is always issued by A to C and not by B to C, as it should intuitively be.
+		However, B's endpoint is the one passed as \a refererEnpoint.
+		i.e: A would create an access request filling B's address as \referer and send it to C.
+		
+		\throws IllegalArgumentException if \a instance is not a local valid instance.
+	*/
+	void lease( in co.IObject instance, in string refererEndpoint ) 
+			raises co.IllegalArgumentException;
+	
+	/*
+		Breaks a lease for \a instance. Erases the reference from \a refererEndpoint to it. If there
+		are no more references to \a instance then it will be released (unless there are local references
+		to it such as publishing it through a key)
+		
+		\throws IllegalArgumentException if \a instance is not a local valid instance.
+		\throws IllegalArgumentException if \a refererEnpoint does not reference \a instance
+	*/
+	void breakLease( in co.IObject instance, in string refererEndpoint ) 
+			raises co.IllegalArgumentException;
+	
+};

@@ -1,5 +1,5 @@
-#ifndef _REEF_SERVANT_H_
-#define _REEF_SERVANT_H_
+#ifndef _REEF_INVOKER_H_
+#define _REEF_INVOKER_H_
 
 #include "Marshaller.h"
 #include "Demarshaller.h"
