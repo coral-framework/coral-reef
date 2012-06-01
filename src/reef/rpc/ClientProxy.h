@@ -15,14 +15,12 @@ namespace reef {
 namespace rpc {
 
     
-class Node;
+class Requestor;
     
 class ClientProxy : public ClientProxy_Base
 {
 public:
-    // Gets or creates a remote object pointing to an existing instance. 
-    static ClientProxy* getOrCreateClientProxy( Node* node, co::IComponent* component, 
-                                                 IActiveLink* link, co::int32 instanceId );
+    ClientProxy( Requestor* requestor, co::IComponent* component, co::int32 instanceId );
     ClientProxy();
     virtual ~ClientProxy();
     
@@ -46,7 +44,7 @@ public:
         { return *reinterpret_cast<void**>( obj ) != s_classPtr; }
     
 private:
-    ClientProxy( Node* node, co::IComponent* component, IActiveLink* connecter, co::int32 instanceId );
+    
     
     /* 
      Treats all possible cases of a TK_INTERFACE param in a call/field msg. 
@@ -67,16 +65,15 @@ private:
        Returns -1 in case memberOwner is the facet */
     co::int32 findDepth( co::IInterface* facet, co::ICompositeType* memberOwner );
 private:
-    co::RefPtr<Node> _node;
+    co::RefPtr<Requestor> _requestor;
     
     static void* s_classPtr;
     
-    co::int32 _instanceId;
+    co::int32 _instanceID;
     
     Marshaller _marshaller;
     Demarshaller _demarshaller;
-    co::RefPtr<IActiveLink> _link;
-    std::string _address; //!< the address of the host that own the actual object proxied by this.
+    
     co::Any _resultBuffer;
     co::RefPtr<co::IObject> _tempRef; //TODO remove
     

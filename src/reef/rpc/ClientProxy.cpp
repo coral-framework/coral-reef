@@ -14,98 +14,21 @@
 namespace reef {
 namespace rpc {
 
-
-/*
- Maps a all the instance Ids belonging to a host to their local ClientProxies representations.
- */
-class Host
-{
-public:
-    inline void addInstance( ClientProxy* remoteObj, co::int32 instanceId )
-    {
-        _instances.insert( std::pair<co::int32, ClientProxy*>( instanceId, remoteObj ) );
-    }
-    
-    inline ClientProxy* getInstance( co::int32 instanceId )
-    {
-        InstanceMap::iterator it = _instances.find( instanceId );
-        return it != _instances.end() ? it->second : 0;
-    }
-    
-    inline void removeInstance( co::int32 instanceId )
-    {
-        InstanceMap::iterator it = _instances.find( instanceId );
-        _instances.erase( it );
-    }
-    
-    inline bool hasInstance()
-    {
-        return _instances.size() > 0;
-    }
-private:
-    typedef std::map<co::int32, ClientProxy*> InstanceMap;
-    InstanceMap _instances;
-};
-
-// Maps every Connecter to a Host. Could be ip to Host but would be slower.
-typedef std::map<IActiveLink*, Host*> Hosts;
-static Hosts _hosts;
-    
-void* ClientProxy::s_classPtr = 0;
-    
-ClientProxy* ClientProxy::getOrCreateClientProxy( Node* node, co::IComponent* component,
-                                            IActiveLink* link, co::int32 instanceId )
-{
-    Host* host = 0;
-    ClientProxy* retValue = 0;
-    Hosts::iterator it = _hosts.find( link );
-    if( it != _hosts.end() )
-    {
-        host = it->second;
-        retValue = host->getInstance( instanceId );
-        
-        if( retValue )
-            return retValue;
-    }
-    else
-    {
-        host = new Host();
-        _hosts.insert( std::pair<IActiveLink*, Host*>( link, host ) );
-    }
-    
-    retValue = new ClientProxy( node, component, link, instanceId );
-    host->addInstance( retValue, instanceId );
-    
-    return retValue;
-}
     
 ClientProxy::ClientProxy()
 {
 }
     
-ClientProxy::ClientProxy( Node* node, co::IComponent* component, IActiveLink* link, 
-                           co::int32 instanceId ) : _node( node ), _link( link ), 
-                                _address( link->getAddress() ), _numFacets( 0 )
+ClientProxy::ClientProxy( Requestor* requestor, co::IComponent* component, co::int32 instanceID ) : 
+    _requestor( requestor ), _numFacets( 0 ), _instanceID( instanceID )
 {
     s_classPtr = *reinterpret_cast<void**>( this );
     setComponent( component );
-    _instanceId = instanceId;
+    _instanceID = instanceID;
 }
     
 ClientProxy::~ClientProxy()
 {   
-    Hosts::iterator it = _hosts.find( _link.get() );
-    assert( it != _hosts.end() );
-    
-    Host* host = it->second;
-    host->removeInstance( _instanceId );
-    
-    if( !host->hasInstance() )
-    {
-        delete host;
-        _hosts.erase( it );
-    }
-    
     for( int i = 0; i < _numFacets; i++ )
     {
         delete _facets[i];
@@ -113,7 +36,7 @@ ClientProxy::~ClientProxy()
     delete [] _interfaces;
     delete [] _facets;
     
-    _node->requestEndAccess( _link.get(), _instanceId );
+    _requestor->requestLeaseBreak( _instanceID );
 }
     
 void ClientProxy::setComponent( co::IComponent* component )
@@ -203,29 +126,7 @@ const co::Any& ClientProxy::dynamicInvoke( co::int32 dynFacetId, co::IMethod* me
     
     co::IType* returnType = method->getReturnType();
 
-    _marshaller.beginCallMarshalling( _instanceId, dynFacetId, method->getIndex(), depth, returnType,
-                                         _node->getPublicAddress() );
-     
-    for( ; args; args.popFirst() )
-    {
-        const co::Any& arg = args.getFirst();
-        
-        if( arg.getKind() != co::TK_INTERFACE )
-            _marshaller.addValueParam( arg );
-        else
-            onInterfaceParam( arg.get<co::IService*>() );
-    }
     
-    std::string msg;
-    _marshaller.getMarshalledCall( msg );
-    _link->send( msg );
-    
-	if( returnType )
-    {
-        awaitReplyUpdating( msg );
-        demarshalReturn( msg, method->getReturnType(), _resultBuffer );
-    }
-
     return _resultBuffer;
 }
 

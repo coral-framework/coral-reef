@@ -1,8 +1,9 @@
 #include "Node.h"
 
-#include "Demarshaller.h"
 #include "Invoker.h"
+#include "Requestor.h"
 #include "ClientProxy.h"
+#include "Demarshaller.h"
 
 #include <reef/rpc/IActiveLink.h>
 #include <reef/rpc/IPassiveLink.h>
@@ -82,6 +83,9 @@ Node::~Node()
 co::IObject* Node::newRemoteInstance( const std::string& instanceType, 
                                            const std::string& address )
 {
+    Requestor* req = Requestor::getOrCreate( address );
+    return req->requestNewInstance( instanceType );
+    
     IActiveLink* link = _transport->connect( address );
     co::int32 instanceId = requestNewInstance( link, instanceType );
     
@@ -442,6 +446,7 @@ reef::rpc::ITransport* Node::getTransportService()
 void Node::setTransportService( reef::rpc::ITransport* transport )
 {
     _transport = transport;
+    Requestor::setTransport( transport );
 }
     
 Client* Node::findReferer( const std::string& ip )
