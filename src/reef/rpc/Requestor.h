@@ -18,6 +18,22 @@ class ITransport;
 class IActiveLink;
 class ClientProxy;
 class RequestorCache;
+   
+/*!
+ An absoulte reference to the owner of a member.
+ 
+ This reference can identify within a host, which service and reflector should be used to invoke a
+ member.
+*/
+struct MemberOwner
+    {
+        co::int32 instanceID; //<! The id of the instance that provides the service
+        co::int32 facetID; //<! The facet ID among the members of the component
+        
+        /*! The member owner Interface. -1 if the actual service interface is the owner. 
+         0 for parent, 1 for a grandparent 2 for a greatgrandparent and so on... */         
+        co::int32 inheritanceDepth; 
+    };
     
 class Requestor : public co::RefCounted
 {
@@ -31,8 +47,7 @@ public:
     
     co::IObject* requestPublicInstance( const std::string& key, const std::string& componentName );
     
-    void requestAsynchInvocation( co::int32 dynFacetId, co::int32 inheritanceDepth,
-                                 co::IMethod* method,  co::Range<co::Any const> args );
+    void requestAsynchInvocation( MemberOwner& owner, co::IMethod* method,  co::Range<co::Any const> args );
     
     void requestAsynchInvocation( co::int32 dynFacetId,co::int32 inheritanceDepth,
                                  co::IField* field, const co::Any arg );

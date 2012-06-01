@@ -6,6 +6,8 @@
 
 #include <reef/rpc/ITransport.h>
 #include <reef/rpc/IActiveLink.h>
+#include <co/IMethod.h>
+#include <co?IField.h>
 #include <co/IComponent.h>
 
 namespace reef {
@@ -70,10 +72,10 @@ co::IObject* Requestor::requestPublicInstance( const std::string& key,
     return cp;
 }
 
-void Requestor::requestAsynchInvocation( co::int32 dynFacetId, co::int32 inheritanceDepth,
-                                            co::IMethod* method, co::Range<co::Any const> args )
+void Requestor::requestAsynchInvocation( co::int32 instanceID, co::int32 dynFacetId, 
+                co::int32 inheritanceDepth, co::IMethod* method, co::Range<co::Any const> args )
 {
-    _marshaller.beginCallMarshalling( _instanceId, dynFacetId, method->getIndex(), inheritanceDepth, returnType,
+    _marshaller.beginCallMarshalling( instanceID, dynFacetId, method->getIndex(), inheritanceDepth, returnType,
                                      _node->getPublicAddress() );
     
     for( ; args; args.popFirst() )
