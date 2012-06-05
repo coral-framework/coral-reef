@@ -2,37 +2,31 @@
 
 #include "Node.h"
 #include "ClientProxy.h"
-#include "RequestorCache.h"
+#include "ClientRequestHandler.h"
 
-#include <reef/rpc/ITransport.h>
-#include <reef/rpc/IActiveLink.h>
 #include <co/IMethod.h>
-#include <co?IField.h>
+#include <co/IField.h>
 #include <co/IComponent.h>
 
 namespace reef {
 namespace rpc {
 
-Requestor::Requestor( Node* node, IActiveLink* link, const std::string& localEndpoint, 
-        RequestorCache* manager ) : _node( node ), _link( link ), _endpoint( link->getAddress() ),
-        _localEndpoint( localEndpoint ), _manager( manager )
+Requestor::Requestor( ClientRequestHandler* handler, const std::string& localEndpoint ) : 
+        _handler( handler ), _endpoint( handler->getEndpoint() ), _localEndpoint( localEndpoint )
 {
+    requestLease( 0 );
 }
     
 Requestor::~Requestor()
 {
-    _manager->onRequestorDestroyed( _endpoint );
 }
 
 co::IObject* Requestor::requestNewInstance( const std::string& componentName )
 {
     std::string msg;
     _marshaller.marshalNewInstance( componentName, _localEndpoint, msg );
-    _link->send( msg );
-    
-    // The Wait for the reply still keeps updating the server
-    while( !_link->receiveReply( msg ) )
-        _node->update();
+ 
+    _handler->handleSynchRequest( msg, msg );
     
     co::int32 instanceID;
     _demarshaller.demarshalData( msg, instanceID );
@@ -50,11 +44,8 @@ co::IObject* Requestor::requestPublicInstance( const std::string& key,
 {
     std::string msg;
     _marshaller.marshalFindInstance( key, _localEndpoint, msg );
-    _link->send( msg );
     
-    // The Wait for the reply still keeps updating the server
-    while( !_link->receiveReply( msg ) )
-        _node->update();
+    _handler->handleSynchRequest( msg, msg );
     
     co::int32 instanceID;
     _demarshaller.demarshalData( msg, instanceID );
@@ -72,11 +63,11 @@ co::IObject* Requestor::requestPublicInstance( const std::string& key,
     return cp;
 }
 
-void Requestor::requestAsynchInvocation( co::int32 instanceID, co::int32 dynFacetId, 
-                co::int32 inheritanceDepth, co::IMethod* method, co::Range<co::Any const> args )
+void Requestor::requestAsynchCall( MemberOwner& owner, co::IMethod* method,  
+                                            co::Range<co::Any const> args )
 {
-    _marshaller.beginCallMarshalling( instanceID, dynFacetId, method->getIndex(), inheritanceDepth, returnType,
-                                     _node->getPublicAddress() );
+    _marshaller.beginCallMarshalling( owner.instanceID, owner.facetID, method->getIndex(), 
+                                     owner.inheritanceDepth, false, _localEndpoint );
     
     for( ; args; args.popFirst() )
     {
@@ -90,31 +81,22 @@ void Requestor::requestAsynchInvocation( co::int32 instanceID, co::int32 dynFace
     
     std::string msg;
     _marshaller.getMarshalledCall( msg );
-    _link->send( msg );
-    
-	if( returnType )
-    {
-        awaitReplyUpdating( msg );
-        demarshalReturn( msg, method->getReturnType(), _resultBuffer );
-    }
-
-    
+    _handler->handleAsynchRequest( msg );    
 }
     
-void Requestor::requestAsynchInvocation( co::int32 dynFacetId, co::int32 inheritanceDepth,
-                                            co::IField* field, const co::Any arg )
-{
-    
-}
 
-void Requestor::requestSynchInvocation( co::int32 dynFacetId, co::int32 inheritanceDepth,
-                                co::IMethod* method, co::Range<co::Any const> args, co::Any& ret  )
+void Requestor::requestSynchCall( MemberOwner& owner, co::IMethod* method, 
+                                           co::Range<co::Any const> args, co::Any& ret  )
 {
     
 }
     
-void Requestor::requestSynchInvocation( co::int32 dynFacetId, co::int32 inheritanceDepth,
-                                           co::IField* field, co::Any& ret )
+void Requestor::requestSetField( MemberOwner& owner, co::IField* field, const co::Any arg )
+{
+    
+}
+    
+void Requestor::requestGetField( MemberOwner& owner, co::IField* field, co::Any& ret )
 {
     
 }
@@ -129,5 +111,39 @@ void Requestor::requestLeaseBreak( co::int32 instanceID )
     
 }
 
+void Requestor::onInterfaceParam( co::IService* param )
+{
+    co::IObject* provider = param->getProvider();
+    std::string providerType = provider->getComponent()->getFullName();
+    co::int32 facetIdx = param->getFacet()->getIndex();
+    co::int32 instanceId;
+    
+    if( isLocalObject( provider ) )
+    {
+        instanceId = _node->publishAnonymousInstance( provider, _address );
+        _marshaller.addReferenceParam( instanceId, facetIdx, Marshaller::LOCAL, &providerType, 
+                                      &_node->getPublicAddress() );
+    }
+    else // is a remote object, so it provides the IInstanceInfo service
+    {
+        ClientProxy* providerCP = static_cast<ClientProxy*>( provider );
+        
+        instanceId = providerCP->getInstanceId();
+        const std::string instanceOwnerAddress = providerCP->getOwnerAddress();
+        
+        if( instanceOwnerAddress == _address ) // Receiver
+        {
+            _marshaller.addReferenceParam( instanceId, facetIdx, Marshaller::RECEIVER );
+        }
+        else
+        {
+            _node->requestBeginAccess( instanceOwnerAddress, instanceId, _address );
+            _marshaller.addReferenceParam( instanceId, facetIdx, Marshaller::ANOTHER, &providerType,
+                                          &instanceOwnerAddress );
+        }
+    }
+}
+
+    
 }
 }

@@ -40,7 +40,7 @@ public:
 	co::int32 getInstanceId();
 	const std::string& getOwnerAddress();
     
-    static inline bool isLocalObject( void* obj ) 
+    static inline bool isClientProxy( void* obj ) 
         { return *reinterpret_cast<void**>( obj ) != s_classPtr; }
     
 private:
