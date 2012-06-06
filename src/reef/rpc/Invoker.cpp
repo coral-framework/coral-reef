@@ -168,7 +168,7 @@ void Invoker::onInterfaceReturned( co::IService* returned, std::string& caller,
     co::int32 facetIdx = returned->getFacet()->getIndex();
     co::int32 instanceId;
     
-    if( ClientProxy::isLocalObject( provider ) )
+    if( !ClientProxy::isClientProxy( provider ) )
     {
         instanceId = _node->publishAnonymousInstance( provider, caller );
         _marshaller.marshalReferenceType( instanceId, facetIdx, Marshaller::RefOwner::LOCAL, 

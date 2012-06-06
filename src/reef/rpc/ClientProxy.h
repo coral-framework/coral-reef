@@ -41,7 +41,7 @@ public:
 	const std::string& getOwnerAddress();
     
     static inline bool isClientProxy( void* obj ) 
-        { return *reinterpret_cast<void**>( obj ) != s_classPtr; }
+        { return *reinterpret_cast<void**>( obj ) == s_classPtr; }
     
 private:
     

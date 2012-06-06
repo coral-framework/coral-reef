@@ -180,7 +180,7 @@ void ClientProxy::onInterfaceParam( co::IService* param )
     co::int32 facetIdx = param->getFacet()->getIndex();
     co::int32 instanceId;
     
-    if( isLocalObject( provider ) )
+    if( !isClientProxy( provider ) )
     {
         instanceId = _node->publishAnonymousInstance( provider, _address );
         _marshaller.addReferenceParam( instanceId, facetIdx, Marshaller::LOCAL, &providerType, 
