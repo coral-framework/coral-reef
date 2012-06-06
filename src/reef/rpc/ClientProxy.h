@@ -42,8 +42,8 @@ public:
 	co::int32 getInstanceId();
 	const std::string& getOwnerAddress();
     
-    static inline bool isLocalObject( void* obj ) 
-        { return *reinterpret_cast<void**>( obj ) != s_classPtr; }
+    static inline bool isClientProxy( void* obj ) 
+        { return *reinterpret_cast<void**>( obj ) == s_classPtr; }
     
 private:
     ClientProxy( Node* node, co::IComponent* component, IActiveLink* connecter, co::int32 instanceId );
