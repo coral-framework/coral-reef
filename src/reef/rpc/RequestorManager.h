@@ -1,5 +1,5 @@
-#ifndef _REEF_REQUESTORCACHE_H_
-#define _REEF_REQUESTORCACHE_H_
+#ifndef _REEF_REQUESTORMANAGER_H_
+#define _REEF_REQUESTORMANAGER_H_
 
 #include <map>
 #include <string>
@@ -11,15 +11,19 @@ class Node;
 class Requestor;
 class ITransport;
 
-class RequestorCache
+class RequestorManager
 {
 public:
     
-    RequestorCache( Node* node, ITransport* transport, const std::string& localEndpoint );
+    RequestorManager( Node* node, ITransport* transport, const std::string& localEndpoint );
     
-    Requestor* getOrCreate( const std::string& endpoint );
+    ~RequestorManager();
+    
+    Requestor* getOrCreateRequestor( const std::string& endpoint );
     
     void onRequestorDestroyed( const std::string& endpoint );
+    
+    inline Node* getNode() { return _node; }
     
 private:
     Node* _node;

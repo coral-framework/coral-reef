@@ -38,36 +38,23 @@ public:
     void dynamicSetField( co::int32 dynFacetId, co::IField* field, const co::Any& value );
     
 	co::int32 getInstanceId();
-	const std::string& getOwnerAddress();
+	Requestor* getRequestor();
     
     static inline bool isClientProxy( void* obj ) 
-        { return *reinterpret_cast<void**>( obj ) == s_classPtr; }
+        { return *reinterpret_cast<void**>( obj ) == _classPtr; }
     
 private:
     
-    
-    /* 
-     Treats all possible cases of a TK_INTERFACE param in a call/field msg. 
-     See Reference Values page on reef's wiki for further info. Also add the Ref param in the marshaller.
-     */
-    void onInterfaceParam( co::IService* param );
-    
-    void fetchReturnValue( co::IType* descriptor, co::Any& returnValue );
-    
     void setComponent( co::IComponent* component );
-
-    void demarshalReturn( const std::string& data, co::IType* returnedType, 
-                                      co::Any& returned );
-    // Awaits a reply from a call. while waiting keeps updating Node.
-    void awaitReplyUpdating( std::string& msg );
     
     /* Returns the depth in the hierarchy of \memberOwner among the supertypes of \facet. 
        Returns -1 in case memberOwner is the facet */
     co::int32 findDepth( co::IInterface* facet, co::ICompositeType* memberOwner );
-private:
-    co::RefPtr<Requestor> _requestor;
     
-    static void* s_classPtr;
+private:
+    Requestor* _requestor;
+    
+    static void* _classPtr;
     
     co::int32 _instanceID;
     
@@ -75,7 +62,6 @@ private:
     Demarshaller _demarshaller;
     
     co::Any _resultBuffer;
-    co::RefPtr<co::IObject> _tempRef; //TODO remove
     
     co::int32 _numFacets;
     co::IService** _facets;

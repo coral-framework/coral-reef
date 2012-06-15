@@ -14,6 +14,7 @@ namespace reef {
 namespace rpc {
 
 class Node;
+class RequestorManager;
     
 //! Delivers the appropriate calls to an Object
 class Invoker
@@ -25,7 +26,7 @@ public:
         proxys for reference parameters
         \param object The object that will be controlled by this Invoker
     */
-    Invoker( Node* node, co::IObject* object );
+    Invoker( Node* node, RequestorManager* requestorMan, co::IObject* object );
     
      ~Invoker();
     
@@ -69,6 +70,8 @@ private:
     co::IComponent* _component;
     
     Node* _node;
+    
+    RequestorManager* _requestorMan;
     
     Marshaller _marshaller;
     

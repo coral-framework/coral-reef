@@ -1,7 +1,9 @@
 #include "Invoker.h"
 
 #include "Node.h"
+#include "Requestor.h"
 #include "ClientProxy.h"
+#include "RequestorManager.h"
 
 #include <co/IPort.h>
 #include <co/IField.h>
@@ -17,7 +19,8 @@ namespace reef {
 namespace rpc {
 
 
-Invoker::Invoker( Node* node, co::IObject* object ) : _node( node )
+Invoker::Invoker( Node* node, RequestorManager* requestorMan, co::IObject* object ) : _node( node ),
+    _requestorMan( requestorMan )
 {
     if( object )
     {
@@ -147,8 +150,8 @@ void Invoker::demarshalParameter( Demarshaller& demarshaller, co::IType* paramTy
             break;
         case Demarshaller::LOCAL:
         case Demarshaller::ANOTHER:
-            instance = _node->getRemoteInstance( instanceType, instanceId, 
-                                                     ownerAddress );
+            Requestor* req = _requestorMan->getOrCreateRequestor( ownerAddress );
+            instance = req->getOrCreateProxy( instanceId, instanceType );
             break;
     }
     tempRefs.push_back( instance ); // TODO: remove
@@ -174,16 +177,25 @@ void Invoker::onInterfaceReturned( co::IService* returned, std::string& caller,
         _marshaller.marshalReferenceType( instanceId, facetIdx, Marshaller::RefOwner::LOCAL, 
 							marshalledReturn, &providerType, &_node->getPublicAddress() );
     }
-    else // is a remote object, so it provides the IInstanceInfo service
+    else
     {
         ClientProxy* providerCP = static_cast<ClientProxy*>( provider );
         
-        instanceId = providerCP->getInstanceId();
-        std::string ownerAddress = providerCP->getOwnerAddress();
+        instanceId = providerCP->getInstanceId();        
+        Requestor* requestor = providerCP->getRequestor();
         
-        _node->requestBeginAccess( ownerAddress, instanceId, caller );
-        _marshaller.marshalReferenceType( instanceId, facetIdx, Marshaller::RefOwner::ANOTHER, 
-                                      marshalledReturn, &providerType, &ownerAddress );
+        if( requestor->getEndpoint() == caller ) // Receiver
+        {
+            _marshaller.addReferenceParam( instanceId, facetIdx, Marshaller::RECEIVER );
+        }
+        else
+        {
+            requestor->requestLease( instanceId, caller );
+            std::string othersEndpoint( requestor->getEndpoint() );
+            _marshaller.marshalReferenceType( instanceId, facetIdx, Marshaller::ANOTHER, 
+                                             marshalledReturn, &providerType, &othersEndpoint );
+        }
+
     }
 }
 

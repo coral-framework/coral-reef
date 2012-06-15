@@ -1,7 +1,11 @@
 #ifndef _REEF_CLIENTREQUESTHANDLER_H_
 #define _REEF_CLIENTREQUESTHANDLER_H_
 
+#include <reef/rpc/IActiveLink.h>
+#include <co/RefPtr.h>
+
 #include <string>
+
 
 namespace reef {
 namespace rpc {
@@ -23,7 +27,7 @@ public:
     
 private:
     Node* _node;
-    IActiveLink* _link;
+    co::RefPtr<IActiveLink> _link;
     std::string _endpoint;
 };
 

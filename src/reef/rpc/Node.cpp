@@ -4,6 +4,7 @@
 #include "Requestor.h"
 #include "ClientProxy.h"
 #include "Demarshaller.h"
+#include "RequestorManager.h"
 
 #include <reef/rpc/IActiveLink.h>
 #include <reef/rpc/IPassiveLink.h>
@@ -32,10 +33,10 @@ public:
     }
     
     /*
-        Adds the Id of a local instance to the list of Ids that this client refers. This method is
-        merely add the ID to the list for usage in algorithms that need to consult the owner of a
-        reference.
-        returns true if the Id was added and false if the Id already exists inside the client.
+     Adds the Id of a local instance to the list of Ids that this client refers. This method is
+     merely add the ID to the list for usage in algorithms that need to consult the owner of a
+     reference.
+     returns true if the Id was added and false if the Id already exists inside the client.
      */
     inline bool addReferredId( co::int32 instanceId )
     {
@@ -44,16 +45,16 @@ public:
     }
     
     /*
-        Analogous to addRefferedID but removes the id.
-    */
+     Analogous to addRefferedID but removes the id.
+     */
     inline bool removeReferredId( co::int32 instanceId )
     {
         return _ids.erase( instanceId );
     }
     
     /*
-        Searches this client references for \param instanceId , returns true if found, false if not.
-    */
+     Searches this client references for \param instanceId , returns true if found, false if not.
+     */
     inline bool searchReference( co::int32 instanceId )
     {
         _it = _ids.find( instanceId );
@@ -69,7 +70,7 @@ private:
     std::set<co::int32> _ids;
     std::set<co::int32>::iterator _it;
 };
-
+    
 Node::Node() : _passiveLink( 0 )
 {
 }
@@ -83,29 +84,15 @@ Node::~Node()
 co::IObject* Node::newRemoteInstance( const std::string& instanceType, 
                                            const std::string& address )
 {
-    Requestor* req = Requestor::getOrCreate( address );
+    Requestor* req = _requestorMan->getOrCreateRequestor( address );
     return req->requestNewInstance( instanceType );
-    
-    IActiveLink* link = _transport->connect( address );
-    co::int32 instanceId = requestNewInstance( link, instanceType );
-    
-    co::IComponent* component = co::cast<co::IComponent>( co::getType( instanceType ) );
-    
-    return ClientProxy::getOrCreateClientProxy( this, component, link, instanceId );
 }
 
 co::IObject* Node::findRemoteInstance( const std::string& instanceType, const std::string& key, 
                                       const std::string& address )
 {
-    IActiveLink* link = _transport->connect( address );
-    co::int32 instanceId = requestFindInstance( link, key );
-    
-    if( instanceId == 0 )
-        return 0;
-    
-    co::IComponent* component = co::cast<co::IComponent>( co::getType( instanceType ) );
-    
-    return ClientProxy::getOrCreateClientProxy( this, component, link, instanceId );
+    Requestor* req = _requestorMan->getOrCreateRequestor( address );
+    return req->requestPublicInstance( key, instanceType );
 }
     
 void Node::start( const std::string&  boundAddress, const std::string& publicAddress )
@@ -115,6 +102,8 @@ void Node::start( const std::string&  boundAddress, const std::string& publicAdd
     _passiveLink = _transport->bind( boundAddress );
     
     _myPublicAddress = publicAddress;
+    
+    _requestorMan = new RequestorManager( this, _transport, _myPublicAddress );
     
     // This first instanceId is for the Node
     _invokers.push_back( 0 );
@@ -154,11 +143,12 @@ void Node::stop()
     for( std::map<std::string, Client*>::iterator clientIt = _referers.begin(); 
         clientIt != _referers.end(); clientIt++ )
     {
-        requestDisconnection( clientIt->first );
         delete clientIt->second;
     }
     
     _passiveLink = 0;
+    
+    delete _requestorMan;
 }
 
 co::IObject* Node::getInstance( co::int32 instanceId )
@@ -189,53 +179,6 @@ void Node::unpublishInstance( const std::string& key )
     
     closeRemoteReference( it->second );
     _publicInstances.erase( it );
-}
-
-co::IObject* Node::getRemoteInstance( const std::string& instanceType, co::int32 instanceId, 
-                                     const std::string& ownerAddress )
-{
-    IActiveLink* link = _transport->connect( ownerAddress );
-    
-    co::IComponent* component = co::cast<co::IComponent>( co::getType( instanceType ) );
-    
-    return ClientProxy::getOrCreateClientProxy( this, component, link, instanceId );
-}
-
-co::int32 Node::requestNewInstance( IActiveLink* link, const std::string& componentName )
-{
-    std::string msg;
-    _marshaller.marshalNewInstance( componentName, _myPublicAddress, msg );
-    link->send( msg );
-    
-    // The Wait for the reply still keeps updating the server
-    while( !link->receiveReply( msg ) )
-        update();
-    
-    co::int32 instanceId;
-    _demarshaller.demarshalData( msg, instanceId );
-    
-    return instanceId;
-}
-
-co::int32 Node::requestFindInstance( IActiveLink* link, const std::string& key )
-{
-    std::string msg;
-    _marshaller.marshalFindInstance( key, _myPublicAddress, msg );
-    link->send( msg );
-    
-    // The Wait for the reply still keeps updating the server
-    while( !link->receiveReply( msg ) )
-        update();
-    
-    co::int32 instanceId;
-    _demarshaller.demarshalData( msg, instanceId );
-    
-    return instanceId;
-}
-
-void Node::requestDisconnection( const std::string& ip )
-{
-    // TODO
 }
     
 void Node::dispatchMessage( const std::string& msg )
@@ -355,24 +298,7 @@ co::int32 Node::publishAnonymousInstance( co::IObject* instance, const std::stri
     
     return instanceId;
 }
-    
-void Node::requestBeginAccess( const std::string& address, co::int32 instanceId,
-                                 const std::string& referer )
-{
-    IActiveLink* link = _transport->connect( address );
-    
-    std::string msg;
-    _marshaller.marshalAccessInstance( instanceId, true, referer, msg );
-    link->send( msg );
-}
-  
-void Node::requestEndAccess( IActiveLink* link, co::int32 instanceId )
-{    
-    std::string msg;
-    _marshaller.marshalAccessInstance( instanceId, false, _myPublicAddress, msg );
-    link->send( msg );
-}
-    
+
 void Node::openRemoteReference( co::int32 instanceId )
 {
     _remoteRefCounting[instanceId]++;
@@ -421,7 +347,7 @@ co::int32 Node::startRemoteRefCount( co::IObject* instance )
     co::int32 newInvokerId = newVirtualAddress();
     _vas.insert( objToAddress( instance, newInvokerId ) );
     
-    _invokers[newInvokerId] = new Invoker( this, instance );
+    _invokers[newInvokerId] = new Invoker( this, _requestorMan, instance );
     _remoteRefCounting[newInvokerId] = 1; // TODO set referer
     
     return newInvokerId;
@@ -446,7 +372,6 @@ reef::rpc::ITransport* Node::getTransportService()
 void Node::setTransportService( reef::rpc::ITransport* transport )
 {
     _transport = transport;
-    Requestor::setTransport( transport );
 }
     
 Client* Node::findReferer( const std::string& ip )
