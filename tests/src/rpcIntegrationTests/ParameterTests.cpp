@@ -1,8 +1,11 @@
 #include <gtest/gtest.h>
 
+#include <moduleA/ChildStruct.h>
+#include <moduleA/MotherStruct.h>
 #include <moduleA/ISimpleTypes.h>
 #include <moduleA/IComplexTypes.h>
 #include <moduleA/IReferenceTypes.h>
+#include <moduleA/StringNativeClass.h>
 #include <mockReef/ITestSetup.h>
 
 #include <reef/rpc/INode.h>
@@ -154,6 +157,76 @@ TEST( ParameterTests, refTypeParameterTest )
     simple->setStoredInt( 7 );
     
     EXPECT_EQ( simple->getStoredInt(), simpleTypesServiceInB->getStoredInt() );
+    
+    setup->tearDown();
+}
+    
+TEST( ParameterTests, complexTypeParameterTest )
+{
+    co::RefPtr<co::IObject> testSetup = co::newInstance( "mockReef.TestSetup" );
+    mockReef::ITestSetup* setup = testSetup->getService<mockReef::ITestSetup>();
+    setup->initTest( 2 );
+    
+    reef::rpc::INode* server = setup->getNode( 1 );
+    reef::rpc::INode* client = setup->getNode( 2 );
+    
+    co::RefPtr<co::IObject> instance = co::newInstance( "moduleA.TestComponent" );
+    moduleA::IComplexTypes* complexTypes = instance->getService<moduleA::IComplexTypes>();
+    server->publishInstance( instance.get(), "instance" );
+    
+    co::RefPtr<co::IObject> rmtInstance = client->findRemoteInstance( "moduleA.TestComponent", 
+                                                                     "instance", "address1" );
+    
+    moduleA::IComplexTypes* rmtComplexTypes = rmtInstance->getService<moduleA::IComplexTypes>();
+    
+    moduleA::MotherStruct ms;
+    moduleA::ChildStruct cs;    
+    moduleA::StringNativeClass native;
+    
+    // setting complex type
+    native.data = "setNative";
+    cs.myNativeClass = native;
+    cs.id = 2;
+    cs.name = "setChild";
+    ms.id = 1;
+    ms.name = "setMother";
+    ms.child = cs;
+    
+    rmtComplexTypes->setMotherStruct( ms );
+    
+    const moduleA::MotherStruct& ms_ = complexTypes->getMotherStruct();
+    const moduleA::ChildStruct& cs_ = ms.child;
+    EXPECT_EQ( ms_.id, 1 );
+    EXPECT_STREQ( ms_.name.c_str(), "setMother" );
+    EXPECT_EQ( cs_.id, 2 );
+    EXPECT_STREQ( cs_.name.c_str(), "setChild" );
+
+    const moduleA::StringNativeClass& native_ = cs_.myNativeClass;
+    
+    EXPECT_STREQ( native_.data.c_str(), "setNative" );
+    
+    // getting complex type
+    native.data = "getNative";
+    cs.myNativeClass = native;
+    cs.id = 4;
+    cs.name = "getChild";
+    ms.id = 3;
+    ms.name = "getMother";
+    ms.child = cs;
+    
+    complexTypes->setMotherStruct( ms );
+    
+    const moduleA::MotherStruct& ms2_ = rmtComplexTypes->getMotherStruct();
+    const moduleA::ChildStruct& cs2_ = ms.child;
+    EXPECT_EQ( ms2_.id, 3 );
+    EXPECT_STREQ( ms2_.name.c_str(), "getMother" );
+    EXPECT_EQ( cs2_.id, 4 );
+    EXPECT_STREQ( cs2_.name.c_str(), "getChild" );
+    
+    const moduleA::StringNativeClass& native2_ = cs2_.myNativeClass;
+    
+    EXPECT_STREQ( native2_.data.c_str(), "getNative" );
+
     
     setup->tearDown();
 }

@@ -6,13 +6,21 @@ message Data_Container
 	optional bool boolean = 1;
 	optional string str = 2;
 	optional double numeric = 3;
-	optional Ref_Type ref_type = 4;
+	
+	optional Complex_Type complex_type = 4;
+	
+	optional Ref_Type ref_type = 5;
 }
 
 message Argument
 {
 	repeated Data_Container data = 1;
 	optional uint32 coany_type = 2; // If the argument is an any, then this is its internal type 
+}
+
+message Complex_Type
+{
+	repeated Argument field = 1;
 }
 
 message Ref_Type

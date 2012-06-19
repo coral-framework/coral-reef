@@ -8,18 +8,6 @@
 
 namespace moduleA {
 
-const co::Any& StringNativeClass_Adapter::getState( moduleA::StringNativeClass& instance )
-{
-	static co::Any returnValue;
-	returnValue.set<std::string&>( instance.data );
-	return returnValue;
-}
-
-void StringNativeClass_Adapter::setState( moduleA::StringNativeClass& instance, const co::Any& state )
-{
-	instance.data = state.get<std::string&>();
-}
-
 const std::string& StringNativeClass_Adapter::getValue( moduleA::StringNativeClass& instance )
 {
 	return instance.data;

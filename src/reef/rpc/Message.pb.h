@@ -35,6 +35,7 @@ void protobuf_ShutdownFile_Message_2eproto();
 
 class Data_Container;
 class Argument;
+class Complex_Type;
 class Ref_Type;
 class Message_Member;
 class Message_New_Inst;
@@ -164,10 +165,18 @@ class Data_Container : public ::google::protobuf::Message {
   inline double numeric() const;
   inline void set_numeric(double value);
   
-  // optional .reef.rpc.Ref_Type ref_type = 4;
+  // optional .reef.rpc.Complex_Type complex_type = 4;
+  inline bool has_complex_type() const;
+  inline void clear_complex_type();
+  static const int kComplexTypeFieldNumber = 4;
+  inline const ::reef::rpc::Complex_Type& complex_type() const;
+  inline ::reef::rpc::Complex_Type* mutable_complex_type();
+  inline ::reef::rpc::Complex_Type* release_complex_type();
+  
+  // optional .reef.rpc.Ref_Type ref_type = 5;
   inline bool has_ref_type() const;
   inline void clear_ref_type();
-  static const int kRefTypeFieldNumber = 4;
+  static const int kRefTypeFieldNumber = 5;
   inline const ::reef::rpc::Ref_Type& ref_type() const;
   inline ::reef::rpc::Ref_Type* mutable_ref_type();
   inline ::reef::rpc::Ref_Type* release_ref_type();
@@ -180,6 +189,8 @@ class Data_Container : public ::google::protobuf::Message {
   inline void clear_has_str();
   inline void set_has_numeric();
   inline void clear_has_numeric();
+  inline void set_has_complex_type();
+  inline void clear_has_complex_type();
   inline void set_has_ref_type();
   inline void clear_has_ref_type();
   
@@ -187,11 +198,12 @@ class Data_Container : public ::google::protobuf::Message {
   
   ::std::string* str_;
   double numeric_;
+  ::reef::rpc::Complex_Type* complex_type_;
   ::reef::rpc::Ref_Type* ref_type_;
   bool boolean_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
   
   friend void  protobuf_AddDesc_Message_2eproto();
   friend void protobuf_AssignDesc_Message_2eproto();
@@ -294,6 +306,91 @@ class Argument : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static Argument* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class Complex_Type : public ::google::protobuf::Message {
+ public:
+  Complex_Type();
+  virtual ~Complex_Type();
+  
+  Complex_Type(const Complex_Type& from);
+  
+  inline Complex_Type& operator=(const Complex_Type& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Complex_Type& default_instance();
+  
+  void Swap(Complex_Type* other);
+  
+  // implements Message ----------------------------------------------
+  
+  Complex_Type* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const Complex_Type& from);
+  void MergeFrom(const Complex_Type& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // repeated .reef.rpc.Argument field = 1;
+  inline int field_size() const;
+  inline void clear_field();
+  static const int kFieldFieldNumber = 1;
+  inline const ::reef::rpc::Argument& field(int index) const;
+  inline ::reef::rpc::Argument* mutable_field(int index);
+  inline ::reef::rpc::Argument* add_field();
+  inline const ::google::protobuf::RepeatedPtrField< ::reef::rpc::Argument >&
+      field() const;
+  inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Argument >*
+      mutable_field();
+  
+  // @@protoc_insertion_point(class_scope:reef.rpc.Complex_Type)
+ private:
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::RepeatedPtrField< ::reef::rpc::Argument > field_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_Message_2eproto();
+  friend void protobuf_AssignDesc_Message_2eproto();
+  friend void protobuf_ShutdownFile_Message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static Complex_Type* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -1124,15 +1221,44 @@ inline void Data_Container::set_numeric(double value) {
   numeric_ = value;
 }
 
-// optional .reef.rpc.Ref_Type ref_type = 4;
-inline bool Data_Container::has_ref_type() const {
+// optional .reef.rpc.Complex_Type complex_type = 4;
+inline bool Data_Container::has_complex_type() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
-inline void Data_Container::set_has_ref_type() {
+inline void Data_Container::set_has_complex_type() {
   _has_bits_[0] |= 0x00000008u;
 }
-inline void Data_Container::clear_has_ref_type() {
+inline void Data_Container::clear_has_complex_type() {
   _has_bits_[0] &= ~0x00000008u;
+}
+inline void Data_Container::clear_complex_type() {
+  if (complex_type_ != NULL) complex_type_->::reef::rpc::Complex_Type::Clear();
+  clear_has_complex_type();
+}
+inline const ::reef::rpc::Complex_Type& Data_Container::complex_type() const {
+  return complex_type_ != NULL ? *complex_type_ : *default_instance_->complex_type_;
+}
+inline ::reef::rpc::Complex_Type* Data_Container::mutable_complex_type() {
+  set_has_complex_type();
+  if (complex_type_ == NULL) complex_type_ = new ::reef::rpc::Complex_Type;
+  return complex_type_;
+}
+inline ::reef::rpc::Complex_Type* Data_Container::release_complex_type() {
+  clear_has_complex_type();
+  ::reef::rpc::Complex_Type* temp = complex_type_;
+  complex_type_ = NULL;
+  return temp;
+}
+
+// optional .reef.rpc.Ref_Type ref_type = 5;
+inline bool Data_Container::has_ref_type() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void Data_Container::set_has_ref_type() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void Data_Container::clear_has_ref_type() {
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline void Data_Container::clear_ref_type() {
   if (ref_type_ != NULL) ref_type_->::reef::rpc::Ref_Type::Clear();
@@ -1202,6 +1328,35 @@ inline ::google::protobuf::uint32 Argument::coany_type() const {
 inline void Argument::set_coany_type(::google::protobuf::uint32 value) {
   set_has_coany_type();
   coany_type_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// Complex_Type
+
+// repeated .reef.rpc.Argument field = 1;
+inline int Complex_Type::field_size() const {
+  return field_.size();
+}
+inline void Complex_Type::clear_field() {
+  field_.Clear();
+}
+inline const ::reef::rpc::Argument& Complex_Type::field(int index) const {
+  return field_.Get(index);
+}
+inline ::reef::rpc::Argument* Complex_Type::mutable_field(int index) {
+  return field_.Mutable(index);
+}
+inline ::reef::rpc::Argument* Complex_Type::add_field() {
+  return field_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::reef::rpc::Argument >&
+Complex_Type::field() const {
+  return field_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Argument >*
+Complex_Type::mutable_field() {
+  return &field_;
 }
 
 // -------------------------------------------------------------------

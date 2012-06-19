@@ -5,6 +5,8 @@
 #include <co/IField.h>
 #include <co/IMethod.h>
 #include <co/Exception.h>
+#include <co/IReflector.h>
+#include <co/IRecordType.h>
 
 namespace reef {
 namespace rpc {
@@ -96,6 +98,8 @@ co::IType* kind2Type( co::TypeKind kind )
     }
     return 0;
 }
+ 
+void PBArgToComplex( const Argument& arg, co::IType* descriptor, co::Any& complexAny );
     
 void PBArgToAny( const Argument& arg, co::IType* descriptor, co::Any& any )
 {
@@ -146,6 +150,10 @@ void PBArgToAny( const Argument& arg, co::IType* descriptor, co::Any& any )
         case co::TK_STRING:
             PBArgWithTypeToAny<std::string>( arg, any, elementType );
             break;
+        case co::TK_STRUCT:
+        case co::TK_NATIVECLASS:
+            PBArgToComplex( arg, descriptor, any );
+            break;
         case co::TK_ANY:
         {
             static co::Any internalAny; // TODO remove
@@ -158,6 +166,30 @@ void PBArgToAny( const Argument& arg, co::IType* descriptor, co::Any& any )
     }
 }
     
+void PBArgToComplex( const Argument& arg, co::IType* descriptor, co::Any& complexAny )
+{
+    assert( descriptor->getKind() != co::TK_ARRAY );
+    
+    complexAny.createComplexValue( descriptor );
+    co::IRecordType* rt = co::cast<co::IRecordType>( descriptor );
+    co::IReflector* refl = rt->getReflector();
+    
+    const Data_Container& container = arg.data( 0 );
+    const Complex_Type& complex = container.complex_type();
+    
+    co::Range<co::IField* const> fields = rt->getFields();
+    co::int32 fieldCount = fields.getSize();
+    for( co::int32 i = 0; i < fieldCount; i++ )
+    {
+        co::IField* field = fields[i];
+        const Argument& fieldArg = complex.field( i );
+        co::Any fieldAny;
+        PBArgToAny( fieldArg, field->getType(), fieldAny );
+        refl->setField( complexAny, field, fieldAny );
+    }
+    
+}
+
 void Message_Type2MsgType( Message_Type message_type, Demarshaller::MsgType& msgType )
 {
     switch( message_type )

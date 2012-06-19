@@ -16,7 +16,4 @@ native class StringNativeClass
 	c++>
 	
 	string value;
-	
-	// the field to be serialized
-	any state;
 };

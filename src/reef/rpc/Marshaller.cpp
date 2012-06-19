@@ -5,6 +5,8 @@
 #include <co/IField.h>
 #include <co/IMethod.h>
 #include <co/Exception.h>
+#include <co/IReflector.h>
+#include <co/IRecordType.h>
 
 namespace reef {
 namespace rpc {
@@ -97,7 +99,9 @@ void anyWithTypeToPBArg<bool>( const co::Any& any, Argument* arg )
         setPBContainerData<bool>( container, vec[i] );
     }
 }
-
+   
+void complexToPBArg( const co::Any& instance, Argument* complexArg );
+    
 // Converts an any containing a vlue type to a protobuf Argument
 void anyToPBArg( const co::Any& any, Argument* arg )
 {
@@ -146,6 +150,10 @@ void anyToPBArg( const co::Any& any, Argument* arg )
         case co::TK_STRING:
             anyWithTypeToPBArg<std::string>( any, arg );
             break;
+        case co::TK_STRUCT:
+        case co::TK_NATIVECLASS:
+            complexToPBArg( any, arg );
+            break;
         case co::TK_ANY:
         {
             const co::Any& internalAny =  any.get<const co::Any&>();
@@ -157,6 +165,26 @@ void anyToPBArg( const co::Any& any, Argument* arg )
             assert( false );
     }
 }
+    
+    
+void complexToPBArg( const co::Any& instance, Argument* complexArg )
+{
+    assert( instance.getKind() != co::TK_ARRAY );
+    
+    co::IRecordType* rt = co::cast<co::IRecordType>( instance.getType() );
+    co::IReflector* refl = rt->getReflector();
+    Data_Container* container = complexArg->add_data();
+    Complex_Type* complexType = container->mutable_complex_type();
+    
+    for( co::Range<co::IField* const> fields = rt->getFields(); fields; fields.popFirst() )
+    {
+        Argument* fieldArg = complexType->add_field();
+        co::Any fieldAny;
+        refl->getField( instance, fields.getFirst(), fieldAny );
+        anyToPBArg( fieldAny, fieldArg );
+    }
+}
+
 
 Marshaller::Marshaller()
 {
