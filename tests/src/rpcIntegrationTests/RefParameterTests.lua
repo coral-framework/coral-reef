@@ -4,7 +4,7 @@ function test()
 	setup:initTest( 3 )
 	
 	local client = setup:getNode( 3 )
-	
+	print( "aaaa" )
 	local instanceIn1 = client:newRemoteInstance( "moduleA.TestComponent",	"address1" )
 	local refTypesServiceIn1 = instanceIn1.reference
 	local simpleTypesServiceIn1 = instanceIn1.simple

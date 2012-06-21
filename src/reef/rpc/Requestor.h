@@ -110,6 +110,7 @@ private:
     
     void demarshalReturn( const std::string& data, co::IType* returnedType, co::Any& ret );
     
+	void lastProxyRemoved();
 private:
         
     Marshaller _marshaller;

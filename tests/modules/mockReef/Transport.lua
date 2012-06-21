@@ -68,6 +68,7 @@ function Transport:getNodeService()
 end
 
 function Transport:clearNetwork()
+	net.nodes = {}
 	net = setmetatable( { msgs = {}, replies = {}, nodes = {} }, { __index = net__index } )
 end
 

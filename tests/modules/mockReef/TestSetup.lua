@@ -58,11 +58,8 @@ function TestSetup:spawnNode( address )
 end
 
 function TestSetup:tearDown()
-	for i,v in ipairs( self.transports ) do
-		if type( v ) == "userdata" then
-			v.config:clearNetwork()
-			return
-		end
+	if #self.transports > 0 then
+		self.transports[1].config:clearNetwork()
 	end
 end
 

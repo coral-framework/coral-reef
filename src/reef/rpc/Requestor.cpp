@@ -20,7 +20,6 @@ Requestor::Requestor( RequestorManager* manager, ClientRequestHandler* handler,
     
 Requestor::~Requestor()
 {
-    _manager->onRequestorDestroyed( _handler->getEndpoint() );
     delete _handler;
 }
 
@@ -141,7 +140,7 @@ void Requestor::requestCancelLease( co::int32 instanceID )
     assert( result );
     
     if( _proxies.size() <= 0 )
-        delete this;
+        lastProxyRemoved();
 }
     
 ClientProxy* Requestor::getOrCreateProxy( co::int32 instanceID, const std::string& componentName )
@@ -239,6 +238,11 @@ void Requestor::demarshalReturn( const std::string& data, co::IType* returnedTyp
     ret.set<co::IService*>( service );
 }
 
+void Requestor::lastProxyRemoved()
+{
+	_manager->onRequestorDestroyed( _handler->getEndpoint() );
+	delete this;
+}
     
 }
 }
