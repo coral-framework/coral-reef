@@ -63,14 +63,16 @@ public:
      */
     co::int32 publishAnonymousInstance( co::IObject* instance, const std::string& referer );
     
-private:    
-    // Dispatches the msg received during an update()
-    void dispatchMessage( const std::string& msg );
-    
     // If a message is destined to the own Node it will be dispatched to these methods.
     void onNewInstMsg(); // creates instance, start its ref counting and replies the instanceId
     void onAccessInstMsg(); // increments the instance ref count
     void onFindInstMsg(); // finds an instance published under a key, increment ref and return ID
+    
+private:    
+    // Dispatches the msg received during an update()
+    void dispatchMessage( const std::string& msg );
+    
+    
     
     void onMsgForInvoker( co::int32 instanceId, bool hasReturn );
        

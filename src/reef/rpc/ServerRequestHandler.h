@@ -11,7 +11,7 @@
 namespace reef {
 namespace rpc {
     
-class LifecycleManager;
+class Invoker;
     
 class ServerRequestHandler
 {
@@ -20,14 +20,15 @@ public:
     
     ~ServerRequestHandler();
     
+    inline void setInvoker( Invoker* invoker ){ _invoker = invoker; }
+    
 	void react();
     
-    // void reply( void* replyhandle, const std::string& reply );
+    void reply( const std::string& reply );
     
 private:
-    Demarshaller _demarshaller;
-    LifecycleManager* _lcm;
     co::RefPtr<IPassiveLink> _link;
+    Invoker* _invoker;
 };
 
 }

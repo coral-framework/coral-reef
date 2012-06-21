@@ -3,6 +3,7 @@
 
 #include "Marshaller.h"
 #include "Demarshaller.h"
+
 #include <co/Any.h>
 #include <co/RefPtr.h>
 #include <co/RefVector.h>
@@ -14,7 +15,10 @@ namespace reef {
 namespace rpc {
 
 class Node;
+class InstanceManager;
 class RequestorManager;
+class InstanceContainer;
+class ServerRequestHandler;
     
 //! Delivers the appropriate calls to an Object
 class Invoker
@@ -26,9 +30,11 @@ public:
         proxys for reference parameters
         \param object The object that will be controlled by this Invoker
     */
-    Invoker( Node* node, RequestorManager* requestorMan, co::IObject* object );
+    Invoker( Node* node, ServerRequestHandler* srh, RequestorManager* requestorMan );
     
      ~Invoker();
+    
+    void dispatchInvocation( const std::string& invocation );
     
     /*!
         Makes an invocation in the actual object based on the to-be-demarshalled data inside the
@@ -37,10 +43,11 @@ public:
         \param isSynch True if it is a synchronous call, and a return is expected
         \param returned What the invocation returned. Already marshalled and ready to send.     
     */
-    void invoke( Demarshaller& demarshaller, bool isSynch, std::string& returned );
+    void invokeInstance( Demarshaller& demarshaller, co::int32 instanceID, bool isSynch, 
+                        std::string& returned );
     
-    //! returns the object controlled by this Invoker
-    inline co::IObject* getObject() { return _object.get(); }
+    void invokeManager( Demarshaller& demarshaller, Demarshaller::MsgType type, bool isSynch, 
+                       std::string& returned );
        
 private:
 
@@ -61,25 +68,17 @@ private:
     // Identify and marshals an interface that has been returned from an invoke
     void onInterfaceReturned( co::IService* returned, std::string& caller, 
                              std::string& marshalledReturn );
-   
-private:
-    co::RefPtr<co::IObject> _object;
 
-    co::int32 _remoteRefCount;
-    
-    co::IComponent* _component;
+private:
     
     Node* _node;
+    InstanceManager* _instanceMan;
+    ServerRequestHandler* _srh;
     
     RequestorManager* _requestorMan;
     
     Marshaller _marshaller;
-    
-    // initializes _openedService's and Reflector's index for the accessed service
-	void onServiceFirstAccess( co::int32 serviceId );
-	std::vector<co::IService*> _openedServices;
-    std::vector<co::IInterface*> _openedInterfaces;
-	std::vector<co::IReflector*> _openedReflectors;    
+    Demarshaller _demarshaller;
 };
     
 }

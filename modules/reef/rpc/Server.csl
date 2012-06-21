@@ -1,4 +1,0 @@
-component Server
-{
-	provides IServer server;
-};

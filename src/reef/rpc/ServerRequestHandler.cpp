@@ -22,19 +22,14 @@ void ServerRequestHandler::react()
     if( !_link->receive( msg ) )
         return;
     
-    co::int32 destInstanceId;
-    Demarshaller::MsgType type;
-    bool hasReturn;
-    _demarshaller.setMarshalledRequest( msg, type, destInstanceId, hasReturn );
-    
-    Invoker* invoker = _lcm->getInvoker( destInstanceId );
-    std::string returned;
-    invoker->invoke( _demarshaller, hasReturn, returned );
-    
-    if( hasReturn )
-        _link->sendReply( returned );    
+    _invoker->dispatchInvocation( msg );
 }
 
+void ServerRequestHandler::reply( const std::string& reply )
+{
+    _link->sendReply( reply );
+}
+    
 
 }
 }

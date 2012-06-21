@@ -3,7 +3,10 @@
 #include "Node.h"
 #include "Requestor.h"
 #include "ClientProxy.h"
+#include "InstanceManager.h"
 #include "RequestorManager.h"
+#include "InstanceContainer.h"
+#include "ServerRequestHandler.h"
 
 #include <co/IPort.h>
 #include <co/IField.h>
@@ -19,28 +22,78 @@ namespace reef {
 namespace rpc {
 
 
-Invoker::Invoker( Node* node, RequestorManager* requestorMan, co::IObject* object ) : _node( node ),
-    _requestorMan( requestorMan )
+Invoker::Invoker( Node* node, ServerRequestHandler* srh, RequestorManager* requestorMan ) : 
+                _node( node ), _srh( srh ), _requestorMan( requestorMan )
 {
-    if( object )
-    {
-        _object = object;
-        _component = _object->getComponent();
-        co::Range<co::IPort* const> ports = _component->getFacets();
-        co::int32 numPorts = static_cast<co::int32>( ports.getSize() );
-        _openedServices.resize( numPorts );
-        _openedInterfaces.resize( numPorts );
-        _openedReflectors.resize( numPorts );
-    }
 }
     
 Invoker::~Invoker()
 {
+}
+
+void Invoker::dispatchInvocation( const std::string& invocation )
+{
+    co::int32 destInstanceId;
+    Demarshaller::MsgType type;
+    bool hasReturn;
+    _demarshaller.setMarshalledRequest( invocation, type, destInstanceId, hasReturn );
+    
+    std::string returnValue;
+    
+    if( destInstanceId == 0 )
+        invokeManager( _demarshaller, type, hasReturn, returnValue );
+    else
+        invokeInstance( _demarshaller, destInstanceId, hasReturn, returnValue );
+    
+    if( hasReturn )
+        _srh->reply( returnValue );
+}
+
+void Invoker::invokeManager( Demarshaller& demarshaller, Demarshaller::MsgType type, bool isSynch, 
+                   std::string& returned )
+{
+    co::int32 returnID;
+    std::string lesseeEndpoint;
+    
+    switch( type )
+    {
+        case Demarshaller::NEW_INST:
+        {
+            std::string componentName;
+            _demarshaller.demarshalNewInstance( componentName, lesseeEndpoint );
+            returnID = _instanceMan->newInstance( componentName, lesseeEndpoint );
+            break;
+        }
+        case Demarshaller::ACCESS_INST:
+        {
+            co::int32 instanceID;
+            bool increment;
+            
+            // REMOTINGERROR: if no instance found with the id
+            _demarshaller.demarshalAccessInstance( instanceID, increment, lesseeEndpoint );
+            if( increment )
+                _instanceMan->createLease( instanceID, lesseeEndpoint );
+            else
+                _instanceMan->cancelLease( instanceID, lesseeEndpoint );
+            
+            break;
+        }
+        case Demarshaller::FIND_INST:
+        {
+            std::string key;
+            _demarshaller.demarshalFindInstance( key, lesseeEndpoint );
+            returnID = _instanceMan->findInstance( key, lesseeEndpoint );
+            break;
+        }
+        default:
+            assert( false );
+    }  
 
 }
     
-void Invoker::invoke( Demarshaller& demarshaller, bool isSynch, std::string& returned )
-{
+void Invoker::invokeInstance( Demarshaller& demarshaller, co::int32 instanceID, bool isSynch, 
+                             std::string& returned )
+{    
     co::int32 facetIdx;
     co::int32 memberIdx;
     co::Any parameter;
@@ -49,11 +102,11 @@ void Invoker::invoke( Demarshaller& demarshaller, bool isSynch, std::string& ret
     
     demarshaller.beginDemarshallingCall( facetIdx, memberIdx, depth, caller );
     
-    if( !_openedServices[facetIdx] ) // if already used before access directly
-        onServiceFirstAccess( facetIdx );
+    InstanceContainer* container = _instanceMan->getInstance( instanceID );
     
-    co::IService* facet = _openedServices[facetIdx];
-    co::IInterface* memberOwner = _openedInterfaces[facetIdx];
+    co::IService* facet = container->getCachedService( facetIdx );
+    
+    co::IInterface* memberOwner = facet->getInterface();
     
     // if method is inherited
     if( depth != -1 )
@@ -199,25 +252,6 @@ void Invoker::onInterfaceReturned( co::IService* returned, std::string& caller,
     }
 }
 
-void Invoker::onServiceFirstAccess( co::int32 serviceId )
-{
-	co::Range<co::IPort* const> ports = _object->getComponent()->getFacets();
-    
-    co::IPort* port = ports[serviceId];
-    assert( port->getIsFacet() );
-    
-    co::IService* service = _object->getServiceAt( port );
-
-    co::IInterface* itf = service->getInterface();
-
-    co::IReflector* reflector = itf->getReflector();
-
-	// saving for easier later access
-	_openedServices[serviceId] = service;
-    _openedInterfaces[serviceId] = itf;
-    _openedReflectors[serviceId] = reflector;
-}
-    
 }
     
 } // namespace reef
