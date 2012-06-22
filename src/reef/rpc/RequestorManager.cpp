@@ -1,6 +1,7 @@
 #include "RequestorManager.h"
 
 #include "Requestor.h"
+#include "InstanceManager.h"
 #include "ClientRequestHandler.h"
 
 #include <reef/rpc/ITransport.h>
@@ -9,8 +10,9 @@
 namespace reef {
 namespace rpc {
 
-RequestorManager::RequestorManager( Node* node, ITransport* transport, const std::string& localEndpoint )
-    : _node( node ), _transport( transport ), _localEndpoint( localEndpoint )
+RequestorManager::RequestorManager( Node* node, InstanceManager* instanceMan, ITransport* transport,
+                const std::string& localEndpoint ) : _node( node ), _instanceMan( instanceMan ),
+                _transport( transport ), _localEndpoint( localEndpoint )
 {
 }
   

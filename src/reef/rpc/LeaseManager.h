@@ -12,6 +12,9 @@ namespace rpc {
 class LeaseManager
 {
 public:
+    LeaseManager();
+    ~LeaseManager();
+    
     /* Tries to add a new lease for \param lessorID belonging to \param lesseeEnpoint. Does nothing
      if there is already a lease for \param lesseeEndpoint. */
     void addLease( co::int32 lessorID, const std::string lesseeEndpoint );
@@ -19,6 +22,8 @@ public:
     /* Removes a lease for \param lessorID belonging to \param lesseeEnpoint. Returns true if there 
      are no more leases for \param lessorID and it has been removed, false otherwise. */
     bool removeLease( co::int32 lessorID, const std::string lesseeEndpoint );
+    
+    co::int32 numLeases( co::int32 lessorID );
     
 private:
     
@@ -60,6 +65,29 @@ private:
         std::set<co::int32>::iterator _it;
     };
 
+    class Lessor
+    {
+    public:
+        inline void addLease( Lessee* lessee )
+        {
+            _lessees.insert( lessee );
+        }
+        
+        inline bool removeLease( Lessee* lessee )
+        {
+            return _lessees.erase( lessee );
+        }
+        
+        inline co::int32 numLeases()
+        {
+            return _lessees.size();
+        }
+        
+    private:
+        std::set<Lessee*> _lessees;
+    };
+    
+    std::map<co::int32, Lessor*> _lessors;
     std::map<std::string, Lessee*> _lessees;
     
     Lessee* findLessee( const std::string& lesseeEndpoint );

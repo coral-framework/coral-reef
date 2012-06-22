@@ -2,9 +2,9 @@
 
 #include "Invoker.h"
 #include "Requestor.h"
-#include "ClientProxy.h"
-#include "Demarshaller.h"
+#include "InstanceManager.h"
 #include "RequestorManager.h"
+#include "ServerRequestHandler.h"
 
 #include <reef/rpc/IActiveLink.h>
 #include <reef/rpc/IPassiveLink.h>
@@ -17,68 +17,14 @@
 
 namespace reef {
 namespace rpc {
-
-/*!
- \brief Internal class that maps a Client Node to all the local instance's Ids. 
- 
- This mapping is purely informative (for usage in algorithms that need to know a reference owner). 
- The actual reference counting that manages the instances' lifecycle happens elsewhere.
- */
-class Client
-{
-public:
-    Client()
-    {
-        
-    }
     
-    /*
-     Adds the Id of a local instance to the list of Ids that this client refers. This method is
-     merely add the ID to the list for usage in algorithms that need to consult the owner of a
-     reference.
-     returns true if the Id was added and false if the Id already exists inside the client.
-     */
-    inline bool addReferredId( co::int32 instanceId )
-    {
-        std::pair<std::set<co::int32>::iterator, bool> res = _ids.insert( instanceId );
-        return res.second;
-    }
-    
-    /*
-     Analogous to addRefferedID but removes the id.
-     */
-    inline bool removeReferredId( co::int32 instanceId )
-    {
-        return _ids.erase( instanceId );
-    }
-    
-    /*
-     Searches this client references for \param instanceId , returns true if found, false if not.
-     */
-    inline bool searchReference( co::int32 instanceId )
-    {
-        _it = _ids.find( instanceId );
-        return _it != _ids.end() ? true : false;
-    }
-    
-    inline bool isEmpty()
-    {
-        return _ids.empty();
-    }
-    
-private:
-    std::set<co::int32> _ids;
-    std::set<co::int32>::iterator _it;
-};
-    
-Node::Node() : _passiveLink( 0 )
+Node::Node() : _srh( 0 )
 {
 }
     
 Node::~Node()
 {
-    if( _passiveLink.get() )
-        stop();
+    assert( _publicEndpoint.empty() ); // Node needs to be stopped
 }
     
 co::IObject* Node::newRemoteInstance( const std::string& instanceType, 
@@ -97,58 +43,32 @@ co::IObject* Node::findRemoteInstance( const std::string& instanceType, const st
     
 void Node::start( const std::string&  boundAddress, const std::string& publicAddress )
 {
-    assert( !_passiveLink.get() );
+    _publicEndpoint = publicAddress;
     
-    _passiveLink = _transport->bind( boundAddress );
+    _srh = new ServerRequestHandler( _transport->bind( boundAddress ) );
+
+    _instanceMan = new InstanceManager();
+ 
+    _requestorMan = new RequestorManager( this, _instanceMan, _transport, _publicEndpoint );
     
-    _myPublicAddress = publicAddress;
-    
-    _requestorMan = new RequestorManager( this, _transport, _myPublicAddress );
-    
-    // This first instanceId is for the Node
-    _invokers.push_back( 0 );
-    _remoteRefCounting.push_back( 0 );
+    _invoker = new Invoker( this, _instanceMan, _srh, _requestorMan );
 }
     
 void Node::update()
 {
-    assert( _passiveLink.get() );
+    assert( _srh );
         
-	std::string msg;
-    if( _passiveLink->receive( msg ) )
-        dispatchMessage( msg );
+	_srh->react();
 }
 
 void Node::stop()
 {
-    assert( _passiveLink.get() );
+    assert( !_publicEndpoint.empty() );
     
-    // fill the empty holes in the invokers vector
-    for( ; !_freedIds.empty(); _freedIds.pop() )
-    {
-        if( _freedIds.top() <= _invokers.size() )
-            _invokers[_freedIds.top()] = _invokers.back();
-        
-        _invokers.pop_back();
-    }
-    
-    // now delete all the invokers
-    size_t size = _invokers.size();
-    for( int i = 1; i < size; i++ )
-    {
-        delete _invokers[i];
-    }
-    
-    // Delete all referers
-    for( std::map<std::string, Client*>::iterator clientIt = _referers.begin(); 
-        clientIt != _referers.end(); clientIt++ )
-    {
-        delete clientIt->second;
-    }
-    
-    _passiveLink = 0;
-    
-    delete _requestorMan;
+    delete _invoker; _invoker = 0;
+    delete _requestorMan; _requestorMan = 0;
+    delete _instanceMan; _instanceMan = 0;
+    delete _srh; _srh = 0;
 }
 
 co::IObject* Node::getInstance( co::int32 instanceId )

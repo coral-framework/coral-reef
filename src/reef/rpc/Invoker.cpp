@@ -22,8 +22,9 @@ namespace reef {
 namespace rpc {
 
 
-Invoker::Invoker( Node* node, ServerRequestHandler* srh, RequestorManager* requestorMan ) : 
-                _node( node ), _srh( srh ), _requestorMan( requestorMan )
+Invoker::Invoker( Node* node, InstanceManager* instanceMan, ServerRequestHandler* srh, 
+                 RequestorManager* requestorMan ) :  _node( node ), _instanceMan( instanceMan ),
+                _srh( srh ), _requestorMan( requestorMan )
 {
 }
     
@@ -61,7 +62,8 @@ void Invoker::invokeManager( Demarshaller& demarshaller, Demarshaller::MsgType t
         {
             std::string componentName;
             _demarshaller.demarshalNewInstance( componentName, lesseeEndpoint );
-            returnID = _instanceMan->newInstance( componentName, lesseeEndpoint );
+            co::IObject* instance = co::newInstance( componentName );
+            returnID = _instanceMan->addInstance( instance, lesseeEndpoint );
             break;
         }
         case Demarshaller::ACCESS_INST:
@@ -226,9 +228,9 @@ void Invoker::onInterfaceReturned( co::IService* returned, std::string& caller,
     
     if( !ClientProxy::isClientProxy( provider ) )
     {
-        instanceId = _node->publishAnonymousInstance( provider, caller );
+        instanceId = _instanceMan->addInstance( provider, caller );
         _marshaller.marshalReferenceType( instanceId, facetIdx, Marshaller::RefOwner::LOCAL, 
-							marshalledReturn, &providerType, &_node->getPublicAddress() );
+							marshalledReturn, &providerType, &_node->getPublicEndpoint() );
     }
     else
     {

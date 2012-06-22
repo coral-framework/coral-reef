@@ -30,7 +30,8 @@ public:
         proxys for reference parameters
         \param object The object that will be controlled by this Invoker
     */
-    Invoker( Node* node, ServerRequestHandler* srh, RequestorManager* requestorMan );
+    Invoker( Node* node, InstanceManager* instanceMan, ServerRequestHandler* srh, 
+            RequestorManager* requestorMan );
     
      ~Invoker();
     

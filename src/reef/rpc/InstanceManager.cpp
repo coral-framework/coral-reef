@@ -11,10 +11,27 @@ namespace rpc {
 InstanceManager::InstanceManager()
 {
     _leaseMan = new LeaseManager();
+    _instances.push_back( 0 );
 }
 
 InstanceManager::~InstanceManager()
 {
+    // fill the empty holes in the invokers vector
+    for( ; !_freedIds.empty(); _freedIds.pop() )
+    {
+        if( _freedIds.top() <= _instances.size() )
+            _instances[_freedIds.top()] = _instances.back();
+        
+        _instances.pop_back();
+    }
+    
+    // now delete all the invokers
+    size_t size = _instances.size();
+    for( int i = 1; i < size; i++ )
+    {
+        delete _instances[i];
+    }
+
     delete _leaseMan;
 }
     
@@ -36,18 +53,6 @@ void InstanceManager::unpublishInstance( const std::string& key )
     
     cancelLease( it->second, "self" );
 }
-    
-co::int32 InstanceManager::newInstance( const std::string& componentName, 
-                                       const std::string& lesseeEndpoint ) 
-{    
-    co::IObject* instance = co::newInstance( componentName );
-    co::int32 instanceID = newID();
-    _instances[instanceID] = new InstanceContainer( instance );
-    
-    _leaseMan->addLease( instanceID, lesseeEndpoint );
-    
-    return instanceID;
-}
 
 co::int32 InstanceManager::findInstance( const std::string& key, const std::string& lesseeEndpoint ) 
 {
@@ -58,6 +63,16 @@ co::int32 InstanceManager::findInstance( const std::string& key, const std::stri
     createLease( it->second, lesseeEndpoint );
     
     return it->second;
+}
+
+co::int32 InstanceManager::addInstance( co::IObject* instance, const std::string& lesseeEndpoint ) 
+{    
+    co::int32 instanceID = newID();
+    _instances[instanceID] = new InstanceContainer( instance );
+    
+    _leaseMan->addLease( instanceID, lesseeEndpoint );
+    
+    return instanceID;
 }
 
 void InstanceManager::createLease( co::int32 instanceID, const std::string& lesseeEndpoint )

@@ -22,10 +22,9 @@ public:
     
     void unpublishInstance( const std::string& key );
     
-    // If a message is destined to the own Node it will be dispatched to these methods.
-    co::int32 newInstance( const std::string& componentName, const std::string& lesseeEndpoint );
-    
     co::int32 findInstance( const std::string& key, const std::string& lesseeEndpoint ); 
+    
+    co::int32 addInstance( co::IObject* instance, const std::string& lesseeEndpoint );
     
     void createLease( co::int32 instanceID, const std::string& lesseeEndpoint );
     

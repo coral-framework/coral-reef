@@ -17,6 +17,7 @@ namespace rpc {
     
 class Node;
 class ClientProxy;
+class InstanceManager;
 class RequestorManager;
 class ClientRequestHandler;
    
@@ -119,6 +120,7 @@ private:
     std::map<co::int32, ClientProxy*> _proxies;
     
     Node* _node;
+    InstanceManager* _instanceMan;
     RequestorManager* _manager;
     ClientRequestHandler* _handler;
     std::string _endpoint;

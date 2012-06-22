@@ -2,6 +2,7 @@
 
 #include "Node.h"
 #include "ClientProxy.h"
+#include "InstanceManager.h"
 #include "RequestorManager.h"
 #include "ClientRequestHandler.h"
 
@@ -13,8 +14,9 @@ namespace reef {
 namespace rpc {
 
 Requestor::Requestor( RequestorManager* manager, ClientRequestHandler* handler, 
-    const std::string& localEndpoint ) :  _manager( manager ),  _handler( handler ), 
-    _endpoint( handler->getEndpoint() ), _localEndpoint( localEndpoint ), _node( manager->getNode() )
+                    const std::string& localEndpoint ) :  _manager( manager ),  _handler( handler ), 
+                    _endpoint( handler->getEndpoint() ), _localEndpoint( localEndpoint ), 
+                    _node( manager->getNode() ), _instanceMan( manager->getInstanceManager() )
 {
 }
     
@@ -178,9 +180,10 @@ void Requestor::marshalProviderInfo( co::IService* param )
     
     if( !ClientProxy::isClientProxy( provider ) )
     {
-        instanceId = _node->publishAnonymousInstance( provider, _endpoint );
+        
+        instanceId = _instanceMan->addInstance( provider, _endpoint );
         _marshaller.addReferenceParam( instanceId, facetIdx, Marshaller::LOCAL, &providerType, 
-                                      &_node->getPublicAddress() );
+                                      &_node->getPublicEndpoint() );
     }
     else // is a remote object, so it provides the IInstanceInfo service
     {
