@@ -16,13 +16,13 @@ ServerRequestHandler::~ServerRequestHandler()
 {
 }
     
-void ServerRequestHandler::react()
+void ServerRequestHandler::react( Invoker* invoker )
 {
     std::string msg;
     if( !_link->receive( msg ) )
         return;
     
-    _invoker->dispatchInvocation( msg );
+    invoker->dispatchInvocation( msg );
 }
 
 void ServerRequestHandler::reply( const std::string& reply )

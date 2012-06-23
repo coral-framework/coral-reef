@@ -89,7 +89,12 @@ void Invoker::invokeManager( Demarshaller& demarshaller, Demarshaller::MsgType t
         }
         default:
             assert( false );
-    }  
+    }
+    
+    if( isSynch )
+    {
+        _marshaller.marshalData( returnID , returned );
+    }
 
 }
     

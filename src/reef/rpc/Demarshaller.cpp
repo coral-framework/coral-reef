@@ -224,8 +224,8 @@ Demarshaller::~Demarshaller()
 }
     
 // sets the message that will be decoded and return its type and destination
-void Demarshaller::setMarshalledRequest( const std::string& request, MsgType& type, co::int32& instanceId, 
-                                bool& hasReturn )
+void Demarshaller::setMarshalledRequest( const std::string& request, MsgType& type, 
+                                        co::int32& instanceId, bool& hasReturn )
 {
     _message->Clear();
     _message->ParseFromString( request );

@@ -20,15 +20,12 @@ public:
     
     ~ServerRequestHandler();
     
-    inline void setInvoker( Invoker* invoker ){ _invoker = invoker; }
-    
-	void react();
+	void react( Invoker* invoker );
     
     void reply( const std::string& reply );
     
 private:
     co::RefPtr<IPassiveLink> _link;
-    Invoker* _invoker;
 };
 
 }

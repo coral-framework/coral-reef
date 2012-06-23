@@ -6,16 +6,32 @@ local Transport = co.Component( "mockReef.Transport" )
 local net__index = {}
 
 function net__index:updateAll()
+	if self.frozen then 
+		print( "self.frozen" ) 
+		return nil 
+	end
 	for i = 1, #self.nodes do
 		self.nodes[i]:update()
 	end
 end
 
+function net__index:freeze()
+	self.frozen = true
+end
+
 function net__index:send( address, msg )
+	if self.frozen then 
+		print( "self.frozen" ) 
+		return nil 
+	end
 	self.msgs[address] = msg 
 end
 
 function net__index:checkReply( address )
+	if self.frozen then 
+		print( "self.frozen" ) 
+		return nil 
+	end
 	local reply = self.replies[address]
 	self.replies[address] = nil
 	
@@ -23,17 +39,25 @@ function net__index:checkReply( address )
 end
 
 function net__index:sendReply( address, msg )
+	if self.frozen then 
+		print( "self.frozen" ) 
+		return nil 
+	end
 	self.replies[address] = msg
 end
 
 function net__index:check( address )
+	if self.frozen then 
+		print( "self.frozen" ) 
+		return nil 
+	end
 	local msg = self.msgs[address]
 	self.msgs[address] = nil
 	
 	return msg
 end
 
-local net = setmetatable( { msgs = {}, replies = {}, nodes = {} }, { __index = net__index } )
+local net = setmetatable( { msgs = {}, replies = {}, nodes = {}, frozen = false }, { __index = net__index } )
 
 function Transport:__init()
 	self.openLinks = {}
@@ -68,8 +92,8 @@ function Transport:getNodeService()
 end
 
 function Transport:clearNetwork()
-	net.nodes = {}
-	net = setmetatable( { msgs = {}, replies = {}, nodes = {} }, { __index = net__index } )
+	net:freeze()
+	net = setmetatable( { msgs = {}, replies = {}, nodes = {}, frozen = false }, { __index = net__index } )
 end
 
 function Transport:removeNodesFromNetwork()

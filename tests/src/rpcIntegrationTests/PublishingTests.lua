@@ -38,11 +38,11 @@ function publishTest()
 	EXPECT_EQ( server:getInstance( 1 ), instanceTC )
 	
 	-- Checks if clientA and clientB are referers
-	local references = server:getRemoteReferences( 1 )
+	local references = server:getInstanceNumLeases( 1 )
 	EXPECT_EQ( references, 3 )
 	
 	-- Checks if returns 0 in case of an invalid id
-	references = server:getRemoteReferences( 3 )
+	references = server:getInstanceNumLeases( 3 )
 	EXPECT_EQ( references, 0 )
 	
 	-- Checks if a remotely created instance is accessible locally
@@ -52,7 +52,7 @@ function publishTest()
 	EXPECT_EQ( newInst.simple.storedInt, 8 )
 	
 	-- Checks if clientA is referer
-	references = server:getRemoteReferences( 2 )
+	references = server:getInstanceNumLeases( 2 )
 	EXPECT_EQ( references, 1 )
 	
 	-- Checks if the ID counting is correct
@@ -65,7 +65,7 @@ function publishTest()
 	EXPECT_EQ( newInst.simple.storedInt, 9 )
 	
 	-- Checks if clientA is referer
-	references = server:getRemoteReferences( 6 )
+	references = server:getInstanceNumLeases( 6 )
 	EXPECT_EQ( references, 1 )
 	
 	setup:tearDown()

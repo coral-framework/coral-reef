@@ -82,7 +82,7 @@ co::int32 LeaseManager::numLeases( co::int32 lessorID )
     return 0;
 }
     
-LeaseManager::Lessee* LeaseManager::findLessee( const std::string& lesseeEnpoint )
+Lessee* LeaseManager::findLessee( const std::string& lesseeEnpoint )
 {
     std::map<std::string, Lessee*>::iterator it = _lessees.find( lesseeEnpoint );
     return  it == _lessees.end() ? 0: it->second;

@@ -35,7 +35,7 @@ InstanceManager::~InstanceManager()
     delete _leaseMan;
 }
     
-void InstanceManager::publishInstance( co::IObject* instance, const std::string& key )
+co::int32 InstanceManager::publishInstance( co::IObject* instance, const std::string& key )
 {
     co::int32 instanceID = newID();
     _instances[instanceID] = new InstanceContainer( instance );
@@ -43,6 +43,8 @@ void InstanceManager::publishInstance( co::IObject* instance, const std::string&
     createLease( instanceID, "self" );
     
     _published.insert( std::pair<std::string, co::int32>( key, instanceID ) );
+    
+    return instanceID;
 }
     
 void InstanceManager::unpublishInstance( const std::string& key )
@@ -87,7 +89,12 @@ void InstanceManager::cancelLease( co::int32 instanceID, const std::string& less
         releaseInstance( instanceID );
     }
 }
-        
+ 
+co::int32 InstanceManager::getInstanceNumLeases( co::int32 instanceID )
+{ 
+    return _leaseMan->numLeases( instanceID ); 
+}
+    
 co::int32 InstanceManager::newID()
 {
     if( !_freedIds.empty() )

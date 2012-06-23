@@ -60,5 +60,5 @@ interface INode
 		If the provided instance is not public returns false. Returns a list with all the addresses 
 		of the nodes that reference the given instance.
 	*/
-	int32 getRemoteReferences( in int32 instanceID );
+	int32 getInstanceNumLeases( in int32 instanceID );
 };

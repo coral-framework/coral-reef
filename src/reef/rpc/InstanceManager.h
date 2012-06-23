@@ -18,7 +18,7 @@ public:
     InstanceManager();
     ~InstanceManager();
     
-    void publishInstance( co::IObject* instance, const std::string& key );
+    co::int32 publishInstance( co::IObject* instance, const std::string& key );
     
     void unpublishInstance( const std::string& key );
     
@@ -32,6 +32,8 @@ public:
     
     
     inline InstanceContainer* getInstance( co::int32 instanceID ){ return _instances[instanceID]; }
+    
+    co::int32 getInstanceNumLeases( co::int32 instanceID );
     
 private:
     co::int32 newID();

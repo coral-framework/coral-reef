@@ -36,9 +36,9 @@ TEST( InvokerRemovalTests, simpleTest )
     objects.push_back( hostA->newRemoteInstance( "moduleA.TestComponent", "address2" ) );
     
     // Each host should have 2 instances with 1 reference each.
-    EXPECT_EQ( hostA->getRemoteReferences( 1 ), 1 );
-    EXPECT_EQ( hostA->getRemoteReferences( 2 ), 1 );
-    EXPECT_EQ( hostA->getRemoteReferences( 3 ), 0 );
+    EXPECT_EQ( hostA->getInstanceNumLeases( 1 ), 1 );
+    EXPECT_EQ( hostA->getInstanceNumLeases( 2 ), 1 );
+    EXPECT_EQ( hostA->getInstanceNumLeases( 3 ), 0 );
     
     for( int i = 0; i < 3; i++ )
     {
@@ -51,19 +51,19 @@ TEST( InvokerRemovalTests, simpleTest )
     }
     
     // Each host should have 2 instances with 2 reference each.
-    EXPECT_EQ( hostA->getRemoteReferences( 1 ), 2 );
-    EXPECT_EQ( hostA->getRemoteReferences( 2 ), 2 );
-    EXPECT_EQ( hostA->getRemoteReferences( 3 ), 0 );
+    EXPECT_EQ( hostA->getInstanceNumLeases( 1 ), 2 );
+    EXPECT_EQ( hostA->getInstanceNumLeases( 2 ), 2 );
+    EXPECT_EQ( hostA->getInstanceNumLeases( 3 ), 0 );
     
     // Each host should have 2 instances with 2 reference each.
-    EXPECT_EQ( hostB->getRemoteReferences( 1 ), 2 );
-    EXPECT_EQ( hostB->getRemoteReferences( 2 ), 2 );
-    EXPECT_EQ( hostB->getRemoteReferences( 3 ), 0 );
+    EXPECT_EQ( hostB->getInstanceNumLeases( 1 ), 2 );
+    EXPECT_EQ( hostB->getInstanceNumLeases( 2 ), 2 );
+    EXPECT_EQ( hostB->getInstanceNumLeases( 3 ), 0 );
     
     // Each host should have 2 instances with 2 reference each.
-    EXPECT_EQ( hostC->getRemoteReferences( 1 ), 2 );
-    EXPECT_EQ( hostC->getRemoteReferences( 2 ), 2 );
-    EXPECT_EQ( hostC->getRemoteReferences( 3 ), 0 );
+    EXPECT_EQ( hostC->getInstanceNumLeases( 1 ), 2 );
+    EXPECT_EQ( hostC->getInstanceNumLeases( 2 ), 2 );
+    EXPECT_EQ( hostC->getInstanceNumLeases( 3 ), 0 );
     
     objects.clear();
     
@@ -73,12 +73,12 @@ TEST( InvokerRemovalTests, simpleTest )
     hostB->getInstance( 2 )->getService<moduleA::IReferenceTypes>()->setSimple( 0 );
     
     // There should be no more references
-    EXPECT_EQ( hostA->getRemoteReferences( 1 ), 0 );
-    EXPECT_EQ( hostA->getRemoteReferences( 2 ), 0 );
-    EXPECT_EQ( hostB->getRemoteReferences( 1 ), 0 );
-    EXPECT_EQ( hostB->getRemoteReferences( 2 ), 0 );
-    EXPECT_EQ( hostC->getRemoteReferences( 1 ), 0 );
-    EXPECT_EQ( hostC->getRemoteReferences( 2 ), 0 );
+    EXPECT_EQ( hostA->getInstanceNumLeases( 1 ), 0 );
+    EXPECT_EQ( hostA->getInstanceNumLeases( 2 ), 0 );
+    EXPECT_EQ( hostB->getInstanceNumLeases( 1 ), 0 );
+    EXPECT_EQ( hostB->getInstanceNumLeases( 2 ), 0 );
+    EXPECT_EQ( hostC->getInstanceNumLeases( 1 ), 0 );
+    EXPECT_EQ( hostC->getInstanceNumLeases( 2 ), 0 );
     
     setup->tearDown();
 }
@@ -92,7 +92,7 @@ TEST( InvokerRemovalTests, repeatedReferenceTest )
     reef::rpc::INode* hostA = setup->getNode( 1 );
     reef::rpc::INode* hostC = setup->getNode( 3 );
     
-    EXPECT_EQ( hostC->getRemoteReferences( 1 ), 0 );
+    EXPECT_EQ( hostC->getInstanceNumLeases( 1 ), 0 );
     
     co::RefPtr<co::IObject> pAtoC = hostA->newRemoteInstance( "moduleA.TestComponent", "address3" );
     co::RefPtr<co::IObject> pA1toB = hostA->newRemoteInstance( "moduleA.TestComponent", "address2" );
@@ -102,21 +102,21 @@ TEST( InvokerRemovalTests, repeatedReferenceTest )
     moduleA::IReferenceTypes* rt1 = pA1toB->getService<moduleA::IReferenceTypes>();
     moduleA::IReferenceTypes* rt2 = pA2toB->getService<moduleA::IReferenceTypes>();
     
-    EXPECT_EQ( hostC->getRemoteReferences( 1 ), 1 );
+    EXPECT_EQ( hostC->getInstanceNumLeases( 1 ), 1 );
     
     rt1->setSimple( st );
     
-    EXPECT_EQ( hostC->getRemoteReferences( 1 ), 2 );
+    EXPECT_EQ( hostC->getInstanceNumLeases( 1 ), 2 );
     
     rt2->setSimple( st );
     
-    EXPECT_EQ( hostC->getRemoteReferences( 1 ), 2 );
+    EXPECT_EQ( hostC->getInstanceNumLeases( 1 ), 2 );
     
     pAtoC = 0;
     pA1toB = 0;
     pA2toB = 0;
     
-    EXPECT_EQ( hostC->getRemoteReferences( 1 ), 0 );
+    EXPECT_EQ( hostC->getInstanceNumLeases( 1 ), 0 );
     
     setup->tearDown();
 }
