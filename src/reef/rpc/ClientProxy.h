@@ -52,7 +52,7 @@ private:
     co::int32 findDepth( co::IInterface* facet, co::ICompositeType* memberOwner );
     
 private:
-    Requestor* _requestor;
+    co::RefPtr<Requestor> _requestor;
     
     static void* _classPtr;
     

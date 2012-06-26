@@ -22,7 +22,7 @@ RequestorManager::~RequestorManager()
     
     for( ; it != _requestors.end(); it++ )
     {
-        delete it->second;
+        it->second->disconnect();
     }
 }
     

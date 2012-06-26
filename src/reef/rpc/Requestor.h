@@ -9,6 +9,7 @@
 #include <co/IField.h>
 #include <co/IMethod.h>
 #include <co/IObject.h>
+#include <co/reserved/RefCounted.h>
 
 #include <map>
 
@@ -44,11 +45,15 @@ struct MemberOwner
     }
 };
     
-class Requestor
+class Requestor : public co::RefCounted
 {
 public:
     Requestor( RequestorManager* manager, ClientRequestHandler* handler, 
               const std::string& localEndpoint );
+    
+    // In case the node has been stopped, but the client proxies are still alive. If the requestor
+    // is just deleted, then, a cancelLease call from a client proxy will result in an error.
+    void disconnect();
     
     ~Requestor();
     
@@ -110,8 +115,7 @@ private:
     void marshalProviderInfo( co::IService* param );
     
     void demarshalReturn( const std::string& data, co::IType* returnedType, co::Any& ret );
-    
-	void lastProxyRemoved();
+
 private:
         
     Marshaller _marshaller;
@@ -119,6 +123,7 @@ private:
 
     std::map<co::int32, ClientProxy*> _proxies;
     
+    bool _connected;
     Node* _node;
     InstanceManager* _instanceMan;
     RequestorManager* _manager;

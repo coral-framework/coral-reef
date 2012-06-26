@@ -14,19 +14,29 @@ namespace reef {
 namespace rpc {
 
 Requestor::Requestor( RequestorManager* manager, ClientRequestHandler* handler, 
-                    const std::string& localEndpoint ) :  _manager( manager ),  _handler( handler ), 
-                    _endpoint( handler->getEndpoint() ), _localEndpoint( localEndpoint ), 
+                    const std::string& localEndpoint ) : _connected( true ), _manager( manager ), 
+    _handler( handler ), _endpoint( handler->getEndpoint() ), _localEndpoint( localEndpoint ), 
                     _node( manager->getNode() ), _instanceMan( manager->getInstanceManager() )
 {
 }
     
+void Requestor::disconnect()
+{
+    _connected = false;
+}
+    
 Requestor::~Requestor()
 {
+    if( _connected )
+        _manager->onRequestorDestroyed( _handler->getEndpoint() );
+    
     delete _handler;
 }
 
 co::IObject* Requestor::requestNewInstance( const std::string& componentName )
 {
+    assert( _connected ); //REMOTINGERROR requesting with node stopped
+    
     std::string msg;
     _marshaller.marshalNewInstance( componentName, _localEndpoint, msg );
  
@@ -46,6 +56,8 @@ co::IObject* Requestor::requestNewInstance( const std::string& componentName )
 co::IObject* Requestor::requestPublicInstance( const std::string& key, 
                                               const std::string& componentName )
 {
+    assert( _connected ); //REMOTINGERROR requesting with node stopped
+    
     std::string msg;
     _marshaller.marshalFindInstance( key, _localEndpoint, msg );
     
@@ -70,6 +82,7 @@ co::IObject* Requestor::requestPublicInstance( const std::string& key,
 void Requestor::requestAsynchCall( MemberOwner& owner, co::IMethod* method,  
                                             co::Range<co::Any const> args )
 {
+    assert( _connected ); //REMOTINGERROR requesting with node stopped
     _marshaller.beginCallMarshalling( owner.instanceID, owner.facetID, method->getIndex(), 
                                      owner.inheritanceDepth, false, _localEndpoint );
     
@@ -84,6 +97,8 @@ void Requestor::requestAsynchCall( MemberOwner& owner, co::IMethod* method,
 void Requestor::requestSynchCall( MemberOwner& owner, co::IMethod* method, 
                                            co::Range<co::Any const> args, co::Any& ret  )
 {
+    assert( _connected ); //REMOTINGERROR requesting with node stopped
+    
     _marshaller.beginCallMarshalling( owner.instanceID, owner.facetID, method->getIndex(), 
                                      owner.inheritanceDepth, true, _localEndpoint );
     
@@ -98,6 +113,8 @@ void Requestor::requestSynchCall( MemberOwner& owner, co::IMethod* method,
     
 void Requestor::requestSetField( MemberOwner& owner, co::IField* field, const co::Any arg )
 {
+    assert( _connected ); //REMOTINGERROR requesting with node stopped
+    
     _marshaller.beginCallMarshalling( owner.instanceID, owner.facetID, field->getIndex(), 
                                      owner.inheritanceDepth, false, _localEndpoint );
     
@@ -113,6 +130,8 @@ void Requestor::requestSetField( MemberOwner& owner, co::IField* field, const co
     
 void Requestor::requestGetField( MemberOwner& owner, co::IField* field, co::Any& ret )
 {
+    assert( _connected ); //REMOTINGERROR requesting with node stopped
+    
     _marshaller.beginCallMarshalling( owner.instanceID, owner.facetID, field->getIndex(), 
                                      owner.inheritanceDepth, true, _localEndpoint );
     
@@ -126,6 +145,8 @@ void Requestor::requestGetField( MemberOwner& owner, co::IField* field, co::Any&
     
 void Requestor::requestLease( co::int32 instanceID, std::string lessee )
 {
+    assert( _connected ); //REMOTINGERROR requesting with node stopped
+    
     Marshaller marshaller; // cannot use the member instance (conflicts with other marshalling)
     std::string msg;
     marshaller.marshalAccessInstance( instanceID, true, lessee, msg );
@@ -134,15 +155,15 @@ void Requestor::requestLease( co::int32 instanceID, std::string lessee )
 
 void Requestor::requestCancelLease( co::int32 instanceID )
 {
+    if( !_connected )
+        return; //REMOTINGLOG cancelling lease after node stopped (should del CPs before stopping)
+        
     std::string msg;
     _marshaller.marshalAccessInstance( instanceID, false, _localEndpoint, msg );
     _handler->handleAsynchRequest( msg );
     
     size_t result = _proxies.erase( instanceID );
     assert( result );
-    
-    if( _proxies.size() <= 0 )
-        lastProxyRemoved();
 }
     
 ClientProxy* Requestor::getOrCreateProxy( co::int32 instanceID, const std::string& componentName )
@@ -239,12 +260,6 @@ void Requestor::demarshalReturn( const std::string& data, co::IType* returnedTyp
     co::IPort* port = ports[facetIdx];
     co::IService* service = instance->getServiceAt( port );
     ret.set<co::IService*>( service );
-}
-
-void Requestor::lastProxyRemoved()
-{
-	_manager->onRequestorDestroyed( _handler->getEndpoint() );
-	delete this;
 }
     
 }

@@ -5,11 +5,18 @@ namespace rpc {
 
 LeaseManager::~LeaseManager()
 {
-    std::map<std::string, Lessee*>::iterator it = _lessees.begin();
+    std::map<std::string, Lessee*>::iterator lesseeIt = _lessees.begin();
     
-    for( ; it != _lessees.end(); it++ )
+    for( ; lesseeIt != _lessees.end(); lesseeIt++ )
     {
-        delete it->second;
+        delete lesseeIt->second;
+    }
+    
+    std::map<co::int32, Lessor*>::iterator lessorIt = _lessors.begin();
+    
+    for( ; lessorIt != _lessors.end(); lessorIt++ )
+    {
+        delete lessorIt->second;
     }
 }
     

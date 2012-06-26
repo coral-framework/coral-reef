@@ -134,7 +134,7 @@ co::int32 ClientProxy::getInstanceId()
 
 Requestor* ClientProxy::getRequestor()
 {
-    return _requestor;
+    return _requestor.get();
 }
 
 co::int32 ClientProxy::findDepth( co::IInterface* facet, co::ICompositeType* memberOwner )
