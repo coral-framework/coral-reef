@@ -34,12 +34,17 @@ void LeaseManager::addLease( co::int32 lessorID, const std::string lesseeEndpoin
     
     std::map<co::int32, Lessor*>::iterator it = _lessors.find( lessorID );
     
-    Lessor* lessor = it->second;
-    if( it == _lessors.end() ) 
+    Lessor* lessor;
+    if( it != _lessors.end() )
+    {
+        lessor = it->second;
+    }
+    else
     {
         lessor = new Lessor();
         _lessors.insert( std::pair<co::int32, Lessor*>( lessorID, lessor ) );
     }
+    
     lessor->addLease( lessee );
 }
 
