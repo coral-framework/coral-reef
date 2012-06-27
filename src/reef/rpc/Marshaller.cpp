@@ -215,19 +215,18 @@ void Marshaller::marshalNewInstance( const std::string& typeName, const std::str
 void Marshaller::marshalAccessInstance( co::int32 instanceId, bool increment, 
                                        const std::string& referer, std::string& request )
 {
-    Message msg;
-    msg.set_msg_type( Message::MSG_ACCESS_INST );
-    msg.set_instance_id( 0 ); // 0 is always the node channel
-    msg.set_has_return( false );
-    msg.set_referer_ip( referer );
+    _message->set_msg_type( Message::MSG_ACCESS_INST );
+    _message->set_instance_id( 0 ); // 0 is always the node channel
+    _message->set_has_return( false );
+    _message->set_referer_ip( referer );
     
     
-	Message_Acc_Inst* msgAccInst = msg.mutable_msg_acc_inst();
+	Message_Acc_Inst* msgAccInst = _message->mutable_msg_acc_inst();
     //TODO: set referer as self
     msgAccInst->set_increment( increment );
     msgAccInst->set_instance_id( instanceId );
     
-    msg.SerializeToString( &request );
+    _message->SerializeToString( &request );
 }
     
 void Marshaller::marshalFindInstance( const std::string& key, const std::string& referer,
