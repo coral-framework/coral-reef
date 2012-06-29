@@ -12,11 +12,12 @@ namespace rpc {
     
 class Node;
 class IActiveLink;
+class ServerRequestHandler;
     
 class ClientRequestHandler
 {
 public:
-    ClientRequestHandler( IActiveLink* link, Node* node );
+    ClientRequestHandler( IActiveLink* link, ServerRequestHandler* srh );
     
     // Low level API used by the ClientProxies
     void handleAsynchRequest( const std::string& request );
@@ -26,8 +27,8 @@ public:
     inline const std::string& getEndpoint(){ return _endpoint; }
     
 private:
-    Node* _node;
     co::RefPtr<IActiveLink> _link;
+    ServerRequestHandler* _srh;
     std::string _endpoint;
 };
 

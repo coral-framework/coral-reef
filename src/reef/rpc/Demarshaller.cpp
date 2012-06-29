@@ -15,35 +15,35 @@ namespace rpc {
     
 // Specializes for each Data container's different get function.
 template <typename T>
-static T getPBContainerData( const Data_Container& container )
+static T getPBContainerData( const Any_PB& container )
 {
     return static_cast<T>( container.numeric() );
 }
 
 // ------------- get and set functions specialization for string and bool ----------- //
 template <>
-const std::string& getPBContainerData<const std::string&>( const Data_Container& container )
+const std::string& getPBContainerData<const std::string&>( const Any_PB& container )
 {
     return container.str();
 }
 
 template <>
-bool getPBContainerData<bool>( const Data_Container& container )
+bool getPBContainerData<bool>( const Any_PB& container )
 {
     return container.boolean();
 }
     
-// Extracts the provided type's data from Argument (deals with arrays and values)
+// Extracts the provided type's data from Parameter (deals with arrays and values)
 template <typename T>
-static void PBArgWithTypeToAny( const Argument& arg, co::Any& any, co::IType* elementType )
+static void PBParamWithTypeToAny( const Parameter& param, co::Any& any, co::IType* elementType )
 {
     if( !elementType )
     {
-        any.set<T>( getPBContainerData<T>( arg.data( 0 ) ) );
+        any.set<T>( getPBContainerData<T>( param.any( 0 ) ) );
         return;
     }
     
-    size_t size = arg.data().size();
+    size_t size = param.any().size();
     if( size == 0 ) // required for vector subscript out of range assertion
         return;
     
@@ -51,22 +51,22 @@ static void PBArgWithTypeToAny( const Argument& arg, co::Any& any, co::IType* el
     T* toCast = reinterpret_cast<T*>( &vec[0] );
     for( int i = 0; i < size; i++ )
     {
-        toCast[i] = getPBContainerData<T>( arg.data( i ) );
+        toCast[i] = getPBContainerData<T>( param.any( i ) );
     }
 }
 
-// ----------------- PBArgWithTypeToAny specializations for string and bool --------------- //
+// ----------------- PBParamWithTypeToAny specializations for string and bool --------------- //
 template <>
-void PBArgWithTypeToAny<std::string>( const Argument& arg, co::Any& any, co::IType* elementType )
+void PBParamWithTypeToAny<std::string>( const Parameter& param, co::Any& any, co::IType* elementType )
 {
     if( !elementType )
     {
         std::string& anyString = any.createString();
-        anyString = getPBContainerData<const std::string&>( arg.data( 0 ) );
+        anyString = getPBContainerData<const std::string&>( param.any( 0 ) );
         return;
     }
     
-    size_t size = arg.data().size();
+    size_t size = param.any().size();
     if( size == 0 ) // required for vector subscript out of range assertion
         return;
     
@@ -74,7 +74,7 @@ void PBArgWithTypeToAny<std::string>( const Argument& arg, co::Any& any, co::ITy
     std::string* toCast = reinterpret_cast<std::string*>( &vec[0] );
     for( int i = 0; i < size; i++ )
     {
-        toCast[i] = getPBContainerData<const std::string&>( arg.data( i ) );
+        toCast[i] = getPBContainerData<const std::string&>( param.any( i ) );
     }
 }
 
@@ -95,13 +95,15 @@ co::IType* kind2Type( co::TypeKind kind )
             return co::getType( "double" );
         case co::TK_STRING:
             return co::getType( "string" );
+        default:
+            assert( false );
     }
     return 0;
 }
  
-void PBArgToComplex( const Argument& arg, co::IType* descriptor, co::Any& complexAny );
+void PBParamToComplex( const Parameter& param, co::IType* descriptor, co::Any& complexAny );
     
-void PBArgToAny( const Argument& arg, co::IType* descriptor, co::Any& any )
+void PBParamToAny( const Parameter& param, co::IType* descriptor, co::Any& any )
 {
     co::TypeKind kind = descriptor->getKind();
     co::IType* elementType = 0; // only used for arrays
@@ -115,49 +117,49 @@ void PBArgToAny( const Argument& arg, co::IType* descriptor, co::Any& any )
     switch( kind )
     {
         case co::TK_BOOLEAN:
-            PBArgWithTypeToAny<bool>( arg, any, elementType );
+            PBParamWithTypeToAny<bool>( param, any, elementType );
             break;
         case co::TK_INT8:
-            PBArgWithTypeToAny<co::int8>( arg, any, elementType );
+            PBParamWithTypeToAny<co::int8>( param, any, elementType );
             break;
         case co::TK_UINT8:
-            PBArgWithTypeToAny<co::uint8>( arg, any, elementType );
+            PBParamWithTypeToAny<co::uint8>( param, any, elementType );
             break;
         case co::TK_INT16:
-            PBArgWithTypeToAny<co::int16>( arg, any, elementType );
+            PBParamWithTypeToAny<co::int16>( param, any, elementType );
             break;
         case co::TK_UINT16:
-            PBArgWithTypeToAny<co::uint16>( arg, any, elementType );
+            PBParamWithTypeToAny<co::uint16>( param, any, elementType );
             break;
         case co::TK_INT32:
-            PBArgWithTypeToAny<co::int32>( arg, any, elementType );
+            PBParamWithTypeToAny<co::int32>( param, any, elementType );
             break;
         case co::TK_UINT32:
-            PBArgWithTypeToAny<co::uint32>( arg, any, elementType );
+            PBParamWithTypeToAny<co::uint32>( param, any, elementType );
             break;
         case co::TK_INT64:
-            PBArgWithTypeToAny<co::int64>( arg, any, elementType );
+            PBParamWithTypeToAny<co::int64>( param, any, elementType );
             break;
         case co::TK_UINT64:
-            PBArgWithTypeToAny<co::uint64>( arg, any, elementType );
+            PBParamWithTypeToAny<co::uint64>( param, any, elementType );
             break;
         case co::TK_FLOAT:
-            PBArgWithTypeToAny<float>( arg, any, elementType );
+            PBParamWithTypeToAny<float>( param, any, elementType );
             break;
         case co::TK_DOUBLE:
-            PBArgWithTypeToAny<double>( arg, any, elementType );
+            PBParamWithTypeToAny<double>( param, any, elementType );
             break;
         case co::TK_STRING:
-            PBArgWithTypeToAny<std::string>( arg, any, elementType );
+            PBParamWithTypeToAny<std::string>( param, any, elementType );
             break;
         case co::TK_STRUCT:
         case co::TK_NATIVECLASS:
-            PBArgToComplex( arg, descriptor, any );
+            PBParamToComplex( param, descriptor, any );
             break;
         case co::TK_ANY:
         {
             static co::Any internalAny; // TODO remove
-            PBArgToAny( arg, kind2Type( static_cast<co::TypeKind>( arg.coany_type() ) ), internalAny );
+            PBParamToAny( param, kind2Type( static_cast<co::TypeKind>( param.any_type() ) ), internalAny );
             any.set<const co::Any&>( internalAny );
             break;
         }
@@ -166,7 +168,7 @@ void PBArgToAny( const Argument& arg, co::IType* descriptor, co::Any& any )
     }
 }
     
-void PBArgToComplex( const Argument& arg, co::IType* descriptor, co::Any& complexAny )
+void PBParamToComplex( const Parameter& param, co::IType* descriptor, co::Any& complexAny )
 {
     assert( descriptor->getKind() != co::TK_ARRAY );
     
@@ -174,7 +176,7 @@ void PBArgToComplex( const Argument& arg, co::IType* descriptor, co::Any& comple
     co::IRecordType* rt = co::cast<co::IRecordType>( descriptor );
     co::IReflector* refl = rt->getReflector();
     
-    const Data_Container& container = arg.data( 0 );
+    const Any_PB& container = param.any( 0 );
     const Complex_Type& complex = container.complex_type();
     
     co::Range<co::IField* const> fields = rt->getFields();
@@ -182,203 +184,200 @@ void PBArgToComplex( const Argument& arg, co::IType* descriptor, co::Any& comple
     for( co::int32 i = 0; i < fieldCount; i++ )
     {
         co::IField* field = fields[i];
-        const Argument& fieldArg = complex.field( i );
+        const Parameter& fieldArg = complex.field( i );
         co::Any fieldAny;
-        PBArgToAny( fieldArg, field->getType(), fieldAny );
+        PBParamToAny( fieldArg, field->getType(), fieldAny );
         refl->setField( complexAny, field, fieldAny );
     }
     
 }
 
-void Message_Type2MsgType( Message_Type message_type, Demarshaller::MsgType& msgType )
+MessageType convertMessageType( Message_Type message_type )
 {
     switch( message_type )
     {
-        case Message::MSG_NEW_INST:
-            msgType = Demarshaller::NEW_INST;
-            break;
-        case Message::MSG_ACCESS_INST:
-            msgType = Demarshaller::ACCESS_INST;
-            break;
-        case Message::MSG_FIND_INST:
-            msgType = Demarshaller::FIND_INST;
-            break;
-        case Message::MSG_CALL:
-            msgType = Demarshaller::CALL;
-            break;
+        case Message::INVOCATION:
+            return INVOCATION;
+        case Message::RETURN:
+            return RETURN;
+        case Message::REQUEST_NEW:
+            return REQUEST_NEW;
+        case Message::REQUEST_LOOKUP:
+            return REQUEST_LOOKUP;
+        case Message::REQUEST_LEASE:
+            return REQUEST_LEASE;
+        case Message::REQUEST_CANCEL_LEASE:
+            return REQUEST_CANCEL_LEASE;
     }
 }
     
+void ParameterPuller::pullValue( co::IType* descriptor, co::Any& valueType )
+{
+    PBParamToAny( _invocation->params( _currentParam ), descriptor, valueType );
+    _currentParam++;
+}
+    
+void ParameterPuller::pullReference( ReferenceType& refType )
+{
+    const Ref_Type& ref_type = _invocation->params( _currentParam++ ).any( 0 ).ref_type();
+    refType.instanceID = ref_type.instance_id();
+    refType.facetIdx = ref_type.facet_idx();
+    
+    switch( ref_type.owner() )
+    {
+        case Ref_Type::OWNER_SENDER:
+            refType.owner = OWNER_SENDER;
+            refType.ownerEndpoint = ref_type.owner_endpoint();
+            refType.instanceType = ref_type.instance_type();
+            return;
+        case Ref_Type::OWNER_RECEIVER:
+            refType.owner = OWNER_RECEIVER;
+            return;
+        case Ref_Type::OWNER_ANOTHER:
+            refType.owner = OWNER_ANOTHER;
+            refType.ownerEndpoint = ref_type.owner_endpoint();
+            refType.instanceType = ref_type.instance_type();
+            return;
+    }
 
+}
+ 
+void ParameterPuller::setInvocation( const Invocation* invocation )
+{
+    _invocation = invocation;
+    _currentParam = 0;
+}
+    
+ParameterPuller::ParameterPuller() : _currentParam( 0 ), _invocation( 0 )
+{
+}
     
 Demarshaller::Demarshaller() : _currentParam( 0 )
 {
     _message = new Message();
-    _argument = new Argument();
+    _parameter = new Parameter();
 }
 
 Demarshaller::~Demarshaller()
 {
     delete _message;
-    delete _argument;
+    delete _parameter;
 }
     
 // sets the message that will be decoded and return its type and destination
-void Demarshaller::setMarshalledRequest( const std::string& request, MsgType& type, 
-                                        co::int32& instanceId, bool& hasReturn )
+MessageType Demarshaller::demarshal( inString data )
 {
     _message->Clear();
-    _message->ParseFromString( request );
-    instanceId = _message->instance_id();
-    hasReturn = _message->has_return();
-    Message_Type2MsgType( _message->msg_type(), type );
-    _msgType = type;
+    _message->ParseFromString( data );
+    _msgType = convertMessageType( _message->type() );
+    return _msgType;
 }
 
 // if msg type is NEW, then, this function will decode it
-void Demarshaller::demarshalNewInstance( std::string& typeName, std::string& referer )
+void Demarshaller::getNew( outString requesterEndpoint, outString instanceType )
 {
-    assert( _msgType == NEW_INST );
+    assert( _msgType == REQUEST_NEW );
     
-    const Message_New_Inst& msgNewInst = _message->msg_new_inst();
-    typeName = msgNewInst.new_instance_type();
-    referer = _message->referer_ip();
+    requesterEndpoint = _message->requester_endpoint();
+    
+    const Request& request = _message->request();
+    instanceType = request.new_instance_type();
 }
 
-void Demarshaller::demarshalAccessInstance( co::int32& instanceId, bool& increment, std::string& referer )
+void Demarshaller::getLookup( outString requesterEndpoint, outString lookupKey )
 {
-    assert( _msgType == ACCESS_INST );
+    assert( _msgType == REQUEST_LOOKUP );
     
-    const Message_Acc_Inst& msgAccessInst = _message->msg_acc_inst();
-    // refererIP = msgAccessInst.referer_ip();
-    instanceId = msgAccessInst.instance_id();
-    increment = msgAccessInst.increment();
-    referer = _message->referer_ip();
+    requesterEndpoint = _message->requester_endpoint();
+    
+    const Request& request = _message->request();
+    lookupKey = request.lookup_key();
+}
+    
+void Demarshaller::getLease( outString requesterEndpoint, co::int32& leaseInstanceID )
+{
+    assert( _msgType == REQUEST_LEASE || _msgType == REQUEST_CANCEL_LEASE );
+    
+    requesterEndpoint = _message->requester_endpoint();
+    
+    const Request& request = _message->request();
+    leaseInstanceID = request.lease_instance_id();
 }
    
-void Demarshaller::demarshalFindInstance( std::string& key, std::string& referer )
+void Demarshaller::getCancelLease( outString requesterEndpoint, co::int32& leaseInstanceID )
 {
-    assert( _msgType == FIND_INST );
-    
-    const Message_Find_Inst& msgFindInst = _message->msg_find_inst();
-    key = msgFindInst.key();
-    referer = _message->referer_ip();
+    getLease( requesterEndpoint, leaseInstanceID );
 }
+    
 /* 
  Starts a decoding state of call/field msg. 
  The decoding state will only be reset after all params are decoded.
  */
-void Demarshaller::beginDemarshallingCall( co::int32& facetIdx, co::int32& memberIdx, 
-                                          co::int32& typeDepth, std::string& caller )
+ParameterPuller& Demarshaller::getInvocation( outString requesterEndpoint, 
+                                             InvocationDetails& details )
 {
-    assert( _msgType == CALL );
+    assert( _msgType == INVOCATION );
     
-    _msgMember = &_message->msg_member();
-    _currentParam = 0;
-    facetIdx = _msgMember->facet_idx();
-    memberIdx = _msgMember->member_idx();
-    typeDepth = _msgMember->type_depth();
-    caller = _message->referer_ip();
+    requesterEndpoint = _message->requester_endpoint();
+    
+    const Invocation& invocation = _message->invocation();
+    
+    details.instanceID = invocation.instance_id();
+    details.facetIdx = invocation.facet_idx();
+    details.memberIdx = invocation.member_idx();
+    details.typeDepth = invocation.type_depth();
+    details.hasReturn = invocation.synch();
+    
+    _puller.setInvocation( &invocation );
+    
+    return _puller;
 }
 
-void Demarshaller::demarshalValueParam( co::Any& param, co::IType* descriptor )
+void Demarshaller::getValueTypeReturn( co::IType* descriptor, co::Any& valueAny )
 {
-    assert( _msgMember );
-    PBArgToAny( _msgMember->arguments( _currentParam++ ), descriptor, param );
-}
-
-void Demarshaller::demarshalReferenceParam( co::int32& instanceId, co::int32& facetIdx, RefOwner& owner,
-                  std::string& instanceType, std::string& ownerAddress )
-{
-    assert( _msgMember );
-    const Ref_Type& refType = _msgMember->arguments( _currentParam++ ).data( 0 ).ref_type();
-    instanceId = refType.instance_id();
-    facetIdx = refType.facet_idx();
+    assert( _msgType == RETURN );
     
-    switch( refType.owner() )
+    const Parameter& returnValue = _message->ret_value();
+
+    PBParamToAny( returnValue, descriptor, valueAny );
+}
+    
+void Demarshaller::getRefTypeReturn( ReferenceType& refType )
+{    
+    assert( _msgType == RETURN );
+    
+    const Parameter& PBParam = _message->ret_value();
+    const Any_PB& PBAny = PBParam.any( 0 );
+    const Ref_Type& ref_type = PBAny.ref_type();
+    
+    refType.instanceID = ref_type.instance_id();
+    refType.facetIdx = ref_type.facet_idx();
+    
+    switch( ref_type.owner() )
     {
-        case Ref_Type::OWNER_LOCAL:
-            owner = LOCAL;
-            ownerAddress = refType.owner_ip();
-            instanceType = refType.instance_type();
+        case Ref_Type::OWNER_SENDER:
+            refType.owner = OWNER_SENDER;
+            refType.ownerEndpoint = ref_type.owner_endpoint();
+            refType.instanceType = ref_type.instance_type();
             return;
         case Ref_Type::OWNER_RECEIVER:
-            owner = RECEIVER;
+            refType.owner = OWNER_RECEIVER;
             return;
         case Ref_Type::OWNER_ANOTHER:
-            owner = ANOTHER;
-            ownerAddress = refType.owner_ip();
-            instanceType = refType.instance_type();
+            refType.owner = OWNER_ANOTHER;
+            refType.ownerEndpoint = ref_type.owner_endpoint();
+            refType.instanceType = ref_type.instance_type();
             return;
     }
-}
-    
-void Demarshaller::demarshalReference( const std::string& data, co::int32& instanceId, 
-                                           co::int32& facetIdx, RefOwner& owner, 
-                                           std::string& instanceType, std::string& ownerAddress )
-{
-    _argument->Clear();
-    _argument->ParseFromString( data );
-    
-    Ref_Type* refType = _argument->mutable_data( 0 )->mutable_ref_type();
-    
-    instanceId = refType->instance_id();
-    facetIdx = refType->facet_idx();
-    
-    switch( refType->owner() )
-    {
-        case Ref_Type::OWNER_LOCAL:
-            owner = RefOwner::LOCAL;
-            ownerAddress = refType->owner_ip();
-            instanceType = refType->instance_type();
-            return;
-        case Ref_Type::OWNER_RECEIVER:
-            owner = RefOwner::RECEIVER;
-            return;
-        case Ref_Type::OWNER_ANOTHER:
-            owner = RefOwner::ANOTHER;
-            ownerAddress = refType->owner_ip();
-            instanceType = refType->instance_type();
-            return;
-    }
-}
-    
-void Demarshaller::demarshalValue( const std::string& data, co::IType* descriptor, co::Any& value )
-{
-    Argument arg;
-    arg.ParseFromString( data );
-    PBArgToAny( arg, descriptor, value );
-}
-    
-// ----- Data Container codec ----- //
-void Demarshaller::demarshalData( const std::string& data, bool& value )
-{
-    Data_Container dataContainer;
-    dataContainer.ParseFromString( data );
-    value = dataContainer.boolean();
-}
 
-void Demarshaller::demarshalData( const std::string& data, double& value )
-{
-    Data_Container dataContainer;
-    dataContainer.ParseFromString( data );
-    value = dataContainer.numeric();
 }
-
-void Demarshaller::demarshalData( const std::string& data, co::int32& value )
+ 
+co::int32 Demarshaller::getIntReturn()
 {
-    Data_Container dataContainer;
-    dataContainer.ParseFromString( data );
-    value = static_cast<co::int32>( dataContainer.numeric() );
+    assert( _msgType == RETURN );
+    return _message->ret_int();
 }
-
-void Demarshaller::demarshalData( const std::string& data, std::string& value )
-{
-    Data_Container dataContainer;
-    dataContainer.ParseFromString( data );
-    value = dataContainer.str();
-}
-
+    
 }
     
 }

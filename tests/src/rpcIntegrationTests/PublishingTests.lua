@@ -10,7 +10,7 @@ function publishTest()
 	
 	-- creates a local instance, publishes it and sets a field for later on testing
 	local instanceTC = co.new "moduleA.TestComponent"
-	EXPECT_EQ( server:publishInstance( instanceTC, "key" ), 1 )
+	EXPECT_EQ( server:publishInstance( instanceTC, "key" ), 0 )
 	local simpleTypes = instanceTC.simple
 	simpleTypes.storedInt = 5
 	
@@ -35,24 +35,24 @@ function publishTest()
 	--[[ Tests the Instance-ID mapping through node local functions ]]
 	
 	-- Checks if the function returns the correct instance
-	EXPECT_EQ( server:getInstance( 1 ), instanceTC )
+	EXPECT_EQ( server:getInstance( 0 ), instanceTC )
 	
 	-- Checks if clientA and clientB are referers
-	local references = server:getInstanceNumLeases( 1 )
+	local references = server:getInstanceNumLeases( 0 )
 	EXPECT_EQ( references, 3 )
 	
 	-- Checks if returns 0 in case of an invalid id
-	references = server:getInstanceNumLeases( 3 )
+	references = server:getInstanceNumLeases( 2 )
 	EXPECT_EQ( references, 0 )
 	
 	-- Checks if a remotely created instance is accessible locally
 	local newInstProxy = clientA:newRemoteInstance( "moduleA.TestComponent", "address3" )
 	newInstProxy.simple.storedInt = 8
-	local newInst = server:getInstance( 2 )
+	local newInst = server:getInstance( 1 )
 	EXPECT_EQ( newInst.simple.storedInt, 8 )
 	
 	-- Checks if clientA is referer
-	references = server:getInstanceNumLeases( 2 )
+	references = server:getInstanceNumLeases( 1 )
 	EXPECT_EQ( references, 1 )
 	
 	-- Checks if the ID counting is correct
@@ -61,11 +61,11 @@ function publishTest()
 	clientB:newRemoteInstance( "moduleA.TestComponent", "address3" )
 	newInstProxy = clientB:newRemoteInstance( "moduleA.TestComponent", "address3" )
 	newInstProxy.simple.storedInt = 9
-	newInst = server:getInstance( 6 )
+	newInst = server:getInstance( 5 )
 	EXPECT_EQ( newInst.simple.storedInt, 9 )
 	
 	-- Checks if clientA is referer
-	references = server:getInstanceNumLeases( 6 )
+	references = server:getInstanceNumLeases( 5 )
 	EXPECT_EQ( references, 1 )
 	
 	setup:tearDown()

@@ -150,7 +150,7 @@ TEST( ParameterTests, refTypeParameterTest )
     refTypesServiceInA->setSimple( simpleTypesServiceInB );
     EXPECT_EQ( simpleTypesServiceInB, refTypesServiceInA->getSimple() );
     
-    moduleA::ISimpleTypes* simple = serverB->getInstance( 1 )->getService<moduleA::ISimpleTypes>();
+    moduleA::ISimpleTypes* simple = serverB->getInstance( 0 )->getService<moduleA::ISimpleTypes>();
     
     EXPECT_NE( simpleTypesServiceInB, simple );
     

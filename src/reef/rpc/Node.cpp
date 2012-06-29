@@ -47,26 +47,28 @@ void Node::start( const std::string&  boundAddress, const std::string& publicAdd
 {
     _publicEndpoint = publicAddress;
     
-    _srh = new ServerRequestHandler( _transport->bind( boundAddress ) );
+    _srh = new ServerRequestHandler( _transport->bind( boundAddress ), _publicEndpoint );
 
     _instanceMan = new InstanceManager();
  
-    _requestorMan = new RequestorManager( this, _instanceMan, _transport, _publicEndpoint );
+    _requestorMan = new RequestorManager( _instanceMan, _transport, _srh );
     
-    _invoker = new Invoker( this, _instanceMan, _srh, _requestorMan );
+    _invoker = new Invoker( _instanceMan, _srh, _requestorMan );
+    _srh->setInvoker( _invoker );
 }
     
 void Node::update()
 {
     assert( _srh );
         
-	_srh->react( _invoker );
+	_srh->react();
 }
 
 void Node::stop()
 {
     assert( !_publicEndpoint.empty() );
     
+    _srh->setInvoker( 0 );
     delete _invoker; _invoker = 0;
     delete _requestorMan; _requestorMan = 0;
     delete _instanceMan; _instanceMan = 0;

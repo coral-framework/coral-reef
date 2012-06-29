@@ -11,7 +11,6 @@ namespace rpc {
 InstanceManager::InstanceManager()
 {
     _leaseMan = new LeaseManager();
-    _instances.push_back( 0 );
 }
 
 InstanceManager::~InstanceManager()
@@ -27,7 +26,7 @@ InstanceManager::~InstanceManager()
     
     // now delete all the invokers
     size_t size = _instances.size();
-    for( int i = 1; i < size; i++ )
+    for( int i = 0; i < size; i++ )
     {
         delete _instances[i];
     }

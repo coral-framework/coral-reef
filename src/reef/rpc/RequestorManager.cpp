@@ -3,6 +3,7 @@
 #include "Requestor.h"
 #include "InstanceManager.h"
 #include "ClientRequestHandler.h"
+#include "ServerRequestHandler.h"
 
 #include <reef/rpc/ITransport.h>
 #include <reef/rpc/IActiveLink.h>
@@ -10,9 +11,9 @@
 namespace reef {
 namespace rpc {
 
-RequestorManager::RequestorManager( Node* node, InstanceManager* instanceMan, ITransport* transport,
-                const std::string& localEndpoint ) : _node( node ), _instanceMan( instanceMan ),
-                _transport( transport ), _localEndpoint( localEndpoint )
+RequestorManager::RequestorManager( InstanceManager* instanceMan, ITransport* transp,
+        ServerRequestHandler* srh ) : _instanceMan( instanceMan ),  _transport( transp ), 
+            _srh( srh ), _publicEndpoint( srh->getPublicEndpoint() )
 {
 }
   
@@ -35,9 +36,9 @@ Requestor* RequestorManager::getOrCreateRequestor( const std::string& endpoint )
         return it->second;
     
     IActiveLink* link = _transport->connect( endpoint );
-    ClientRequestHandler* crh = new ClientRequestHandler( link, _node );
+    ClientRequestHandler* crh = new ClientRequestHandler( link, _srh );
     
-    Requestor* req = new Requestor( this, crh, _localEndpoint );
+    Requestor* req = new Requestor( this, crh, _publicEndpoint );
     
     std::pair<std::string, Requestor*> reqPair( endpoint, req );
     _requestors.insert( reqPair );

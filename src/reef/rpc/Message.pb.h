@@ -33,23 +33,44 @@ void  protobuf_AddDesc_Message_2eproto();
 void protobuf_AssignDesc_Message_2eproto();
 void protobuf_ShutdownFile_Message_2eproto();
 
-class Data_Container;
-class Argument;
+class Message;
+class Request;
+class Invocation;
+class Parameter;
+class Any_PB;
 class Complex_Type;
 class Ref_Type;
-class Message_Member;
-class Message_New_Inst;
-class Message_Find_Inst;
-class Message_Acc_Inst;
-class Message;
 
+enum Message_Type {
+  Message_Type_INVOCATION = 0,
+  Message_Type_REQUEST_NEW = 1,
+  Message_Type_REQUEST_LOOKUP = 2,
+  Message_Type_REQUEST_LEASE = 3,
+  Message_Type_REQUEST_CANCEL_LEASE = 4,
+  Message_Type_RETURN = 5
+};
+bool Message_Type_IsValid(int value);
+const Message_Type Message_Type_Type_MIN = Message_Type_INVOCATION;
+const Message_Type Message_Type_Type_MAX = Message_Type_RETURN;
+const int Message_Type_Type_ARRAYSIZE = Message_Type_Type_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* Message_Type_descriptor();
+inline const ::std::string& Message_Type_Name(Message_Type value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    Message_Type_descriptor(), value);
+}
+inline bool Message_Type_Parse(
+    const ::std::string& name, Message_Type* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<Message_Type>(
+    Message_Type_descriptor(), name, value);
+}
 enum Ref_Type_Owner {
-  Ref_Type_Owner_OWNER_LOCAL = 0,
+  Ref_Type_Owner_OWNER_SENDER = 0,
   Ref_Type_Owner_OWNER_RECEIVER = 1,
   Ref_Type_Owner_OWNER_ANOTHER = 2
 };
 bool Ref_Type_Owner_IsValid(int value);
-const Ref_Type_Owner Ref_Type_Owner_Owner_MIN = Ref_Type_Owner_OWNER_LOCAL;
+const Ref_Type_Owner Ref_Type_Owner_Owner_MIN = Ref_Type_Owner_OWNER_SENDER;
 const Ref_Type_Owner Ref_Type_Owner_Owner_MAX = Ref_Type_Owner_OWNER_ANOTHER;
 const int Ref_Type_Owner_Owner_ARRAYSIZE = Ref_Type_Owner_Owner_MAX + 1;
 
@@ -63,37 +84,16 @@ inline bool Ref_Type_Owner_Parse(
   return ::google::protobuf::internal::ParseNamedEnum<Ref_Type_Owner>(
     Ref_Type_Owner_descriptor(), name, value);
 }
-enum Message_Type {
-  Message_Type_MSG_NEW_INST = 0,
-  Message_Type_MSG_ACCESS_INST = 1,
-  Message_Type_MSG_FIND_INST = 2,
-  Message_Type_MSG_CALL = 3
-};
-bool Message_Type_IsValid(int value);
-const Message_Type Message_Type_Type_MIN = Message_Type_MSG_NEW_INST;
-const Message_Type Message_Type_Type_MAX = Message_Type_MSG_CALL;
-const int Message_Type_Type_ARRAYSIZE = Message_Type_Type_MAX + 1;
-
-const ::google::protobuf::EnumDescriptor* Message_Type_descriptor();
-inline const ::std::string& Message_Type_Name(Message_Type value) {
-  return ::google::protobuf::internal::NameOfEnum(
-    Message_Type_descriptor(), value);
-}
-inline bool Message_Type_Parse(
-    const ::std::string& name, Message_Type* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<Message_Type>(
-    Message_Type_descriptor(), name, value);
-}
 // ===================================================================
 
-class Data_Container : public ::google::protobuf::Message {
+class Message : public ::google::protobuf::Message {
  public:
-  Data_Container();
-  virtual ~Data_Container();
+  Message();
+  virtual ~Message();
   
-  Data_Container(const Data_Container& from);
+  Message(const Message& from);
   
-  inline Data_Container& operator=(const Data_Container& from) {
+  inline Message& operator=(const Message& from) {
     CopyFrom(from);
     return *this;
   }
@@ -107,17 +107,524 @@ class Data_Container : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const Data_Container& default_instance();
+  static const Message& default_instance();
   
-  void Swap(Data_Container* other);
+  void Swap(Message* other);
   
   // implements Message ----------------------------------------------
   
-  Data_Container* New() const;
+  Message* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const Data_Container& from);
-  void MergeFrom(const Data_Container& from);
+  void CopyFrom(const Message& from);
+  void MergeFrom(const Message& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  typedef Message_Type Type;
+  static const Type INVOCATION = Message_Type_INVOCATION;
+  static const Type REQUEST_NEW = Message_Type_REQUEST_NEW;
+  static const Type REQUEST_LOOKUP = Message_Type_REQUEST_LOOKUP;
+  static const Type REQUEST_LEASE = Message_Type_REQUEST_LEASE;
+  static const Type REQUEST_CANCEL_LEASE = Message_Type_REQUEST_CANCEL_LEASE;
+  static const Type RETURN = Message_Type_RETURN;
+  static inline bool Type_IsValid(int value) {
+    return Message_Type_IsValid(value);
+  }
+  static const Type Type_MIN =
+    Message_Type_Type_MIN;
+  static const Type Type_MAX =
+    Message_Type_Type_MAX;
+  static const int Type_ARRAYSIZE =
+    Message_Type_Type_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  Type_descriptor() {
+    return Message_Type_descriptor();
+  }
+  static inline const ::std::string& Type_Name(Type value) {
+    return Message_Type_Name(value);
+  }
+  static inline bool Type_Parse(const ::std::string& name,
+      Type* value) {
+    return Message_Type_Parse(name, value);
+  }
+  
+  // accessors -------------------------------------------------------
+  
+  // optional string requester_endpoint = 1;
+  inline bool has_requester_endpoint() const;
+  inline void clear_requester_endpoint();
+  static const int kRequesterEndpointFieldNumber = 1;
+  inline const ::std::string& requester_endpoint() const;
+  inline void set_requester_endpoint(const ::std::string& value);
+  inline void set_requester_endpoint(const char* value);
+  inline void set_requester_endpoint(const char* value, size_t size);
+  inline ::std::string* mutable_requester_endpoint();
+  inline ::std::string* release_requester_endpoint();
+  
+  // required .reef.rpc.Message.Type type = 2;
+  inline bool has_type() const;
+  inline void clear_type();
+  static const int kTypeFieldNumber = 2;
+  inline ::reef::rpc::Message_Type type() const;
+  inline void set_type(::reef::rpc::Message_Type value);
+  
+  // optional .reef.rpc.Invocation invocation = 3;
+  inline bool has_invocation() const;
+  inline void clear_invocation();
+  static const int kInvocationFieldNumber = 3;
+  inline const ::reef::rpc::Invocation& invocation() const;
+  inline ::reef::rpc::Invocation* mutable_invocation();
+  inline ::reef::rpc::Invocation* release_invocation();
+  
+  // optional .reef.rpc.Request request = 4;
+  inline bool has_request() const;
+  inline void clear_request();
+  static const int kRequestFieldNumber = 4;
+  inline const ::reef::rpc::Request& request() const;
+  inline ::reef::rpc::Request* mutable_request();
+  inline ::reef::rpc::Request* release_request();
+  
+  // optional .reef.rpc.Parameter ret_value = 5;
+  inline bool has_ret_value() const;
+  inline void clear_ret_value();
+  static const int kRetValueFieldNumber = 5;
+  inline const ::reef::rpc::Parameter& ret_value() const;
+  inline ::reef::rpc::Parameter* mutable_ret_value();
+  inline ::reef::rpc::Parameter* release_ret_value();
+  
+  // optional int32 ret_int = 6;
+  inline bool has_ret_int() const;
+  inline void clear_ret_int();
+  static const int kRetIntFieldNumber = 6;
+  inline ::google::protobuf::int32 ret_int() const;
+  inline void set_ret_int(::google::protobuf::int32 value);
+  
+  // @@protoc_insertion_point(class_scope:reef.rpc.Message)
+ private:
+  inline void set_has_requester_endpoint();
+  inline void clear_has_requester_endpoint();
+  inline void set_has_type();
+  inline void clear_has_type();
+  inline void set_has_invocation();
+  inline void clear_has_invocation();
+  inline void set_has_request();
+  inline void clear_has_request();
+  inline void set_has_ret_value();
+  inline void clear_has_ret_value();
+  inline void set_has_ret_int();
+  inline void clear_has_ret_int();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::std::string* requester_endpoint_;
+  ::reef::rpc::Invocation* invocation_;
+  ::reef::rpc::Request* request_;
+  int type_;
+  ::google::protobuf::int32 ret_int_;
+  ::reef::rpc::Parameter* ret_value_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_Message_2eproto();
+  friend void protobuf_AssignDesc_Message_2eproto();
+  friend void protobuf_ShutdownFile_Message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static Message* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class Request : public ::google::protobuf::Message {
+ public:
+  Request();
+  virtual ~Request();
+  
+  Request(const Request& from);
+  
+  inline Request& operator=(const Request& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Request& default_instance();
+  
+  void Swap(Request* other);
+  
+  // implements Message ----------------------------------------------
+  
+  Request* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const Request& from);
+  void MergeFrom(const Request& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional string new_instance_type = 2;
+  inline bool has_new_instance_type() const;
+  inline void clear_new_instance_type();
+  static const int kNewInstanceTypeFieldNumber = 2;
+  inline const ::std::string& new_instance_type() const;
+  inline void set_new_instance_type(const ::std::string& value);
+  inline void set_new_instance_type(const char* value);
+  inline void set_new_instance_type(const char* value, size_t size);
+  inline ::std::string* mutable_new_instance_type();
+  inline ::std::string* release_new_instance_type();
+  
+  // optional string lookup_key = 3;
+  inline bool has_lookup_key() const;
+  inline void clear_lookup_key();
+  static const int kLookupKeyFieldNumber = 3;
+  inline const ::std::string& lookup_key() const;
+  inline void set_lookup_key(const ::std::string& value);
+  inline void set_lookup_key(const char* value);
+  inline void set_lookup_key(const char* value, size_t size);
+  inline ::std::string* mutable_lookup_key();
+  inline ::std::string* release_lookup_key();
+  
+  // optional uint32 lease_instance_id = 4;
+  inline bool has_lease_instance_id() const;
+  inline void clear_lease_instance_id();
+  static const int kLeaseInstanceIdFieldNumber = 4;
+  inline ::google::protobuf::uint32 lease_instance_id() const;
+  inline void set_lease_instance_id(::google::protobuf::uint32 value);
+  
+  // @@protoc_insertion_point(class_scope:reef.rpc.Request)
+ private:
+  inline void set_has_new_instance_type();
+  inline void clear_has_new_instance_type();
+  inline void set_has_lookup_key();
+  inline void clear_has_lookup_key();
+  inline void set_has_lease_instance_id();
+  inline void clear_has_lease_instance_id();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::std::string* new_instance_type_;
+  ::std::string* lookup_key_;
+  ::google::protobuf::uint32 lease_instance_id_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_Message_2eproto();
+  friend void protobuf_AssignDesc_Message_2eproto();
+  friend void protobuf_ShutdownFile_Message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static Request* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class Invocation : public ::google::protobuf::Message {
+ public:
+  Invocation();
+  virtual ~Invocation();
+  
+  Invocation(const Invocation& from);
+  
+  inline Invocation& operator=(const Invocation& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Invocation& default_instance();
+  
+  void Swap(Invocation* other);
+  
+  // implements Message ----------------------------------------------
+  
+  Invocation* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const Invocation& from);
+  void MergeFrom(const Invocation& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // required uint32 instance_id = 1;
+  inline bool has_instance_id() const;
+  inline void clear_instance_id();
+  static const int kInstanceIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 instance_id() const;
+  inline void set_instance_id(::google::protobuf::uint32 value);
+  
+  // required uint32 facet_idx = 2;
+  inline bool has_facet_idx() const;
+  inline void clear_facet_idx();
+  static const int kFacetIdxFieldNumber = 2;
+  inline ::google::protobuf::uint32 facet_idx() const;
+  inline void set_facet_idx(::google::protobuf::uint32 value);
+  
+  // required uint32 member_idx = 3;
+  inline bool has_member_idx() const;
+  inline void clear_member_idx();
+  static const int kMemberIdxFieldNumber = 3;
+  inline ::google::protobuf::uint32 member_idx() const;
+  inline void set_member_idx(::google::protobuf::uint32 value);
+  
+  // required int32 type_depth = 4;
+  inline bool has_type_depth() const;
+  inline void clear_type_depth();
+  static const int kTypeDepthFieldNumber = 4;
+  inline ::google::protobuf::int32 type_depth() const;
+  inline void set_type_depth(::google::protobuf::int32 value);
+  
+  // required bool synch = 5;
+  inline bool has_synch() const;
+  inline void clear_synch();
+  static const int kSynchFieldNumber = 5;
+  inline bool synch() const;
+  inline void set_synch(bool value);
+  
+  // repeated .reef.rpc.Parameter params = 6;
+  inline int params_size() const;
+  inline void clear_params();
+  static const int kParamsFieldNumber = 6;
+  inline const ::reef::rpc::Parameter& params(int index) const;
+  inline ::reef::rpc::Parameter* mutable_params(int index);
+  inline ::reef::rpc::Parameter* add_params();
+  inline const ::google::protobuf::RepeatedPtrField< ::reef::rpc::Parameter >&
+      params() const;
+  inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Parameter >*
+      mutable_params();
+  
+  // @@protoc_insertion_point(class_scope:reef.rpc.Invocation)
+ private:
+  inline void set_has_instance_id();
+  inline void clear_has_instance_id();
+  inline void set_has_facet_idx();
+  inline void clear_has_facet_idx();
+  inline void set_has_member_idx();
+  inline void clear_has_member_idx();
+  inline void set_has_type_depth();
+  inline void clear_has_type_depth();
+  inline void set_has_synch();
+  inline void clear_has_synch();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint32 instance_id_;
+  ::google::protobuf::uint32 facet_idx_;
+  ::google::protobuf::uint32 member_idx_;
+  ::google::protobuf::int32 type_depth_;
+  ::google::protobuf::RepeatedPtrField< ::reef::rpc::Parameter > params_;
+  bool synch_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_Message_2eproto();
+  friend void protobuf_AssignDesc_Message_2eproto();
+  friend void protobuf_ShutdownFile_Message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static Invocation* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class Parameter : public ::google::protobuf::Message {
+ public:
+  Parameter();
+  virtual ~Parameter();
+  
+  Parameter(const Parameter& from);
+  
+  inline Parameter& operator=(const Parameter& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Parameter& default_instance();
+  
+  void Swap(Parameter* other);
+  
+  // implements Message ----------------------------------------------
+  
+  Parameter* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const Parameter& from);
+  void MergeFrom(const Parameter& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // repeated .reef.rpc.Any_PB any = 1;
+  inline int any_size() const;
+  inline void clear_any();
+  static const int kAnyFieldNumber = 1;
+  inline const ::reef::rpc::Any_PB& any(int index) const;
+  inline ::reef::rpc::Any_PB* mutable_any(int index);
+  inline ::reef::rpc::Any_PB* add_any();
+  inline const ::google::protobuf::RepeatedPtrField< ::reef::rpc::Any_PB >&
+      any() const;
+  inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Any_PB >*
+      mutable_any();
+  
+  // optional uint32 any_type = 2;
+  inline bool has_any_type() const;
+  inline void clear_any_type();
+  static const int kAnyTypeFieldNumber = 2;
+  inline ::google::protobuf::uint32 any_type() const;
+  inline void set_any_type(::google::protobuf::uint32 value);
+  
+  // @@protoc_insertion_point(class_scope:reef.rpc.Parameter)
+ private:
+  inline void set_has_any_type();
+  inline void clear_has_any_type();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::RepeatedPtrField< ::reef::rpc::Any_PB > any_;
+  ::google::protobuf::uint32 any_type_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_Message_2eproto();
+  friend void protobuf_AssignDesc_Message_2eproto();
+  friend void protobuf_ShutdownFile_Message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static Parameter* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class Any_PB : public ::google::protobuf::Message {
+ public:
+  Any_PB();
+  virtual ~Any_PB();
+  
+  Any_PB(const Any_PB& from);
+  
+  inline Any_PB& operator=(const Any_PB& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Any_PB& default_instance();
+  
+  void Swap(Any_PB* other);
+  
+  // implements Message ----------------------------------------------
+  
+  Any_PB* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const Any_PB& from);
+  void MergeFrom(const Any_PB& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -181,7 +688,7 @@ class Data_Container : public ::google::protobuf::Message {
   inline ::reef::rpc::Ref_Type* mutable_ref_type();
   inline ::reef::rpc::Ref_Type* release_ref_type();
   
-  // @@protoc_insertion_point(class_scope:reef.rpc.Data_Container)
+  // @@protoc_insertion_point(class_scope:reef.rpc.Any_PB)
  private:
   inline void set_has_boolean();
   inline void clear_has_boolean();
@@ -210,102 +717,7 @@ class Data_Container : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_Message_2eproto();
   
   void InitAsDefaultInstance();
-  static Data_Container* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class Argument : public ::google::protobuf::Message {
- public:
-  Argument();
-  virtual ~Argument();
-  
-  Argument(const Argument& from);
-  
-  inline Argument& operator=(const Argument& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const Argument& default_instance();
-  
-  void Swap(Argument* other);
-  
-  // implements Message ----------------------------------------------
-  
-  Argument* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const Argument& from);
-  void MergeFrom(const Argument& from);
-  void Clear();
-  bool IsInitialized() const;
-  
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  
-  ::google::protobuf::Metadata GetMetadata() const;
-  
-  // nested types ----------------------------------------------------
-  
-  // accessors -------------------------------------------------------
-  
-  // repeated .reef.rpc.Data_Container data = 1;
-  inline int data_size() const;
-  inline void clear_data();
-  static const int kDataFieldNumber = 1;
-  inline const ::reef::rpc::Data_Container& data(int index) const;
-  inline ::reef::rpc::Data_Container* mutable_data(int index);
-  inline ::reef::rpc::Data_Container* add_data();
-  inline const ::google::protobuf::RepeatedPtrField< ::reef::rpc::Data_Container >&
-      data() const;
-  inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Data_Container >*
-      mutable_data();
-  
-  // optional uint32 coany_type = 2;
-  inline bool has_coany_type() const;
-  inline void clear_coany_type();
-  static const int kCoanyTypeFieldNumber = 2;
-  inline ::google::protobuf::uint32 coany_type() const;
-  inline void set_coany_type(::google::protobuf::uint32 value);
-  
-  // @@protoc_insertion_point(class_scope:reef.rpc.Argument)
- private:
-  inline void set_has_coany_type();
-  inline void clear_has_coany_type();
-  
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-  
-  ::google::protobuf::RepeatedPtrField< ::reef::rpc::Data_Container > data_;
-  ::google::protobuf::uint32 coany_type_;
-  
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
-  
-  friend void  protobuf_AddDesc_Message_2eproto();
-  friend void protobuf_AssignDesc_Message_2eproto();
-  friend void protobuf_ShutdownFile_Message_2eproto();
-  
-  void InitAsDefaultInstance();
-  static Argument* default_instance_;
+  static Any_PB* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -363,16 +775,16 @@ class Complex_Type : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // repeated .reef.rpc.Argument field = 1;
+  // repeated .reef.rpc.Parameter field = 1;
   inline int field_size() const;
   inline void clear_field();
   static const int kFieldFieldNumber = 1;
-  inline const ::reef::rpc::Argument& field(int index) const;
-  inline ::reef::rpc::Argument* mutable_field(int index);
-  inline ::reef::rpc::Argument* add_field();
-  inline const ::google::protobuf::RepeatedPtrField< ::reef::rpc::Argument >&
+  inline const ::reef::rpc::Parameter& field(int index) const;
+  inline ::reef::rpc::Parameter* mutable_field(int index);
+  inline ::reef::rpc::Parameter* add_field();
+  inline const ::google::protobuf::RepeatedPtrField< ::reef::rpc::Parameter >&
       field() const;
-  inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Argument >*
+  inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Parameter >*
       mutable_field();
   
   // @@protoc_insertion_point(class_scope:reef.rpc.Complex_Type)
@@ -380,7 +792,7 @@ class Complex_Type : public ::google::protobuf::Message {
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
-  ::google::protobuf::RepeatedPtrField< ::reef::rpc::Argument > field_;
+  ::google::protobuf::RepeatedPtrField< ::reef::rpc::Parameter > field_;
   
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
@@ -447,7 +859,7 @@ class Ref_Type : public ::google::protobuf::Message {
   // nested types ----------------------------------------------------
   
   typedef Ref_Type_Owner Owner;
-  static const Owner OWNER_LOCAL = Ref_Type_Owner_OWNER_LOCAL;
+  static const Owner OWNER_SENDER = Ref_Type_Owner_OWNER_SENDER;
   static const Owner OWNER_RECEIVER = Ref_Type_Owner_OWNER_RECEIVER;
   static const Owner OWNER_ANOTHER = Ref_Type_Owner_OWNER_ANOTHER;
   static inline bool Owner_IsValid(int value) {
@@ -505,16 +917,16 @@ class Ref_Type : public ::google::protobuf::Message {
   inline ::std::string* mutable_instance_type();
   inline ::std::string* release_instance_type();
   
-  // optional string owner_ip = 5;
-  inline bool has_owner_ip() const;
-  inline void clear_owner_ip();
-  static const int kOwnerIpFieldNumber = 5;
-  inline const ::std::string& owner_ip() const;
-  inline void set_owner_ip(const ::std::string& value);
-  inline void set_owner_ip(const char* value);
-  inline void set_owner_ip(const char* value, size_t size);
-  inline ::std::string* mutable_owner_ip();
-  inline ::std::string* release_owner_ip();
+  // optional string owner_endpoint = 5;
+  inline bool has_owner_endpoint() const;
+  inline void clear_owner_endpoint();
+  static const int kOwnerEndpointFieldNumber = 5;
+  inline const ::std::string& owner_endpoint() const;
+  inline void set_owner_endpoint(const ::std::string& value);
+  inline void set_owner_endpoint(const char* value);
+  inline void set_owner_endpoint(const char* value, size_t size);
+  inline ::std::string* mutable_owner_endpoint();
+  inline ::std::string* release_owner_endpoint();
   
   // @@protoc_insertion_point(class_scope:reef.rpc.Ref_Type)
  private:
@@ -526,15 +938,15 @@ class Ref_Type : public ::google::protobuf::Message {
   inline void clear_has_facet_idx();
   inline void set_has_instance_type();
   inline void clear_has_instance_type();
-  inline void set_has_owner_ip();
-  inline void clear_has_owner_ip();
+  inline void set_has_owner_endpoint();
+  inline void clear_has_owner_endpoint();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   int owner_;
   ::google::protobuf::uint32 instance_id_;
   ::std::string* instance_type_;
-  ::std::string* owner_ip_;
+  ::std::string* owner_endpoint_;
   ::google::protobuf::uint32 facet_idx_;
   
   mutable int _cached_size_;
@@ -547,648 +959,609 @@ class Ref_Type : public ::google::protobuf::Message {
   void InitAsDefaultInstance();
   static Ref_Type* default_instance_;
 };
-// -------------------------------------------------------------------
-
-class Message_Member : public ::google::protobuf::Message {
- public:
-  Message_Member();
-  virtual ~Message_Member();
-  
-  Message_Member(const Message_Member& from);
-  
-  inline Message_Member& operator=(const Message_Member& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const Message_Member& default_instance();
-  
-  void Swap(Message_Member* other);
-  
-  // implements Message ----------------------------------------------
-  
-  Message_Member* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const Message_Member& from);
-  void MergeFrom(const Message_Member& from);
-  void Clear();
-  bool IsInitialized() const;
-  
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  
-  ::google::protobuf::Metadata GetMetadata() const;
-  
-  // nested types ----------------------------------------------------
-  
-  // accessors -------------------------------------------------------
-  
-  // required uint32 facet_idx = 1;
-  inline bool has_facet_idx() const;
-  inline void clear_facet_idx();
-  static const int kFacetIdxFieldNumber = 1;
-  inline ::google::protobuf::uint32 facet_idx() const;
-  inline void set_facet_idx(::google::protobuf::uint32 value);
-  
-  // required uint32 member_idx = 2;
-  inline bool has_member_idx() const;
-  inline void clear_member_idx();
-  static const int kMemberIdxFieldNumber = 2;
-  inline ::google::protobuf::uint32 member_idx() const;
-  inline void set_member_idx(::google::protobuf::uint32 value);
-  
-  // required int32 type_depth = 3;
-  inline bool has_type_depth() const;
-  inline void clear_type_depth();
-  static const int kTypeDepthFieldNumber = 3;
-  inline ::google::protobuf::int32 type_depth() const;
-  inline void set_type_depth(::google::protobuf::int32 value);
-  
-  // repeated .reef.rpc.Argument arguments = 4;
-  inline int arguments_size() const;
-  inline void clear_arguments();
-  static const int kArgumentsFieldNumber = 4;
-  inline const ::reef::rpc::Argument& arguments(int index) const;
-  inline ::reef::rpc::Argument* mutable_arguments(int index);
-  inline ::reef::rpc::Argument* add_arguments();
-  inline const ::google::protobuf::RepeatedPtrField< ::reef::rpc::Argument >&
-      arguments() const;
-  inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Argument >*
-      mutable_arguments();
-  
-  // @@protoc_insertion_point(class_scope:reef.rpc.Message_Member)
- private:
-  inline void set_has_facet_idx();
-  inline void clear_has_facet_idx();
-  inline void set_has_member_idx();
-  inline void clear_has_member_idx();
-  inline void set_has_type_depth();
-  inline void clear_has_type_depth();
-  
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-  
-  ::google::protobuf::uint32 facet_idx_;
-  ::google::protobuf::uint32 member_idx_;
-  ::google::protobuf::RepeatedPtrField< ::reef::rpc::Argument > arguments_;
-  ::google::protobuf::int32 type_depth_;
-  
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
-  
-  friend void  protobuf_AddDesc_Message_2eproto();
-  friend void protobuf_AssignDesc_Message_2eproto();
-  friend void protobuf_ShutdownFile_Message_2eproto();
-  
-  void InitAsDefaultInstance();
-  static Message_Member* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class Message_New_Inst : public ::google::protobuf::Message {
- public:
-  Message_New_Inst();
-  virtual ~Message_New_Inst();
-  
-  Message_New_Inst(const Message_New_Inst& from);
-  
-  inline Message_New_Inst& operator=(const Message_New_Inst& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const Message_New_Inst& default_instance();
-  
-  void Swap(Message_New_Inst* other);
-  
-  // implements Message ----------------------------------------------
-  
-  Message_New_Inst* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const Message_New_Inst& from);
-  void MergeFrom(const Message_New_Inst& from);
-  void Clear();
-  bool IsInitialized() const;
-  
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  
-  ::google::protobuf::Metadata GetMetadata() const;
-  
-  // nested types ----------------------------------------------------
-  
-  // accessors -------------------------------------------------------
-  
-  // required string new_instance_type = 1;
-  inline bool has_new_instance_type() const;
-  inline void clear_new_instance_type();
-  static const int kNewInstanceTypeFieldNumber = 1;
-  inline const ::std::string& new_instance_type() const;
-  inline void set_new_instance_type(const ::std::string& value);
-  inline void set_new_instance_type(const char* value);
-  inline void set_new_instance_type(const char* value, size_t size);
-  inline ::std::string* mutable_new_instance_type();
-  inline ::std::string* release_new_instance_type();
-  
-  // @@protoc_insertion_point(class_scope:reef.rpc.Message_New_Inst)
- private:
-  inline void set_has_new_instance_type();
-  inline void clear_has_new_instance_type();
-  
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-  
-  ::std::string* new_instance_type_;
-  
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
-  
-  friend void  protobuf_AddDesc_Message_2eproto();
-  friend void protobuf_AssignDesc_Message_2eproto();
-  friend void protobuf_ShutdownFile_Message_2eproto();
-  
-  void InitAsDefaultInstance();
-  static Message_New_Inst* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class Message_Find_Inst : public ::google::protobuf::Message {
- public:
-  Message_Find_Inst();
-  virtual ~Message_Find_Inst();
-  
-  Message_Find_Inst(const Message_Find_Inst& from);
-  
-  inline Message_Find_Inst& operator=(const Message_Find_Inst& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const Message_Find_Inst& default_instance();
-  
-  void Swap(Message_Find_Inst* other);
-  
-  // implements Message ----------------------------------------------
-  
-  Message_Find_Inst* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const Message_Find_Inst& from);
-  void MergeFrom(const Message_Find_Inst& from);
-  void Clear();
-  bool IsInitialized() const;
-  
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  
-  ::google::protobuf::Metadata GetMetadata() const;
-  
-  // nested types ----------------------------------------------------
-  
-  // accessors -------------------------------------------------------
-  
-  // required string key = 1;
-  inline bool has_key() const;
-  inline void clear_key();
-  static const int kKeyFieldNumber = 1;
-  inline const ::std::string& key() const;
-  inline void set_key(const ::std::string& value);
-  inline void set_key(const char* value);
-  inline void set_key(const char* value, size_t size);
-  inline ::std::string* mutable_key();
-  inline ::std::string* release_key();
-  
-  // @@protoc_insertion_point(class_scope:reef.rpc.Message_Find_Inst)
- private:
-  inline void set_has_key();
-  inline void clear_has_key();
-  
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-  
-  ::std::string* key_;
-  
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
-  
-  friend void  protobuf_AddDesc_Message_2eproto();
-  friend void protobuf_AssignDesc_Message_2eproto();
-  friend void protobuf_ShutdownFile_Message_2eproto();
-  
-  void InitAsDefaultInstance();
-  static Message_Find_Inst* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class Message_Acc_Inst : public ::google::protobuf::Message {
- public:
-  Message_Acc_Inst();
-  virtual ~Message_Acc_Inst();
-  
-  Message_Acc_Inst(const Message_Acc_Inst& from);
-  
-  inline Message_Acc_Inst& operator=(const Message_Acc_Inst& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const Message_Acc_Inst& default_instance();
-  
-  void Swap(Message_Acc_Inst* other);
-  
-  // implements Message ----------------------------------------------
-  
-  Message_Acc_Inst* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const Message_Acc_Inst& from);
-  void MergeFrom(const Message_Acc_Inst& from);
-  void Clear();
-  bool IsInitialized() const;
-  
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  
-  ::google::protobuf::Metadata GetMetadata() const;
-  
-  // nested types ----------------------------------------------------
-  
-  // accessors -------------------------------------------------------
-  
-  // required bool increment = 1;
-  inline bool has_increment() const;
-  inline void clear_increment();
-  static const int kIncrementFieldNumber = 1;
-  inline bool increment() const;
-  inline void set_increment(bool value);
-  
-  // required uint32 instance_id = 2;
-  inline bool has_instance_id() const;
-  inline void clear_instance_id();
-  static const int kInstanceIdFieldNumber = 2;
-  inline ::google::protobuf::uint32 instance_id() const;
-  inline void set_instance_id(::google::protobuf::uint32 value);
-  
-  // @@protoc_insertion_point(class_scope:reef.rpc.Message_Acc_Inst)
- private:
-  inline void set_has_increment();
-  inline void clear_has_increment();
-  inline void set_has_instance_id();
-  inline void clear_has_instance_id();
-  
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-  
-  bool increment_;
-  ::google::protobuf::uint32 instance_id_;
-  
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
-  
-  friend void  protobuf_AddDesc_Message_2eproto();
-  friend void protobuf_AssignDesc_Message_2eproto();
-  friend void protobuf_ShutdownFile_Message_2eproto();
-  
-  void InitAsDefaultInstance();
-  static Message_Acc_Inst* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class Message : public ::google::protobuf::Message {
- public:
-  Message();
-  virtual ~Message();
-  
-  Message(const Message& from);
-  
-  inline Message& operator=(const Message& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const Message& default_instance();
-  
-  void Swap(Message* other);
-  
-  // implements Message ----------------------------------------------
-  
-  Message* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const Message& from);
-  void MergeFrom(const Message& from);
-  void Clear();
-  bool IsInitialized() const;
-  
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  
-  ::google::protobuf::Metadata GetMetadata() const;
-  
-  // nested types ----------------------------------------------------
-  
-  typedef Message_Type Type;
-  static const Type MSG_NEW_INST = Message_Type_MSG_NEW_INST;
-  static const Type MSG_ACCESS_INST = Message_Type_MSG_ACCESS_INST;
-  static const Type MSG_FIND_INST = Message_Type_MSG_FIND_INST;
-  static const Type MSG_CALL = Message_Type_MSG_CALL;
-  static inline bool Type_IsValid(int value) {
-    return Message_Type_IsValid(value);
-  }
-  static const Type Type_MIN =
-    Message_Type_Type_MIN;
-  static const Type Type_MAX =
-    Message_Type_Type_MAX;
-  static const int Type_ARRAYSIZE =
-    Message_Type_Type_ARRAYSIZE;
-  static inline const ::google::protobuf::EnumDescriptor*
-  Type_descriptor() {
-    return Message_Type_descriptor();
-  }
-  static inline const ::std::string& Type_Name(Type value) {
-    return Message_Type_Name(value);
-  }
-  static inline bool Type_Parse(const ::std::string& name,
-      Type* value) {
-    return Message_Type_Parse(name, value);
-  }
-  
-  // accessors -------------------------------------------------------
-  
-  // required .reef.rpc.Message.Type msg_type = 1;
-  inline bool has_msg_type() const;
-  inline void clear_msg_type();
-  static const int kMsgTypeFieldNumber = 1;
-  inline ::reef::rpc::Message_Type msg_type() const;
-  inline void set_msg_type(::reef::rpc::Message_Type value);
-  
-  // required uint32 instance_id = 2;
-  inline bool has_instance_id() const;
-  inline void clear_instance_id();
-  static const int kInstanceIdFieldNumber = 2;
-  inline ::google::protobuf::uint32 instance_id() const;
-  inline void set_instance_id(::google::protobuf::uint32 value);
-  
-  // required bool has_return = 3;
-  inline bool has_has_return() const;
-  inline void clear_has_return();
-  static const int kHasReturnFieldNumber = 3;
-  inline bool has_return() const;
-  inline void set_has_return(bool value);
-  
-  // required string referer_ip = 4;
-  inline bool has_referer_ip() const;
-  inline void clear_referer_ip();
-  static const int kRefererIpFieldNumber = 4;
-  inline const ::std::string& referer_ip() const;
-  inline void set_referer_ip(const ::std::string& value);
-  inline void set_referer_ip(const char* value);
-  inline void set_referer_ip(const char* value, size_t size);
-  inline ::std::string* mutable_referer_ip();
-  inline ::std::string* release_referer_ip();
-  
-  // optional .reef.rpc.Message_New_Inst msg_new_inst = 5;
-  inline bool has_msg_new_inst() const;
-  inline void clear_msg_new_inst();
-  static const int kMsgNewInstFieldNumber = 5;
-  inline const ::reef::rpc::Message_New_Inst& msg_new_inst() const;
-  inline ::reef::rpc::Message_New_Inst* mutable_msg_new_inst();
-  inline ::reef::rpc::Message_New_Inst* release_msg_new_inst();
-  
-  // optional .reef.rpc.Message_Acc_Inst msg_acc_inst = 6;
-  inline bool has_msg_acc_inst() const;
-  inline void clear_msg_acc_inst();
-  static const int kMsgAccInstFieldNumber = 6;
-  inline const ::reef::rpc::Message_Acc_Inst& msg_acc_inst() const;
-  inline ::reef::rpc::Message_Acc_Inst* mutable_msg_acc_inst();
-  inline ::reef::rpc::Message_Acc_Inst* release_msg_acc_inst();
-  
-  // optional .reef.rpc.Message_Find_Inst msg_find_inst = 7;
-  inline bool has_msg_find_inst() const;
-  inline void clear_msg_find_inst();
-  static const int kMsgFindInstFieldNumber = 7;
-  inline const ::reef::rpc::Message_Find_Inst& msg_find_inst() const;
-  inline ::reef::rpc::Message_Find_Inst* mutable_msg_find_inst();
-  inline ::reef::rpc::Message_Find_Inst* release_msg_find_inst();
-  
-  // optional .reef.rpc.Message_Member msg_member = 8;
-  inline bool has_msg_member() const;
-  inline void clear_msg_member();
-  static const int kMsgMemberFieldNumber = 8;
-  inline const ::reef::rpc::Message_Member& msg_member() const;
-  inline ::reef::rpc::Message_Member* mutable_msg_member();
-  inline ::reef::rpc::Message_Member* release_msg_member();
-  
-  // @@protoc_insertion_point(class_scope:reef.rpc.Message)
- private:
-  inline void set_has_msg_type();
-  inline void clear_has_msg_type();
-  inline void set_has_instance_id();
-  inline void clear_has_instance_id();
-  inline void set_has_has_return();
-  inline void clear_has_has_return();
-  inline void set_has_referer_ip();
-  inline void clear_has_referer_ip();
-  inline void set_has_msg_new_inst();
-  inline void clear_has_msg_new_inst();
-  inline void set_has_msg_acc_inst();
-  inline void clear_has_msg_acc_inst();
-  inline void set_has_msg_find_inst();
-  inline void clear_has_msg_find_inst();
-  inline void set_has_msg_member();
-  inline void clear_has_msg_member();
-  
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-  
-  int msg_type_;
-  ::google::protobuf::uint32 instance_id_;
-  ::std::string* referer_ip_;
-  ::reef::rpc::Message_New_Inst* msg_new_inst_;
-  ::reef::rpc::Message_Acc_Inst* msg_acc_inst_;
-  ::reef::rpc::Message_Find_Inst* msg_find_inst_;
-  ::reef::rpc::Message_Member* msg_member_;
-  bool has_return_;
-  
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(8 + 31) / 32];
-  
-  friend void  protobuf_AddDesc_Message_2eproto();
-  friend void protobuf_AssignDesc_Message_2eproto();
-  friend void protobuf_ShutdownFile_Message_2eproto();
-  
-  void InitAsDefaultInstance();
-  static Message* default_instance_;
-};
 // ===================================================================
 
 
 // ===================================================================
 
-// Data_Container
+// Message
 
-// optional bool boolean = 1;
-inline bool Data_Container::has_boolean() const {
+// optional string requester_endpoint = 1;
+inline bool Message::has_requester_endpoint() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void Data_Container::set_has_boolean() {
+inline void Message::set_has_requester_endpoint() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void Data_Container::clear_has_boolean() {
+inline void Message::clear_has_requester_endpoint() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void Data_Container::clear_boolean() {
+inline void Message::clear_requester_endpoint() {
+  if (requester_endpoint_ != &::google::protobuf::internal::kEmptyString) {
+    requester_endpoint_->clear();
+  }
+  clear_has_requester_endpoint();
+}
+inline const ::std::string& Message::requester_endpoint() const {
+  return *requester_endpoint_;
+}
+inline void Message::set_requester_endpoint(const ::std::string& value) {
+  set_has_requester_endpoint();
+  if (requester_endpoint_ == &::google::protobuf::internal::kEmptyString) {
+    requester_endpoint_ = new ::std::string;
+  }
+  requester_endpoint_->assign(value);
+}
+inline void Message::set_requester_endpoint(const char* value) {
+  set_has_requester_endpoint();
+  if (requester_endpoint_ == &::google::protobuf::internal::kEmptyString) {
+    requester_endpoint_ = new ::std::string;
+  }
+  requester_endpoint_->assign(value);
+}
+inline void Message::set_requester_endpoint(const char* value, size_t size) {
+  set_has_requester_endpoint();
+  if (requester_endpoint_ == &::google::protobuf::internal::kEmptyString) {
+    requester_endpoint_ = new ::std::string;
+  }
+  requester_endpoint_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* Message::mutable_requester_endpoint() {
+  set_has_requester_endpoint();
+  if (requester_endpoint_ == &::google::protobuf::internal::kEmptyString) {
+    requester_endpoint_ = new ::std::string;
+  }
+  return requester_endpoint_;
+}
+inline ::std::string* Message::release_requester_endpoint() {
+  clear_has_requester_endpoint();
+  if (requester_endpoint_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = requester_endpoint_;
+    requester_endpoint_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// required .reef.rpc.Message.Type type = 2;
+inline bool Message::has_type() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void Message::set_has_type() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void Message::clear_has_type() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void Message::clear_type() {
+  type_ = 0;
+  clear_has_type();
+}
+inline ::reef::rpc::Message_Type Message::type() const {
+  return static_cast< ::reef::rpc::Message_Type >(type_);
+}
+inline void Message::set_type(::reef::rpc::Message_Type value) {
+  GOOGLE_DCHECK(::reef::rpc::Message_Type_IsValid(value));
+  set_has_type();
+  type_ = value;
+}
+
+// optional .reef.rpc.Invocation invocation = 3;
+inline bool Message::has_invocation() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void Message::set_has_invocation() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void Message::clear_has_invocation() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void Message::clear_invocation() {
+  if (invocation_ != NULL) invocation_->::reef::rpc::Invocation::Clear();
+  clear_has_invocation();
+}
+inline const ::reef::rpc::Invocation& Message::invocation() const {
+  return invocation_ != NULL ? *invocation_ : *default_instance_->invocation_;
+}
+inline ::reef::rpc::Invocation* Message::mutable_invocation() {
+  set_has_invocation();
+  if (invocation_ == NULL) invocation_ = new ::reef::rpc::Invocation;
+  return invocation_;
+}
+inline ::reef::rpc::Invocation* Message::release_invocation() {
+  clear_has_invocation();
+  ::reef::rpc::Invocation* temp = invocation_;
+  invocation_ = NULL;
+  return temp;
+}
+
+// optional .reef.rpc.Request request = 4;
+inline bool Message::has_request() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void Message::set_has_request() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void Message::clear_has_request() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void Message::clear_request() {
+  if (request_ != NULL) request_->::reef::rpc::Request::Clear();
+  clear_has_request();
+}
+inline const ::reef::rpc::Request& Message::request() const {
+  return request_ != NULL ? *request_ : *default_instance_->request_;
+}
+inline ::reef::rpc::Request* Message::mutable_request() {
+  set_has_request();
+  if (request_ == NULL) request_ = new ::reef::rpc::Request;
+  return request_;
+}
+inline ::reef::rpc::Request* Message::release_request() {
+  clear_has_request();
+  ::reef::rpc::Request* temp = request_;
+  request_ = NULL;
+  return temp;
+}
+
+// optional .reef.rpc.Parameter ret_value = 5;
+inline bool Message::has_ret_value() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void Message::set_has_ret_value() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void Message::clear_has_ret_value() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void Message::clear_ret_value() {
+  if (ret_value_ != NULL) ret_value_->::reef::rpc::Parameter::Clear();
+  clear_has_ret_value();
+}
+inline const ::reef::rpc::Parameter& Message::ret_value() const {
+  return ret_value_ != NULL ? *ret_value_ : *default_instance_->ret_value_;
+}
+inline ::reef::rpc::Parameter* Message::mutable_ret_value() {
+  set_has_ret_value();
+  if (ret_value_ == NULL) ret_value_ = new ::reef::rpc::Parameter;
+  return ret_value_;
+}
+inline ::reef::rpc::Parameter* Message::release_ret_value() {
+  clear_has_ret_value();
+  ::reef::rpc::Parameter* temp = ret_value_;
+  ret_value_ = NULL;
+  return temp;
+}
+
+// optional int32 ret_int = 6;
+inline bool Message::has_ret_int() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void Message::set_has_ret_int() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void Message::clear_has_ret_int() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void Message::clear_ret_int() {
+  ret_int_ = 0;
+  clear_has_ret_int();
+}
+inline ::google::protobuf::int32 Message::ret_int() const {
+  return ret_int_;
+}
+inline void Message::set_ret_int(::google::protobuf::int32 value) {
+  set_has_ret_int();
+  ret_int_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// Request
+
+// optional string new_instance_type = 2;
+inline bool Request::has_new_instance_type() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void Request::set_has_new_instance_type() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void Request::clear_has_new_instance_type() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void Request::clear_new_instance_type() {
+  if (new_instance_type_ != &::google::protobuf::internal::kEmptyString) {
+    new_instance_type_->clear();
+  }
+  clear_has_new_instance_type();
+}
+inline const ::std::string& Request::new_instance_type() const {
+  return *new_instance_type_;
+}
+inline void Request::set_new_instance_type(const ::std::string& value) {
+  set_has_new_instance_type();
+  if (new_instance_type_ == &::google::protobuf::internal::kEmptyString) {
+    new_instance_type_ = new ::std::string;
+  }
+  new_instance_type_->assign(value);
+}
+inline void Request::set_new_instance_type(const char* value) {
+  set_has_new_instance_type();
+  if (new_instance_type_ == &::google::protobuf::internal::kEmptyString) {
+    new_instance_type_ = new ::std::string;
+  }
+  new_instance_type_->assign(value);
+}
+inline void Request::set_new_instance_type(const char* value, size_t size) {
+  set_has_new_instance_type();
+  if (new_instance_type_ == &::google::protobuf::internal::kEmptyString) {
+    new_instance_type_ = new ::std::string;
+  }
+  new_instance_type_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* Request::mutable_new_instance_type() {
+  set_has_new_instance_type();
+  if (new_instance_type_ == &::google::protobuf::internal::kEmptyString) {
+    new_instance_type_ = new ::std::string;
+  }
+  return new_instance_type_;
+}
+inline ::std::string* Request::release_new_instance_type() {
+  clear_has_new_instance_type();
+  if (new_instance_type_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = new_instance_type_;
+    new_instance_type_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// optional string lookup_key = 3;
+inline bool Request::has_lookup_key() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void Request::set_has_lookup_key() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void Request::clear_has_lookup_key() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void Request::clear_lookup_key() {
+  if (lookup_key_ != &::google::protobuf::internal::kEmptyString) {
+    lookup_key_->clear();
+  }
+  clear_has_lookup_key();
+}
+inline const ::std::string& Request::lookup_key() const {
+  return *lookup_key_;
+}
+inline void Request::set_lookup_key(const ::std::string& value) {
+  set_has_lookup_key();
+  if (lookup_key_ == &::google::protobuf::internal::kEmptyString) {
+    lookup_key_ = new ::std::string;
+  }
+  lookup_key_->assign(value);
+}
+inline void Request::set_lookup_key(const char* value) {
+  set_has_lookup_key();
+  if (lookup_key_ == &::google::protobuf::internal::kEmptyString) {
+    lookup_key_ = new ::std::string;
+  }
+  lookup_key_->assign(value);
+}
+inline void Request::set_lookup_key(const char* value, size_t size) {
+  set_has_lookup_key();
+  if (lookup_key_ == &::google::protobuf::internal::kEmptyString) {
+    lookup_key_ = new ::std::string;
+  }
+  lookup_key_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* Request::mutable_lookup_key() {
+  set_has_lookup_key();
+  if (lookup_key_ == &::google::protobuf::internal::kEmptyString) {
+    lookup_key_ = new ::std::string;
+  }
+  return lookup_key_;
+}
+inline ::std::string* Request::release_lookup_key() {
+  clear_has_lookup_key();
+  if (lookup_key_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = lookup_key_;
+    lookup_key_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// optional uint32 lease_instance_id = 4;
+inline bool Request::has_lease_instance_id() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void Request::set_has_lease_instance_id() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void Request::clear_has_lease_instance_id() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void Request::clear_lease_instance_id() {
+  lease_instance_id_ = 0u;
+  clear_has_lease_instance_id();
+}
+inline ::google::protobuf::uint32 Request::lease_instance_id() const {
+  return lease_instance_id_;
+}
+inline void Request::set_lease_instance_id(::google::protobuf::uint32 value) {
+  set_has_lease_instance_id();
+  lease_instance_id_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// Invocation
+
+// required uint32 instance_id = 1;
+inline bool Invocation::has_instance_id() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void Invocation::set_has_instance_id() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void Invocation::clear_has_instance_id() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void Invocation::clear_instance_id() {
+  instance_id_ = 0u;
+  clear_has_instance_id();
+}
+inline ::google::protobuf::uint32 Invocation::instance_id() const {
+  return instance_id_;
+}
+inline void Invocation::set_instance_id(::google::protobuf::uint32 value) {
+  set_has_instance_id();
+  instance_id_ = value;
+}
+
+// required uint32 facet_idx = 2;
+inline bool Invocation::has_facet_idx() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void Invocation::set_has_facet_idx() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void Invocation::clear_has_facet_idx() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void Invocation::clear_facet_idx() {
+  facet_idx_ = 0u;
+  clear_has_facet_idx();
+}
+inline ::google::protobuf::uint32 Invocation::facet_idx() const {
+  return facet_idx_;
+}
+inline void Invocation::set_facet_idx(::google::protobuf::uint32 value) {
+  set_has_facet_idx();
+  facet_idx_ = value;
+}
+
+// required uint32 member_idx = 3;
+inline bool Invocation::has_member_idx() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void Invocation::set_has_member_idx() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void Invocation::clear_has_member_idx() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void Invocation::clear_member_idx() {
+  member_idx_ = 0u;
+  clear_has_member_idx();
+}
+inline ::google::protobuf::uint32 Invocation::member_idx() const {
+  return member_idx_;
+}
+inline void Invocation::set_member_idx(::google::protobuf::uint32 value) {
+  set_has_member_idx();
+  member_idx_ = value;
+}
+
+// required int32 type_depth = 4;
+inline bool Invocation::has_type_depth() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void Invocation::set_has_type_depth() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void Invocation::clear_has_type_depth() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void Invocation::clear_type_depth() {
+  type_depth_ = 0;
+  clear_has_type_depth();
+}
+inline ::google::protobuf::int32 Invocation::type_depth() const {
+  return type_depth_;
+}
+inline void Invocation::set_type_depth(::google::protobuf::int32 value) {
+  set_has_type_depth();
+  type_depth_ = value;
+}
+
+// required bool synch = 5;
+inline bool Invocation::has_synch() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void Invocation::set_has_synch() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void Invocation::clear_has_synch() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void Invocation::clear_synch() {
+  synch_ = false;
+  clear_has_synch();
+}
+inline bool Invocation::synch() const {
+  return synch_;
+}
+inline void Invocation::set_synch(bool value) {
+  set_has_synch();
+  synch_ = value;
+}
+
+// repeated .reef.rpc.Parameter params = 6;
+inline int Invocation::params_size() const {
+  return params_.size();
+}
+inline void Invocation::clear_params() {
+  params_.Clear();
+}
+inline const ::reef::rpc::Parameter& Invocation::params(int index) const {
+  return params_.Get(index);
+}
+inline ::reef::rpc::Parameter* Invocation::mutable_params(int index) {
+  return params_.Mutable(index);
+}
+inline ::reef::rpc::Parameter* Invocation::add_params() {
+  return params_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::reef::rpc::Parameter >&
+Invocation::params() const {
+  return params_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Parameter >*
+Invocation::mutable_params() {
+  return &params_;
+}
+
+// -------------------------------------------------------------------
+
+// Parameter
+
+// repeated .reef.rpc.Any_PB any = 1;
+inline int Parameter::any_size() const {
+  return any_.size();
+}
+inline void Parameter::clear_any() {
+  any_.Clear();
+}
+inline const ::reef::rpc::Any_PB& Parameter::any(int index) const {
+  return any_.Get(index);
+}
+inline ::reef::rpc::Any_PB* Parameter::mutable_any(int index) {
+  return any_.Mutable(index);
+}
+inline ::reef::rpc::Any_PB* Parameter::add_any() {
+  return any_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::reef::rpc::Any_PB >&
+Parameter::any() const {
+  return any_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Any_PB >*
+Parameter::mutable_any() {
+  return &any_;
+}
+
+// optional uint32 any_type = 2;
+inline bool Parameter::has_any_type() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void Parameter::set_has_any_type() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void Parameter::clear_has_any_type() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void Parameter::clear_any_type() {
+  any_type_ = 0u;
+  clear_has_any_type();
+}
+inline ::google::protobuf::uint32 Parameter::any_type() const {
+  return any_type_;
+}
+inline void Parameter::set_any_type(::google::protobuf::uint32 value) {
+  set_has_any_type();
+  any_type_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// Any_PB
+
+// optional bool boolean = 1;
+inline bool Any_PB::has_boolean() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void Any_PB::set_has_boolean() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void Any_PB::clear_has_boolean() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void Any_PB::clear_boolean() {
   boolean_ = false;
   clear_has_boolean();
 }
-inline bool Data_Container::boolean() const {
+inline bool Any_PB::boolean() const {
   return boolean_;
 }
-inline void Data_Container::set_boolean(bool value) {
+inline void Any_PB::set_boolean(bool value) {
   set_has_boolean();
   boolean_ = value;
 }
 
 // optional string str = 2;
-inline bool Data_Container::has_str() const {
+inline bool Any_PB::has_str() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void Data_Container::set_has_str() {
+inline void Any_PB::set_has_str() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void Data_Container::clear_has_str() {
+inline void Any_PB::clear_has_str() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void Data_Container::clear_str() {
+inline void Any_PB::clear_str() {
   if (str_ != &::google::protobuf::internal::kEmptyString) {
     str_->clear();
   }
   clear_has_str();
 }
-inline const ::std::string& Data_Container::str() const {
+inline const ::std::string& Any_PB::str() const {
   return *str_;
 }
-inline void Data_Container::set_str(const ::std::string& value) {
+inline void Any_PB::set_str(const ::std::string& value) {
   set_has_str();
   if (str_ == &::google::protobuf::internal::kEmptyString) {
     str_ = new ::std::string;
   }
   str_->assign(value);
 }
-inline void Data_Container::set_str(const char* value) {
+inline void Any_PB::set_str(const char* value) {
   set_has_str();
   if (str_ == &::google::protobuf::internal::kEmptyString) {
     str_ = new ::std::string;
   }
   str_->assign(value);
 }
-inline void Data_Container::set_str(const char* value, size_t size) {
+inline void Any_PB::set_str(const char* value, size_t size) {
   set_has_str();
   if (str_ == &::google::protobuf::internal::kEmptyString) {
     str_ = new ::std::string;
   }
   str_->assign(reinterpret_cast<const char*>(value), size);
 }
-inline ::std::string* Data_Container::mutable_str() {
+inline ::std::string* Any_PB::mutable_str() {
   set_has_str();
   if (str_ == &::google::protobuf::internal::kEmptyString) {
     str_ = new ::std::string;
   }
   return str_;
 }
-inline ::std::string* Data_Container::release_str() {
+inline ::std::string* Any_PB::release_str() {
   clear_has_str();
   if (str_ == &::google::protobuf::internal::kEmptyString) {
     return NULL;
@@ -1200,50 +1573,50 @@ inline ::std::string* Data_Container::release_str() {
 }
 
 // optional double numeric = 3;
-inline bool Data_Container::has_numeric() const {
+inline bool Any_PB::has_numeric() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void Data_Container::set_has_numeric() {
+inline void Any_PB::set_has_numeric() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void Data_Container::clear_has_numeric() {
+inline void Any_PB::clear_has_numeric() {
   _has_bits_[0] &= ~0x00000004u;
 }
-inline void Data_Container::clear_numeric() {
+inline void Any_PB::clear_numeric() {
   numeric_ = 0;
   clear_has_numeric();
 }
-inline double Data_Container::numeric() const {
+inline double Any_PB::numeric() const {
   return numeric_;
 }
-inline void Data_Container::set_numeric(double value) {
+inline void Any_PB::set_numeric(double value) {
   set_has_numeric();
   numeric_ = value;
 }
 
 // optional .reef.rpc.Complex_Type complex_type = 4;
-inline bool Data_Container::has_complex_type() const {
+inline bool Any_PB::has_complex_type() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
-inline void Data_Container::set_has_complex_type() {
+inline void Any_PB::set_has_complex_type() {
   _has_bits_[0] |= 0x00000008u;
 }
-inline void Data_Container::clear_has_complex_type() {
+inline void Any_PB::clear_has_complex_type() {
   _has_bits_[0] &= ~0x00000008u;
 }
-inline void Data_Container::clear_complex_type() {
+inline void Any_PB::clear_complex_type() {
   if (complex_type_ != NULL) complex_type_->::reef::rpc::Complex_Type::Clear();
   clear_has_complex_type();
 }
-inline const ::reef::rpc::Complex_Type& Data_Container::complex_type() const {
+inline const ::reef::rpc::Complex_Type& Any_PB::complex_type() const {
   return complex_type_ != NULL ? *complex_type_ : *default_instance_->complex_type_;
 }
-inline ::reef::rpc::Complex_Type* Data_Container::mutable_complex_type() {
+inline ::reef::rpc::Complex_Type* Any_PB::mutable_complex_type() {
   set_has_complex_type();
   if (complex_type_ == NULL) complex_type_ = new ::reef::rpc::Complex_Type;
   return complex_type_;
 }
-inline ::reef::rpc::Complex_Type* Data_Container::release_complex_type() {
+inline ::reef::rpc::Complex_Type* Any_PB::release_complex_type() {
   clear_has_complex_type();
   ::reef::rpc::Complex_Type* temp = complex_type_;
   complex_type_ = NULL;
@@ -1251,28 +1624,28 @@ inline ::reef::rpc::Complex_Type* Data_Container::release_complex_type() {
 }
 
 // optional .reef.rpc.Ref_Type ref_type = 5;
-inline bool Data_Container::has_ref_type() const {
+inline bool Any_PB::has_ref_type() const {
   return (_has_bits_[0] & 0x00000010u) != 0;
 }
-inline void Data_Container::set_has_ref_type() {
+inline void Any_PB::set_has_ref_type() {
   _has_bits_[0] |= 0x00000010u;
 }
-inline void Data_Container::clear_has_ref_type() {
+inline void Any_PB::clear_has_ref_type() {
   _has_bits_[0] &= ~0x00000010u;
 }
-inline void Data_Container::clear_ref_type() {
+inline void Any_PB::clear_ref_type() {
   if (ref_type_ != NULL) ref_type_->::reef::rpc::Ref_Type::Clear();
   clear_has_ref_type();
 }
-inline const ::reef::rpc::Ref_Type& Data_Container::ref_type() const {
+inline const ::reef::rpc::Ref_Type& Any_PB::ref_type() const {
   return ref_type_ != NULL ? *ref_type_ : *default_instance_->ref_type_;
 }
-inline ::reef::rpc::Ref_Type* Data_Container::mutable_ref_type() {
+inline ::reef::rpc::Ref_Type* Any_PB::mutable_ref_type() {
   set_has_ref_type();
   if (ref_type_ == NULL) ref_type_ = new ::reef::rpc::Ref_Type;
   return ref_type_;
 }
-inline ::reef::rpc::Ref_Type* Data_Container::release_ref_type() {
+inline ::reef::rpc::Ref_Type* Any_PB::release_ref_type() {
   clear_has_ref_type();
   ::reef::rpc::Ref_Type* temp = ref_type_;
   ref_type_ = NULL;
@@ -1281,80 +1654,29 @@ inline ::reef::rpc::Ref_Type* Data_Container::release_ref_type() {
 
 // -------------------------------------------------------------------
 
-// Argument
-
-// repeated .reef.rpc.Data_Container data = 1;
-inline int Argument::data_size() const {
-  return data_.size();
-}
-inline void Argument::clear_data() {
-  data_.Clear();
-}
-inline const ::reef::rpc::Data_Container& Argument::data(int index) const {
-  return data_.Get(index);
-}
-inline ::reef::rpc::Data_Container* Argument::mutable_data(int index) {
-  return data_.Mutable(index);
-}
-inline ::reef::rpc::Data_Container* Argument::add_data() {
-  return data_.Add();
-}
-inline const ::google::protobuf::RepeatedPtrField< ::reef::rpc::Data_Container >&
-Argument::data() const {
-  return data_;
-}
-inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Data_Container >*
-Argument::mutable_data() {
-  return &data_;
-}
-
-// optional uint32 coany_type = 2;
-inline bool Argument::has_coany_type() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void Argument::set_has_coany_type() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void Argument::clear_has_coany_type() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void Argument::clear_coany_type() {
-  coany_type_ = 0u;
-  clear_has_coany_type();
-}
-inline ::google::protobuf::uint32 Argument::coany_type() const {
-  return coany_type_;
-}
-inline void Argument::set_coany_type(::google::protobuf::uint32 value) {
-  set_has_coany_type();
-  coany_type_ = value;
-}
-
-// -------------------------------------------------------------------
-
 // Complex_Type
 
-// repeated .reef.rpc.Argument field = 1;
+// repeated .reef.rpc.Parameter field = 1;
 inline int Complex_Type::field_size() const {
   return field_.size();
 }
 inline void Complex_Type::clear_field() {
   field_.Clear();
 }
-inline const ::reef::rpc::Argument& Complex_Type::field(int index) const {
+inline const ::reef::rpc::Parameter& Complex_Type::field(int index) const {
   return field_.Get(index);
 }
-inline ::reef::rpc::Argument* Complex_Type::mutable_field(int index) {
+inline ::reef::rpc::Parameter* Complex_Type::mutable_field(int index) {
   return field_.Mutable(index);
 }
-inline ::reef::rpc::Argument* Complex_Type::add_field() {
+inline ::reef::rpc::Parameter* Complex_Type::add_field() {
   return field_.Add();
 }
-inline const ::google::protobuf::RepeatedPtrField< ::reef::rpc::Argument >&
+inline const ::google::protobuf::RepeatedPtrField< ::reef::rpc::Parameter >&
 Complex_Type::field() const {
   return field_;
 }
-inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Argument >*
+inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Parameter >*
 Complex_Type::mutable_field() {
   return &field_;
 }
@@ -1488,574 +1810,62 @@ inline ::std::string* Ref_Type::release_instance_type() {
   }
 }
 
-// optional string owner_ip = 5;
-inline bool Ref_Type::has_owner_ip() const {
+// optional string owner_endpoint = 5;
+inline bool Ref_Type::has_owner_endpoint() const {
   return (_has_bits_[0] & 0x00000010u) != 0;
 }
-inline void Ref_Type::set_has_owner_ip() {
+inline void Ref_Type::set_has_owner_endpoint() {
   _has_bits_[0] |= 0x00000010u;
 }
-inline void Ref_Type::clear_has_owner_ip() {
+inline void Ref_Type::clear_has_owner_endpoint() {
   _has_bits_[0] &= ~0x00000010u;
 }
-inline void Ref_Type::clear_owner_ip() {
-  if (owner_ip_ != &::google::protobuf::internal::kEmptyString) {
-    owner_ip_->clear();
+inline void Ref_Type::clear_owner_endpoint() {
+  if (owner_endpoint_ != &::google::protobuf::internal::kEmptyString) {
+    owner_endpoint_->clear();
   }
-  clear_has_owner_ip();
+  clear_has_owner_endpoint();
 }
-inline const ::std::string& Ref_Type::owner_ip() const {
-  return *owner_ip_;
+inline const ::std::string& Ref_Type::owner_endpoint() const {
+  return *owner_endpoint_;
 }
-inline void Ref_Type::set_owner_ip(const ::std::string& value) {
-  set_has_owner_ip();
-  if (owner_ip_ == &::google::protobuf::internal::kEmptyString) {
-    owner_ip_ = new ::std::string;
+inline void Ref_Type::set_owner_endpoint(const ::std::string& value) {
+  set_has_owner_endpoint();
+  if (owner_endpoint_ == &::google::protobuf::internal::kEmptyString) {
+    owner_endpoint_ = new ::std::string;
   }
-  owner_ip_->assign(value);
+  owner_endpoint_->assign(value);
 }
-inline void Ref_Type::set_owner_ip(const char* value) {
-  set_has_owner_ip();
-  if (owner_ip_ == &::google::protobuf::internal::kEmptyString) {
-    owner_ip_ = new ::std::string;
+inline void Ref_Type::set_owner_endpoint(const char* value) {
+  set_has_owner_endpoint();
+  if (owner_endpoint_ == &::google::protobuf::internal::kEmptyString) {
+    owner_endpoint_ = new ::std::string;
   }
-  owner_ip_->assign(value);
+  owner_endpoint_->assign(value);
 }
-inline void Ref_Type::set_owner_ip(const char* value, size_t size) {
-  set_has_owner_ip();
-  if (owner_ip_ == &::google::protobuf::internal::kEmptyString) {
-    owner_ip_ = new ::std::string;
+inline void Ref_Type::set_owner_endpoint(const char* value, size_t size) {
+  set_has_owner_endpoint();
+  if (owner_endpoint_ == &::google::protobuf::internal::kEmptyString) {
+    owner_endpoint_ = new ::std::string;
   }
-  owner_ip_->assign(reinterpret_cast<const char*>(value), size);
+  owner_endpoint_->assign(reinterpret_cast<const char*>(value), size);
 }
-inline ::std::string* Ref_Type::mutable_owner_ip() {
-  set_has_owner_ip();
-  if (owner_ip_ == &::google::protobuf::internal::kEmptyString) {
-    owner_ip_ = new ::std::string;
+inline ::std::string* Ref_Type::mutable_owner_endpoint() {
+  set_has_owner_endpoint();
+  if (owner_endpoint_ == &::google::protobuf::internal::kEmptyString) {
+    owner_endpoint_ = new ::std::string;
   }
-  return owner_ip_;
+  return owner_endpoint_;
 }
-inline ::std::string* Ref_Type::release_owner_ip() {
-  clear_has_owner_ip();
-  if (owner_ip_ == &::google::protobuf::internal::kEmptyString) {
+inline ::std::string* Ref_Type::release_owner_endpoint() {
+  clear_has_owner_endpoint();
+  if (owner_endpoint_ == &::google::protobuf::internal::kEmptyString) {
     return NULL;
   } else {
-    ::std::string* temp = owner_ip_;
-    owner_ip_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    ::std::string* temp = owner_endpoint_;
+    owner_endpoint_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
     return temp;
   }
-}
-
-// -------------------------------------------------------------------
-
-// Message_Member
-
-// required uint32 facet_idx = 1;
-inline bool Message_Member::has_facet_idx() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void Message_Member::set_has_facet_idx() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void Message_Member::clear_has_facet_idx() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void Message_Member::clear_facet_idx() {
-  facet_idx_ = 0u;
-  clear_has_facet_idx();
-}
-inline ::google::protobuf::uint32 Message_Member::facet_idx() const {
-  return facet_idx_;
-}
-inline void Message_Member::set_facet_idx(::google::protobuf::uint32 value) {
-  set_has_facet_idx();
-  facet_idx_ = value;
-}
-
-// required uint32 member_idx = 2;
-inline bool Message_Member::has_member_idx() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void Message_Member::set_has_member_idx() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void Message_Member::clear_has_member_idx() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void Message_Member::clear_member_idx() {
-  member_idx_ = 0u;
-  clear_has_member_idx();
-}
-inline ::google::protobuf::uint32 Message_Member::member_idx() const {
-  return member_idx_;
-}
-inline void Message_Member::set_member_idx(::google::protobuf::uint32 value) {
-  set_has_member_idx();
-  member_idx_ = value;
-}
-
-// required int32 type_depth = 3;
-inline bool Message_Member::has_type_depth() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void Message_Member::set_has_type_depth() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void Message_Member::clear_has_type_depth() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void Message_Member::clear_type_depth() {
-  type_depth_ = 0;
-  clear_has_type_depth();
-}
-inline ::google::protobuf::int32 Message_Member::type_depth() const {
-  return type_depth_;
-}
-inline void Message_Member::set_type_depth(::google::protobuf::int32 value) {
-  set_has_type_depth();
-  type_depth_ = value;
-}
-
-// repeated .reef.rpc.Argument arguments = 4;
-inline int Message_Member::arguments_size() const {
-  return arguments_.size();
-}
-inline void Message_Member::clear_arguments() {
-  arguments_.Clear();
-}
-inline const ::reef::rpc::Argument& Message_Member::arguments(int index) const {
-  return arguments_.Get(index);
-}
-inline ::reef::rpc::Argument* Message_Member::mutable_arguments(int index) {
-  return arguments_.Mutable(index);
-}
-inline ::reef::rpc::Argument* Message_Member::add_arguments() {
-  return arguments_.Add();
-}
-inline const ::google::protobuf::RepeatedPtrField< ::reef::rpc::Argument >&
-Message_Member::arguments() const {
-  return arguments_;
-}
-inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Argument >*
-Message_Member::mutable_arguments() {
-  return &arguments_;
-}
-
-// -------------------------------------------------------------------
-
-// Message_New_Inst
-
-// required string new_instance_type = 1;
-inline bool Message_New_Inst::has_new_instance_type() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void Message_New_Inst::set_has_new_instance_type() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void Message_New_Inst::clear_has_new_instance_type() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void Message_New_Inst::clear_new_instance_type() {
-  if (new_instance_type_ != &::google::protobuf::internal::kEmptyString) {
-    new_instance_type_->clear();
-  }
-  clear_has_new_instance_type();
-}
-inline const ::std::string& Message_New_Inst::new_instance_type() const {
-  return *new_instance_type_;
-}
-inline void Message_New_Inst::set_new_instance_type(const ::std::string& value) {
-  set_has_new_instance_type();
-  if (new_instance_type_ == &::google::protobuf::internal::kEmptyString) {
-    new_instance_type_ = new ::std::string;
-  }
-  new_instance_type_->assign(value);
-}
-inline void Message_New_Inst::set_new_instance_type(const char* value) {
-  set_has_new_instance_type();
-  if (new_instance_type_ == &::google::protobuf::internal::kEmptyString) {
-    new_instance_type_ = new ::std::string;
-  }
-  new_instance_type_->assign(value);
-}
-inline void Message_New_Inst::set_new_instance_type(const char* value, size_t size) {
-  set_has_new_instance_type();
-  if (new_instance_type_ == &::google::protobuf::internal::kEmptyString) {
-    new_instance_type_ = new ::std::string;
-  }
-  new_instance_type_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* Message_New_Inst::mutable_new_instance_type() {
-  set_has_new_instance_type();
-  if (new_instance_type_ == &::google::protobuf::internal::kEmptyString) {
-    new_instance_type_ = new ::std::string;
-  }
-  return new_instance_type_;
-}
-inline ::std::string* Message_New_Inst::release_new_instance_type() {
-  clear_has_new_instance_type();
-  if (new_instance_type_ == &::google::protobuf::internal::kEmptyString) {
-    return NULL;
-  } else {
-    ::std::string* temp = new_instance_type_;
-    new_instance_type_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-    return temp;
-  }
-}
-
-// -------------------------------------------------------------------
-
-// Message_Find_Inst
-
-// required string key = 1;
-inline bool Message_Find_Inst::has_key() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void Message_Find_Inst::set_has_key() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void Message_Find_Inst::clear_has_key() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void Message_Find_Inst::clear_key() {
-  if (key_ != &::google::protobuf::internal::kEmptyString) {
-    key_->clear();
-  }
-  clear_has_key();
-}
-inline const ::std::string& Message_Find_Inst::key() const {
-  return *key_;
-}
-inline void Message_Find_Inst::set_key(const ::std::string& value) {
-  set_has_key();
-  if (key_ == &::google::protobuf::internal::kEmptyString) {
-    key_ = new ::std::string;
-  }
-  key_->assign(value);
-}
-inline void Message_Find_Inst::set_key(const char* value) {
-  set_has_key();
-  if (key_ == &::google::protobuf::internal::kEmptyString) {
-    key_ = new ::std::string;
-  }
-  key_->assign(value);
-}
-inline void Message_Find_Inst::set_key(const char* value, size_t size) {
-  set_has_key();
-  if (key_ == &::google::protobuf::internal::kEmptyString) {
-    key_ = new ::std::string;
-  }
-  key_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* Message_Find_Inst::mutable_key() {
-  set_has_key();
-  if (key_ == &::google::protobuf::internal::kEmptyString) {
-    key_ = new ::std::string;
-  }
-  return key_;
-}
-inline ::std::string* Message_Find_Inst::release_key() {
-  clear_has_key();
-  if (key_ == &::google::protobuf::internal::kEmptyString) {
-    return NULL;
-  } else {
-    ::std::string* temp = key_;
-    key_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-    return temp;
-  }
-}
-
-// -------------------------------------------------------------------
-
-// Message_Acc_Inst
-
-// required bool increment = 1;
-inline bool Message_Acc_Inst::has_increment() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void Message_Acc_Inst::set_has_increment() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void Message_Acc_Inst::clear_has_increment() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void Message_Acc_Inst::clear_increment() {
-  increment_ = false;
-  clear_has_increment();
-}
-inline bool Message_Acc_Inst::increment() const {
-  return increment_;
-}
-inline void Message_Acc_Inst::set_increment(bool value) {
-  set_has_increment();
-  increment_ = value;
-}
-
-// required uint32 instance_id = 2;
-inline bool Message_Acc_Inst::has_instance_id() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void Message_Acc_Inst::set_has_instance_id() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void Message_Acc_Inst::clear_has_instance_id() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void Message_Acc_Inst::clear_instance_id() {
-  instance_id_ = 0u;
-  clear_has_instance_id();
-}
-inline ::google::protobuf::uint32 Message_Acc_Inst::instance_id() const {
-  return instance_id_;
-}
-inline void Message_Acc_Inst::set_instance_id(::google::protobuf::uint32 value) {
-  set_has_instance_id();
-  instance_id_ = value;
-}
-
-// -------------------------------------------------------------------
-
-// Message
-
-// required .reef.rpc.Message.Type msg_type = 1;
-inline bool Message::has_msg_type() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void Message::set_has_msg_type() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void Message::clear_has_msg_type() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void Message::clear_msg_type() {
-  msg_type_ = 0;
-  clear_has_msg_type();
-}
-inline ::reef::rpc::Message_Type Message::msg_type() const {
-  return static_cast< ::reef::rpc::Message_Type >(msg_type_);
-}
-inline void Message::set_msg_type(::reef::rpc::Message_Type value) {
-  GOOGLE_DCHECK(::reef::rpc::Message_Type_IsValid(value));
-  set_has_msg_type();
-  msg_type_ = value;
-}
-
-// required uint32 instance_id = 2;
-inline bool Message::has_instance_id() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void Message::set_has_instance_id() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void Message::clear_has_instance_id() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void Message::clear_instance_id() {
-  instance_id_ = 0u;
-  clear_has_instance_id();
-}
-inline ::google::protobuf::uint32 Message::instance_id() const {
-  return instance_id_;
-}
-inline void Message::set_instance_id(::google::protobuf::uint32 value) {
-  set_has_instance_id();
-  instance_id_ = value;
-}
-
-// required bool has_return = 3;
-inline bool Message::has_has_return() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void Message::set_has_has_return() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void Message::clear_has_has_return() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void Message::clear_has_return() {
-  has_return_ = false;
-  clear_has_has_return();
-}
-inline bool Message::has_return() const {
-  return has_return_;
-}
-inline void Message::set_has_return(bool value) {
-  set_has_has_return();
-  has_return_ = value;
-}
-
-// required string referer_ip = 4;
-inline bool Message::has_referer_ip() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
-}
-inline void Message::set_has_referer_ip() {
-  _has_bits_[0] |= 0x00000008u;
-}
-inline void Message::clear_has_referer_ip() {
-  _has_bits_[0] &= ~0x00000008u;
-}
-inline void Message::clear_referer_ip() {
-  if (referer_ip_ != &::google::protobuf::internal::kEmptyString) {
-    referer_ip_->clear();
-  }
-  clear_has_referer_ip();
-}
-inline const ::std::string& Message::referer_ip() const {
-  return *referer_ip_;
-}
-inline void Message::set_referer_ip(const ::std::string& value) {
-  set_has_referer_ip();
-  if (referer_ip_ == &::google::protobuf::internal::kEmptyString) {
-    referer_ip_ = new ::std::string;
-  }
-  referer_ip_->assign(value);
-}
-inline void Message::set_referer_ip(const char* value) {
-  set_has_referer_ip();
-  if (referer_ip_ == &::google::protobuf::internal::kEmptyString) {
-    referer_ip_ = new ::std::string;
-  }
-  referer_ip_->assign(value);
-}
-inline void Message::set_referer_ip(const char* value, size_t size) {
-  set_has_referer_ip();
-  if (referer_ip_ == &::google::protobuf::internal::kEmptyString) {
-    referer_ip_ = new ::std::string;
-  }
-  referer_ip_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* Message::mutable_referer_ip() {
-  set_has_referer_ip();
-  if (referer_ip_ == &::google::protobuf::internal::kEmptyString) {
-    referer_ip_ = new ::std::string;
-  }
-  return referer_ip_;
-}
-inline ::std::string* Message::release_referer_ip() {
-  clear_has_referer_ip();
-  if (referer_ip_ == &::google::protobuf::internal::kEmptyString) {
-    return NULL;
-  } else {
-    ::std::string* temp = referer_ip_;
-    referer_ip_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-    return temp;
-  }
-}
-
-// optional .reef.rpc.Message_New_Inst msg_new_inst = 5;
-inline bool Message::has_msg_new_inst() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
-}
-inline void Message::set_has_msg_new_inst() {
-  _has_bits_[0] |= 0x00000010u;
-}
-inline void Message::clear_has_msg_new_inst() {
-  _has_bits_[0] &= ~0x00000010u;
-}
-inline void Message::clear_msg_new_inst() {
-  if (msg_new_inst_ != NULL) msg_new_inst_->::reef::rpc::Message_New_Inst::Clear();
-  clear_has_msg_new_inst();
-}
-inline const ::reef::rpc::Message_New_Inst& Message::msg_new_inst() const {
-  return msg_new_inst_ != NULL ? *msg_new_inst_ : *default_instance_->msg_new_inst_;
-}
-inline ::reef::rpc::Message_New_Inst* Message::mutable_msg_new_inst() {
-  set_has_msg_new_inst();
-  if (msg_new_inst_ == NULL) msg_new_inst_ = new ::reef::rpc::Message_New_Inst;
-  return msg_new_inst_;
-}
-inline ::reef::rpc::Message_New_Inst* Message::release_msg_new_inst() {
-  clear_has_msg_new_inst();
-  ::reef::rpc::Message_New_Inst* temp = msg_new_inst_;
-  msg_new_inst_ = NULL;
-  return temp;
-}
-
-// optional .reef.rpc.Message_Acc_Inst msg_acc_inst = 6;
-inline bool Message::has_msg_acc_inst() const {
-  return (_has_bits_[0] & 0x00000020u) != 0;
-}
-inline void Message::set_has_msg_acc_inst() {
-  _has_bits_[0] |= 0x00000020u;
-}
-inline void Message::clear_has_msg_acc_inst() {
-  _has_bits_[0] &= ~0x00000020u;
-}
-inline void Message::clear_msg_acc_inst() {
-  if (msg_acc_inst_ != NULL) msg_acc_inst_->::reef::rpc::Message_Acc_Inst::Clear();
-  clear_has_msg_acc_inst();
-}
-inline const ::reef::rpc::Message_Acc_Inst& Message::msg_acc_inst() const {
-  return msg_acc_inst_ != NULL ? *msg_acc_inst_ : *default_instance_->msg_acc_inst_;
-}
-inline ::reef::rpc::Message_Acc_Inst* Message::mutable_msg_acc_inst() {
-  set_has_msg_acc_inst();
-  if (msg_acc_inst_ == NULL) msg_acc_inst_ = new ::reef::rpc::Message_Acc_Inst;
-  return msg_acc_inst_;
-}
-inline ::reef::rpc::Message_Acc_Inst* Message::release_msg_acc_inst() {
-  clear_has_msg_acc_inst();
-  ::reef::rpc::Message_Acc_Inst* temp = msg_acc_inst_;
-  msg_acc_inst_ = NULL;
-  return temp;
-}
-
-// optional .reef.rpc.Message_Find_Inst msg_find_inst = 7;
-inline bool Message::has_msg_find_inst() const {
-  return (_has_bits_[0] & 0x00000040u) != 0;
-}
-inline void Message::set_has_msg_find_inst() {
-  _has_bits_[0] |= 0x00000040u;
-}
-inline void Message::clear_has_msg_find_inst() {
-  _has_bits_[0] &= ~0x00000040u;
-}
-inline void Message::clear_msg_find_inst() {
-  if (msg_find_inst_ != NULL) msg_find_inst_->::reef::rpc::Message_Find_Inst::Clear();
-  clear_has_msg_find_inst();
-}
-inline const ::reef::rpc::Message_Find_Inst& Message::msg_find_inst() const {
-  return msg_find_inst_ != NULL ? *msg_find_inst_ : *default_instance_->msg_find_inst_;
-}
-inline ::reef::rpc::Message_Find_Inst* Message::mutable_msg_find_inst() {
-  set_has_msg_find_inst();
-  if (msg_find_inst_ == NULL) msg_find_inst_ = new ::reef::rpc::Message_Find_Inst;
-  return msg_find_inst_;
-}
-inline ::reef::rpc::Message_Find_Inst* Message::release_msg_find_inst() {
-  clear_has_msg_find_inst();
-  ::reef::rpc::Message_Find_Inst* temp = msg_find_inst_;
-  msg_find_inst_ = NULL;
-  return temp;
-}
-
-// optional .reef.rpc.Message_Member msg_member = 8;
-inline bool Message::has_msg_member() const {
-  return (_has_bits_[0] & 0x00000080u) != 0;
-}
-inline void Message::set_has_msg_member() {
-  _has_bits_[0] |= 0x00000080u;
-}
-inline void Message::clear_has_msg_member() {
-  _has_bits_[0] &= ~0x00000080u;
-}
-inline void Message::clear_msg_member() {
-  if (msg_member_ != NULL) msg_member_->::reef::rpc::Message_Member::Clear();
-  clear_has_msg_member();
-}
-inline const ::reef::rpc::Message_Member& Message::msg_member() const {
-  return msg_member_ != NULL ? *msg_member_ : *default_instance_->msg_member_;
-}
-inline ::reef::rpc::Message_Member* Message::mutable_msg_member() {
-  set_has_msg_member();
-  if (msg_member_ == NULL) msg_member_ = new ::reef::rpc::Message_Member;
-  return msg_member_;
-}
-inline ::reef::rpc::Message_Member* Message::release_msg_member() {
-  clear_has_msg_member();
-  ::reef::rpc::Message_Member* temp = msg_member_;
-  msg_member_ = NULL;
-  return temp;
 }
 
 
@@ -2069,12 +1879,12 @@ namespace google {
 namespace protobuf {
 
 template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::reef::rpc::Ref_Type_Owner>() {
-  return ::reef::rpc::Ref_Type_Owner_descriptor();
-}
-template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::reef::rpc::Message_Type>() {
   return ::reef::rpc::Message_Type_descriptor();
+}
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::reef::rpc::Ref_Type_Owner>() {
+  return ::reef::rpc::Ref_Type_Owner_descriptor();
 }
 
 }  // namespace google

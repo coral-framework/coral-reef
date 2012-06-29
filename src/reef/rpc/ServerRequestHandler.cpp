@@ -7,7 +7,8 @@
 namespace reef {
 namespace rpc {
 
-ServerRequestHandler::ServerRequestHandler( IPassiveLink* link ) : _link( link )
+ServerRequestHandler::ServerRequestHandler( IPassiveLink* link, const std::string& publicEndpoint ) 
+        : _link( link ), _publicEndpoint( publicEndpoint )
 {
     assert( _link.get() );
 }
@@ -16,13 +17,15 @@ ServerRequestHandler::~ServerRequestHandler()
 {
 }
     
-void ServerRequestHandler::react( Invoker* invoker )
+void ServerRequestHandler::react()
 {
+    assert( _invoker && _link.get() );
+    
     std::string msg;
     if( !_link->receive( msg ) )
         return;
     
-    invoker->dispatchInvocation( msg );
+    _invoker->dispatchInvocation( msg );
 }
 
 void ServerRequestHandler::reply( const std::string& reply )

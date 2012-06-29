@@ -33,7 +33,7 @@ function test()
 	
 	EXPECT_EQ( refTypesServiceIn1.simple, simpleTypesServiceIn2 )
 	
-	local localInstanceIn1 = setup:getNode( 1 ):getInstance( 1 )
+	local localInstanceIn1 = setup:getNode( 1 ):getInstance( 0 )
 	localInstanceIn1.simple.storedInt = 10
 	
 	EXPECT_EQ( refTypesServiceIn2.simple.storedInt, 10 )

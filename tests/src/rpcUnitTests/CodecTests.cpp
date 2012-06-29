@@ -10,6 +10,14 @@
 #include <co/IInterface.h>
 #include <co/ITypeManager.h>
 
+#define INT1 10
+#define INT2 20
+#define INT3 30
+#define INT4 40
+#define BOOL1 true
+#define DOUBLE1 10.0
+#define STRING1 "string1"
+#define STRING2 "string2"
 
 namespace reef {
 namespace rpc {
@@ -22,7 +30,16 @@ static void fillUint8Array( const T value, std::vector<co::uint8>& dest, co::int
     toCast[i] = value;
 }
 
-typedef Demarshaller::MsgType MsgType;
+bool compareDetails( InvocationDetails& det1, InvocationDetails& det2 )
+{
+    bool result = true;
+    result = result && det1.instanceID == det2.instanceID;
+    result = result && det1.facetIdx == det2.facetIdx;
+    result = result && det1.memberIdx == det2.memberIdx;
+    result = result && det1.typeDepth == det2.typeDepth;
+    result = result && det1.hasReturn == det2.hasReturn;
+    return result;
+}
     
 TEST( CodecTests, simpleTypesTest )
 {
@@ -31,68 +48,53 @@ TEST( CodecTests, simpleTypesTest )
     
     // parameters common to message types
     std::string msg;
-    std::string referer;
-    MsgType msgType;
-    bool hasReturn;
-    co::int32 msgReceiverID;
-    co::int32 instanceId;
+    std::string requester;
+    MessageType msgType;
     
+    std::string instanceType;
+    marshaller.marshalNew( STRING1, STRING2, msg );
+    msgType = demarshaller.demarshal( msg );
+    demarshaller.getNew( requester, instanceType );
     
-    // ------ new inst
-    std::string typeName;
+    EXPECT_EQ( msgType, REQUEST_NEW );
+    EXPECT_STREQ( requester.c_str(), STRING1 );
+    EXPECT_STREQ( instanceType.c_str(), STRING2 );
     
-    marshaller.marshalNewInstance( "test", "address", msg );
-    demarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
-    
-    EXPECT_EQ( msgType, Demarshaller::NEW_INST );
-    EXPECT_EQ( msgReceiverID, 0 );
-    EXPECT_TRUE( hasReturn );
-    
-    EXPECT_NO_THROW( demarshaller.demarshalNewInstance( typeName , referer ) );
-    EXPECT_STREQ( referer.c_str(), "address" );
-    EXPECT_STREQ( typeName.c_str(), "test" );
-    
-    marshaller.marshalFindInstance( "key", "address2", msg );
-    demarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
-    
-    EXPECT_EQ( msgType, Demarshaller::FIND_INST );
-    EXPECT_EQ( msgReceiverID, 0 );
-    EXPECT_TRUE( hasReturn );
-
     std::string key;
+    marshaller.marshalLookup( STRING1, STRING2, msg );
+    msgType = demarshaller.demarshal( msg );
+    demarshaller.getLookup( requester, key );
     
-    EXPECT_NO_THROW( demarshaller.demarshalFindInstance( key, referer ) );
-    EXPECT_STREQ( referer.c_str(), "address2" );
-    EXPECT_STREQ( key.c_str(), "key" );
-   
-    // ------ accessinst
-    bool increment;
+    EXPECT_EQ( msgType, REQUEST_LOOKUP );
+    EXPECT_STREQ( requester.c_str(), STRING1 );
+    EXPECT_STREQ( key.c_str(), STRING2 );
+
+    co::int32 leaseInstanceID;
+    marshaller.marshalLease( STRING1, INT1, msg );
+    msgType = demarshaller.demarshal( msg );
+    demarshaller.getLease( requester, leaseInstanceID );
     
-    marshaller.marshalAccessInstance( 5, true, "address3", msg );
-    demarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
+    EXPECT_EQ( msgType, REQUEST_LEASE );
+    EXPECT_STREQ( requester.c_str(), STRING1 );
+    EXPECT_EQ( leaseInstanceID, INT1 );
     
-    EXPECT_EQ( msgType, Demarshaller::ACCESS_INST );
-    EXPECT_EQ( msgReceiverID, 0 );
-    EXPECT_FALSE( hasReturn );
+    marshaller.marshalCancelLease( STRING1, INT2, msg );
+    msgType = demarshaller.demarshal( msg );
+    demarshaller.getLease( requester, leaseInstanceID );
     
-    EXPECT_NO_THROW( demarshaller.demarshalAccessInstance( instanceId, increment, referer ) );
-    EXPECT_STREQ( referer.c_str(), "address3" );
-    EXPECT_EQ( instanceId, 5 );
-    EXPECT_TRUE( increment );
+    EXPECT_EQ( msgType, REQUEST_CANCEL_LEASE );
+    EXPECT_STREQ( requester.c_str(), STRING1 );
+    EXPECT_EQ( leaseInstanceID, INT2 );
     
     // ------ call value types TODO:Complex types
-    co::int32 facetIdx;
-    co::int32 memberIdx;
-    co::int32 memberOwner;
-    std::string caller;
     
     // all the possible parameter types
-    co::Any intAny; intAny.set<co::int32>( 6 );
-    co::Any doubleAny; doubleAny.set<double>( 6.0 );
+    co::Any intAny; intAny.set<co::int32>( INT1 );
+    co::Any doubleAny; doubleAny.set<double>( DOUBLE1 );
     co::Any stringParam;
     std::string& stringParamString = stringParam.createString();
-    stringParamString = "hello";
-    co::Any boolAny; boolAny.set<bool>( true );
+    stringParamString = STRING1;
+    co::Any boolAny; boolAny.set<bool>( BOOL1 );
     co::Any intArrayAny;
     co::Any stringArrayAny;
     std::vector<co::uint8>& intArray = intArrayAny.createArray( co::getType( "int32" ), 10 );
@@ -106,25 +108,23 @@ TEST( CodecTests, simpleTypesTest )
 		fillUint8Array<co::int32>( i, intArray, i );
 	}
     
-    marshaller.beginCallMarshalling( 3, 4, 5, 6, true, caller );
-    marshaller.addValueParam( intAny );
-    marshaller.addValueParam( doubleAny );
-    marshaller.addValueParam( stringParam );
-    marshaller.addValueParam( boolAny );
-    marshaller.addValueParam( intArrayAny );
-    marshaller.addValueParam( stringArrayAny );
-    marshaller.getMarshalledCall( msg );
+    InvocationDetails details( INT1, INT2, INT3, INT4, BOOL1 );
+    ParameterPusher& pusher = marshaller.beginInvocation( STRING1, details );
+    pusher.pushValue( intAny );
+    pusher.pushValue( doubleAny );
+    pusher.pushValue( stringParam );
+    pusher.pushValue( boolAny );
+    pusher.pushValue( intArrayAny );
+    pusher.pushValue( stringArrayAny );
+    marshaller.marshalInvocation( msg );
     
-    demarshaller.setMarshalledRequest( msg, msgType, msgReceiverID, hasReturn );
+    msgType = demarshaller.demarshal( msg );
     
-    EXPECT_EQ( msgType, Demarshaller::CALL );
-    EXPECT_EQ( msgReceiverID, 3 );
-    EXPECT_TRUE( hasReturn );
+    EXPECT_EQ( msgType, INVOCATION );
     
-    demarshaller.beginDemarshallingCall( facetIdx, memberIdx, memberOwner, caller );
-    EXPECT_EQ( facetIdx, 4 );
-    EXPECT_EQ( memberIdx, 5 );
-    EXPECT_EQ( memberOwner, 6 );
+    InvocationDetails details2;
+    ParameterPuller& puller = demarshaller.getInvocation( requester, details2 );
+    EXPECT_TRUE( compareDetails( details, details2 ) );
     
     co::IType* intType = co::getType( "int32" );
     co::IType* doubleType = co::getType( "double" );
@@ -135,18 +135,24 @@ TEST( CodecTests, simpleTypesTest )
     
     
     co::Any param;
-    demarshaller.demarshalValueParam( param, intType );
-    EXPECT_EQ( param.get<co::int32>(), 6 );
-    demarshaller.demarshalValueParam( param, doubleType );
-    EXPECT_EQ( param.get<double>(), 6.0 );
-    demarshaller.demarshalValueParam( param, stringType );
-    EXPECT_STREQ( param.get<const std::string&>().c_str(), "hello" );
-    demarshaller.demarshalValueParam( param, boolType );
-    EXPECT_TRUE( param.get<bool>() );
+    
+    puller.pullValue( intType, param );
+    EXPECT_EQ( param.get<co::int32>(), INT1 );
+    
+    puller.pullValue( doubleType, param );
+    EXPECT_EQ( param.get<double>(), DOUBLE1 );
+    
+    puller.pullValue( stringType, param );
+    EXPECT_STREQ( param.get<const std::string&>().c_str(), STRING1 );
+    
+    puller.pullValue( boolType, param );
+    EXPECT_EQ( param.get<bool>(), BOOL1 );
+    
     co::Any intArrayParam;
-    demarshaller.demarshalValueParam( intArrayParam, intArrayType );
+    puller.pullValue( intArrayType, intArrayParam );
+    
     co::Any stringArrayParam;
-    demarshaller.demarshalValueParam( stringArrayParam, stringArrayType );
+    puller.pullValue( stringArrayType, stringArrayParam );
     
     const co::Range<const co::int32> intRange = intArrayParam.get<const co::Range<const co::int32> >();
     const co::Range<const std::string> stringRange = stringArrayParam.get<const co::Range<const std::string> >();
@@ -161,28 +167,35 @@ TEST( CodecTests, simpleTypesTest )
 
 	// Test rogue values methods
 	co::Any value;
-    marshaller.marshalValueType( intAny, msg );
-	demarshaller.demarshalValue( msg, intType, value );
-	EXPECT_EQ( value.get<co::int32>(), 6 );
+    marshaller.marshalValueTypeReturn( intAny, msg );
+	demarshaller.demarshal( msg );
+    demarshaller.getValueTypeReturn( intType, value );
+	EXPECT_EQ( value.get<co::int32>(), INT1 );
 
-	marshaller.marshalValueType( doubleAny, msg );
-	demarshaller.demarshalValue( msg, doubleType, value );
-	EXPECT_EQ( value.get<double>(), 6.0 );
+	marshaller.marshalValueTypeReturn( doubleAny, msg );
+	demarshaller.demarshal( msg );
+    demarshaller.getValueTypeReturn( doubleType, value );
+	EXPECT_EQ( value.get<double>(), DOUBLE1 );
 
-	marshaller.marshalValueType( stringParam, msg );
-	demarshaller.demarshalValue( msg, stringType, value );
-	EXPECT_STREQ( value.get<const std::string&>().c_str(), "hello" );
+	marshaller.marshalValueTypeReturn( stringParam, msg );
+	demarshaller.demarshal( msg );
+    demarshaller.getValueTypeReturn( stringType, value );
+	EXPECT_STREQ( value.get<const std::string&>().c_str(), STRING1 );
 
-	marshaller.marshalValueType( boolAny, msg );
-	demarshaller.demarshalValue( msg, boolType, value );
-	EXPECT_TRUE( value.get<bool>() );
+	marshaller.marshalValueTypeReturn( boolAny, msg );
+	demarshaller.demarshal( msg );
+    demarshaller.getValueTypeReturn( boolType, value );
+	EXPECT_EQ( param.get<bool>(), BOOL1 );
 
 	co::Any intArrayValue;
-	marshaller.marshalValueType( intArrayAny, msg );
-	demarshaller.demarshalValue( msg, intArrayType, intArrayValue );
+	marshaller.marshalValueTypeReturn( intArrayAny, msg );
+	demarshaller.demarshal( msg );
+    demarshaller.getValueTypeReturn( intArrayType, intArrayValue );
+    
 	co::Any stringArrayValue;
-	marshaller.marshalValueType( stringArrayAny, msg );
-	demarshaller.demarshalValue( msg, stringArrayType, stringArrayValue );
+	marshaller.marshalValueTypeReturn( stringArrayAny, msg );
+	demarshaller.demarshal( msg );
+    demarshaller.getValueTypeReturn( stringArrayType, stringArrayValue );
 
 	const co::Range<const co::int32> intRange2 = intArrayValue.get<const co::Range<const co::int32> >();
     const co::Range<const std::string> stringRange2 = stringArrayValue.get<const co::Range<const std::string> >();

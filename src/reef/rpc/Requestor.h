@@ -49,7 +49,7 @@ class Requestor : public co::RefCounted
 {
 public:
     Requestor( RequestorManager* manager, ClientRequestHandler* handler, 
-              const std::string& localEndpoint );
+              const std::string& publicEndpoint );
     
     // In case the node has been stopped, but the client proxies are still alive. If the requestor
     // is just deleted, then, a cancelLease call from a client proxy will result in an error.
@@ -109,12 +109,13 @@ public:
     
 private:
     
-    void marshalParameters( co::IMethod* method, co::Range<co::Any const> args );
+    void pushParameters( co::IMethod* method, co::Range<co::Any const> args, 
+                           ParameterPusher& pusher );
     
-    // Extracts and marshals all the necessary info from \param param.
-    void marshalProviderInfo( co::IService* param );
+    // Extracts all the necessary info from \param param and saves it on \param refType.
+    void getProviderInfo( co::IService* param, ReferenceType& refType );
     
-    void demarshalReturn( const std::string& data, co::IType* returnedType, co::Any& ret );
+    void getReturn( const std::string& data, co::IType* returnedType, co::Any& ret );
 
 private:
         
@@ -124,12 +125,11 @@ private:
     std::map<co::int32, ClientProxy*> _proxies;
     
     bool _connected;
-    Node* _node;
-    InstanceManager* _instanceMan;
     RequestorManager* _manager;
     ClientRequestHandler* _handler;
+    InstanceManager* _instanceMan;
     std::string _endpoint;
-    std::string _localEndpoint;
+    std::string _publicEndpoint;
     
     co::RefPtr<co::IObject> _tempRef; //TODO remove
 };

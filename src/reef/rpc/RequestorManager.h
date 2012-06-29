@@ -11,13 +11,13 @@ class Node;
 class Requestor;
 class ITransport;
 class InstanceManager;
+class ServerRequestHandler;
 
 class RequestorManager
 {
 public:
     
-    RequestorManager( Node* node, InstanceManager* instanceMan, ITransport* transport, 
-                     const std::string& localEndpoint );
+    RequestorManager( InstanceManager* instanceMan, ITransport* transp, ServerRequestHandler* srh );
     
     ~RequestorManager();
     
@@ -25,13 +25,12 @@ public:
     
     void onRequestorDestroyed( const std::string& endpoint );
     
-    inline Node* getNode() { return _node; }
     inline InstanceManager* getInstanceManager() { return _instanceMan; }
 private:
-    Node* _node;
     InstanceManager* _instanceMan;
     ITransport* _transport;
-    std::string _localEndpoint;
+    ServerRequestHandler* _srh;
+    std::string _publicEndpoint;
     std::map<std::string, Requestor*> _requestors;
 };
 

@@ -12,8 +12,8 @@ function bulkReferencing()
 		ref[i] = client:findRemoteInstance( "moduleA.TestComponent", "key"..i, "address"..i ).reference
 	end
 	
-	local clientRef = client:getInstance( 1 ).reference
-	local simple = setup:getNode( 6 ):getInstance( 1 ).simple
+	local clientRef = client:getInstance( 0 ).reference
+	local simple = setup:getNode( 6 ):getInstance( 0 ).simple
 	simple.storedInt = 6
 	
 	EXPECT_EQ( clientRef:meth1( ref[2], ref[3], ref[4], ref[5], simple ), 7 )

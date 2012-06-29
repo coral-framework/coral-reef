@@ -16,16 +16,21 @@ class Invoker;
 class ServerRequestHandler
 {
 public:
-    ServerRequestHandler( IPassiveLink* link );
+    ServerRequestHandler( IPassiveLink* link, const std::string& publicEndpoint );
     
     ~ServerRequestHandler();
     
-	void react( Invoker* invoker );
+	void react();
     
     void reply( const std::string& reply );
     
+    inline void setInvoker( Invoker* invoker ){ _invoker = invoker; }
+    inline const std::string& getPublicEndpoint(){ return _publicEndpoint; }
+    
 private:
     co::RefPtr<IPassiveLink> _link;
+    Invoker* _invoker;
+    std::string _publicEndpoint;
 };
 
 }

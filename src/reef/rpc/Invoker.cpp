@@ -22,8 +22,8 @@ namespace reef {
 namespace rpc {
 
 
-Invoker::Invoker( Node* node, InstanceManager* instanceMan, ServerRequestHandler* srh, 
-                 RequestorManager* requestorMan ) :  _node( node ), _instanceMan( instanceMan ),
+Invoker::Invoker( InstanceManager* instanceMan, ServerRequestHandler* srh, 
+                 RequestorManager* requestorMan ) : _instanceMan( instanceMan ),
                 _srh( srh ), _requestorMan( requestorMan )
 {
 }
@@ -32,124 +32,127 @@ Invoker::~Invoker()
 {
 }
 
-void Invoker::dispatchInvocation( const std::string& invocation )
+void Invoker::dispatchInvocation( const std::string& invocationData )
 {
-    co::int32 destInstanceId;
-    Demarshaller::MsgType type;
-    bool hasReturn;
-    _demarshaller.setMarshalledRequest( invocation, type, destInstanceId, hasReturn );
+    MessageType msgType = _demarshaller.demarshal( invocationData );
     
     std::string returnValue;
     
-    if( destInstanceId == 0 )
-        invokeManager( _demarshaller, type, hasReturn, returnValue );
+    if( msgType != INVOCATION )
+        invokeManager( _demarshaller, msgType, returnValue );
     else
-        invokeInstance( _demarshaller, destInstanceId, hasReturn, returnValue );
+        invokeInstance( _demarshaller, returnValue );
     
-    if( hasReturn )
+    if( !returnValue.empty() )
         _srh->reply( returnValue );
 }
 
-void Invoker::invokeManager( Demarshaller& demarshaller, Demarshaller::MsgType type, bool isSynch, 
-                   std::string& returned )
+void Invoker::invokeManager( Demarshaller& demarshaller, MessageType msgType, 
+                            std::string& returnValue )
 {
     co::int32 returnID;
-    std::string lesseeEndpoint;
+    std::string requesterEndpoint;
     
-    switch( type )
+    switch( msgType )
     {
-        case Demarshaller::NEW_INST:
+        case REQUEST_NEW:
         {
-            std::string componentName;
-            _demarshaller.demarshalNewInstance( componentName, lesseeEndpoint );
-            co::IObject* instance = co::newInstance( componentName );
-            returnID = _instanceMan->addInstance( instance, lesseeEndpoint );
+            std::string instanceType;
+            _demarshaller.getNew( requesterEndpoint, instanceType );
+            co::IObject* instance = co::newInstance( instanceType );
+            returnID = _instanceMan->addInstance( instance, requesterEndpoint );
             break;
         }
-        case Demarshaller::ACCESS_INST:
-        {
-            co::int32 instanceID;
-            bool increment;
-            
-            // REMOTINGERROR: if no instance found with the id
-            _demarshaller.demarshalAccessInstance( instanceID, increment, lesseeEndpoint );
-            if( increment )
-                _instanceMan->createLease( instanceID, lesseeEndpoint );
-            else
-                _instanceMan->cancelLease( instanceID, lesseeEndpoint );
-            
-            break;
-        }
-        case Demarshaller::FIND_INST:
+        case REQUEST_LOOKUP:
         {
             std::string key;
-            _demarshaller.demarshalFindInstance( key, lesseeEndpoint );
-            returnID = _instanceMan->findInstance( key, lesseeEndpoint );
+            _demarshaller.getLookup( requesterEndpoint, key );
+            returnID = _instanceMan->findInstance( key, requesterEndpoint );
             break;
+        }
+        case REQUEST_LEASE:
+        {
+            co::int32 instanceID;
+            
+            // REMOTINGERROR: if no instance found with the id
+            _demarshaller.getLease( requesterEndpoint, instanceID );
+            
+            _instanceMan->createLease( instanceID, requesterEndpoint );
+            return;
+        }
+        case REQUEST_CANCEL_LEASE:
+        {
+            co::int32 instanceID;
+            
+            // REMOTINGERROR: if no instance found with the id
+            _demarshaller.getLease( requesterEndpoint, instanceID );
+            
+            _instanceMan->cancelLease( instanceID, requesterEndpoint );
+            return;
         }
         default:
             assert( false );
     }
     
-    if( isSynch )
-    {
-        _marshaller.marshalData( returnID , returned );
-    }
-
+    _marshaller.marshalIntReturn( returnID , returnValue );
 }
     
-void Invoker::invokeInstance( Demarshaller& demarshaller, co::int32 instanceID, bool isSynch, 
-                             std::string& returned )
+void Invoker::invokeInstance( Demarshaller& demarshaller, std::string& returnMsg )
 {    
-    co::int32 facetIdx;
-    co::int32 memberIdx;
-    co::Any parameter;
-    co::int32 depth;
-    std::string caller;
+    std::string senderEndpoint;
+    InvocationDetails details;
     
-    demarshaller.beginDemarshallingCall( facetIdx, memberIdx, depth, caller );
+    ParameterPuller& puller = demarshaller.getInvocation( senderEndpoint, details );
     
-    InstanceContainer* container = _instanceMan->getInstance( instanceID );
+    InstanceContainer* container = _instanceMan->getInstance( details.instanceID );
     
-    co::IService* facet = container->getCachedService( facetIdx );
+    co::IService* facet = container->getCachedService( details.facetIdx );
     
     co::IInterface* memberOwner = facet->getInterface();
     
     // if method is inherited
-    if( depth != -1 )
-        memberOwner = memberOwner->getSuperTypes()[depth];
+    if( details.typeDepth != -1 )
+        memberOwner = memberOwner->getSuperTypes()[details.typeDepth];
         
     co::IReflector* reflector = memberOwner->getReflector();
-    co::IMember* member = memberOwner->getMembers()[memberIdx];
+    co::IMember* member = memberOwner->getMembers()[details.memberIdx];
     co::MemberKind kind = member->getKind();
+    
+    co::Any returnAny;
     
     if( kind == co::MK_METHOD )
     {
-        onMethod( demarshaller, facet, co::cast<co::IMethod>( member ), reflector, parameter );
-        if( !isSynch )
+        onMethod( puller, facet, co::cast<co::IMethod>( member ), reflector, returnAny );
+        if( !details.hasReturn )
             return;
     }   
     else   
     {
-        if( !isSynch )
+        if( !details.hasReturn )
         {
-            onSetField( demarshaller, facet, co::cast<co::IField>( member ), reflector );
+            onSetField( puller, facet, co::cast<co::IField>( member ), reflector );
             return;
         }
         else
         {
-            onGetField( demarshaller, facet, co::cast<co::IField>( member ), reflector, parameter );
+            onGetField( facet, co::cast<co::IField>( member ), reflector, returnAny );
         }
     }
    
     // Marshals the return from the call
-    if( parameter.getKind() != co::TK_INTERFACE )
-        _marshaller.marshalValueType( parameter, returned );
+    if( returnAny.getKind() != co::TK_INTERFACE )
+    {
+        _marshaller.marshalValueTypeReturn( returnAny, returnMsg );
+    }
     else
-        onInterfaceReturned( parameter.get<co::IService*>(), caller, returned );
+    {
+        ReferenceType refType;
+        getRefTypeInfo( returnAny.get<co::IService*>(), senderEndpoint, refType );
+        _marshaller.marshalRefTypeReturn( refType, returnMsg );
+    }
 }
 
-void Invoker::onMethod( Demarshaller& demarshaller, co::IService* facet, co::IMethod* method, 
+void Invoker::onMethod( ParameterPuller& puller, co::IService* facet, co::IMethod* method, 
                            co::IReflector* refl, co::Any& returned )
 {
     // TODO: remove this and maky the co::any's reference the objects themselves
@@ -162,100 +165,110 @@ void Invoker::onMethod( Demarshaller& demarshaller, co::IService* facet, co::IMe
     args.resize( size );
     for( int i = 0; i < size; i++ )
     {
-        demarshalParameter( demarshaller, params[i]->getType(), args[i], tempReferences );
+        co::IType* paramType = params[i]->getType();
+        if( paramType->getKind() != co::TK_INTERFACE )
+        {
+            puller.pullValue( paramType, args[i] );
+        }
+        else
+        {
+            ReferenceType refTypeInfo;
+            puller.pullReference( refTypeInfo );
+            getRefType( refTypeInfo, args[i], tempReferences );
+        }
     }
 
     refl->invoke( facet, method, args, returned );
 }
     
-void Invoker::onGetField( Demarshaller& demarshaller, co::IService* facet, co::IField* field, 
+void Invoker::onGetField( co::IService* facet, co::IField* field, 
                              co::IReflector* refl, co::Any& returned )
 {
     refl->getField( facet, field, returned );
 }
 
-void Invoker::onSetField(  Demarshaller& demarshaller, co::IService* facet, co::IField* field, 
+void Invoker::onSetField( ParameterPuller& puller, co::IService* facet, co::IField* field, 
                              co::IReflector* refl )
 {
     // TODO: remove this and maky the co::any's reference the objects themselves
     co::RefVector<co::IObject> tempReferences;
     
     co::Any value;
-    demarshalParameter( demarshaller, field->getType(), value, tempReferences );
+    
+    co::IType* fieldType = field->getType();
+    
+    if( fieldType->getKind() != co::TK_INTERFACE )
+    {
+        puller.pullValue( fieldType, value );
+    }
+    else
+    {
+        ReferenceType refTypeInfo;
+        puller.pullReference( refTypeInfo );
+        getRefType( refTypeInfo, value, tempReferences );
+    }
     
     refl->setField( facet, field, value );
 }
     
-void Invoker::demarshalParameter( Demarshaller& demarshaller, co::IType* paramType, co::Any& param, 
-                         co::RefVector<co::IObject>& tempRefs )
+void Invoker::getRefType( ReferenceType& refTypeInfo, co::Any& param, 
+                             co::RefVector<co::IObject>& tempRefs )
 {
-    if( paramType->getKind() != co::TK_INTERFACE )
-    {
-        demarshaller.demarshalValueParam( param, paramType );
-        return;
-    }
-    
-    co::int32 instanceId;
-    co::int32 facetIdx;
-    Demarshaller::RefOwner owner;
-    std::string instanceType;
-    std::string ownerAddress;
-    
-    demarshaller.demarshalReferenceParam( instanceId, facetIdx, owner, instanceType, ownerAddress );
     co::IObject* instance;
-    switch( owner )
+    switch( refTypeInfo.owner )
     {
-        case Demarshaller::RECEIVER:
-            instance = _node->getInstance( instanceId );
+        case OWNER_RECEIVER:
+            instance = _instanceMan->getInstance( refTypeInfo.instanceID )->getInstance();
             break;
-        case Demarshaller::LOCAL:
-        case Demarshaller::ANOTHER:
-            Requestor* req = _requestorMan->getOrCreateRequestor( ownerAddress );
-            instance = req->getOrCreateProxy( instanceId, instanceType );
+        case OWNER_SENDER:
+        case OWNER_ANOTHER:
+            Requestor* req = _requestorMan->getOrCreateRequestor( refTypeInfo.ownerEndpoint );
+            instance = req->getOrCreateProxy( refTypeInfo.instanceID, refTypeInfo.instanceType );
             break;
     }
     tempRefs.push_back( instance ); // TODO: remove
     
     co::Range<co::IPort* const> ports = instance->getComponent()->getFacets();
     
-    co::IPort* port = ports[facetIdx];
+    co::IPort* port = ports[refTypeInfo.facetIdx];
     co::IService* service = instance->getServiceAt( port );
     param.set<co::IService*>( service );
 }
 
-void Invoker::onInterfaceReturned( co::IService* returned, std::string& caller, 
-                                      std::string& marshalledReturn )
+void Invoker::getRefTypeInfo( co::IService* service, std::string& senderEndpoint, 
+                                  ReferenceType& refType )
 {
-    co::IObject* provider = returned->getProvider();
-    std::string providerType = provider->getComponent()->getFullName();
-    co::int32 facetIdx = returned->getFacet()->getIndex();
-    co::int32 instanceId;
+    co::IObject* provider = service->getProvider();
+    
+    refType.instanceType = provider->getComponent()->getFullName();
+    
+    refType.facetIdx = service->getFacet()->getIndex();
     
     if( !ClientProxy::isClientProxy( provider ) )
     {
-        instanceId = _instanceMan->addInstance( provider, caller );
-        _marshaller.marshalReferenceType( instanceId, facetIdx, Marshaller::RefOwner::LOCAL, 
-							marshalledReturn, &providerType, &_node->getPublicEndpoint() );
+        refType.instanceID = _instanceMan->addInstance( provider, "self" );
+        refType.owner = OWNER_SENDER;
+        refType.ownerEndpoint = _srh->getPublicEndpoint();
     }
-    else
+    else // is a remote object, so it provides the IInstanceInfo service
     {
         ClientProxy* providerCP = static_cast<ClientProxy*>( provider );
         
-        instanceId = providerCP->getInstanceId();        
+        refType.instanceID = providerCP->getInstanceId();
+        
         Requestor* requestor = providerCP->getRequestor();
         
-        if( requestor->getEndpoint() == caller ) // Receiver
+        if( requestor->getEndpoint() == senderEndpoint ) // Receiver
         {
-            _marshaller.addReferenceParam( instanceId, facetIdx, Marshaller::RECEIVER );
+            refType.owner = OWNER_RECEIVER;
+            refType.ownerEndpoint = "";
         }
         else
         {
-            requestor->requestLease( instanceId, caller );
-            std::string othersEndpoint( requestor->getEndpoint() );
-            _marshaller.marshalReferenceType( instanceId, facetIdx, Marshaller::ANOTHER, 
-                                             marshalledReturn, &providerType, &othersEndpoint );
+            requestor->requestLease( refType.instanceID, senderEndpoint );
+            refType.owner = OWNER_ANOTHER;
+            refType.ownerEndpoint = requestor->getEndpoint();
         }
-
     }
 }
 

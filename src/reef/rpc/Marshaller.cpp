@@ -10,183 +10,227 @@
 
 namespace reef {
 namespace rpc {
+  
+// ------------ Any to Protobuf conversion functions --------------- //
 
-   
-    // ------------ Any to Protobuf conversion functions --------------- //
-    
 // Specializes for each Data container's different set function.
 template <typename T>
-static void setPBContainerData( Data_Container* container, T value ) 
+static void setPBContainerData( Any_PB* container, T value ) 
 {
     container->set_numeric( static_cast<double>( value ) );
 }
 
 template <>
-void setPBContainerData<bool>( Data_Container* container, bool value ) 
+void setPBContainerData<bool>( Any_PB* container, bool value ) 
 {
     container->set_boolean( value );
 }
 
 template <>
-void setPBContainerData<const std::string&>( Data_Container* container, const std::string& value ) 
+void setPBContainerData<const std::string&>( Any_PB* container, const std::string& value ) 
 {
     container->set_str( value );
 }
 
 // Extracts the provided type's data from Any (deals with arrays and values)
 template <typename T>
-static void anyWithTypeToPBArg( const co::Any& any, Argument* arg )
+static void anyWithTypeToPBParam( const co::Any& any, Parameter* param )
 {
     // if the Any is a single value, set it directly 
     if( any.getKind() != co::TK_ARRAY )
     {
-        Data_Container* container = arg->add_data();
+        Any_PB* container = param->add_any();
         setPBContainerData<T>( container, any.get<T>() );
         return;
     }
     
-    // if the Any is an array, iterate through the values adding to the Argument
+    // if the Any is an array, iterate through the values adding to the Parameter
     const co::Range<const T> range = any.get<const co::Range<const T> >();
     
     size_t size = range.getSize();
     for( int i = 0; i < size; i++ )
     {
-        Data_Container* container = arg->add_data();
+        Any_PB* container = param->add_any();
         setPBContainerData<T>( container, range[i] );
     }
 }
 
 template <>
-void anyWithTypeToPBArg<std::string>( const co::Any& any, Argument* arg )
+void anyWithTypeToPBParam<std::string>( const co::Any& any, Parameter* param )
 {
     // if the Any is a single value, set it directly 
     if( any.getKind() != co::TK_ARRAY )
     {
-        Data_Container* container = arg->add_data();
+        Any_PB* container = param->add_any();
         setPBContainerData<const std::string&>( container, any.get<const std::string&>() );
         return;
     }
     
-    // if the Any is an array, iterate through the values adding to the Argument
+    // if the Any is an array, iterate through the values adding to the Parameter
     const co::Range<const std::string> range = any.get<const co::Range<const std::string> >();
     
     size_t size = range.getSize();
     for( int i = 0; i < size; i++ )
     {
-        Data_Container* container = arg->add_data();
+        Any_PB* container = param->add_any();
         setPBContainerData<const std::string&>( container, range[i] );
     }
 }
 
 template <>
-void anyWithTypeToPBArg<bool>( const co::Any& any, Argument* arg )
+void anyWithTypeToPBParam<bool>( const co::Any& any, Parameter* param )
 {
     // if the Any is a single value, set it directly 
     if( any.getKind() != co::TK_ARRAY )
     {
-        Data_Container* container = arg->add_data();
+        Any_PB* container = param->add_any();
         setPBContainerData<bool>( container, any.get<bool>() );
         return;
     }
     
-    // if the Any is an array, iterate through the values adding to the Argument
+    // if the Any is an array, iterate through the values adding to the Parameter
     const std::vector<bool>& vec = any.get<const std::vector<bool> &>();
     
     size_t size = vec.size();
     for( int i = 0; i < size; i++ )
     {
-        Data_Container* container = arg->add_data();
+        Any_PB* container = param->add_any();
         setPBContainerData<bool>( container, vec[i] );
     }
 }
-   
-void complexToPBArg( const co::Any& instance, Argument* complexArg );
-    
-// Converts an any containing a vlue type to a protobuf Argument
-void anyToPBArg( const co::Any& any, Argument* arg )
+
+void complexToPBParam( const co::Any& instance, Parameter* complexParam );
+
+// Converts an any containing a vlue type to a protobuf Parameter
+void valueToPBParam( const co::Any& any, Parameter* param )
 {
     std::vector<co::Any> anyVec;
     co::TypeKind kind = any.getKind();
     
     if( kind == co::TK_ARRAY )
         kind = any.getType()->getKind();
-        
+    
     
     switch( kind )
     {
         case co::TK_BOOLEAN:
-            anyWithTypeToPBArg<bool>( any, arg );
+            anyWithTypeToPBParam<bool>( any, param );
             break;
         case co::TK_INT8:
-            anyWithTypeToPBArg<co::int8>( any, arg );
+            anyWithTypeToPBParam<co::int8>( any, param );
             break;
         case co::TK_UINT8:
-            anyWithTypeToPBArg<co::uint8>( any, arg );
+            anyWithTypeToPBParam<co::uint8>( any, param );
             break;
         case co::TK_INT16:
-            anyWithTypeToPBArg<co::int16>( any, arg );
+            anyWithTypeToPBParam<co::int16>( any, param );
             break;
         case co::TK_UINT16:
-            anyWithTypeToPBArg<co::uint16>( any, arg );
+            anyWithTypeToPBParam<co::uint16>( any, param );
             break;
         case co::TK_INT32:
-            anyWithTypeToPBArg<co::int32>( any, arg );
+            anyWithTypeToPBParam<co::int32>( any, param );
             break;
         case co::TK_UINT32:
-            anyWithTypeToPBArg<co::uint32>( any, arg );
+            anyWithTypeToPBParam<co::uint32>( any, param );
             break;
         case co::TK_INT64:
-            anyWithTypeToPBArg<co::int64>( any, arg );
+            anyWithTypeToPBParam<co::int64>( any, param );
             break;
         case co::TK_UINT64:
-            anyWithTypeToPBArg<co::uint64>( any, arg );
+            anyWithTypeToPBParam<co::uint64>( any, param );
             break;
         case co::TK_FLOAT:
-            anyWithTypeToPBArg<float>( any, arg );
+            anyWithTypeToPBParam<float>( any, param );
             break;
         case co::TK_DOUBLE:
-            anyWithTypeToPBArg<double>( any, arg );
+            anyWithTypeToPBParam<double>( any, param );
             break;
         case co::TK_STRING:
-            anyWithTypeToPBArg<std::string>( any, arg );
+            anyWithTypeToPBParam<std::string>( any, param );
             break;
         case co::TK_STRUCT:
         case co::TK_NATIVECLASS:
-            complexToPBArg( any, arg );
+            complexToPBParam( any, param );
             break;
         case co::TK_ANY:
         {
             const co::Any& internalAny =  any.get<const co::Any&>();
-            arg->set_coany_type( static_cast<co::uint32>( internalAny.getKind() ) );
-            anyToPBArg( internalAny, arg );
+            param->set_any_type( static_cast<co::uint32>( internalAny.getKind() ) );
+            valueToPBParam( internalAny, param );
             break;
         }
         default:
             assert( false );
     }
 }
-    
-    
-void complexToPBArg( const co::Any& instance, Argument* complexArg )
+
+
+void complexToPBParam( const co::Any& instance, Parameter* complexParam )
 {
     assert( instance.getKind() != co::TK_ARRAY );
     
     co::IRecordType* rt = co::cast<co::IRecordType>( instance.getType() );
     co::IReflector* refl = rt->getReflector();
-    Data_Container* container = complexArg->add_data();
+    Any_PB* container = complexParam->add_any();
     Complex_Type* complexType = container->mutable_complex_type();
     
     for( co::Range<co::IField* const> fields = rt->getFields(); fields; fields.popFirst() )
     {
-        Argument* fieldArg = complexType->add_field();
+        Parameter* fieldArg = complexType->add_field();
         co::Any fieldAny;
         refl->getField( instance, fields.getFirst(), fieldAny );
-        anyToPBArg( fieldAny, fieldArg );
+        valueToPBParam( fieldAny, fieldArg );
+    }
+}
+    
+void refToPBParam( const ReferenceType& refType, Parameter* refParam )
+{
+    Any_PB* PBAny = refParam->add_any();
+    Ref_Type* ref_type = PBAny->mutable_ref_type();
+    
+    ref_type->set_instance_id( refType.instanceID );
+    ref_type->set_facet_idx( refType.facetIdx );
+    
+    switch( refType.owner )
+    {
+        case OWNER_SENDER:
+            ref_type->set_owner( Ref_Type::OWNER_SENDER );
+            ref_type->set_instance_type( refType.instanceType );
+            ref_type->set_owner_endpoint( refType.ownerEndpoint );
+            break;
+        case OWNER_RECEIVER:
+            ref_type->set_owner( Ref_Type::OWNER_RECEIVER );
+            break;
+        case OWNER_ANOTHER:
+            ref_type->set_owner( Ref_Type::OWNER_ANOTHER );
+            ref_type->set_instance_type( refType.instanceType );
+            ref_type->set_owner_endpoint( refType.ownerEndpoint );
+            break;        
     }
 }
 
+ParameterPusher::ParameterPusher()
+{
+}
 
-Marshaller::Marshaller()
+void ParameterPusher::pushValue( const co::Any& valueType )
+{
+    assert( _invocation );
+    
+    Parameter* PBParam = _invocation->add_params();
+    valueToPBParam( valueType, PBParam );
+}
+
+void ParameterPusher::pushReference( const ReferenceType& refType )
+{
+    assert( _invocation );
+    
+    Parameter* PBParam = _invocation->add_params();
+    refToPBParam( refType, PBParam );
+}
+
+Marshaller::Marshaller() : _request( 0 ), _invocation( 0 ), _msgClear( true )
 {
     _message = new Message();
 }
@@ -195,174 +239,133 @@ Marshaller::~Marshaller()
 {
     delete _message;
 }
-    
-void Marshaller::marshalNewInstance( const std::string& typeName, const std::string& referer,
-                                    std::string& request )
-{
-    _message->set_msg_type( Message::MSG_NEW_INST );
-    _message->set_instance_id( 0 ); // 0 is always the node channel
-    _message->set_has_return( true );
-    _message->set_referer_ip( referer );
 
+void Marshaller::marshalNew( inString requesterEndpoint, inString instanceType, outString msg )
+{
+    assert( _msgClear );
     
-	Message_New_Inst* msgNewInst = _message->mutable_msg_new_inst();
-    msgNewInst->set_new_instance_type( typeName );
+    _message->set_requester_endpoint( requesterEndpoint );
+    _message->set_type( Message::REQUEST_NEW );
     
-    _message->SerializeToString( &request );
+    Request* request = _message->mutable_request();
+    request->set_new_instance_type( instanceType );
+    
+    _message->SerializeToString( &msg );
     _message->Clear();
 }
 
-void Marshaller::marshalAccessInstance( co::int32 instanceId, bool increment, 
-                                       const std::string& referer, std::string& request )
+void Marshaller::marshalLookup( inString requesterEndpoint, inString lookupKey, outString msg )
 {
-    _message->set_msg_type( Message::MSG_ACCESS_INST );
-    _message->set_instance_id( 0 ); // 0 is always the node channel
-    _message->set_has_return( false );
-    _message->set_referer_ip( referer );
+    assert( _msgClear );
     
+    _message->set_requester_endpoint( requesterEndpoint );
+    _message->set_type( Message::REQUEST_LOOKUP );
     
-	Message_Acc_Inst* msgAccInst = _message->mutable_msg_acc_inst();
-    //TODO: set referer as self
-    msgAccInst->set_increment( increment );
-    msgAccInst->set_instance_id( instanceId );
+    Request* request = _message->mutable_request();
+    request->set_lookup_key( lookupKey );
     
-    _message->SerializeToString( &request );
+    _message->SerializeToString( &msg );
+    _message->Clear();
+    _request = 0;
 }
-    
-void Marshaller::marshalFindInstance( const std::string& key, const std::string& referer,
-                                     std::string& request )
+
+void Marshaller::marshalLease( inString requesterEndpoint, co::int32 leaseInstanceID, outString msg )
 {
-    _message->set_msg_type( Message::MSG_FIND_INST );
-    _message->set_instance_id( 0 ); // 0 is always the node channel
-    _message->set_has_return( true );
-    _message->set_referer_ip( referer );
+    assert( _msgClear );
     
+    _message->set_requester_endpoint( requesterEndpoint );
+    _message->set_type( Message::REQUEST_LEASE );
     
-	Message_Find_Inst* msgFindInst = _message->mutable_msg_find_inst();
-    msgFindInst->set_key( key );
+    Request* request = _message->mutable_request();
+    request->set_lease_instance_id( leaseInstanceID );
     
-    _message->SerializeToString( &request );
+    _message->SerializeToString( &msg );
+    _message->Clear();
+}
+
+void Marshaller::marshalCancelLease( inString requesterEndpoint, co::int32 leaseInstanceID, 
+                                    outString msg )
+{
+    assert( _msgClear );
+    
+    _message->set_requester_endpoint( requesterEndpoint );
+    _message->set_type( Message::REQUEST_CANCEL_LEASE );
+    
+    Request* request = _message->mutable_request();
+    request->set_lease_instance_id( leaseInstanceID );
+    
+    _message->SerializeToString( &msg );
     _message->Clear();
 }
     
-void Marshaller::beginCallMarshalling( co::int32 instanceId, co::int32 facetIdx, co::int32 memberIdx,
-                            co::int32 typeDepth, bool hasReturn, const std::string& callerAddress )
-{
-    if( instanceId == 0 )
-        throw new co::Exception( "A call msg can't have an instanceId of 0" );
+ParameterPusher& Marshaller::beginInvocation( inString requesterEndpoint, InvocationDetails details )
+                                                   
+{   
+    assert( _msgClear );
     
-    _message->set_msg_type( Message::MSG_CALL );
-    _message->set_instance_id( instanceId );
-    _message->set_has_return( hasReturn );
-    _message->set_referer_ip( callerAddress ); // In case a reference is returned this is the referer
+    _message->set_requester_endpoint( requesterEndpoint );
+    _message->set_type( Message::INVOCATION );
     
-    _msgMember = _message->mutable_msg_member();
-    _msgMember->set_facet_idx( facetIdx );
-    _msgMember->set_member_idx( memberIdx );
-    _msgMember->set_type_depth( typeDepth );
+    Invocation* invocation = _message->mutable_invocation();
+    invocation->set_instance_id( details.instanceID );
+    invocation->set_facet_idx( details.facetIdx );
+    invocation->set_member_idx( details.memberIdx );
+    invocation->set_type_depth( details.typeDepth );
+    invocation->set_synch( details.hasReturn );
+    
+    _paramPusher._invocation = invocation;
+    return _paramPusher;
+    
+    _msgClear = false;
 }
 
-void Marshaller::addValueParam( const co::Any& param )
+void Marshaller::marshalInvocation( outString msg )
 {
-    checkIfCallMsg();
-    Argument* PBArg = _msgMember->add_arguments();
-    anyToPBArg( param, PBArg );
-}
-
-void Marshaller::addReferenceParam( co::int32 instanceId, co::int32 facetIdx, RefOwner owner, 
-                        const std::string* instanceType, const std::string* ownerAddress )
-{
-    checkIfCallMsg();
-    Argument* PBArg = _msgMember->add_arguments();
-    reference2PBArg( instanceId, facetIdx, owner, PBArg, instanceType, ownerAddress );
-}
-
-void Marshaller::marshalReferenceType( co::int32 instanceId, co::int32 facetIdx, RefOwner owner, 
-                                      std::string& reference, const std::string* instanceType, 
-                                          const std::string* ownerAddress )
-{
-    Argument PBArg;
-    reference2PBArg( instanceId, facetIdx, owner, &PBArg, instanceType, ownerAddress );
-    PBArg.SerializeToString( &reference );
-}
+    assert( _paramPusher._invocation );
     
-void Marshaller::reference2PBArg( co::int32 instanceId, co::int32 facetIdx, RefOwner owner, 
-                                    Argument* PBArg, const std::string* instanceType, 
-                                    const std::string* ownerAddress )
-{
-    Data_Container* dc = PBArg->add_data();
-    Ref_Type* refType = dc->mutable_ref_type();
-    
-    refType->set_instance_id( instanceId );
-    refType->set_facet_idx( facetIdx );
-    
-    
-    switch( owner )
-    {
-    case LOCAL:
-            refType->set_owner( Ref_Type::OWNER_LOCAL );
-            refType->set_owner_ip( *ownerAddress );
-            refType->set_instance_type( *instanceType );
-            break;
-    case RECEIVER:
-            refType->set_owner( Ref_Type::OWNER_RECEIVER );
-            break;
-    case ANOTHER:
-            refType->set_owner( Ref_Type::OWNER_ANOTHER );
-            refType->set_owner_ip( *ownerAddress );
-            refType->set_instance_type( *instanceType );
-            break;        
-    }
-}
-    
-void Marshaller::marshalValueType( const co::Any& demarshalledValue, std::string& marshalledValue )
-{
-    Argument returnArg;
-    anyToPBArg( demarshalledValue, &returnArg );
-    returnArg.SerializeToString( &marshalledValue );
-}
-    
-void Marshaller::getMarshalledCall( std::string& request )
-{
-    _message->SerializeToString( &request );
+    _message->SerializeToString( &msg );
     _message->Clear();
-    _msgMember = 0;
-}
-
-void Marshaller::marshalData( bool value, std::string& data )
-{
-    Data_Container dataContainer;
-    dataContainer.set_boolean( value );
-    dataContainer.SerializeToString( &data );
-}
-
-void Marshaller::marshalData( double value, std::string& data )
-{
-    Data_Container dataContainer;
-    dataContainer.set_numeric( value );
-    dataContainer.SerializeToString( &data );
-}
-
-void Marshaller::marshalData( co::int32 value, std::string& data )
-{
-    Data_Container dataContainer;
-    dataContainer.set_numeric( static_cast<co::int32>( value ) );
-    dataContainer.SerializeToString( &data );
-}
-
-void Marshaller::marshalData( const std::string& value, std::string& data )
-{
-    Data_Container dataContainer;
-    dataContainer.set_str( value );
-    dataContainer.SerializeToString( &data );
-}
-
-void Marshaller::checkIfCallMsg()
-{
-    if( !_msgMember )
-        throw new co::Exception( "Could not add a Parameter to an empty Message" );
+    
+    _paramPusher._invocation = 0;
+    _msgClear = true;
 }
     
-}
+void Marshaller::marshalIntReturn( co::int32 value, outString msg )
+{
+    assert( _msgClear );
     
+    _message->set_type( Message::RETURN );
+    
+    _message->set_ret_int( value );
+    _message->SerializeToString( &msg );
+    _message->Clear();
+}
+
+void Marshaller::marshalValueTypeReturn( const co::Any& valueAny, outString msg )
+{
+    assert( _msgClear );
+    
+    _message->set_type( Message::RETURN );
+    
+    Parameter* param = _message->mutable_ret_value();
+    valueToPBParam( valueAny, param );
+    
+    _message->SerializeToString( &msg );
+    _message->Clear();
+}
+
+void Marshaller::marshalRefTypeReturn( const ReferenceType& refType, outString msg )
+{
+    assert( _msgClear );
+    
+    _message->set_type( Message::RETURN );
+    
+    Parameter* param = _message->mutable_ret_value();
+    refToPBParam( refType, param );
+    
+    _message->SerializeToString( &msg );
+    _message->Clear();
+}
+
+}
 }

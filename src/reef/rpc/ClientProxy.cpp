@@ -22,7 +22,7 @@ ClientProxy::ClientProxy()
 }
     
 ClientProxy::ClientProxy( Requestor* requestor, co::IComponent* component, co::int32 instanceID ) : 
-    _requestor( requestor ), _numFacets( 0 ), _instanceID( instanceID )
+    _requestor( requestor ), _instanceID( instanceID ), _numFacets( 0 )
 {
     _classPtr = *reinterpret_cast<void**>( this );
     setComponent( component );
