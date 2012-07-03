@@ -4,9 +4,9 @@
 #include "Node.h"
 #include "ClientProxy.h"
 
-#include <mockReef/IFakeLink.h>
-#include <moduleA/ISimpleTypes.h>
-#include <moduleA/IReferenceTypes.h>
+#include <rpcTests/IFakeLink.h>
+#include <rpcTests/ISimpleTypes.h>
+#include <rpcTests/IReferenceTypes.h>
 #include <reef/rpc/ITransport.h>
 #include <reef/rpc/IActiveLink.h>
 #include <co/Coral.h>

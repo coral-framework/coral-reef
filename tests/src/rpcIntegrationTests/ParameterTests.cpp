@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 
-#include <moduleA/ChildStruct.h>
-#include <moduleA/MotherStruct.h>
-#include <moduleA/ISimpleTypes.h>
-#include <moduleA/IComplexTypes.h>
-#include <moduleA/IReferenceTypes.h>
-#include <moduleA/StringNativeClass.h>
-#include <mockReef/ITestSetup.h>
+#include <rpcTests/ChildStruct.h>
+#include <rpcTests/MotherStruct.h>
+#include <rpcTests/ISimpleTypes.h>
+#include <rpcTests/IComplexTypes.h>
+#include <rpcTests/IReferenceTypes.h>
+#include <rpcTests/StringNativeClass.h>
+#include <rpcTests/ITestSetup.h>
 
 #include <reef/rpc/INode.h>
 #include <reef/rpc/ITransport.h>
@@ -22,15 +22,15 @@ namespace rpc {
     
 TEST( ParameterTests, simpleTypesTest )
 {
-    co::RefPtr<co::IObject> testSetup = co::newInstance( "mockReef.TestSetup" );
-    mockReef::ITestSetup* setup = testSetup->getService<mockReef::ITestSetup>();
+    co::RefPtr<co::IObject> testSetup = co::newInstance( "rpcTests.TestSetup" );
+    rpcTests::ITestSetup* setup = testSetup->getService<rpcTests::ITestSetup>();
     setup->initTest( 2 );
     
     reef::rpc::INode* client = setup->getNode( 1 );
     
-    co::RefPtr<co::IObject> remoteInstance = client->newRemoteInstance( "moduleA.TestComponent",
+    co::RefPtr<co::IObject> remoteInstance = client->newRemoteInstance( "rpcTests.TestComponent",
                                                             "address2" );
-    moduleA::ISimpleTypes* simple = remoteInstance->getService<moduleA::ISimpleTypes>();
+    rpcTests::ISimpleTypes* simple = remoteInstance->getService<rpcTests::ISimpleTypes>();
     
     // ------ Simple value types ------
     simple->setDouble( 0.1 );
@@ -114,25 +114,25 @@ TEST( ParameterTests, simpleTypesTest )
 
 TEST( ParameterTests, refTypeParameterTest )
 {
-    co::RefPtr<co::IObject> testSetup = co::newInstance( "mockReef.TestSetup" );
-    mockReef::ITestSetup* setup = testSetup->getService<mockReef::ITestSetup>();
+    co::RefPtr<co::IObject> testSetup = co::newInstance( "rpcTests.TestSetup" );
+    rpcTests::ITestSetup* setup = testSetup->getService<rpcTests::ITestSetup>();
     setup->initTest( 3 );
     
     reef::rpc::INode* serverB = setup->getNode( 2 );
     reef::rpc::INode* client = setup->getNode( 3 );
 
-    co::RefPtr<co::IObject> instanceInA = client->newRemoteInstance( "moduleA.TestComponent",
+    co::RefPtr<co::IObject> instanceInA = client->newRemoteInstance( "rpcTests.TestComponent",
                                                                 "address1" );
-    moduleA::IReferenceTypes* refTypesServiceInA = instanceInA->getService<moduleA::IReferenceTypes>();
-    moduleA::ISimpleTypes* simpleTypesServiceInA = instanceInA->getService<moduleA::ISimpleTypes>();
+    rpcTests::IReferenceTypes* refTypesServiceInA = instanceInA->getService<rpcTests::IReferenceTypes>();
+    rpcTests::ISimpleTypes* simpleTypesServiceInA = instanceInA->getService<rpcTests::ISimpleTypes>();
     
-    co::RefPtr<co::IObject> instanceInB = client->newRemoteInstance( "moduleA.TestComponent",
+    co::RefPtr<co::IObject> instanceInB = client->newRemoteInstance( "rpcTests.TestComponent",
                                                                     "address2" );
-    moduleA::ISimpleTypes* simpleTypesServiceInB = instanceInB->getService<moduleA::ISimpleTypes>();
+    rpcTests::ISimpleTypes* simpleTypesServiceInB = instanceInB->getService<rpcTests::ISimpleTypes>();
 
     
-    co::RefPtr<co::IObject> instanceLocal = co::newInstance( "moduleA.TestComponent" );
-    moduleA::ISimpleTypes* simpleTypesServiceLocal = instanceLocal->getService<moduleA::ISimpleTypes>();
+    co::RefPtr<co::IObject> instanceLocal = co::newInstance( "rpcTests.TestComponent" );
+    rpcTests::ISimpleTypes* simpleTypesServiceLocal = instanceLocal->getService<rpcTests::ISimpleTypes>();
     
     EXPECT_EQ( refTypesServiceInA->callIncrementInt( simpleTypesServiceInA, 3 ), 4 );
     EXPECT_EQ( refTypesServiceInA->callDivideDouble( simpleTypesServiceInA, 15, 5 ), 3 );
@@ -150,7 +150,7 @@ TEST( ParameterTests, refTypeParameterTest )
     refTypesServiceInA->setSimple( simpleTypesServiceInB );
     EXPECT_EQ( simpleTypesServiceInB, refTypesServiceInA->getSimple() );
     
-    moduleA::ISimpleTypes* simple = serverB->getInstance( 0 )->getService<moduleA::ISimpleTypes>();
+    rpcTests::ISimpleTypes* simple = serverB->getInstance( 0 )->getService<rpcTests::ISimpleTypes>();
     
     EXPECT_NE( simpleTypesServiceInB, simple );
     
@@ -163,25 +163,25 @@ TEST( ParameterTests, refTypeParameterTest )
     
 TEST( ParameterTests, complexTypeParameterTest )
 {
-    co::RefPtr<co::IObject> testSetup = co::newInstance( "mockReef.TestSetup" );
-    mockReef::ITestSetup* setup = testSetup->getService<mockReef::ITestSetup>();
+    co::RefPtr<co::IObject> testSetup = co::newInstance( "rpcTests.TestSetup" );
+    rpcTests::ITestSetup* setup = testSetup->getService<rpcTests::ITestSetup>();
     setup->initTest( 2 );
     
     reef::rpc::INode* server = setup->getNode( 1 );
     reef::rpc::INode* client = setup->getNode( 2 );
     
-    co::RefPtr<co::IObject> instance = co::newInstance( "moduleA.TestComponent" );
-    moduleA::IComplexTypes* complexTypes = instance->getService<moduleA::IComplexTypes>();
+    co::RefPtr<co::IObject> instance = co::newInstance( "rpcTests.TestComponent" );
+    rpcTests::IComplexTypes* complexTypes = instance->getService<rpcTests::IComplexTypes>();
     server->publishInstance( instance.get(), "instance" );
     
-    co::RefPtr<co::IObject> rmtInstance = client->findRemoteInstance( "moduleA.TestComponent", 
+    co::RefPtr<co::IObject> rmtInstance = client->findRemoteInstance( "rpcTests.TestComponent", 
                                                                      "instance", "address1" );
     
-    moduleA::IComplexTypes* rmtComplexTypes = rmtInstance->getService<moduleA::IComplexTypes>();
+    rpcTests::IComplexTypes* rmtComplexTypes = rmtInstance->getService<rpcTests::IComplexTypes>();
     
-    moduleA::MotherStruct ms;
-    moduleA::ChildStruct cs;    
-    moduleA::StringNativeClass native;
+    rpcTests::MotherStruct ms;
+    rpcTests::ChildStruct cs;    
+    rpcTests::StringNativeClass native;
     
     // setting complex type
     native.data = "setNative";
@@ -194,14 +194,14 @@ TEST( ParameterTests, complexTypeParameterTest )
     
     rmtComplexTypes->setMotherStruct( ms );
     
-    const moduleA::MotherStruct& ms_ = complexTypes->getMotherStruct();
-    const moduleA::ChildStruct& cs_ = ms.child;
+    const rpcTests::MotherStruct& ms_ = complexTypes->getMotherStruct();
+    const rpcTests::ChildStruct& cs_ = ms.child;
     EXPECT_EQ( ms_.id, 1 );
     EXPECT_STREQ( ms_.name.c_str(), "setMother" );
     EXPECT_EQ( cs_.id, 2 );
     EXPECT_STREQ( cs_.name.c_str(), "setChild" );
 
-    const moduleA::StringNativeClass& native_ = cs_.myNativeClass;
+    const rpcTests::StringNativeClass& native_ = cs_.myNativeClass;
     
     EXPECT_STREQ( native_.data.c_str(), "setNative" );
     
@@ -216,14 +216,14 @@ TEST( ParameterTests, complexTypeParameterTest )
     
     complexTypes->setMotherStruct( ms );
     
-    const moduleA::MotherStruct& ms2_ = rmtComplexTypes->getMotherStruct();
-    const moduleA::ChildStruct& cs2_ = ms.child;
+    const rpcTests::MotherStruct& ms2_ = rmtComplexTypes->getMotherStruct();
+    const rpcTests::ChildStruct& cs2_ = ms.child;
     EXPECT_EQ( ms2_.id, 3 );
     EXPECT_STREQ( ms2_.name.c_str(), "getMother" );
     EXPECT_EQ( cs2_.id, 4 );
     EXPECT_STREQ( cs2_.name.c_str(), "getChild" );
     
-    const moduleA::StringNativeClass& native2_ = cs2_.myNativeClass;
+    const rpcTests::StringNativeClass& native2_ = cs2_.myNativeClass;
     
     EXPECT_STREQ( native2_.data.c_str(), "getNative" );
 

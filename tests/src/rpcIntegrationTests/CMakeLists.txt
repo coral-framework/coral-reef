@@ -4,11 +4,11 @@
 
 project( RPCINTEGRATIONTESTS )
 
-CORAL_GENERATE_MAPPINGS( _GENERATED_MAPPINGS "mockReef.ITestSetup" )
+CORAL_GENERATE_MAPPINGS( _GENERATED_MAPPINGS "rpcTests.ITestSetup" )
 
 include_directories(
 	${GTEST_INCLUDE_DIRS}
-	${moduleA_BINARY_DIR}/generated
+	${rpcTests_BINARY_DIR}/generated
 	${CMAKE_BINARY_DIR}/src/reef/rpc/generated
 	${CMAKE_SOURCE_DIR}/src/reef/rpc
 	${CMAKE_CURRENT_BINARY_DIR}/generated
@@ -19,7 +19,7 @@ file( GLOB _HEADERS *.h )
 file( GLOB _SOURCES *.cpp )
 
 add_executable( rpcIntegrationTests EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} ${_GENERATED_MAPPINGS} )
-add_dependencies( rpcIntegrationTests moduleA mockReef rpc )
+add_dependencies( rpcIntegrationTests rpcTests rpc )
 
 CORAL_TARGET( rpcIntegrationTests )
 

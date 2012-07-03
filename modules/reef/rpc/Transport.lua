@@ -1,7 +1,7 @@
-local ActiveLink = require "mockReef.ActiveLink"
-local PassiveLink = require "mockReef.PassiveLink"
+local ActiveLink = require "reef.rpc.ActiveLink"
+local PassiveLink = require "reef.rpc.PassiveLink"
 
-local Transport = co.Component( "mockReef.Transport" )
+local Transport = co.Component( "reef.rpc.Transport" )
 
 local net__index = {}
 

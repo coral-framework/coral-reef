@@ -1,4 +1,4 @@
-local PassiveLink = co.Component( { name = "mockReef.PassiveLink", 
+local PassiveLink = co.Component( { name = "reef.rpc.PassiveLink", 
 								provides = { passive = "reef.rpc.IPassiveLink" } } )
 
 function PassiveLink:sendReply( msg )

@@ -1,19 +1,19 @@
 
 function test()
-	local setup = co.new "mockReef.TestSetup".setup
+	local setup = co.new "rpcTests.TestSetup".setup
 	setup:initTest( 3 )
 	
 	local client = setup:getNode( 3 )
 	print( "aaaa" )
-	local instanceIn1 = client:newRemoteInstance( "moduleA.TestComponent",	"address1" )
+	local instanceIn1 = client:newRemoteInstance( "rpcTests.TestComponent",	"address1" )
 	local refTypesServiceIn1 = instanceIn1.reference
 	local simpleTypesServiceIn1 = instanceIn1.simple
 	
-	local instanceIn2 = client:newRemoteInstance( "moduleA.TestComponent", "address2" )
+	local instanceIn2 = client:newRemoteInstance( "rpcTests.TestComponent", "address2" )
 	local simpleTypesServiceIn2 = instanceIn2.simple
 	local refTypesServiceIn2 = instanceIn2.reference
 	
-	local instanceLocal = co.new "moduleA.TestComponent"
+	local instanceLocal = co.new "rpcTests.TestComponent"
 	local simpleTypesServiceLocal = instanceLocal.simple
 	
 	EXPECT_EQ( refTypesServiceIn1:callIncrementInt( simpleTypesServiceIn1, 3 ), 4 )

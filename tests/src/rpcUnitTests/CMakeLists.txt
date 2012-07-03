@@ -4,13 +4,13 @@
 
 project( RPCUNITTESTS )
 CORAL_GENERATE_MODULE( _GENERATED_RPC_FILES reef.rpc )
-CORAL_GENERATE_MAPPINGS( _GENERATED_MAPPINGS "mockReef.IFakeLink" "mockReef.ITestSetup" )
+CORAL_GENERATE_MAPPINGS( _GENERATED_MAPPINGS "rpcTests.IFakeLink" "rpcTests.ITestSetup" )
 
 include_directories(
 	${GTEST_INCLUDE_DIRS}
 	${REEF_SOURCE_DIR}/src/reef/rpc
 	${CMAKE_CURRENT_BINARY_DIR}/generated
-	${moduleA_BINARY_DIR}/generated
+	${rpcTests_BINARY_DIR}/generated
 )
 
 # Gather source files in the current directory
@@ -22,7 +22,7 @@ file( GLOB _REPLICATED_MODULE_FILES	${REEF_SOURCE_DIR}/src/reef/rpc/*.cpp )
 list( REMOVE_ITEM _GENERATED_RPC_FILES "${CMAKE_CURRENT_BINARY_DIR}/generated/__Bootstrap.cpp" )
 
 add_executable( rpcUnitTests EXCLUDE_FROM_ALL ${_REPLICATED_MODULE_FILES} ${_HEADERS} ${_SOURCES} ${_GENERATED_RPC_FILES} ${_GENERATED_MAPPINGS} )
-add_dependencies( rpcUnitTests moduleA mockReef )
+add_dependencies( rpcUnitTests rpcTests )
 
 CORAL_TARGET( rpcUnitTests )
 

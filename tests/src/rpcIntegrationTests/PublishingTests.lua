@@ -1,5 +1,5 @@
 function publishTest()
-	local setup = co.new "mockReef.TestSetup".setup
+	local setup = co.new "rpcTests.TestSetup".setup
 	setup:initTest( 3 )
 	
 	local clientA = setup:getNode( 1 )
@@ -9,14 +9,14 @@ function publishTest()
 	--[[ Testes the access to the published instance ]]
 	
 	-- creates a local instance, publishes it and sets a field for later on testing
-	local instanceTC = co.new "moduleA.TestComponent"
+	local instanceTC = co.new "rpcTests.TestComponent"
 	EXPECT_EQ( server:publishInstance( instanceTC, "key" ), 0 )
 	local simpleTypes = instanceTC.simple
 	simpleTypes.storedInt = 5
 	
 	-- Gets the published instance proxy in the clients
-	local instanceTCinA = clientA:findRemoteInstance( "moduleA.TestComponent", "key", "address3" )
-	local instanceTCinB = clientB:findRemoteInstance( "moduleA.TestComponent", "key", "address3" )
+	local instanceTCinA = clientA:findRemoteInstance( "rpcTests.TestComponent", "key", "address3" )
+	local instanceTCinB = clientB:findRemoteInstance( "rpcTests.TestComponent", "key", "address3" )
 	
 	-- tests if the value matches in client A and changes it
 	ASSERT_TRUE( instanceTCinA and instanceTCinB )
@@ -46,7 +46,7 @@ function publishTest()
 	EXPECT_EQ( references, 0 )
 	
 	-- Checks if a remotely created instance is accessible locally
-	local newInstProxy = clientA:newRemoteInstance( "moduleA.TestComponent", "address3" )
+	local newInstProxy = clientA:newRemoteInstance( "rpcTests.TestComponent", "address3" )
 	newInstProxy.simple.storedInt = 8
 	local newInst = server:getInstance( 1 )
 	EXPECT_EQ( newInst.simple.storedInt, 8 )
@@ -56,10 +56,10 @@ function publishTest()
 	EXPECT_EQ( references, 1 )
 	
 	-- Checks if the ID counting is correct
-	clientB:newRemoteInstance( "moduleA.TestComponent", "address3" )
-	clientB:newRemoteInstance( "moduleA.TestComponent", "address3" )
-	clientB:newRemoteInstance( "moduleA.TestComponent", "address3" )
-	newInstProxy = clientB:newRemoteInstance( "moduleA.TestComponent", "address3" )
+	clientB:newRemoteInstance( "rpcTests.TestComponent", "address3" )
+	clientB:newRemoteInstance( "rpcTests.TestComponent", "address3" )
+	clientB:newRemoteInstance( "rpcTests.TestComponent", "address3" )
+	newInstProxy = clientB:newRemoteInstance( "rpcTests.TestComponent", "address3" )
 	newInstProxy.simple.storedInt = 9
 	newInst = server:getInstance( 5 )
 	EXPECT_EQ( newInst.simple.storedInt, 9 )

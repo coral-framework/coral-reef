@@ -1,4 +1,4 @@
-@lua.Scripted( "mockReef.TestSetup" )
+@lua.Scripted( "rpcTests.TestSetup" )
 
 component TestSetup
 {

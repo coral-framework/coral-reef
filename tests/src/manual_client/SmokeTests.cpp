@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <moduleA/ISimpleTypes.h>
-#include <moduleA/IComplexTypes.h>
-#include <moduleA/IReferenceTypes.h>
+#include <rpcTests/ISimpleTypes.h>
+#include <rpcTests/IComplexTypes.h>
+#include <rpcTests/IReferenceTypes.h>
 
 #include <reef/rpc/INode.h>
 #include <reef/rpc/ITransport.h>
@@ -35,12 +35,12 @@ TEST( SmokeTests, simpleTypesTest )
      the receiver will need to send messages to this node. */
     node->start( "tcp://*:4021", "tcp://localhost:4021" );
     
-    // instantiates a moduleA.TestComponent in host bound to the given address
-    co::RefPtr<co::IObject> remoteInstance = node->newRemoteInstance( "moduleA.TestComponent",
+    // instantiates a rpcTests.TestComponent in host bound to the given address
+    co::RefPtr<co::IObject> remoteInstance = node->newRemoteInstance( "rpcTests.TestComponent",
                                                                        "tcp://localhost:4020" );
     
-    // Gets the moduleA.ISimpleTypes interface from the remote instance
-    moduleA::ISimpleTypes* simple = remoteInstance->getService<moduleA::ISimpleTypes>();
+    // Gets the rpcTests.ISimpleTypes interface from the remote instance
+    rpcTests::ISimpleTypes* simple = remoteInstance->getService<rpcTests::ISimpleTypes>();
     
     // simple get and set test
     simple->setDouble( 0.1 );

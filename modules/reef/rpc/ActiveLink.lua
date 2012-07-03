@@ -1,4 +1,4 @@
-local ActiveLink = co.Component( { name = "mockReef.ActiveLink", 
+local ActiveLink = co.Component( { name = "reef.rpc.ActiveLink", 
 								provides = { active = "reef.rpc.IActiveLink" } } )
 
 function ActiveLink:send( msg )

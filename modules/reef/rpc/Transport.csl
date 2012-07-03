@@ -1,4 +1,4 @@
-@lua.Scripted( "mockReef.Transport" ) 
+@lua.Scripted( "reef.rpc.Transport" ) 
 import reef.rpc.ITransport;
 import reef.rpc.INode;
 

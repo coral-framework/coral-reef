@@ -1,7 +1,7 @@
 native class StringNativeClass
 {
 	<c++
-		namespace moduleA
+		namespace rpcTests
 		{ 
 			struct StringNativeClass
 			{

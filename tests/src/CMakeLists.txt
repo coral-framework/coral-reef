@@ -9,8 +9,7 @@ set( CORAL_PATH ${CORAL_PATH} "${CMAKE_SOURCE_DIR}/tests/modules" )
 CORAL_GET_PATH_STRING( CORAL_PATH_STR )
 set_property( DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS "CORAL_PATH=\"${CORAL_PATH_STR}\"" )
 
-add_subdirectory( moduleA )
-add_subdirectory( mockReef )
+add_subdirectory( rpcTests )
 add_subdirectory( rpcUnitTests )
 add_subdirectory( rpcIntegrationTests )
 
@@ -19,9 +18,9 @@ if( NOT MANUAL_TESTING_DISABLED )
 	add_subdirectory( manual_client )
 	add_subdirectory( manual_server )
 	# Add a custom target to build all test artifacts
-	ADD_CUSTOM_TARGET( tests DEPENDS reef mockReef moduleA rpcUnitTests rpcIntegrationTests
+	ADD_CUSTOM_TARGET( tests DEPENDS reef rpcTests rpcUnitTests rpcIntegrationTests
 		manual_client manual_server
 	)
 else()
-	ADD_CUSTOM_TARGET( tests DEPENDS rpc mockReef moduleA rpcUnitTests rpcIntegrationTests )
+	ADD_CUSTOM_TARGET( tests DEPENDS rpc rpcTests rpcUnitTests rpcIntegrationTests )
 endif()

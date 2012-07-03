@@ -6,7 +6,7 @@ project( SERVERTESTS )
 
 include_directories(
 	${GTEST_INCLUDE_DIRS}
-	${moduleA_BINARY_DIR}/generated
+	${rpcTests_BINARY_DIR}/generated
 	${CMAKE_BINARY_DIR}/src/reef/rpc/generated
 	${CMAKE_SOURCE_DIR}/src/reef/rpc
 )
@@ -16,7 +16,7 @@ file( GLOB _HEADERS *.h )
 file( GLOB _SOURCES *.cpp )
 
 add_executable( manual_server EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} ${_CORE_SOURCES} ${_GENERATED_FILES} )
-add_dependencies( manual_server moduleA reef )
+add_dependencies( manual_server rpcTests reef )
 
 CORAL_TARGET( manual_server )
 

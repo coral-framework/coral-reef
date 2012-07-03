@@ -7,8 +7,8 @@
 #include <Message.pb.h>
 #include "Invoker.h"
 
-#include <moduleA/ISimpleTypes.h>
-#include <moduleA/IReferenceTypes.h>
+#include <rpcTests/ISimpleTypes.h>
+#include <rpcTests/IReferenceTypes.h>
 
 #include <co/Coral.h>
 #include <co/IPort.h>
