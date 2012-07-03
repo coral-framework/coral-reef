@@ -15,6 +15,7 @@ function publishTest()
 	simpleTypes.storedInt = 5
 	
 	-- Gets the published instance proxy in the clients
+	EXPECT_FALSE( clientA:findRemoteInstance( "rpcTests.TestComponent", "wrongkey", "address3" ) )
 	local instanceTCinA = clientA:findRemoteInstance( "rpcTests.TestComponent", "key", "address3" )
 	local instanceTCinB = clientB:findRemoteInstance( "rpcTests.TestComponent", "key", "address3" )
 	

@@ -59,7 +59,8 @@ co::int32 InstanceManager::findInstance( const std::string& key, const std::stri
 {
     std::map<std::string, co::int32>::iterator it = _published.find( key );
     
-    assert( it != _published.end() ); //REMOTINGERROR not found
+    if( it == _published.end() ) //REMOTINGERROR LOG not found
+        return -1;
     
     createLease( it->second, lesseeEndpoint );
     

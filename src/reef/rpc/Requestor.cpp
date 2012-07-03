@@ -64,6 +64,8 @@ co::IObject* Requestor::requestPublicInstance( const std::string& key,
     
     _demarshaller.demarshal( msg );
     co::int32 instanceID = _demarshaller.getIntReturn();
+    if( instanceID == -1 )
+        return 0;
     
     // First, search if there isnt already a cp to the instanceID
     std::map<co::int32, ClientProxy*>::iterator it = _proxies.find( instanceID );
