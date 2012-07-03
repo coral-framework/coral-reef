@@ -10,6 +10,7 @@ message Message
 		REQUEST_LEASE = 3;
 		REQUEST_CANCEL_LEASE = 4;
 		RETURN = 5;
+		EXCEPTION = 6;
 	}
 	
 	optional string requester_endpoint = 1;
@@ -19,6 +20,7 @@ message Message
 	optional Request request = 4;
 	optional Parameter ret_value = 5;
 	optional int32 ret_int = 6;
+	optional Exception exception = 7;
 }
 
 message Request
@@ -26,6 +28,18 @@ message Request
 	optional string new_instance_type = 2;
 	optional string lookup_key = 3;
 	optional uint32 lease_instance_id = 4;
+}
+
+message Exception
+{
+	enum Type
+	{
+		ERROR_LOGIC = 0;
+		ERROR_REMOTING = 1;
+	}
+	required Type type = 1;
+	required string exception_name = 2;
+	required string expection_msg = 3;
 }
 
 // Commands (triggers actions into destination nodes)
