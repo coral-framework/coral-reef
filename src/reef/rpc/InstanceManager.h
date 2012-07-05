@@ -4,7 +4,7 @@
 #include <co/IObject.h>
 
 #include <map>
-#include <stack>
+#include <set>
 
 namespace reef {
 namespace rpc {
@@ -43,7 +43,7 @@ private:
 private:
     std::vector<InstanceContainer*> _instances;
     std::map<std::string, co::int32> _published;
-    std::stack<co::int32> _freedIds; //!< auxiliary array for recicling deleted Ids
+    std::set<co::int32> _freedIds; //!< auxiliary array for recicling deleted Ids
     
     LeaseManager* _leaseMan;
 };

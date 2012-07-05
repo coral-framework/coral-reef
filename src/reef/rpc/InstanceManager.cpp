@@ -16,14 +16,16 @@ InstanceManager::InstanceManager()
 InstanceManager::~InstanceManager()
 {
     // fill the empty holes in the invokers vector
-    for( ; !_freedIds.empty(); _freedIds.pop() )
+    for( std::set<co::int32>::iterator it = _freedIds.begin(); it != _freedIds.end(); it++ )
     {
-        if( _freedIds.top() <= _instances.size() )
-            _instances[_freedIds.top()] = _instances.back();
+        if( *it > _instances.size() )
+            break;
+        
+        _instances[*it] = _instances.back();
         
         _instances.pop_back();
     }
-    
+        
     // now delete all the invokers
     size_t size = _instances.size();
     for( int i = 0; i < size; i++ )
@@ -99,8 +101,9 @@ co::int32 InstanceManager::newID()
 {
     if( !_freedIds.empty() )
     {
-        co::int32 newID = _freedIds.top();
-        _freedIds.pop();
+        std::set<co::int32>::iterator it = _freedIds.begin();
+        co::int32 newID = *it;
+        _freedIds.erase( it );
         return newID;
     }
     else
@@ -114,7 +117,7 @@ co::int32 InstanceManager::newID()
 void InstanceManager::releaseInstance( co::int32 instanceID )
 {
     delete _instances[instanceID];
-    _freedIds.push( instanceID );
+    _freedIds.insert( instanceID );
 }
 
 }
