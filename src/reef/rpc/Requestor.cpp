@@ -7,6 +7,7 @@
 #include "RequestorManager.h"
 #include "ClientRequestHandler.h"
 
+#include <co/IReflector.h>
 #include <co/IComponent.h>
 
 namespace reef {
@@ -95,7 +96,6 @@ void Requestor::requestAsynchCall( MemberOwner& owner, co::IMethod* method,
     _marshaller.marshalInvocation( msg );
     _handler->handleAsynchRequest( msg );    
 }
-    
 
 void Requestor::requestSynchCall( MemberOwner& owner, co::IMethod* method, 
                                            co::Range<co::Any const> args, co::Any& ret  )
@@ -249,7 +249,25 @@ void Requestor::getProviderInfo( co::IService* param, ReferenceType& refType )
 
 void Requestor::getReturn( const std::string& data, co::IType* returnedType, co::Any& ret )
 {
-    _demarshaller.demarshal( data );
+    MessageType type = _demarshaller.demarshal( data );
+    
+    if( type == EXCEPTION )
+    {
+        std::string exTypeName;
+        std::string what;
+        ExceptionType exType = _demarshaller.getException( exTypeName, what );
+        if( exType == EX_REMOTING )
+        {
+            // TODO try to resolve the problem if possible
+            //if not resolved then:
+            co::getType( exTypeName )->getReflector()->raise( what );
+        }
+        else
+        {
+            co::getType( exTypeName )->getReflector()->raise( what );
+        }
+    }
+    
     
     if( returnedType->getKind() != co::TK_INTERFACE )
     {

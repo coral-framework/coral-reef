@@ -6,6 +6,8 @@
 
 #include "TestComponent_Base.h"
 #include <rpcTests/MotherStruct.h>
+
+#include <co/IReflector.h>
 #include <co/RefPtr.h>
 
 namespace rpcTests {
@@ -370,6 +372,11 @@ public:
 	{
 		_storedString = str;
 	}
+    
+    void throwException( const std::string& exceptionType, const std::string& exceptionMsg )
+    {
+        co::getType( exceptionType )->getReflector()->raise( exceptionMsg );
+    }
 
 private:
     co::RefPtr<rpcTests::ISimpleTypes> _storedSimple;

@@ -1,8 +1,11 @@
 #ifndef __REEF_MARSHAL_H__
 #define __REEF_MARSHAL_H__
 
+#include <reef/rpc/RemotingException.h>
+
 #include <co/Any.h>
 #include <co/Coral.h>
+#include <co/Exception.h>
 
 #include <string>
 
@@ -62,6 +65,13 @@ private:
     ParameterPusher();
     Invocation* _invocation;
 };
+  
+enum ExceptionType
+{
+    EX_CORAL,
+    EX_REMOTING,
+    EX_STD
+};
     
 typedef const std::string& inString;
 typedef std::string& outString;
@@ -99,6 +109,9 @@ public:
     void marshalIntReturn( co::int32 value, outString msg );
     void marshalValueTypeReturn( const co::Any& valueAny, outString msg );
     void marshalRefTypeReturn( const ReferenceType& refType, outString msg );
+    
+    // Exceptions
+    void marshalException( ExceptionType exType, inString exTypeName, inString what, outString msg );
     
 private:
     Message* _message;

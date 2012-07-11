@@ -7,7 +7,6 @@ local net__index = {}
 
 function net__index:updateAll()
 	if self.frozen then 
-		print( "self.frozen" ) 
 		return nil 
 	end
 	for i = 1, #self.nodes do
@@ -21,7 +20,6 @@ end
 
 function net__index:send( address, msg )
 	if self.frozen then 
-		print( "self.frozen" ) 
 		return nil 
 	end
 	self.msgs[address] = msg 
@@ -29,7 +27,6 @@ end
 
 function net__index:checkReply( address )
 	if self.frozen then 
-		print( "self.frozen" ) 
 		return nil 
 	end
 	local reply = self.replies[address]
@@ -40,7 +37,6 @@ end
 
 function net__index:sendReply( address, msg )
 	if self.frozen then 
-		print( "self.frozen" ) 
 		return nil 
 	end
 	self.replies[address] = msg

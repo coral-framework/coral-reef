@@ -366,6 +366,34 @@ void Marshaller::marshalRefTypeReturn( const ReferenceType& refType, outString m
     _message->SerializeToString( &msg );
     _message->Clear();
 }
+    
+void Marshaller::marshalException( ExceptionType exType, inString exTypeName, inString what, 
+                                  outString msg )
+{
+    assert( _msgClear );
+    
+    _message->set_type( Message::EXCEPTION );
+    
+    Exception* ex = _message->mutable_exception();
+    switch( exType )
+    {
+        case EX_CORAL:
+            ex->set_type( Exception::CORAL );
+            break;
+        case EX_REMOTING:
+            ex->set_type( Exception::REMOTING );
+            break;
+        case EX_STD:
+            ex->set_type( Exception::STD );
+            break;
+            
+    }
+    ex->set_type_name( exTypeName );
+    ex->set_what( what );
+    
+    _message->SerializeToString( &msg );
+    _message->Clear();
+}
 
 }
 }

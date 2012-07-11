@@ -92,6 +92,17 @@ void InstanceManager::cancelLease( co::int32 instanceID, const std::string& less
     }
 }
  
+InstanceContainer* InstanceManager::getInstance( co::int32 instanceID )
+{ 
+    std::set<co::int32>::iterator it = _freedIds.find( instanceID );
+    
+    // Check if not a freed ID or higher then ID count. Can still be acessing the wrong instance.
+    if( it == _freedIds.end() && instanceID < _instances.size() )
+        return _instances[instanceID]; 
+    
+    return 0;
+}
+    
 co::int32 InstanceManager::getInstanceNumLeases( co::int32 instanceID )
 { 
     return _leaseMan->numLeases( instanceID ); 

@@ -8,15 +8,20 @@
 #include <co/IReflector.h>
 #include <co/IRecordType.h>
 
+#include <sstream>
+
 namespace reef {
 namespace rpc {
 
     // -------------- Protobuf to Any conversion functions ------------------//
-    
+
 // Specializes for each Data container's different get function.
 template <typename T>
 static T getPBContainerData( const Any_PB& container )
 {
+    if( !container.has_numeric() )
+        throw std::string( "No numeric data in parameter" );
+    
     return static_cast<T>( container.numeric() );
 }
 
@@ -24,12 +29,18 @@ static T getPBContainerData( const Any_PB& container )
 template <>
 const std::string& getPBContainerData<const std::string&>( const Any_PB& container )
 {
+    if( !container.has_str() )
+        throw std::string( "No string data in parameter" );
+    
     return container.str();
 }
 
 template <>
 bool getPBContainerData<bool>( const Any_PB& container )
 {
+    if( !container.has_boolean() )
+        throw std::string( "No boolean data in parameter" );
+    
     return container.boolean();
 }
     
@@ -96,7 +107,7 @@ co::IType* kind2Type( co::TypeKind kind )
         case co::TK_STRING:
             return co::getType( "string" );
         default:
-            assert( false );
+            throw std::string( "Only co::Any containing simple value types are supported" );
     }
     return 0;
 }
@@ -112,6 +123,11 @@ void PBParamToAny( const Parameter& param, co::IType* descriptor, co::Any& any )
     {
         elementType = co::cast<co::IArray>( descriptor )->getElementType();
         kind = elementType->getKind();
+    }
+    else
+    {
+        if( param.any().size() < 1 )
+            throw std::string( "Empty parameter" );
     }
     
     switch( kind )
@@ -164,7 +180,10 @@ void PBParamToAny( const Parameter& param, co::IType* descriptor, co::Any& any )
             break;
         }
         default:
-            assert( false );
+        {
+            if( elementType )
+                throw std::string( elementType->getFullName() ).append( " array is not supported" );
+        }
     }
 }
     
@@ -177,6 +196,10 @@ void PBParamToComplex( const Parameter& param, co::IType* descriptor, co::Any& c
     co::IReflector* refl = rt->getReflector();
     
     const Any_PB& container = param.any( 0 );
+    
+    if( !container.has_complex_type() )
+        throw std::string( "No complex type data in parameter" );
+    
     const Complex_Type& complex = container.complex_type();
     
     co::Range<co::IField* const> fields = rt->getFields();
@@ -189,37 +212,46 @@ void PBParamToComplex( const Parameter& param, co::IType* descriptor, co::Any& c
         PBParamToAny( fieldArg, field->getType(), fieldAny );
         refl->setField( complexAny, field, fieldAny );
     }
-    
-}
-
-MessageType convertMessageType( Message_Type message_type )
-{
-    switch( message_type )
-    {
-        case Message::INVOCATION:
-            return INVOCATION;
-        case Message::RETURN:
-            return RETURN;
-        case Message::REQUEST_NEW:
-            return REQUEST_NEW;
-        case Message::REQUEST_LOOKUP:
-            return REQUEST_LOOKUP;
-        case Message::REQUEST_LEASE:
-            return REQUEST_LEASE;
-        case Message::REQUEST_CANCEL_LEASE:
-            return REQUEST_CANCEL_LEASE;
-    }
 }
     
 void ParameterPuller::pullValue( co::IType* descriptor, co::Any& valueType )
 {
-    PBParamToAny( _invocation->params( _currentParam ), descriptor, valueType );
-    _currentParam++;
+    try
+    {
+        PBParamToAny( _invocation->params( _currentParam ), descriptor, valueType );
+        _currentParam++;
+    }
+    catch( std::string& e )
+    {
+        CORAL_THROW( RemotingException, "Error in Invocation in the reading of parameter " << 
+                    _currentParam << ": " << e );        
+    }
 }
     
 void ParameterPuller::pullReference( ReferenceType& refType )
 {
-    const Ref_Type& ref_type = _invocation->params( _currentParam++ ).any( 0 ).ref_type();
+    const Parameter& param = _invocation->params( _currentParam );
+    
+    size_t paramSize = param.any().size();
+    if( paramSize < 1 )
+    {
+        CORAL_THROW( RemotingException, "Error in Invocation in the reading of parameter " << 
+                    _currentParam << ": " << "Empty parameter" );
+    }
+    else if( paramSize > 1 )
+    {
+        CORAL_THROW( RemotingException, "Error in Invocation in the reading of parameter " << 
+                _currentParam << ": " << "Multiple references stored in a single value parameter" );
+    }
+    
+    const Ref_Type& ref_type = param.any( 0 ).ref_type();
+    
+    if( !ref_type.IsInitialized() )
+    {
+        CORAL_THROW( RemotingException, "Error in Invocation in the reading of parameter " << 
+                    _currentParam << ": " << "Missing fields of the reference type" );
+    }
+    
     refType.instanceID = ref_type.instance_id();
     refType.facetIdx = ref_type.facet_idx();
     
@@ -229,17 +261,20 @@ void ParameterPuller::pullReference( ReferenceType& refType )
             refType.owner = OWNER_SENDER;
             refType.ownerEndpoint = ref_type.owner_endpoint();
             refType.instanceType = ref_type.instance_type();
-            return;
+            break;
         case Ref_Type::OWNER_RECEIVER:
             refType.owner = OWNER_RECEIVER;
-            return;
+            break;
         case Ref_Type::OWNER_ANOTHER:
             refType.owner = OWNER_ANOTHER;
             refType.ownerEndpoint = ref_type.owner_endpoint();
             refType.instanceType = ref_type.instance_type();
-            return;
+            break;
+        default:
+            assert( false );
     }
 
+    _currentParam++;
 }
  
 void ParameterPuller::setInvocation( const Invocation* invocation )
@@ -269,7 +304,68 @@ MessageType Demarshaller::demarshal( inString data )
 {
     _message->Clear();
     _message->ParseFromString( data );
-    _msgType = convertMessageType( _message->type() );
+    
+    if( !_message->IsInitialized() )
+        CORAL_THROW( RemotingException, "Invalid message data" );
+    
+    _msgType = INVALID;
+    
+    switch( _message->type() )
+    {
+        case Message::INVOCATION:
+        {
+            if( _message->has_invocation() )
+                _msgType = INVOCATION;
+            
+            break;
+        }
+        case Message::RETURN:
+        {
+            if( _message->has_ret_int() || _message->has_ret_value() )
+                _msgType = RETURN;
+            
+            break;
+        }
+        case Message::REQUEST_NEW:
+        {
+            if( _message->has_request() )
+                _msgType = REQUEST_NEW;
+            
+            break;
+        }
+        case Message::REQUEST_LOOKUP:
+        {
+            if( _message->has_request() )
+                _msgType = REQUEST_LOOKUP;
+            
+            break;
+        }
+        case Message::REQUEST_LEASE:
+        {
+            if( _message->has_request() )
+                _msgType = REQUEST_LEASE;
+            
+            break;
+        }
+        case Message::REQUEST_CANCEL_LEASE:
+        {
+            if( _message->has_request() )
+                _msgType = REQUEST_CANCEL_LEASE;
+            
+            break;
+        }
+        case Message::EXCEPTION:
+        {
+            if( _message->has_exception() )
+                _msgType = EXCEPTION;
+            
+            break;
+        }
+    }
+    
+    if( _msgType == INVALID )
+        CORAL_THROW( RemotingException, "Invalid message data" );
+    
     return _msgType;
 }
 
@@ -281,6 +377,10 @@ void Demarshaller::getNew( outString requesterEndpoint, outString instanceType )
     requesterEndpoint = _message->requester_endpoint();
     
     const Request& request = _message->request();
+    
+    if( !request.IsInitialized() || !request.has_new_instance_type() )
+        CORAL_THROW( RemotingException, "Invalid request data" );
+    
     instanceType = request.new_instance_type();
 }
 
@@ -291,6 +391,10 @@ void Demarshaller::getLookup( outString requesterEndpoint, outString lookupKey )
     requesterEndpoint = _message->requester_endpoint();
     
     const Request& request = _message->request();
+    
+    if( !request.IsInitialized() || !request.has_lookup_key() )
+        CORAL_THROW( RemotingException, "Invalid request data" );
+    
     lookupKey = request.lookup_key();
 }
     
@@ -301,6 +405,10 @@ void Demarshaller::getLease( outString requesterEndpoint, co::int32& leaseInstan
     requesterEndpoint = _message->requester_endpoint();
     
     const Request& request = _message->request();
+    
+    if( !request.IsInitialized() || !request.has_lease_instance_id() )
+        CORAL_THROW( RemotingException, "Invalid request data" );
+    
     leaseInstanceID = request.lease_instance_id();
 }
    
@@ -322,6 +430,9 @@ ParameterPuller& Demarshaller::getInvocation( outString requesterEndpoint,
     
     const Invocation& invocation = _message->invocation();
     
+    if( !invocation.IsInitialized() )
+        CORAL_THROW( RemotingException, "Invalid invocation data" );
+    
     details.instanceID = invocation.instance_id();
     details.facetIdx = invocation.facet_idx();
     details.memberIdx = invocation.member_idx();
@@ -339,7 +450,14 @@ void Demarshaller::getValueTypeReturn( co::IType* descriptor, co::Any& valueAny 
     
     const Parameter& returnValue = _message->ret_value();
 
-    PBParamToAny( returnValue, descriptor, valueAny );
+    try
+    {
+        PBParamToAny( returnValue, descriptor, valueAny );
+    }
+    catch( std::string& e )
+    {
+        CORAL_THROW( RemotingException, "Error converting return value: " << e );        
+    }
 }
     
 void Demarshaller::getRefTypeReturn( ReferenceType& refType )
@@ -347,9 +465,24 @@ void Demarshaller::getRefTypeReturn( ReferenceType& refType )
     assert( _msgType == RETURN );
     
     const Parameter& PBParam = _message->ret_value();
-    const Any_PB& PBAny = PBParam.any( 0 );
-    const Ref_Type& ref_type = PBAny.ref_type();
     
+    size_t paramSize = PBParam.any().size();
+    if( paramSize < 1 )
+    {
+        CORAL_THROW( RemotingException, "Error converting return reference : Empty parameter" );
+    }
+    else if( paramSize > 1 )
+    {
+        CORAL_THROW( RemotingException, "Error converting return reference : Multiple references" );
+    }
+    
+    const Ref_Type& ref_type = PBParam.any( 0 ).ref_type();
+    
+    if( !ref_type.IsInitialized() )
+    {
+        CORAL_THROW( RemotingException, "Error converting return reference : Missing fields" );
+    }
+
     refType.instanceID = ref_type.instance_id();
     refType.facetIdx = ref_type.facet_idx();
     
@@ -369,13 +502,35 @@ void Demarshaller::getRefTypeReturn( ReferenceType& refType )
             refType.instanceType = ref_type.instance_type();
             return;
     }
-
 }
  
 co::int32 Demarshaller::getIntReturn()
 {
     assert( _msgType == RETURN );
     return _message->ret_int();
+}
+    
+ExceptionType Demarshaller::getException( outString exTypeName, outString what )
+{
+    assert( _msgType == EXCEPTION );
+    const Exception& ex = _message->exception();
+    
+    if( !ex.IsInitialized() )
+        CORAL_THROW( RemotingException, "Invalid exception data" );
+    
+    exTypeName = ex.type_name();
+    what = ex.what();
+    
+    switch( ex.type() )
+    {
+        case Exception::CORAL:
+            return EX_CORAL;
+        case Exception::REMOTING:
+            return EX_REMOTING;
+        case Exception::STD:
+            return EX_STD;
+    }
+    
 }
     
 }

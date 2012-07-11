@@ -26,10 +26,13 @@ public:
     
     inline const std::string& getEndpoint(){ return _endpoint; }
     
+    inline void setTimeout( co::int32 seconds ){ _timeout = seconds; }
 private:
     co::RefPtr<IActiveLink> _link;
     ServerRequestHandler* _srh;
     std::string _endpoint;
+    
+    co::int32 _timeout;
 };
 
 }

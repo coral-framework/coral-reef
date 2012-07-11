@@ -8,20 +8,27 @@
 #include "InstanceContainer.h"
 #include "ServerRequestHandler.h"
 
+#include <reef/rpc/RemotingException.h>
+
 #include <co/IPort.h>
+#include <co/IType.h>
 #include <co/IField.h>
+#include <co/ISystem.h>
 #include <co/IMethod.h>
 #include <co/IMember.h>
+#include <co/Exception.h>
 #include <co/IReflector.h>
 #include <co/IParameter.h>
+#include <co/ITypeManager.h>
 
 #include <string>
 #include <iostream>
+#include <sstream>
 
 namespace reef {
 namespace rpc {
 
-
+    
 Invoker::Invoker( InstanceManager* instanceMan, ServerRequestHandler* srh, 
                  RequestorManager* requestorMan ) : _instanceMan( instanceMan ),
                 _srh( srh ), _requestorMan( requestorMan )
@@ -33,15 +40,30 @@ Invoker::~Invoker()
 }
 
 void Invoker::dispatchInvocation( const std::string& invocationData )
-{
-    MessageType msgType = _demarshaller.demarshal( invocationData );
-    
+{    
     std::string returnValue;
     
-    if( msgType != INVOCATION )
-        invokeManager( _demarshaller, msgType, returnValue );
-    else
-        invokeInstance( _demarshaller, returnValue );
+    try
+    {
+        MessageType msgType = _demarshaller.demarshal( invocationData );
+        
+        if( msgType != INVOCATION )
+            invokeManager( _demarshaller, msgType, returnValue );
+        else
+            invokeInstance( _demarshaller, returnValue );
+    }
+    catch( RemotingException& e )
+    {
+        _marshaller.marshalException( EX_REMOTING, e.getTypeName(), e.what(), returnValue );
+    }
+    catch( co::Exception& e )
+    {
+        _marshaller.marshalException( EX_CORAL, e.getTypeName(), e.what(), returnValue );
+    }
+    catch( std::exception& e )
+    {
+        _marshaller.marshalException( EX_STD, "std", e.what(), returnValue );
+    }
     
     if( !returnValue.empty() )
         _srh->reply( returnValue );
@@ -59,7 +81,12 @@ void Invoker::invokeManager( Demarshaller& demarshaller, MessageType msgType,
         {
             std::string instanceType;
             _demarshaller.getNew( requesterEndpoint, instanceType );
-            co::IObject* instance = co::newInstance( instanceType );
+            
+            co::IType* type = co::getSystem()->getTypes()->findType( instanceType );
+            if( !type )
+                CORAL_THROW( RemotingException, "Unknown component type: " << instanceType );
+            
+            co::IObject* instance = type->getReflector()->newInstance();
             returnID = _instanceMan->addInstance( instance, requesterEndpoint );
             break;
         }
@@ -74,8 +101,10 @@ void Invoker::invokeManager( Demarshaller& demarshaller, MessageType msgType,
         {
             co::int32 instanceID;
             
-            // REMOTINGERROR: if no instance found with the id
             _demarshaller.getLease( requesterEndpoint, instanceID );
+            
+            if( !_instanceMan->getInstance( instanceID ) )
+                CORAL_THROW( RemotingException, "No such instance of id: " << instanceID );
             
             _instanceMan->createLease( instanceID, requesterEndpoint );
             return;
@@ -84,8 +113,10 @@ void Invoker::invokeManager( Demarshaller& demarshaller, MessageType msgType,
         {
             co::int32 instanceID;
             
-            // REMOTINGERROR: if no instance found with the id
             _demarshaller.getLease( requesterEndpoint, instanceID );
+            
+            if( !_instanceMan->getInstance( instanceID ) )
+                CORAL_THROW( RemotingException, "No such instance of id: " << instanceID );
             
             _instanceMan->cancelLease( instanceID, requesterEndpoint );
             return;
@@ -99,6 +130,7 @@ void Invoker::invokeManager( Demarshaller& demarshaller, MessageType msgType,
     
 void Invoker::invokeInstance( Demarshaller& demarshaller, std::string& returnMsg )
 {    
+    // ------ Get invocation meta data and check for inconsistencies first ------ //
     std::string senderEndpoint;
     InvocationDetails details;
     
@@ -106,18 +138,38 @@ void Invoker::invokeInstance( Demarshaller& demarshaller, std::string& returnMsg
     
     InstanceContainer* container = _instanceMan->getInstance( details.instanceID );
     
-    co::IService* facet = container->getCachedService( details.facetIdx );
+    if( !container )
+        CORAL_THROW( RemotingException, "No such instance of id: " << details.instanceID );
+    
+    co::IService* facet = container->getService( details.facetIdx );
+    
+    if( !facet )
+        CORAL_THROW( RemotingException, "No such facet of index: " << details.facetIdx );
     
     co::IInterface* memberOwner = facet->getInterface();
     
     // if method is inherited
     if( details.typeDepth != -1 )
-        memberOwner = memberOwner->getSuperTypes()[details.typeDepth];
+    {
+        co::Range<co::IInterface* const> superTypes = memberOwner->getSuperTypes();
+        
+        if( details.typeDepth >= superTypes.getSize() || details.typeDepth < -1 )
+            CORAL_THROW( RemotingException, "No such member owner of depth: " << details.typeDepth );
+            
+        memberOwner = superTypes[details.typeDepth];
+    }
         
     co::IReflector* reflector = memberOwner->getReflector();
-    co::IMember* member = memberOwner->getMembers()[details.memberIdx];
+    
+    co::Range<co::IMember* const> members = memberOwner->getMembers();
+    
+    if( details.memberIdx >= members.getSize() || details.memberIdx < 0 )
+        CORAL_THROW( RemotingException, "No such member of index: " << details.memberIdx );
+    
+    co::IMember* member = members[details.memberIdx];
     co::MemberKind kind = member->getKind();
     
+    // ------ Proceed to the actual invocation ------ //
     co::Any returnAny;
     
     if( kind == co::MK_METHOD )
@@ -139,7 +191,7 @@ void Invoker::invokeInstance( Demarshaller& demarshaller, std::string& returnMsg
         }
     }
    
-    // Marshals the return from the call
+    // Marshals the return from the call if applicable
     if( returnAny.getKind() != co::TK_INTERFACE )
     {
         _marshaller.marshalValueTypeReturn( returnAny, returnMsg );
@@ -272,6 +324,49 @@ void Invoker::getRefTypeInfo( co::IService* service, std::string& senderEndpoint
     }
 }
 
+void Invoker::handleRemotingError( RemotingResult rr, std::string& returnValue )
+{
+    std::string errorMsg;
+    
+    switch( rr )
+    {
+        case RR_UNKNOWN_COMPONENT_TYPE:
+        {
+            errorMsg = "Unknown component type";
+            return;
+        }
+        case RR_NO_SUCH_LEASE:
+        {
+            errorMsg = "No such lease";
+            return;
+        }
+        case RR_NO_SUCH_INSTANCE:
+        {
+            errorMsg = "No such instance";
+            return;
+        }
+        case RR_NO_SUCH_FACET:
+        {
+            errorMsg = "No such facet";
+            return;
+        }
+        case RR_NO_SUCH_MEMBER_OWNER:
+        {
+            errorMsg = "No such member owner";
+            return;
+        }
+        case RR_NO_SUCH_MEMBER:
+        {
+            errorMsg = "No such member";
+            return;
+        }
+        default:
+            assert( false );
+    }
+    
+    _marshaller.marshalException( EX_REMOTING, "reef.rpc.RemotingError", errorMsg, returnValue );
+}
+    
 }
     
 } // namespace reef

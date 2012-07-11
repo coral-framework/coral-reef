@@ -23,7 +23,9 @@ enum MessageType
     REQUEST_NEW,
     REQUEST_LOOKUP,
     REQUEST_LEASE,
-    REQUEST_CANCEL_LEASE
+    REQUEST_CANCEL_LEASE,
+    EXCEPTION,
+    INVALID
 };
 
 // Helper class. Extracts parameters from a demarshalled invocation.
@@ -42,7 +44,7 @@ private:
     co::int32 _currentParam;
     const Invocation* _invocation;
 };
-    
+  
 class Demarshaller
 {
     
@@ -71,6 +73,7 @@ public:
     void getRefTypeReturn( ReferenceType& refType );
     co::int32 getIntReturn();
     
+    ExceptionType getException( outString exTypeName, outString what );
 private:
     void checkIfCallMsg();
     

@@ -25,6 +25,10 @@ const ::google::protobuf::EnumDescriptor* Message_Type_descriptor_ = NULL;
 const ::google::protobuf::Descriptor* Request_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   Request_reflection_ = NULL;
+const ::google::protobuf::Descriptor* Exception_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  Exception_reflection_ = NULL;
+const ::google::protobuf::EnumDescriptor* Exception_Type_descriptor_ = NULL;
 const ::google::protobuf::Descriptor* Invocation_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   Invocation_reflection_ = NULL;
@@ -52,13 +56,14 @@ void protobuf_AssignDesc_Message_2eproto() {
       "Message.proto");
   GOOGLE_CHECK(file != NULL);
   Message_descriptor_ = file->message_type(0);
-  static const int Message_offsets_[6] = {
+  static const int Message_offsets_[7] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, requester_endpoint_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, invocation_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, request_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, ret_value_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, ret_int_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, exception_),
   };
   Message_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -89,7 +94,25 @@ void protobuf_AssignDesc_Message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Request));
-  Invocation_descriptor_ = file->message_type(2);
+  Exception_descriptor_ = file->message_type(2);
+  static const int Exception_offsets_[3] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Exception, type_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Exception, type_name_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Exception, what_),
+  };
+  Exception_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      Exception_descriptor_,
+      Exception::default_instance_,
+      Exception_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Exception, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Exception, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(Exception));
+  Exception_Type_descriptor_ = Exception_descriptor_->enum_type(0);
+  Invocation_descriptor_ = file->message_type(3);
   static const int Invocation_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Invocation, instance_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Invocation, facet_idx_),
@@ -109,7 +132,7 @@ void protobuf_AssignDesc_Message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Invocation));
-  Parameter_descriptor_ = file->message_type(3);
+  Parameter_descriptor_ = file->message_type(4);
   static const int Parameter_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Parameter, any_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Parameter, any_type_),
@@ -125,7 +148,7 @@ void protobuf_AssignDesc_Message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Parameter));
-  Any_PB_descriptor_ = file->message_type(4);
+  Any_PB_descriptor_ = file->message_type(5);
   static const int Any_PB_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Any_PB, boolean_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Any_PB, str_),
@@ -144,7 +167,7 @@ void protobuf_AssignDesc_Message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Any_PB));
-  Complex_Type_descriptor_ = file->message_type(5);
+  Complex_Type_descriptor_ = file->message_type(6);
   static const int Complex_Type_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Complex_Type, field_),
   };
@@ -159,7 +182,7 @@ void protobuf_AssignDesc_Message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Complex_Type));
-  Ref_Type_descriptor_ = file->message_type(6);
+  Ref_Type_descriptor_ = file->message_type(7);
   static const int Ref_Type_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Ref_Type, owner_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Ref_Type, instance_id_),
@@ -196,6 +219,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     Request_descriptor_, &Request::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    Exception_descriptor_, &Exception::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     Invocation_descriptor_, &Invocation::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     Parameter_descriptor_, &Parameter::default_instance());
@@ -214,6 +239,8 @@ void protobuf_ShutdownFile_Message_2eproto() {
   delete Message_reflection_;
   delete Request::default_instance_;
   delete Request_reflection_;
+  delete Exception::default_instance_;
+  delete Exception_reflection_;
   delete Invocation::default_instance_;
   delete Invocation_reflection_;
   delete Parameter::default_instance_;
@@ -233,37 +260,42 @@ void protobuf_AddDesc_Message_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\rMessage.proto\022\010reef.rpc\"\310\002\n\007Message\022\032\n"
+    "\n\rMessage.proto\022\010reef.rpc\"\200\003\n\007Message\022\032\n"
     "\022requester_endpoint\030\001 \001(\t\022$\n\004type\030\002 \002(\0162"
     "\026.reef.rpc.Message.Type\022(\n\ninvocation\030\003 "
     "\001(\0132\024.reef.rpc.Invocation\022\"\n\007request\030\004 \001"
     "(\0132\021.reef.rpc.Request\022&\n\tret_value\030\005 \001(\013"
-    "2\023.reef.rpc.Parameter\022\017\n\007ret_int\030\006 \001(\005\"t"
-    "\n\004Type\022\016\n\nINVOCATION\020\000\022\017\n\013REQUEST_NEW\020\001\022"
-    "\022\n\016REQUEST_LOOKUP\020\002\022\021\n\rREQUEST_LEASE\020\003\022\030"
-    "\n\024REQUEST_CANCEL_LEASE\020\004\022\n\n\006RETURN\020\005\"S\n\007"
-    "Request\022\031\n\021new_instance_type\030\002 \001(\t\022\022\n\nlo"
-    "okup_key\030\003 \001(\t\022\031\n\021lease_instance_id\030\004 \001("
-    "\r\"\220\001\n\nInvocation\022\023\n\013instance_id\030\001 \002(\r\022\021\n"
-    "\tfacet_idx\030\002 \002(\r\022\022\n\nmember_idx\030\003 \002(\r\022\022\n\n"
-    "type_depth\030\004 \002(\005\022\r\n\005synch\030\005 \002(\010\022#\n\006param"
-    "s\030\006 \003(\0132\023.reef.rpc.Parameter\"<\n\tParamete"
-    "r\022\035\n\003any\030\001 \003(\0132\020.reef.rpc.Any_PB\022\020\n\010any_"
-    "type\030\002 \001(\r\"\213\001\n\006Any_PB\022\017\n\007boolean\030\001 \001(\010\022\013"
-    "\n\003str\030\002 \001(\t\022\017\n\007numeric\030\003 \001(\001\022,\n\014complex_"
-    "type\030\004 \001(\0132\026.reef.rpc.Complex_Type\022$\n\010re"
-    "f_type\030\005 \001(\0132\022.reef.rpc.Ref_Type\"2\n\014Comp"
-    "lex_Type\022\"\n\005field\030\001 \003(\0132\023.reef.rpc.Param"
-    "eter\"\314\001\n\010Ref_Type\022\'\n\005owner\030\001 \002(\0162\030.reef."
-    "rpc.Ref_Type.Owner\022\023\n\013instance_id\030\002 \002(\r\022"
-    "\021\n\tfacet_idx\030\003 \002(\r\022\025\n\rinstance_type\030\004 \001("
-    "\t\022\026\n\016owner_endpoint\030\005 \001(\t\"@\n\005Owner\022\020\n\014OW"
-    "NER_SENDER\020\000\022\022\n\016OWNER_RECEIVER\020\001\022\021\n\rOWNE"
-    "R_ANOTHER\020\002", 1051);
+    "2\023.reef.rpc.Parameter\022\017\n\007ret_int\030\006 \001(\005\022&"
+    "\n\texception\030\007 \001(\0132\023.reef.rpc.Exception\"\203"
+    "\001\n\004Type\022\016\n\nINVOCATION\020\000\022\017\n\013REQUEST_NEW\020\001"
+    "\022\022\n\016REQUEST_LOOKUP\020\002\022\021\n\rREQUEST_LEASE\020\003\022"
+    "\030\n\024REQUEST_CANCEL_LEASE\020\004\022\n\n\006RETURN\020\005\022\r\n"
+    "\tEXCEPTION\020\006\"S\n\007Request\022\031\n\021new_instance_"
+    "type\030\002 \001(\t\022\022\n\nlookup_key\030\003 \001(\t\022\031\n\021lease_"
+    "instance_id\030\004 \001(\r\"~\n\tException\022&\n\004type\030\001"
+    " \002(\0162\030.reef.rpc.Exception.Type\022\021\n\ttype_n"
+    "ame\030\002 \002(\t\022\014\n\004what\030\003 \002(\t\"(\n\004Type\022\t\n\005CORAL"
+    "\020\000\022\014\n\010REMOTING\020\001\022\007\n\003STD\020\002\"\220\001\n\nInvocation"
+    "\022\023\n\013instance_id\030\001 \002(\r\022\021\n\tfacet_idx\030\002 \002(\r"
+    "\022\022\n\nmember_idx\030\003 \002(\r\022\022\n\ntype_depth\030\004 \002(\005"
+    "\022\r\n\005synch\030\005 \002(\010\022#\n\006params\030\006 \003(\0132\023.reef.r"
+    "pc.Parameter\"<\n\tParameter\022\035\n\003any\030\001 \003(\0132\020"
+    ".reef.rpc.Any_PB\022\020\n\010any_type\030\002 \001(\r\"\213\001\n\006A"
+    "ny_PB\022\017\n\007boolean\030\001 \001(\010\022\013\n\003str\030\002 \001(\t\022\017\n\007n"
+    "umeric\030\003 \001(\001\022,\n\014complex_type\030\004 \001(\0132\026.ree"
+    "f.rpc.Complex_Type\022$\n\010ref_type\030\005 \001(\0132\022.r"
+    "eef.rpc.Ref_Type\"2\n\014Complex_Type\022\"\n\005fiel"
+    "d\030\001 \003(\0132\023.reef.rpc.Parameter\"\314\001\n\010Ref_Typ"
+    "e\022\'\n\005owner\030\001 \002(\0162\030.reef.rpc.Ref_Type.Own"
+    "er\022\023\n\013instance_id\030\002 \002(\r\022\021\n\tfacet_idx\030\003 \002"
+    "(\r\022\025\n\rinstance_type\030\004 \001(\t\022\026\n\016owner_endpo"
+    "int\030\005 \001(\t\"@\n\005Owner\022\020\n\014OWNER_SENDER\020\000\022\022\n\016"
+    "OWNER_RECEIVER\020\001\022\021\n\rOWNER_ANOTHER\020\002", 1235);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "Message.proto", &protobuf_RegisterTypes);
   Message::default_instance_ = new Message();
   Request::default_instance_ = new Request();
+  Exception::default_instance_ = new Exception();
   Invocation::default_instance_ = new Invocation();
   Parameter::default_instance_ = new Parameter();
   Any_PB::default_instance_ = new Any_PB();
@@ -271,6 +303,7 @@ void protobuf_AddDesc_Message_2eproto() {
   Ref_Type::default_instance_ = new Ref_Type();
   Message::default_instance_->InitAsDefaultInstance();
   Request::default_instance_->InitAsDefaultInstance();
+  Exception::default_instance_->InitAsDefaultInstance();
   Invocation::default_instance_->InitAsDefaultInstance();
   Parameter::default_instance_->InitAsDefaultInstance();
   Any_PB::default_instance_->InitAsDefaultInstance();
@@ -301,6 +334,7 @@ bool Message_Type_IsValid(int value) {
     case 3:
     case 4:
     case 5:
+    case 6:
       return true;
     default:
       return false;
@@ -314,6 +348,7 @@ const Message_Type Message::REQUEST_LOOKUP;
 const Message_Type Message::REQUEST_LEASE;
 const Message_Type Message::REQUEST_CANCEL_LEASE;
 const Message_Type Message::RETURN;
+const Message_Type Message::EXCEPTION;
 const Message_Type Message::Type_MIN;
 const Message_Type Message::Type_MAX;
 const int Message::Type_ARRAYSIZE;
@@ -325,6 +360,7 @@ const int Message::kInvocationFieldNumber;
 const int Message::kRequestFieldNumber;
 const int Message::kRetValueFieldNumber;
 const int Message::kRetIntFieldNumber;
+const int Message::kExceptionFieldNumber;
 #endif  // !_MSC_VER
 
 Message::Message()
@@ -336,6 +372,7 @@ void Message::InitAsDefaultInstance() {
   invocation_ = const_cast< ::reef::rpc::Invocation*>(&::reef::rpc::Invocation::default_instance());
   request_ = const_cast< ::reef::rpc::Request*>(&::reef::rpc::Request::default_instance());
   ret_value_ = const_cast< ::reef::rpc::Parameter*>(&::reef::rpc::Parameter::default_instance());
+  exception_ = const_cast< ::reef::rpc::Exception*>(&::reef::rpc::Exception::default_instance());
 }
 
 Message::Message(const Message& from)
@@ -352,6 +389,7 @@ void Message::SharedCtor() {
   request_ = NULL;
   ret_value_ = NULL;
   ret_int_ = 0;
+  exception_ = NULL;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -367,6 +405,7 @@ void Message::SharedDtor() {
     delete invocation_;
     delete request_;
     delete ret_value_;
+    delete exception_;
   }
 }
 
@@ -408,6 +447,9 @@ void Message::Clear() {
       if (ret_value_ != NULL) ret_value_->::reef::rpc::Parameter::Clear();
     }
     ret_int_ = 0;
+    if (has_exception()) {
+      if (exception_ != NULL) exception_->::reef::rpc::Exception::Clear();
+    }
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -510,6 +552,20 @@ bool Message::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(58)) goto parse_exception;
+        break;
+      }
+      
+      // optional .reef.rpc.Exception exception = 7;
+      case 7: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_exception:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_exception()));
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -570,6 +626,12 @@ void Message::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(6, this->ret_int(), output);
   }
   
+  // optional .reef.rpc.Exception exception = 7;
+  if (has_exception()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      7, this->exception(), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -618,6 +680,13 @@ void Message::SerializeWithCachedSizes(
   // optional int32 ret_int = 6;
   if (has_ret_int()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(6, this->ret_int(), target);
+  }
+  
+  // optional .reef.rpc.Exception exception = 7;
+  if (has_exception()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        7, this->exception(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -672,6 +741,13 @@ int Message::ByteSize() const {
           this->ret_int());
     }
     
+    // optional .reef.rpc.Exception exception = 7;
+    if (has_exception()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->exception());
+    }
+    
   }
   if (!unknown_fields().empty()) {
     total_size +=
@@ -717,6 +793,9 @@ void Message::MergeFrom(const Message& from) {
     if (from.has_ret_int()) {
       set_ret_int(from.ret_int());
     }
+    if (from.has_exception()) {
+      mutable_exception()->::reef::rpc::Exception::MergeFrom(from.exception());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -742,6 +821,9 @@ bool Message::IsInitialized() const {
   if (has_ret_value()) {
     if (!this->ret_value().IsInitialized()) return false;
   }
+  if (has_exception()) {
+    if (!this->exception().IsInitialized()) return false;
+  }
   return true;
 }
 
@@ -753,6 +835,7 @@ void Message::Swap(Message* other) {
     std::swap(request_, other->request_);
     std::swap(ret_value_, other->ret_value_);
     std::swap(ret_int_, other->ret_int_);
+    std::swap(exception_, other->exception_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
@@ -1085,6 +1168,357 @@ void Request::Swap(Request* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = Request_descriptor_;
   metadata.reflection = Request_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+const ::google::protobuf::EnumDescriptor* Exception_Type_descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return Exception_Type_descriptor_;
+}
+bool Exception_Type_IsValid(int value) {
+  switch(value) {
+    case 0:
+    case 1:
+    case 2:
+      return true;
+    default:
+      return false;
+  }
+}
+
+#ifndef _MSC_VER
+const Exception_Type Exception::CORAL;
+const Exception_Type Exception::REMOTING;
+const Exception_Type Exception::STD;
+const Exception_Type Exception::Type_MIN;
+const Exception_Type Exception::Type_MAX;
+const int Exception::Type_ARRAYSIZE;
+#endif  // _MSC_VER
+#ifndef _MSC_VER
+const int Exception::kTypeFieldNumber;
+const int Exception::kTypeNameFieldNumber;
+const int Exception::kWhatFieldNumber;
+#endif  // !_MSC_VER
+
+Exception::Exception()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void Exception::InitAsDefaultInstance() {
+}
+
+Exception::Exception(const Exception& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void Exception::SharedCtor() {
+  _cached_size_ = 0;
+  type_ = 0;
+  type_name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  what_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+Exception::~Exception() {
+  SharedDtor();
+}
+
+void Exception::SharedDtor() {
+  if (type_name_ != &::google::protobuf::internal::kEmptyString) {
+    delete type_name_;
+  }
+  if (what_ != &::google::protobuf::internal::kEmptyString) {
+    delete what_;
+  }
+  if (this != default_instance_) {
+  }
+}
+
+void Exception::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* Exception::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return Exception_descriptor_;
+}
+
+const Exception& Exception::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_Message_2eproto();  return *default_instance_;
+}
+
+Exception* Exception::default_instance_ = NULL;
+
+Exception* Exception::New() const {
+  return new Exception;
+}
+
+void Exception::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    type_ = 0;
+    if (has_type_name()) {
+      if (type_name_ != &::google::protobuf::internal::kEmptyString) {
+        type_name_->clear();
+      }
+    }
+    if (has_what()) {
+      if (what_ != &::google::protobuf::internal::kEmptyString) {
+        what_->clear();
+      }
+    }
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool Exception::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required .reef.rpc.Exception.Type type = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+          int value;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          if (::reef::rpc::Exception_Type_IsValid(value)) {
+            set_type(static_cast< ::reef::rpc::Exception_Type >(value));
+          } else {
+            mutable_unknown_fields()->AddVarint(1, value);
+          }
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(18)) goto parse_type_name;
+        break;
+      }
+      
+      // required string type_name = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_type_name:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_type_name()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->type_name().data(), this->type_name().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(26)) goto parse_what;
+        break;
+      }
+      
+      // required string what = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_what:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_what()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->what().data(), this->what().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+      
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void Exception::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // required .reef.rpc.Exception.Type type = 1;
+  if (has_type()) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      1, this->type(), output);
+  }
+  
+  // required string type_name = 2;
+  if (has_type_name()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->type_name().data(), this->type_name().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      2, this->type_name(), output);
+  }
+  
+  // required string what = 3;
+  if (has_what()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->what().data(), this->what().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      3, this->what(), output);
+  }
+  
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* Exception::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // required .reef.rpc.Exception.Type type = 1;
+  if (has_type()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      1, this->type(), target);
+  }
+  
+  // required string type_name = 2;
+  if (has_type_name()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->type_name().data(), this->type_name().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->type_name(), target);
+  }
+  
+  // required string what = 3;
+  if (has_what()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->what().data(), this->what().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        3, this->what(), target);
+  }
+  
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int Exception::ByteSize() const {
+  int total_size = 0;
+  
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required .reef.rpc.Exception.Type type = 1;
+    if (has_type()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::EnumSize(this->type());
+    }
+    
+    // required string type_name = 2;
+    if (has_type_name()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->type_name());
+    }
+    
+    // required string what = 3;
+    if (has_what()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->what());
+    }
+    
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void Exception::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const Exception* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const Exception*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void Exception::MergeFrom(const Exception& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_type()) {
+      set_type(from.type());
+    }
+    if (from.has_type_name()) {
+      set_type_name(from.type_name());
+    }
+    if (from.has_what()) {
+      set_what(from.what());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void Exception::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Exception::CopyFrom(const Exception& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Exception::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000007) != 0x00000007) return false;
+  
+  return true;
+}
+
+void Exception::Swap(Exception* other) {
+  if (other != this) {
+    std::swap(type_, other->type_);
+    std::swap(type_name_, other->type_name_);
+    std::swap(what_, other->what_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata Exception::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = Exception_descriptor_;
+  metadata.reflection = Exception_reflection_;
   return metadata;
 }
 

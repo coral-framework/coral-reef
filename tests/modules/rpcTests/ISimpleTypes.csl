@@ -39,4 +39,6 @@ interface ISimpleTypes extends ISimpleParent
 	any addDoublesFromAny( in any d1, in any d2 );
 	any concatenateFromAny( in any str1, in any str2 );
 	any mergeListsFromAny( in any l1, in any l2 );
+	
+	void throwException( in string exceptionType, in string exceptionMsg );
 };

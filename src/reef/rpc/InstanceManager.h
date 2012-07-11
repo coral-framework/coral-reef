@@ -30,8 +30,7 @@ public:
     
     void cancelLease( co::int32 instanceID, const std::string& lesseeEndpoint );
     
-    
-    inline InstanceContainer* getInstance( co::int32 instanceID ){ return _instances[instanceID]; }
+    InstanceContainer* getInstance( co::int32 instanceID );
     
     co::int32 getInstanceNumLeases( co::int32 instanceID );
     

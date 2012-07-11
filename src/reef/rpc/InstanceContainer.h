@@ -16,7 +16,7 @@ public:
     InstanceContainer( co::IObject* instance );
     
     // Get the (cacheable) service
-    co::IService* getCachedService( co::int32 facetIdx );
+    co::IService* getService( co::int32 facetIdx );
     
     inline co::IObject* getInstance(){ return _instance.get(); }
     
@@ -30,7 +30,7 @@ private:
     co::IComponent* _component;
     
     // initializes _openedService's and Reflector's index for the accessed service
-	void onServiceFirstAccess( co::int32 serviceId );
+	co::IService* onServiceFirstAccess( co::int32 serviceId );
 	std::vector<co::IService*> _openedServices;
 };
 

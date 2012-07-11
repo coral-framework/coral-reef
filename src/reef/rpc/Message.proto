@@ -34,12 +34,13 @@ message Exception
 {
 	enum Type
 	{
-		ERROR_LOGIC = 0;
-		ERROR_REMOTING = 1;
+		CORAL = 0;
+		REMOTING = 1;
+		STD = 2;
 	}
 	required Type type = 1;
-	required string exception_name = 2;
-	required string expection_msg = 3;
+	required string type_name = 2;
+	required string what = 3;
 }
 
 // Commands (triggers actions into destination nodes)

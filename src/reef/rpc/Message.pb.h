@@ -35,6 +35,7 @@ void protobuf_ShutdownFile_Message_2eproto();
 
 class Message;
 class Request;
+class Exception;
 class Invocation;
 class Parameter;
 class Any_PB;
@@ -47,11 +48,12 @@ enum Message_Type {
   Message_Type_REQUEST_LOOKUP = 2,
   Message_Type_REQUEST_LEASE = 3,
   Message_Type_REQUEST_CANCEL_LEASE = 4,
-  Message_Type_RETURN = 5
+  Message_Type_RETURN = 5,
+  Message_Type_EXCEPTION = 6
 };
 bool Message_Type_IsValid(int value);
 const Message_Type Message_Type_Type_MIN = Message_Type_INVOCATION;
-const Message_Type Message_Type_Type_MAX = Message_Type_RETURN;
+const Message_Type Message_Type_Type_MAX = Message_Type_EXCEPTION;
 const int Message_Type_Type_ARRAYSIZE = Message_Type_Type_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* Message_Type_descriptor();
@@ -63,6 +65,26 @@ inline bool Message_Type_Parse(
     const ::std::string& name, Message_Type* value) {
   return ::google::protobuf::internal::ParseNamedEnum<Message_Type>(
     Message_Type_descriptor(), name, value);
+}
+enum Exception_Type {
+  Exception_Type_CORAL = 0,
+  Exception_Type_REMOTING = 1,
+  Exception_Type_STD = 2
+};
+bool Exception_Type_IsValid(int value);
+const Exception_Type Exception_Type_Type_MIN = Exception_Type_CORAL;
+const Exception_Type Exception_Type_Type_MAX = Exception_Type_STD;
+const int Exception_Type_Type_ARRAYSIZE = Exception_Type_Type_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* Exception_Type_descriptor();
+inline const ::std::string& Exception_Type_Name(Exception_Type value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    Exception_Type_descriptor(), value);
+}
+inline bool Exception_Type_Parse(
+    const ::std::string& name, Exception_Type* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<Exception_Type>(
+    Exception_Type_descriptor(), name, value);
 }
 enum Ref_Type_Owner {
   Ref_Type_Owner_OWNER_SENDER = 0,
@@ -145,6 +167,7 @@ class Message : public ::google::protobuf::Message {
   static const Type REQUEST_LEASE = Message_Type_REQUEST_LEASE;
   static const Type REQUEST_CANCEL_LEASE = Message_Type_REQUEST_CANCEL_LEASE;
   static const Type RETURN = Message_Type_RETURN;
+  static const Type EXCEPTION = Message_Type_EXCEPTION;
   static inline bool Type_IsValid(int value) {
     return Message_Type_IsValid(value);
   }
@@ -217,6 +240,14 @@ class Message : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 ret_int() const;
   inline void set_ret_int(::google::protobuf::int32 value);
   
+  // optional .reef.rpc.Exception exception = 7;
+  inline bool has_exception() const;
+  inline void clear_exception();
+  static const int kExceptionFieldNumber = 7;
+  inline const ::reef::rpc::Exception& exception() const;
+  inline ::reef::rpc::Exception* mutable_exception();
+  inline ::reef::rpc::Exception* release_exception();
+  
   // @@protoc_insertion_point(class_scope:reef.rpc.Message)
  private:
   inline void set_has_requester_endpoint();
@@ -231,6 +262,8 @@ class Message : public ::google::protobuf::Message {
   inline void clear_has_ret_value();
   inline void set_has_ret_int();
   inline void clear_has_ret_int();
+  inline void set_has_exception();
+  inline void clear_has_exception();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
@@ -240,9 +273,10 @@ class Message : public ::google::protobuf::Message {
   int type_;
   ::google::protobuf::int32 ret_int_;
   ::reef::rpc::Parameter* ret_value_;
+  ::reef::rpc::Exception* exception_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(7 + 31) / 32];
   
   friend void  protobuf_AddDesc_Message_2eproto();
   friend void protobuf_AssignDesc_Message_2eproto();
@@ -360,6 +394,141 @@ class Request : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static Request* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class Exception : public ::google::protobuf::Message {
+ public:
+  Exception();
+  virtual ~Exception();
+  
+  Exception(const Exception& from);
+  
+  inline Exception& operator=(const Exception& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Exception& default_instance();
+  
+  void Swap(Exception* other);
+  
+  // implements Message ----------------------------------------------
+  
+  Exception* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const Exception& from);
+  void MergeFrom(const Exception& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  typedef Exception_Type Type;
+  static const Type CORAL = Exception_Type_CORAL;
+  static const Type REMOTING = Exception_Type_REMOTING;
+  static const Type STD = Exception_Type_STD;
+  static inline bool Type_IsValid(int value) {
+    return Exception_Type_IsValid(value);
+  }
+  static const Type Type_MIN =
+    Exception_Type_Type_MIN;
+  static const Type Type_MAX =
+    Exception_Type_Type_MAX;
+  static const int Type_ARRAYSIZE =
+    Exception_Type_Type_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  Type_descriptor() {
+    return Exception_Type_descriptor();
+  }
+  static inline const ::std::string& Type_Name(Type value) {
+    return Exception_Type_Name(value);
+  }
+  static inline bool Type_Parse(const ::std::string& name,
+      Type* value) {
+    return Exception_Type_Parse(name, value);
+  }
+  
+  // accessors -------------------------------------------------------
+  
+  // required .reef.rpc.Exception.Type type = 1;
+  inline bool has_type() const;
+  inline void clear_type();
+  static const int kTypeFieldNumber = 1;
+  inline ::reef::rpc::Exception_Type type() const;
+  inline void set_type(::reef::rpc::Exception_Type value);
+  
+  // required string type_name = 2;
+  inline bool has_type_name() const;
+  inline void clear_type_name();
+  static const int kTypeNameFieldNumber = 2;
+  inline const ::std::string& type_name() const;
+  inline void set_type_name(const ::std::string& value);
+  inline void set_type_name(const char* value);
+  inline void set_type_name(const char* value, size_t size);
+  inline ::std::string* mutable_type_name();
+  inline ::std::string* release_type_name();
+  
+  // required string what = 3;
+  inline bool has_what() const;
+  inline void clear_what();
+  static const int kWhatFieldNumber = 3;
+  inline const ::std::string& what() const;
+  inline void set_what(const ::std::string& value);
+  inline void set_what(const char* value);
+  inline void set_what(const char* value, size_t size);
+  inline ::std::string* mutable_what();
+  inline ::std::string* release_what();
+  
+  // @@protoc_insertion_point(class_scope:reef.rpc.Exception)
+ private:
+  inline void set_has_type();
+  inline void clear_has_type();
+  inline void set_has_type_name();
+  inline void clear_has_type_name();
+  inline void set_has_what();
+  inline void clear_has_what();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::std::string* type_name_;
+  ::std::string* what_;
+  int type_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_Message_2eproto();
+  friend void protobuf_AssignDesc_Message_2eproto();
+  friend void protobuf_ShutdownFile_Message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static Exception* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -1156,6 +1325,35 @@ inline void Message::set_ret_int(::google::protobuf::int32 value) {
   ret_int_ = value;
 }
 
+// optional .reef.rpc.Exception exception = 7;
+inline bool Message::has_exception() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void Message::set_has_exception() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void Message::clear_has_exception() {
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline void Message::clear_exception() {
+  if (exception_ != NULL) exception_->::reef::rpc::Exception::Clear();
+  clear_has_exception();
+}
+inline const ::reef::rpc::Exception& Message::exception() const {
+  return exception_ != NULL ? *exception_ : *default_instance_->exception_;
+}
+inline ::reef::rpc::Exception* Message::mutable_exception() {
+  set_has_exception();
+  if (exception_ == NULL) exception_ = new ::reef::rpc::Exception;
+  return exception_;
+}
+inline ::reef::rpc::Exception* Message::release_exception() {
+  clear_has_exception();
+  ::reef::rpc::Exception* temp = exception_;
+  exception_ = NULL;
+  return temp;
+}
+
 // -------------------------------------------------------------------
 
 // Request
@@ -1296,6 +1494,149 @@ inline ::google::protobuf::uint32 Request::lease_instance_id() const {
 inline void Request::set_lease_instance_id(::google::protobuf::uint32 value) {
   set_has_lease_instance_id();
   lease_instance_id_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// Exception
+
+// required .reef.rpc.Exception.Type type = 1;
+inline bool Exception::has_type() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void Exception::set_has_type() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void Exception::clear_has_type() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void Exception::clear_type() {
+  type_ = 0;
+  clear_has_type();
+}
+inline ::reef::rpc::Exception_Type Exception::type() const {
+  return static_cast< ::reef::rpc::Exception_Type >(type_);
+}
+inline void Exception::set_type(::reef::rpc::Exception_Type value) {
+  GOOGLE_DCHECK(::reef::rpc::Exception_Type_IsValid(value));
+  set_has_type();
+  type_ = value;
+}
+
+// required string type_name = 2;
+inline bool Exception::has_type_name() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void Exception::set_has_type_name() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void Exception::clear_has_type_name() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void Exception::clear_type_name() {
+  if (type_name_ != &::google::protobuf::internal::kEmptyString) {
+    type_name_->clear();
+  }
+  clear_has_type_name();
+}
+inline const ::std::string& Exception::type_name() const {
+  return *type_name_;
+}
+inline void Exception::set_type_name(const ::std::string& value) {
+  set_has_type_name();
+  if (type_name_ == &::google::protobuf::internal::kEmptyString) {
+    type_name_ = new ::std::string;
+  }
+  type_name_->assign(value);
+}
+inline void Exception::set_type_name(const char* value) {
+  set_has_type_name();
+  if (type_name_ == &::google::protobuf::internal::kEmptyString) {
+    type_name_ = new ::std::string;
+  }
+  type_name_->assign(value);
+}
+inline void Exception::set_type_name(const char* value, size_t size) {
+  set_has_type_name();
+  if (type_name_ == &::google::protobuf::internal::kEmptyString) {
+    type_name_ = new ::std::string;
+  }
+  type_name_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* Exception::mutable_type_name() {
+  set_has_type_name();
+  if (type_name_ == &::google::protobuf::internal::kEmptyString) {
+    type_name_ = new ::std::string;
+  }
+  return type_name_;
+}
+inline ::std::string* Exception::release_type_name() {
+  clear_has_type_name();
+  if (type_name_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = type_name_;
+    type_name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// required string what = 3;
+inline bool Exception::has_what() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void Exception::set_has_what() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void Exception::clear_has_what() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void Exception::clear_what() {
+  if (what_ != &::google::protobuf::internal::kEmptyString) {
+    what_->clear();
+  }
+  clear_has_what();
+}
+inline const ::std::string& Exception::what() const {
+  return *what_;
+}
+inline void Exception::set_what(const ::std::string& value) {
+  set_has_what();
+  if (what_ == &::google::protobuf::internal::kEmptyString) {
+    what_ = new ::std::string;
+  }
+  what_->assign(value);
+}
+inline void Exception::set_what(const char* value) {
+  set_has_what();
+  if (what_ == &::google::protobuf::internal::kEmptyString) {
+    what_ = new ::std::string;
+  }
+  what_->assign(value);
+}
+inline void Exception::set_what(const char* value, size_t size) {
+  set_has_what();
+  if (what_ == &::google::protobuf::internal::kEmptyString) {
+    what_ = new ::std::string;
+  }
+  what_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* Exception::mutable_what() {
+  set_has_what();
+  if (what_ == &::google::protobuf::internal::kEmptyString) {
+    what_ = new ::std::string;
+  }
+  return what_;
+}
+inline ::std::string* Exception::release_what() {
+  clear_has_what();
+  if (what_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = what_;
+    what_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
 }
 
 // -------------------------------------------------------------------
@@ -1881,6 +2222,10 @@ namespace protobuf {
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::reef::rpc::Message_Type>() {
   return ::reef::rpc::Message_Type_descriptor();
+}
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::reef::rpc::Exception_Type>() {
+  return ::reef::rpc::Exception_Type_descriptor();
 }
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::reef::rpc::Ref_Type_Owner>() {
