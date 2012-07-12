@@ -7,7 +7,6 @@ end
 
 function PassiveLink:receive()
 	local msg = self.net:check( self.address )
-	--print( "PassiveLink of address ".. self.address .. " received: " .. tostring( msg ) )
 	
 	if msg then
 		return true, msg

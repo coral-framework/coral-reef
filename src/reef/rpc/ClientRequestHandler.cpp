@@ -25,6 +25,7 @@ void ClientRequestHandler::handleSynchRequest( const std::string& request, std::
 {
     _link->send( request );
     
+    // Begin counting for timeout
     time_t tstart = time(0);
     
     // The Wait for the reply still keeps updating the server
@@ -32,7 +33,7 @@ void ClientRequestHandler::handleSynchRequest( const std::string& request, std::
     {
         _srh->react();
         
-        if( _timeout + tstart - time( 0 ) > 0 )
+        if( time( 0 ) - tstart > _timeout )
             CORAL_THROW( RemotingException, "Reply receiving timeout" );
     }
 }
