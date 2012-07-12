@@ -1,5 +1,9 @@
 #include "LeaseManager.h"
 
+#include <reef/rpc/RemotingException.h>
+
+#include <sstream>
+
 namespace reef {
 namespace rpc {
 
@@ -51,13 +55,14 @@ void LeaseManager::addLease( co::int32 lessorID, const std::string lesseeEndpoin
 bool LeaseManager::removeLease( co::int32 lessorID, const std::string lesseeEndpoint )
 {
     std::map<std::string, Lessee*>::iterator lesseeIt = _lessees.find( lesseeEndpoint );
-    assert( lesseeIt != _lessees.end() ); //REMOTINGERROR There is no Lessee associated with ip
+    if( lesseeIt == _lessees.end() ) //REMOTINGERROR There is no Lessee associated with ip
+		CORAL_THROW( RemotingException, "The lessee has 0 leases to cancel" )
     
     // Remove the reference to the lessor from the lessee, and if empty, remove the lessee
     Lessee* lessee = lesseeIt->second;
     
     if( !lessee->removeLease( lessorID ) )
-        assert( false ); //REMOTINGERROR There is no reference to the Id
+        CORAL_THROW( RemotingException, "The lessee has lease for " << lessorID );
     
     if( !lessee->hasLeases() )
     {

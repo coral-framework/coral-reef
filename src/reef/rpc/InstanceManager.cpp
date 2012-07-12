@@ -14,23 +14,14 @@ InstanceManager::InstanceManager()
 }
 
 InstanceManager::~InstanceManager()
-{
-    // fill the empty holes in the invokers vector
-    for( std::set<co::int32>::iterator it = _freedIds.begin(); it != _freedIds.end(); it++ )
-    {
-        if( *it > _instances.size() )
-            break;
-        
-        _instances[*it] = _instances.back();
-        
-        _instances.pop_back();
-    }
-        
-    // now delete all the invokers
+{        
+    // now delete all the containers
     size_t size = _instances.size();
     for( int i = 0; i < size; i++ )
     {
-        delete _instances[i];
+		std::set<co::int32>::iterator it = _freedIds.find( i );
+		if( it == _freedIds.end() )
+			delete _instances[i];
     }
 
     delete _leaseMan;
