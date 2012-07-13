@@ -221,7 +221,7 @@ private:
 		const std::string& script = "dso.SpaceSyncClient";
 		const std::string& function = "initializeIds";
 
-		std::vector<const co::Any> results;
+		co::Range<const co::Any> results;
 
 		co::IObject* object = _node->findRemoteInstance( "dso.ServerSpace", _serverSpaceKey, _serverAddress );
 
