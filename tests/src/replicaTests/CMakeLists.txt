@@ -1,12 +1,16 @@
 
 project( replica )
 
+CORAL_GENERATE_MAPPINGS( _GENERATED_MAPPINGS "rpcTests.ITestSetup" )
+
 # set the tests 'module' dir as the CORAL_PATH along with the CORAL_ROOT
 set( CORAL_PATH ${CORAL_PATH} 
 	"${CMAKE_SOURCE_DIR}/tests/modules" 
 	"${CMAKE_SOURCE_DIR}/modules" 
 	)
 
+	
+	
 # Pass the CORAL_PATH as a precompiler definition to all subprojects
 CORAL_GET_PATH_STRING( CORAL_PATH_STR )
 set_property( DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS "CORAL_PATH=\"${CORAL_PATH_STR}\"" )
@@ -22,8 +26,8 @@ include_directories(
 	${CMAKE_SOURCE_DIR}/src/reef/rpc
 	${CMAKE_BINARY_DIR}/src/dso/generated
 	${CMAKE_SOURCE_DIR}/src/dso
-	${CMAKE_BINARY_DIR}/tests/src/rpcTests/generated
-	${CMAKE_BINARY_DIR}/tests/src/dom/generated
+	${rpcTests_BINARY_DIR}/generated
+	${dom_BINARY_DIR}/generated
 )
 
 # Gather test source files in the current directory
@@ -33,8 +37,8 @@ file( GLOB _HEADERS CompanySpace.h )
 file( GLOB _SOURCES CompanySpace.cpp Main.cpp )
 
 # Create test executable
-add_executable( replica EXCLUDE_FROM_ALL ${_TESTS} ${_HEADERS} ${_SOURCES} )
-add_dependencies( replica dom reef dso mockReef )
+add_executable( replica EXCLUDE_FROM_ALL ${_TESTS} ${_HEADERS} ${_SOURCES} ${_GENERATED_MAPPINGS} )
+add_dependencies( replica dom rpcTests reef dso)
 
 CORAL_TARGET( replica )
 
