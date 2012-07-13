@@ -115,7 +115,7 @@ public:
 		const std::string& script = "dso.SpaceSyncServer";
 		const std::string& function = "processAllSpaceChanges";
 
-		std::vector<const co::Any> results;
+		co::Range<const co::Any> results;
 
 		co::Any args[3];
 		args[0].set<ca::ISpace*>( _space.get() );
@@ -152,7 +152,7 @@ private:
 		const std::string& script = "dso.SpaceSyncServer";
 		const std::string& function = "initializeIds";
 
-		std::vector<const co::Any> results;
+		co::Range<const co::Any> results;
 
 		co::Any args[1];
 		args[0].set<ca::ISpace*>( _space.get() );
