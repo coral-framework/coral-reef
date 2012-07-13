@@ -38,7 +38,7 @@ file( GLOB _SOURCES CompanySpace.cpp Main.cpp )
 
 # Create test executable
 add_executable( replica EXCLUDE_FROM_ALL ${_TESTS} ${_HEADERS} ${_SOURCES} ${_GENERATED_MAPPINGS} )
-add_dependencies( replica dom rpcTests reef dso)
+add_dependencies( replica dom rpcTests rpc dso)
 
 CORAL_TARGET( replica )
 
