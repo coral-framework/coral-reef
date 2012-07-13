@@ -1,0 +1,11 @@
+interface IEmployee
+{
+	string name;
+	
+	string role;
+	
+	int32 salary;
+	
+	IProject leading;
+	IProject[] working;
+};

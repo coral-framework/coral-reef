@@ -1,0 +1,5 @@
+component Company
+{
+	provides ICompany company;
+	receives IEmployee ceo;
+};

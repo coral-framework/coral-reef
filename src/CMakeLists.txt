@@ -2,6 +2,7 @@
 SET_PROPERTY( GLOBAL PROPERTY USE_FOLDERS ON )
 
 add_subdirectory( reef )
+add_subdirectory( dso )
 
 set( BUILD_ZMQ ON CACHE BOOL "Building ZMQ also" )
 if( BUILD_ZMQ )

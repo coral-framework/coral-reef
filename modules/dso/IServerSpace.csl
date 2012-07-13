@@ -1,0 +1,11 @@
+interface IServerSpace
+{
+	readonly ca.ISpace space;
+	
+	void publishSpace( in ca.ISpace space, in string key );
+	int8[] getPublishedSpaceData();
+	
+	void addRemoteSpaceObserver( in IRemoteSpaceObserver observer );
+	void notifyRemoteChanges();
+	
+};

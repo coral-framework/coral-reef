@@ -10,14 +10,18 @@ project( REEF )
 # Setup Coral
 ################################################################################
 
-# Resolve the CORAL_ROOT
-file( TO_CMAKE_PATH "$ENV{CORAL_ROOT}" CORAL_ROOT )
-
-# Add Coral's CMake dir to the CMAKE_MODULE_PATH
-set( CMAKE_MODULE_PATH ${CORAL_ROOT}/cmake ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH} )
-
 # Load Coral's CMake package
+if( NOT CORAL_ROOT )
+	file( TO_CMAKE_PATH "$ENV{CORAL_ROOT}" CORAL_ROOT )
+endif()
+set( CMAKE_MODULE_PATH ${CORAL_ROOT}/cmake ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH} )
 find_package( Coral REQUIRED )
+
+set( CORAL_PATH
+	"${CMAKE_BINARY_DIR}/modules"
+	"${CMAKE_SOURCE_DIR}/modules"
+	${CORAL_PATH}
+)
 
 # FindPROTOBUF.cmake looks for PROTOBUF_SRC_ROOT_FOLDER cmake variable instead of an ENV var
 if( WIN32 )
@@ -26,13 +30,6 @@ if( WIN32 )
 endif()
 
 find_package( Protobuf REQUIRED )
-
-# Configure the coral path
-set( CORAL_PATH
-	"${CORAL_ROOT}/modules"
-	"${CMAKE_BINARY_DIR}/modules"
-	"${CMAKE_SOURCE_DIR}/modules"
-)
 
 include_directories( ${CORAL_INCLUDE_DIRS} ${ZMQ_INCLUDE_DIRS} ${PROTOBUF_INCLUDE_DIRS} )
 

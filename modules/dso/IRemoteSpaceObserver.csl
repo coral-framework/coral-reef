@@ -1,0 +1,9 @@
+interface IRemoteSpaceObserver
+{
+	// void onRemoteSpaceChanged( in ChangeSet[] changes ); that's what should be
+
+	// all these methods should be changed for one method only, receiving a ChangeSet
+	bool onChange( in uint32 serviceId, in string memberName, in any newValue );
+	bool onNewObject( in uint32 newId, in string newObjectType );
+	bool onRefChange( in uint32 serviceId, in string memberName, in string newRefValue );
+};

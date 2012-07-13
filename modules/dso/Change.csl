@@ -1,0 +1,6 @@
+struct Change
+{
+	string name;
+	any newValue;
+	string newRefValue;
+};

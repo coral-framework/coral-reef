@@ -1,0 +1,5 @@
+struct ChangeSet
+{
+	uint32 serviceId;
+	Change[] changes;
+};

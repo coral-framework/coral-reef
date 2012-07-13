@@ -1,0 +1,6 @@
+interface IService extends IProject
+{
+	double monthlyIncome;
+	
+	IEmployee[] mantainers;
+};
