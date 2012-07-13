@@ -73,6 +73,8 @@ void Node::stop()
     delete _requestorMan; _requestorMan = 0;
     delete _instanceMan; _instanceMan = 0;
     delete _srh; _srh = 0;
+
+	_publicEndpoint.clear();
 }
 
 co::IObject* Node::getInstance( co::int32 instanceId )
