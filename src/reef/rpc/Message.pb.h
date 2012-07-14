@@ -38,7 +38,8 @@ class Request;
 class Exception;
 class Invocation;
 class Parameter;
-class Any_PB;
+class Container;
+class Any_Type;
 class Complex_Type;
 class Ref_Type;
 
@@ -721,37 +722,27 @@ class Parameter : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // repeated .reef.rpc.Any_PB any = 1;
-  inline int any_size() const;
-  inline void clear_any();
-  static const int kAnyFieldNumber = 1;
-  inline const ::reef::rpc::Any_PB& any(int index) const;
-  inline ::reef::rpc::Any_PB* mutable_any(int index);
-  inline ::reef::rpc::Any_PB* add_any();
-  inline const ::google::protobuf::RepeatedPtrField< ::reef::rpc::Any_PB >&
-      any() const;
-  inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Any_PB >*
-      mutable_any();
-  
-  // optional uint32 any_type = 2;
-  inline bool has_any_type() const;
-  inline void clear_any_type();
-  static const int kAnyTypeFieldNumber = 2;
-  inline ::google::protobuf::uint32 any_type() const;
-  inline void set_any_type(::google::protobuf::uint32 value);
+  // repeated .reef.rpc.Container container = 1;
+  inline int container_size() const;
+  inline void clear_container();
+  static const int kContainerFieldNumber = 1;
+  inline const ::reef::rpc::Container& container(int index) const;
+  inline ::reef::rpc::Container* mutable_container(int index);
+  inline ::reef::rpc::Container* add_container();
+  inline const ::google::protobuf::RepeatedPtrField< ::reef::rpc::Container >&
+      container() const;
+  inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Container >*
+      mutable_container();
   
   // @@protoc_insertion_point(class_scope:reef.rpc.Parameter)
  private:
-  inline void set_has_any_type();
-  inline void clear_has_any_type();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
-  ::google::protobuf::RepeatedPtrField< ::reef::rpc::Any_PB > any_;
-  ::google::protobuf::uint32 any_type_;
+  ::google::protobuf::RepeatedPtrField< ::reef::rpc::Container > container_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
   
   friend void  protobuf_AddDesc_Message_2eproto();
   friend void protobuf_AssignDesc_Message_2eproto();
@@ -762,14 +753,14 @@ class Parameter : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
-class Any_PB : public ::google::protobuf::Message {
+class Container : public ::google::protobuf::Message {
  public:
-  Any_PB();
-  virtual ~Any_PB();
+  Container();
+  virtual ~Container();
   
-  Any_PB(const Any_PB& from);
+  Container(const Container& from);
   
-  inline Any_PB& operator=(const Any_PB& from) {
+  inline Container& operator=(const Container& from) {
     CopyFrom(from);
     return *this;
   }
@@ -783,17 +774,17 @@ class Any_PB : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const Any_PB& default_instance();
+  static const Container& default_instance();
   
-  void Swap(Any_PB* other);
+  void Swap(Container* other);
   
   // implements Message ----------------------------------------------
   
-  Any_PB* New() const;
+  Container* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const Any_PB& from);
-  void MergeFrom(const Any_PB& from);
+  void CopyFrom(const Container& from);
+  void MergeFrom(const Container& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -849,15 +840,23 @@ class Any_PB : public ::google::protobuf::Message {
   inline ::reef::rpc::Complex_Type* mutable_complex_type();
   inline ::reef::rpc::Complex_Type* release_complex_type();
   
-  // optional .reef.rpc.Ref_Type ref_type = 5;
+  // optional .reef.rpc.Any_Type any_type = 5;
+  inline bool has_any_type() const;
+  inline void clear_any_type();
+  static const int kAnyTypeFieldNumber = 5;
+  inline const ::reef::rpc::Any_Type& any_type() const;
+  inline ::reef::rpc::Any_Type* mutable_any_type();
+  inline ::reef::rpc::Any_Type* release_any_type();
+  
+  // optional .reef.rpc.Ref_Type ref_type = 6;
   inline bool has_ref_type() const;
   inline void clear_ref_type();
-  static const int kRefTypeFieldNumber = 5;
+  static const int kRefTypeFieldNumber = 6;
   inline const ::reef::rpc::Ref_Type& ref_type() const;
   inline ::reef::rpc::Ref_Type* mutable_ref_type();
   inline ::reef::rpc::Ref_Type* release_ref_type();
   
-  // @@protoc_insertion_point(class_scope:reef.rpc.Any_PB)
+  // @@protoc_insertion_point(class_scope:reef.rpc.Container)
  private:
   inline void set_has_boolean();
   inline void clear_has_boolean();
@@ -867,6 +866,8 @@ class Any_PB : public ::google::protobuf::Message {
   inline void clear_has_numeric();
   inline void set_has_complex_type();
   inline void clear_has_complex_type();
+  inline void set_has_any_type();
+  inline void clear_has_any_type();
   inline void set_has_ref_type();
   inline void clear_has_ref_type();
   
@@ -875,18 +876,126 @@ class Any_PB : public ::google::protobuf::Message {
   ::std::string* str_;
   double numeric_;
   ::reef::rpc::Complex_Type* complex_type_;
+  ::reef::rpc::Any_Type* any_type_;
   ::reef::rpc::Ref_Type* ref_type_;
   bool boolean_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
   
   friend void  protobuf_AddDesc_Message_2eproto();
   friend void protobuf_AssignDesc_Message_2eproto();
   friend void protobuf_ShutdownFile_Message_2eproto();
   
   void InitAsDefaultInstance();
-  static Any_PB* default_instance_;
+  static Container* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class Any_Type : public ::google::protobuf::Message {
+ public:
+  Any_Type();
+  virtual ~Any_Type();
+  
+  Any_Type(const Any_Type& from);
+  
+  inline Any_Type& operator=(const Any_Type& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Any_Type& default_instance();
+  
+  void Swap(Any_Type* other);
+  
+  // implements Message ----------------------------------------------
+  
+  Any_Type* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const Any_Type& from);
+  void MergeFrom(const Any_Type& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // required int32 kind = 1;
+  inline bool has_kind() const;
+  inline void clear_kind();
+  static const int kKindFieldNumber = 1;
+  inline ::google::protobuf::int32 kind() const;
+  inline void set_kind(::google::protobuf::int32 value);
+  
+  // optional string type = 2;
+  inline bool has_type() const;
+  inline void clear_type();
+  static const int kTypeFieldNumber = 2;
+  inline const ::std::string& type() const;
+  inline void set_type(const ::std::string& value);
+  inline void set_type(const char* value);
+  inline void set_type(const char* value, size_t size);
+  inline ::std::string* mutable_type();
+  inline ::std::string* release_type();
+  
+  // optional .reef.rpc.Parameter param = 3;
+  inline bool has_param() const;
+  inline void clear_param();
+  static const int kParamFieldNumber = 3;
+  inline const ::reef::rpc::Parameter& param() const;
+  inline ::reef::rpc::Parameter* mutable_param();
+  inline ::reef::rpc::Parameter* release_param();
+  
+  // @@protoc_insertion_point(class_scope:reef.rpc.Any_Type)
+ private:
+  inline void set_has_kind();
+  inline void clear_has_kind();
+  inline void set_has_type();
+  inline void clear_has_type();
+  inline void set_has_param();
+  inline void clear_has_param();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::std::string* type_;
+  ::reef::rpc::Parameter* param_;
+  ::google::protobuf::int32 kind_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_Message_2eproto();
+  friend void protobuf_AssignDesc_Message_2eproto();
+  friend void protobuf_ShutdownFile_Message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static Any_Type* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -1782,127 +1891,105 @@ Invocation::mutable_params() {
 
 // Parameter
 
-// repeated .reef.rpc.Any_PB any = 1;
-inline int Parameter::any_size() const {
-  return any_.size();
+// repeated .reef.rpc.Container container = 1;
+inline int Parameter::container_size() const {
+  return container_.size();
 }
-inline void Parameter::clear_any() {
-  any_.Clear();
+inline void Parameter::clear_container() {
+  container_.Clear();
 }
-inline const ::reef::rpc::Any_PB& Parameter::any(int index) const {
-  return any_.Get(index);
+inline const ::reef::rpc::Container& Parameter::container(int index) const {
+  return container_.Get(index);
 }
-inline ::reef::rpc::Any_PB* Parameter::mutable_any(int index) {
-  return any_.Mutable(index);
+inline ::reef::rpc::Container* Parameter::mutable_container(int index) {
+  return container_.Mutable(index);
 }
-inline ::reef::rpc::Any_PB* Parameter::add_any() {
-  return any_.Add();
+inline ::reef::rpc::Container* Parameter::add_container() {
+  return container_.Add();
 }
-inline const ::google::protobuf::RepeatedPtrField< ::reef::rpc::Any_PB >&
-Parameter::any() const {
-  return any_;
+inline const ::google::protobuf::RepeatedPtrField< ::reef::rpc::Container >&
+Parameter::container() const {
+  return container_;
 }
-inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Any_PB >*
-Parameter::mutable_any() {
-  return &any_;
-}
-
-// optional uint32 any_type = 2;
-inline bool Parameter::has_any_type() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void Parameter::set_has_any_type() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void Parameter::clear_has_any_type() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void Parameter::clear_any_type() {
-  any_type_ = 0u;
-  clear_has_any_type();
-}
-inline ::google::protobuf::uint32 Parameter::any_type() const {
-  return any_type_;
-}
-inline void Parameter::set_any_type(::google::protobuf::uint32 value) {
-  set_has_any_type();
-  any_type_ = value;
+inline ::google::protobuf::RepeatedPtrField< ::reef::rpc::Container >*
+Parameter::mutable_container() {
+  return &container_;
 }
 
 // -------------------------------------------------------------------
 
-// Any_PB
+// Container
 
 // optional bool boolean = 1;
-inline bool Any_PB::has_boolean() const {
+inline bool Container::has_boolean() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void Any_PB::set_has_boolean() {
+inline void Container::set_has_boolean() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void Any_PB::clear_has_boolean() {
+inline void Container::clear_has_boolean() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void Any_PB::clear_boolean() {
+inline void Container::clear_boolean() {
   boolean_ = false;
   clear_has_boolean();
 }
-inline bool Any_PB::boolean() const {
+inline bool Container::boolean() const {
   return boolean_;
 }
-inline void Any_PB::set_boolean(bool value) {
+inline void Container::set_boolean(bool value) {
   set_has_boolean();
   boolean_ = value;
 }
 
 // optional string str = 2;
-inline bool Any_PB::has_str() const {
+inline bool Container::has_str() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void Any_PB::set_has_str() {
+inline void Container::set_has_str() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void Any_PB::clear_has_str() {
+inline void Container::clear_has_str() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void Any_PB::clear_str() {
+inline void Container::clear_str() {
   if (str_ != &::google::protobuf::internal::kEmptyString) {
     str_->clear();
   }
   clear_has_str();
 }
-inline const ::std::string& Any_PB::str() const {
+inline const ::std::string& Container::str() const {
   return *str_;
 }
-inline void Any_PB::set_str(const ::std::string& value) {
+inline void Container::set_str(const ::std::string& value) {
   set_has_str();
   if (str_ == &::google::protobuf::internal::kEmptyString) {
     str_ = new ::std::string;
   }
   str_->assign(value);
 }
-inline void Any_PB::set_str(const char* value) {
+inline void Container::set_str(const char* value) {
   set_has_str();
   if (str_ == &::google::protobuf::internal::kEmptyString) {
     str_ = new ::std::string;
   }
   str_->assign(value);
 }
-inline void Any_PB::set_str(const char* value, size_t size) {
+inline void Container::set_str(const char* value, size_t size) {
   set_has_str();
   if (str_ == &::google::protobuf::internal::kEmptyString) {
     str_ = new ::std::string;
   }
   str_->assign(reinterpret_cast<const char*>(value), size);
 }
-inline ::std::string* Any_PB::mutable_str() {
+inline ::std::string* Container::mutable_str() {
   set_has_str();
   if (str_ == &::google::protobuf::internal::kEmptyString) {
     str_ = new ::std::string;
   }
   return str_;
 }
-inline ::std::string* Any_PB::release_str() {
+inline ::std::string* Container::release_str() {
   clear_has_str();
   if (str_ == &::google::protobuf::internal::kEmptyString) {
     return NULL;
@@ -1914,82 +2001,224 @@ inline ::std::string* Any_PB::release_str() {
 }
 
 // optional double numeric = 3;
-inline bool Any_PB::has_numeric() const {
+inline bool Container::has_numeric() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void Any_PB::set_has_numeric() {
+inline void Container::set_has_numeric() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void Any_PB::clear_has_numeric() {
+inline void Container::clear_has_numeric() {
   _has_bits_[0] &= ~0x00000004u;
 }
-inline void Any_PB::clear_numeric() {
+inline void Container::clear_numeric() {
   numeric_ = 0;
   clear_has_numeric();
 }
-inline double Any_PB::numeric() const {
+inline double Container::numeric() const {
   return numeric_;
 }
-inline void Any_PB::set_numeric(double value) {
+inline void Container::set_numeric(double value) {
   set_has_numeric();
   numeric_ = value;
 }
 
 // optional .reef.rpc.Complex_Type complex_type = 4;
-inline bool Any_PB::has_complex_type() const {
+inline bool Container::has_complex_type() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
-inline void Any_PB::set_has_complex_type() {
+inline void Container::set_has_complex_type() {
   _has_bits_[0] |= 0x00000008u;
 }
-inline void Any_PB::clear_has_complex_type() {
+inline void Container::clear_has_complex_type() {
   _has_bits_[0] &= ~0x00000008u;
 }
-inline void Any_PB::clear_complex_type() {
+inline void Container::clear_complex_type() {
   if (complex_type_ != NULL) complex_type_->::reef::rpc::Complex_Type::Clear();
   clear_has_complex_type();
 }
-inline const ::reef::rpc::Complex_Type& Any_PB::complex_type() const {
+inline const ::reef::rpc::Complex_Type& Container::complex_type() const {
   return complex_type_ != NULL ? *complex_type_ : *default_instance_->complex_type_;
 }
-inline ::reef::rpc::Complex_Type* Any_PB::mutable_complex_type() {
+inline ::reef::rpc::Complex_Type* Container::mutable_complex_type() {
   set_has_complex_type();
   if (complex_type_ == NULL) complex_type_ = new ::reef::rpc::Complex_Type;
   return complex_type_;
 }
-inline ::reef::rpc::Complex_Type* Any_PB::release_complex_type() {
+inline ::reef::rpc::Complex_Type* Container::release_complex_type() {
   clear_has_complex_type();
   ::reef::rpc::Complex_Type* temp = complex_type_;
   complex_type_ = NULL;
   return temp;
 }
 
-// optional .reef.rpc.Ref_Type ref_type = 5;
-inline bool Any_PB::has_ref_type() const {
+// optional .reef.rpc.Any_Type any_type = 5;
+inline bool Container::has_any_type() const {
   return (_has_bits_[0] & 0x00000010u) != 0;
 }
-inline void Any_PB::set_has_ref_type() {
+inline void Container::set_has_any_type() {
   _has_bits_[0] |= 0x00000010u;
 }
-inline void Any_PB::clear_has_ref_type() {
+inline void Container::clear_has_any_type() {
   _has_bits_[0] &= ~0x00000010u;
 }
-inline void Any_PB::clear_ref_type() {
+inline void Container::clear_any_type() {
+  if (any_type_ != NULL) any_type_->::reef::rpc::Any_Type::Clear();
+  clear_has_any_type();
+}
+inline const ::reef::rpc::Any_Type& Container::any_type() const {
+  return any_type_ != NULL ? *any_type_ : *default_instance_->any_type_;
+}
+inline ::reef::rpc::Any_Type* Container::mutable_any_type() {
+  set_has_any_type();
+  if (any_type_ == NULL) any_type_ = new ::reef::rpc::Any_Type;
+  return any_type_;
+}
+inline ::reef::rpc::Any_Type* Container::release_any_type() {
+  clear_has_any_type();
+  ::reef::rpc::Any_Type* temp = any_type_;
+  any_type_ = NULL;
+  return temp;
+}
+
+// optional .reef.rpc.Ref_Type ref_type = 6;
+inline bool Container::has_ref_type() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void Container::set_has_ref_type() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void Container::clear_has_ref_type() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void Container::clear_ref_type() {
   if (ref_type_ != NULL) ref_type_->::reef::rpc::Ref_Type::Clear();
   clear_has_ref_type();
 }
-inline const ::reef::rpc::Ref_Type& Any_PB::ref_type() const {
+inline const ::reef::rpc::Ref_Type& Container::ref_type() const {
   return ref_type_ != NULL ? *ref_type_ : *default_instance_->ref_type_;
 }
-inline ::reef::rpc::Ref_Type* Any_PB::mutable_ref_type() {
+inline ::reef::rpc::Ref_Type* Container::mutable_ref_type() {
   set_has_ref_type();
   if (ref_type_ == NULL) ref_type_ = new ::reef::rpc::Ref_Type;
   return ref_type_;
 }
-inline ::reef::rpc::Ref_Type* Any_PB::release_ref_type() {
+inline ::reef::rpc::Ref_Type* Container::release_ref_type() {
   clear_has_ref_type();
   ::reef::rpc::Ref_Type* temp = ref_type_;
   ref_type_ = NULL;
+  return temp;
+}
+
+// -------------------------------------------------------------------
+
+// Any_Type
+
+// required int32 kind = 1;
+inline bool Any_Type::has_kind() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void Any_Type::set_has_kind() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void Any_Type::clear_has_kind() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void Any_Type::clear_kind() {
+  kind_ = 0;
+  clear_has_kind();
+}
+inline ::google::protobuf::int32 Any_Type::kind() const {
+  return kind_;
+}
+inline void Any_Type::set_kind(::google::protobuf::int32 value) {
+  set_has_kind();
+  kind_ = value;
+}
+
+// optional string type = 2;
+inline bool Any_Type::has_type() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void Any_Type::set_has_type() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void Any_Type::clear_has_type() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void Any_Type::clear_type() {
+  if (type_ != &::google::protobuf::internal::kEmptyString) {
+    type_->clear();
+  }
+  clear_has_type();
+}
+inline const ::std::string& Any_Type::type() const {
+  return *type_;
+}
+inline void Any_Type::set_type(const ::std::string& value) {
+  set_has_type();
+  if (type_ == &::google::protobuf::internal::kEmptyString) {
+    type_ = new ::std::string;
+  }
+  type_->assign(value);
+}
+inline void Any_Type::set_type(const char* value) {
+  set_has_type();
+  if (type_ == &::google::protobuf::internal::kEmptyString) {
+    type_ = new ::std::string;
+  }
+  type_->assign(value);
+}
+inline void Any_Type::set_type(const char* value, size_t size) {
+  set_has_type();
+  if (type_ == &::google::protobuf::internal::kEmptyString) {
+    type_ = new ::std::string;
+  }
+  type_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* Any_Type::mutable_type() {
+  set_has_type();
+  if (type_ == &::google::protobuf::internal::kEmptyString) {
+    type_ = new ::std::string;
+  }
+  return type_;
+}
+inline ::std::string* Any_Type::release_type() {
+  clear_has_type();
+  if (type_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = type_;
+    type_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// optional .reef.rpc.Parameter param = 3;
+inline bool Any_Type::has_param() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void Any_Type::set_has_param() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void Any_Type::clear_has_param() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void Any_Type::clear_param() {
+  if (param_ != NULL) param_->::reef::rpc::Parameter::Clear();
+  clear_has_param();
+}
+inline const ::reef::rpc::Parameter& Any_Type::param() const {
+  return param_ != NULL ? *param_ : *default_instance_->param_;
+}
+inline ::reef::rpc::Parameter* Any_Type::mutable_param() {
+  set_has_param();
+  if (param_ == NULL) param_ = new ::reef::rpc::Parameter;
+  return param_;
+}
+inline ::reef::rpc::Parameter* Any_Type::release_param() {
+  clear_has_param();
+  ::reef::rpc::Parameter* temp = param_;
+  param_ = NULL;
   return temp;
 }
 

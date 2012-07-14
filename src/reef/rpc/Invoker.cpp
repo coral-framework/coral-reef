@@ -229,7 +229,7 @@ void Invoker::onMethod( ParameterPuller& puller, co::IService* facet, co::IMetho
             getRefType( refTypeInfo, args[i], tempReferences );
         }
     }
-
+    
     refl->invoke( facet, method, args, returned );
 }
     

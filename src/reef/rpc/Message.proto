@@ -56,12 +56,11 @@ message Invocation
 
 message Parameter
 {
-	repeated Any_PB any = 1;
-	optional uint32 any_type = 2; // If the parameter is an any, then this is its internal type 
+	repeated Container container = 1;
 }
 
 // Data types (information transfer):
-message Any_PB
+message Container
 {
 	optional bool boolean = 1;
 	optional string str = 2;
@@ -69,7 +68,16 @@ message Any_PB
 	
 	optional Complex_Type complex_type = 4;
 	
-	optional Ref_Type ref_type = 5;
+	optional Any_Type any_type = 5;
+	
+	optional Ref_Type ref_type = 6;
+}
+
+message Any_Type
+{
+	required int32 kind = 1;
+	optional string type = 2;
+	optional Parameter param = 3;
 }
 
 message Complex_Type

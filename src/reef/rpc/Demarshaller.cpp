@@ -17,7 +17,7 @@ namespace rpc {
 
 // Specializes for each Data container's different get function.
 template <typename T>
-static T getPBContainerData( const Any_PB& container )
+static T getPBContainerData( const Container& container )
 {
     if( !container.has_numeric() )
         throw std::string( "No numeric data in parameter" );
@@ -27,7 +27,7 @@ static T getPBContainerData( const Any_PB& container )
 
 // ------------- get and set functions specialization for string and bool ----------- //
 template <>
-const std::string& getPBContainerData<const std::string&>( const Any_PB& container )
+const std::string& getPBContainerData<const std::string&>( const Container& container )
 {
     if( !container.has_str() )
         throw std::string( "No string data in parameter" );
@@ -36,7 +36,7 @@ const std::string& getPBContainerData<const std::string&>( const Any_PB& contain
 }
 
 template <>
-bool getPBContainerData<bool>( const Any_PB& container )
+bool getPBContainerData<bool>( const Container& container )
 {
     if( !container.has_boolean() )
         throw std::string( "No boolean data in parameter" );
@@ -50,11 +50,11 @@ static void PBParamWithTypeToAny( const Parameter& param, co::Any& any, co::ITyp
 {
     if( !elementType )
     {
-        any.set<T>( getPBContainerData<T>( param.any( 0 ) ) );
+        any.set<T>( getPBContainerData<T>( param.container( 0 ) ) );
         return;
     }
     
-    size_t size = param.any().size();
+    size_t size = param.container().size();
     if( size == 0 ) // required for vector subscript out of range assertion
         return;
     
@@ -62,7 +62,7 @@ static void PBParamWithTypeToAny( const Parameter& param, co::Any& any, co::ITyp
     T* toCast = reinterpret_cast<T*>( &vec[0] );
     for( int i = 0; i < size; i++ )
     {
-        toCast[i] = getPBContainerData<T>( param.any( i ) );
+        toCast[i] = getPBContainerData<T>( param.container( i ) );
     }
 }
 
@@ -73,11 +73,11 @@ void PBParamWithTypeToAny<std::string>( const Parameter& param, co::Any& any, co
     if( !elementType )
     {
         std::string& anyString = any.createString();
-        anyString = getPBContainerData<const std::string&>( param.any( 0 ) );
+        anyString = getPBContainerData<const std::string&>( param.container( 0 ) );
         return;
     }
     
-    size_t size = param.any().size();
+    size_t size = param.container().size();
     if( size == 0 ) // required for vector subscript out of range assertion
         return;
     
@@ -85,10 +85,10 @@ void PBParamWithTypeToAny<std::string>( const Parameter& param, co::Any& any, co
     std::string* toCast = reinterpret_cast<std::string*>( &vec[0] );
     for( int i = 0; i < size; i++ )
     {
-        toCast[i] = getPBContainerData<const std::string&>( param.any( i ) );
+        toCast[i] = getPBContainerData<const std::string&>( param.container( i ) );
     }
 }
-
+    
 // Will be removed with all the coral 0.7 workarounds
 co::IType* kind2Type( co::TypeKind kind )
 {
@@ -96,10 +96,22 @@ co::IType* kind2Type( co::TypeKind kind )
     {
         case co::TK_BOOLEAN:
             return co::getType( "bool" );
+        case co::TK_INT8:
+            return co::getType( "int8" );
+        case co::TK_UINT8:
+            return co::getType( "uint8" );
+        case co::TK_INT16:
+            return co::getType( "int16" );
+        case co::TK_UINT16:
+            return co::getType( "uint16" );
         case co::TK_INT32:
             return co::getType( "int32" );
         case co::TK_UINT32:
             return co::getType( "uint32" );
+        case co::TK_INT64:
+            return co::getType( "int64" );
+        case co::TK_UINT64:
+            return co::getType( "uint64" );
         case co::TK_FLOAT:
             return co::getType( "float" );
         case co::TK_DOUBLE:
@@ -107,14 +119,12 @@ co::IType* kind2Type( co::TypeKind kind )
         case co::TK_STRING:
             return co::getType( "string" );
         default:
-            throw std::string( "Only co::Any containing simple value types are supported" );
+            assert( false );
     }
     return 0;
 }
- 
-void PBParamToComplex( const Parameter& param, co::IType* descriptor, co::Any& complexAny );
-    
-void PBParamToAny( const Parameter& param, co::IType* descriptor, co::Any& any )
+
+void ParameterPuller::PBParamToValue( const Parameter& param, co::IType* descriptor, co::Any& any )
 {
     co::TypeKind kind = descriptor->getKind();
     co::IType* elementType = 0; // only used for arrays
@@ -126,7 +136,7 @@ void PBParamToAny( const Parameter& param, co::IType* descriptor, co::Any& any )
     }
     else
     {
-        if( param.any().size() < 1 )
+        if( param.container().size() < 1 )
             throw std::string( "Empty parameter" );
     }
     
@@ -173,12 +183,7 @@ void PBParamToAny( const Parameter& param, co::IType* descriptor, co::Any& any )
             PBParamToComplex( param, descriptor, any );
             break;
         case co::TK_ANY:
-        {
-            static co::Any internalAny; // TODO remove
-            PBParamToAny( param, kind2Type( static_cast<co::TypeKind>( param.any_type() ) ), internalAny );
-            any.set<const co::Any&>( internalAny );
-            break;
-        }
+            PBParamToAny( param, any );
         default:
         {
             if( elementType )
@@ -187,7 +192,30 @@ void PBParamToAny( const Parameter& param, co::IType* descriptor, co::Any& any )
     }
 }
     
-void PBParamToComplex( const Parameter& param, co::IType* descriptor, co::Any& complexAny )
+void ParameterPuller::PBParamToAny( const Parameter& param, co::Any& any )
+{
+    const Any_Type& any_type = param.container( 0 ).any_type();
+    co::TypeKind internalKind = static_cast<co::TypeKind>( any_type.kind() );
+    
+    if( internalKind == co::TK_NONE )
+        return;
+    
+    // Need to keep local references for the Anys (in coral 0.8 this will end)
+    static co::Any _tempRefs[10];
+    static int anyCount = 0;
+    
+    co::IType* internalType;
+    if( internalKind == co::TK_STRUCT || internalKind == co::TK_NATIVECLASS )
+        internalType = co::getType( any_type.type() );
+    else
+        internalType = kind2Type( internalKind );
+    
+    PBParamToValue( any_type.param(), internalType, _tempRefs[anyCount] );
+    any.set<const co::Any&>( _tempRefs[anyCount] );
+    anyCount = (anyCount + 1) % 10;
+}
+    
+void ParameterPuller::PBParamToComplex( const Parameter& param, co::IType* descriptor, co::Any& complexAny )
 {
     assert( descriptor->getKind() != co::TK_ARRAY );
     
@@ -195,7 +223,7 @@ void PBParamToComplex( const Parameter& param, co::IType* descriptor, co::Any& c
     co::IRecordType* rt = co::cast<co::IRecordType>( descriptor );
     co::IReflector* refl = rt->getReflector();
     
-    const Any_PB& container = param.any( 0 );
+    const Container& container = param.container( 0 );
     
     if( !container.has_complex_type() )
         throw std::string( "No complex type data in parameter" );
@@ -209,8 +237,9 @@ void PBParamToComplex( const Parameter& param, co::IType* descriptor, co::Any& c
         co::IField* field = fields[i];
         const Parameter& fieldArg = complex.field( i );
         co::Any fieldAny;
-        PBParamToAny( fieldArg, field->getType(), fieldAny );
-        refl->setField( complexAny, field, fieldAny );
+        PBParamToValue( fieldArg, field->getType(), fieldAny );
+        if( fieldAny.isValid() )
+            refl->setField( complexAny, field, fieldAny );
     }
 }
     
@@ -218,7 +247,7 @@ void ParameterPuller::pullValue( co::IType* descriptor, co::Any& valueType )
 {
     try
     {
-        PBParamToAny( _invocation->params( _currentParam ), descriptor, valueType );
+        PBParamToValue( _invocation->params( _currentParam ), descriptor, valueType );
         _currentParam++;
     }
     catch( std::string& e )
@@ -232,7 +261,7 @@ void ParameterPuller::pullReference( ReferenceType& refType )
 {
     const Parameter& param = _invocation->params( _currentParam );
     
-    size_t paramSize = param.any().size();
+    size_t paramSize = param.container().size();
     if( paramSize < 1 )
     {
         CORAL_THROW( RemotingException, "Error in Invocation in the reading of parameter " << 
@@ -244,7 +273,7 @@ void ParameterPuller::pullReference( ReferenceType& refType )
                 _currentParam << ": " << "Multiple references stored in a single value parameter" );
     }
     
-    const Ref_Type& ref_type = param.any( 0 ).ref_type();
+    const Ref_Type& ref_type = param.container( 0 ).ref_type();
     
     if( !ref_type.IsInitialized() )
     {
@@ -281,6 +310,7 @@ void ParameterPuller::setInvocation( const Invocation* invocation )
 {
     _invocation = invocation;
     _currentParam = 0;
+    //_tempRefs.clear();
 }
     
 ParameterPuller::ParameterPuller() : _currentParam( 0 ), _invocation( 0 )
@@ -452,7 +482,7 @@ void Demarshaller::getValueTypeReturn( co::IType* descriptor, co::Any& valueAny 
 
     try
     {
-        PBParamToAny( returnValue, descriptor, valueAny );
+        _puller.PBParamToValue( returnValue, descriptor, valueAny );
     }
     catch( std::string& e )
     {
@@ -466,7 +496,7 @@ void Demarshaller::getRefTypeReturn( ReferenceType& refType )
     
     const Parameter& PBParam = _message->ret_value();
     
-    size_t paramSize = PBParam.any().size();
+    size_t paramSize = PBParam.container().size();
     if( paramSize < 1 )
     {
         CORAL_THROW( RemotingException, "Error converting return reference : Empty parameter" );
@@ -476,7 +506,7 @@ void Demarshaller::getRefTypeReturn( ReferenceType& refType )
         CORAL_THROW( RemotingException, "Error converting return reference : Multiple references" );
     }
     
-    const Ref_Type& ref_type = PBParam.any( 0 ).ref_type();
+    const Ref_Type& ref_type = PBParam.container( 0 ).ref_type();
     
     if( !ref_type.IsInitialized() )
     {

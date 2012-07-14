@@ -47,6 +47,71 @@ public:
 		_motherStruct = motherStruct;
 	}
 
+    co::Range<co::Any const> extractChilds( co::Range<co::Any const> mothers )
+	{
+        _anys.clear();
+        _anys.resize( mothers.getSize() );
+        _motherStructs.clear();
+        _childStructs.clear();
+        
+        for( int i = 0; mothers; mothers.popFirst(), i++ )
+        {
+            _motherStructs.push_back( mothers.getFirst().get<const MotherStruct&>() );
+            _childStructs.push_back( _motherStructs[i].child );
+            _anys[i].set<const ChildStruct&>( _childStructs[i] );
+        }
+        
+        return _anys;
+	}
+    
+	const co::Any& getChild( const co::Any& motherStruct )
+	{
+        _childStruct = motherStruct.get<const MotherStruct&>().child;
+        _tempAny.set<const ChildStruct&>( _childStruct );
+        return _tempAny;
+	}
+    
+	const co::Any& setNativeClassValue( const co::Any& stringNativeClass, const std::string& value )
+	{
+		_stringNativeClass = stringNativeClass.get<const StringNativeClass&>();
+        _stringNativeClass.data = value;
+        _tempAny.set<const StringNativeClass&>( _stringNativeClass );
+        return _tempAny;
+	}
+    
+    void setNativeClassField( const co::Any& stringNativeClass )
+	{
+		_stringNativeClass = stringNativeClass.get<const StringNativeClass&>();
+	}
+    
+	co::Range<rpcTests::MotherStruct const> placeChilds( co::Range<rpcTests::MotherStruct const> mothers, co::Range<rpcTests::ChildStruct const> childs )
+	{
+        assert( mothers.getSize() == childs.getSize() );
+        _motherStructs.clear();
+        
+		for( int i = 0; mothers.getSize(); i++ )
+        {
+            _motherStructs.push_back( mothers[i] );
+            _motherStructs[i].child = childs[i];
+        }
+        
+        return _motherStructs;
+	}
+    
+	co::Range<rpcTests::ChildStruct const> placeNatives( co::Range<rpcTests::ChildStruct const> childs, co::Range<rpcTests::StringNativeClass const> natives )
+	{
+		assert( natives.getSize() == childs.getSize() );
+        _childStructs.clear();
+        
+		for( int i = 0; childs.getSize(); i++ )
+        {
+            _childStructs.push_back( childs[i] );
+            _childStructs[i].myNativeClass = natives[i];
+        }
+        
+        return _childStructs;
+	}
+    
 	// ------ rpcTests.IReferenceTypes Methods ------ //
     
     void setSimple( rpcTests::ISimpleTypes* simple )
@@ -385,6 +450,7 @@ private:
 	// member variables
 	rpcTests::StringNativeClass _stringNativeClass;
 	rpcTests::MotherStruct _motherStruct;
+    rpcTests::ChildStruct _childStruct;
 	co::int32 _dummy;
 	double _storedDouble;
 	std::vector<double> _storedDoubleList;
@@ -396,6 +462,11 @@ private:
 	std::string _storedString;
 	std::vector<std::string> _storedStringList;
     std::vector<std::string> _storedParentStringList;
+    std::vector<ChildStruct> _childStructs;
+    std::vector<MotherStruct> _motherStructs;
+    std::vector<StringNativeClass> _natives;
+    std::vector<co::Any> _anys;
+    co::Any _tempAny;
 };
 
 CORAL_EXPORT_COMPONENT( TestComponent, TestComponent );

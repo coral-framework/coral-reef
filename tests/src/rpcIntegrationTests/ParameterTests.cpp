@@ -194,14 +194,14 @@ TEST( ParameterTests, complexTypeParameterTest )
     
     rmtComplexTypes->setMotherStruct( ms );
     
-    const rpcTests::MotherStruct& ms_ = complexTypes->getMotherStruct();
-    const rpcTests::ChildStruct& cs_ = ms.child;
+    rpcTests::MotherStruct ms_ = complexTypes->getMotherStruct();
+    rpcTests::ChildStruct cs_ = ms.child;
     EXPECT_EQ( ms_.id, 1 );
     EXPECT_STREQ( ms_.name.c_str(), "setMother" );
     EXPECT_EQ( cs_.id, 2 );
     EXPECT_STREQ( cs_.name.c_str(), "setChild" );
 
-    const rpcTests::StringNativeClass& native_ = cs_.myNativeClass;
+    rpcTests::StringNativeClass native_ = cs_.myNativeClass;
     
     EXPECT_STREQ( native_.data.c_str(), "setNative" );
     
@@ -216,17 +216,45 @@ TEST( ParameterTests, complexTypeParameterTest )
     
     complexTypes->setMotherStruct( ms );
     
-    const rpcTests::MotherStruct& ms2_ = rmtComplexTypes->getMotherStruct();
-    const rpcTests::ChildStruct& cs2_ = ms.child;
+    rpcTests::MotherStruct ms2_ = rmtComplexTypes->getMotherStruct();
+    rpcTests::ChildStruct cs2_ = ms.child;
     EXPECT_EQ( ms2_.id, 3 );
     EXPECT_STREQ( ms2_.name.c_str(), "getMother" );
     EXPECT_EQ( cs2_.id, 4 );
     EXPECT_STREQ( cs2_.name.c_str(), "getChild" );
     
-    const rpcTests::StringNativeClass& native2_ = cs2_.myNativeClass;
+    rpcTests::StringNativeClass native2_ = cs2_.myNativeClass;
     
     EXPECT_STREQ( native2_.data.c_str(), "getNative" );
 
+    // Structs types inside any
+    native.data = "nativeAny";
+    cs.myNativeClass = native;
+    cs.id = 5;
+    cs.name = "childAny";
+    ms.child = cs;
+    
+    co::Any anyMother;
+    anyMother.set<const rpcTests::MotherStruct&>( ms );
+    
+    co::Any anyChild_ = rmtComplexTypes->getChild( anyMother );
+    rpcTests::ChildStruct cs3_ = anyChild_.get<const rpcTests::ChildStruct&>();
+    EXPECT_EQ( cs3_.id, 5 );
+    EXPECT_STREQ( cs3_.name.c_str(), "childAny" );
+    
+    rpcTests::StringNativeClass native3_ = cs3_.myNativeClass;
+    
+    EXPECT_STREQ( native3_.data.c_str(), "nativeAny" );
+    
+    // NativeClass inside any
+    co::Any anyNative;
+    anyNative.set<const rpcTests::StringNativeClass&>( native );
+    
+    co::Any anyNative2_ = rmtComplexTypes->setNativeClassValue( anyNative, "nativeAny2" );
+    
+    rpcTests::StringNativeClass native4_ = anyNative2_.get<const rpcTests::StringNativeClass&>();
+
+    EXPECT_STREQ( native4_.data.c_str(), "nativeAny2" );
     
     setup->tearDown();
 }

@@ -3,4 +3,5 @@ struct ChildStruct
 	int32 id;
 	string name;
 	StringNativeClass myNativeClass;
+	any anything;
 };

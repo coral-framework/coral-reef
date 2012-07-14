@@ -8,6 +8,8 @@
 #include <co/IReflector.h>
 #include <co/IRecordType.h>
 
+#include <sstream>
+
 namespace reef {
 namespace rpc {
   
@@ -15,31 +17,31 @@ namespace rpc {
 
 // Specializes for each Data container's different set function.
 template <typename T>
-static void setPBContainerData( Any_PB* container, T value ) 
+static void setPBContainerData( Container* container, T value ) 
 {
     container->set_numeric( static_cast<double>( value ) );
 }
 
 template <>
-void setPBContainerData<bool>( Any_PB* container, bool value ) 
+void setPBContainerData<bool>( Container* container, bool value ) 
 {
     container->set_boolean( value );
 }
 
 template <>
-void setPBContainerData<const std::string&>( Any_PB* container, const std::string& value ) 
+void setPBContainerData<const std::string&>( Container* container, const std::string& value ) 
 {
     container->set_str( value );
 }
 
 // Extracts the provided type's data from Any (deals with arrays and values)
 template <typename T>
-static void anyWithTypeToPBParam( const co::Any& any, Parameter* param )
+static void simpleToPBParam( const co::Any& any, Parameter* param )
 {
     // if the Any is a single value, set it directly 
     if( any.getKind() != co::TK_ARRAY )
     {
-        Any_PB* container = param->add_any();
+        Container* container = param->add_container();
         setPBContainerData<T>( container, any.get<T>() );
         return;
     }
@@ -50,18 +52,18 @@ static void anyWithTypeToPBParam( const co::Any& any, Parameter* param )
     size_t size = range.getSize();
     for( int i = 0; i < size; i++ )
     {
-        Any_PB* container = param->add_any();
+        Container* container = param->add_container();
         setPBContainerData<T>( container, range[i] );
     }
 }
 
 template <>
-void anyWithTypeToPBParam<std::string>( const co::Any& any, Parameter* param )
+void simpleToPBParam<std::string>( const co::Any& any, Parameter* param )
 {
     // if the Any is a single value, set it directly 
     if( any.getKind() != co::TK_ARRAY )
     {
-        Any_PB* container = param->add_any();
+        Container* container = param->add_container();
         setPBContainerData<const std::string&>( container, any.get<const std::string&>() );
         return;
     }
@@ -72,18 +74,18 @@ void anyWithTypeToPBParam<std::string>( const co::Any& any, Parameter* param )
     size_t size = range.getSize();
     for( int i = 0; i < size; i++ )
     {
-        Any_PB* container = param->add_any();
+        Container* container = param->add_container();
         setPBContainerData<const std::string&>( container, range[i] );
     }
 }
 
 template <>
-void anyWithTypeToPBParam<bool>( const co::Any& any, Parameter* param )
+void simpleToPBParam<bool>( const co::Any& any, Parameter* param )
 {
     // if the Any is a single value, set it directly 
     if( any.getKind() != co::TK_ARRAY )
     {
-        Any_PB* container = param->add_any();
+        Container* container = param->add_container();
         setPBContainerData<bool>( container, any.get<bool>() );
         return;
     }
@@ -94,13 +96,14 @@ void anyWithTypeToPBParam<bool>( const co::Any& any, Parameter* param )
     size_t size = vec.size();
     for( int i = 0; i < size; i++ )
     {
-        Any_PB* container = param->add_any();
+        Container* container = param->add_container();
         setPBContainerData<bool>( container, vec[i] );
     }
 }
 
 void complexToPBParam( const co::Any& instance, Parameter* complexParam );
-
+void anyToPBParam( const co::Any& any, Parameter* param );
+    
 // Converts an any containing a vlue type to a protobuf Parameter
 void valueToPBParam( const co::Any& any, Parameter* param )
 {
@@ -114,65 +117,84 @@ void valueToPBParam( const co::Any& any, Parameter* param )
     switch( kind )
     {
         case co::TK_BOOLEAN:
-            anyWithTypeToPBParam<bool>( any, param );
+            simpleToPBParam<bool>( any, param );
             break;
         case co::TK_INT8:
-            anyWithTypeToPBParam<co::int8>( any, param );
+            simpleToPBParam<co::int8>( any, param );
             break;
         case co::TK_UINT8:
-            anyWithTypeToPBParam<co::uint8>( any, param );
+            simpleToPBParam<co::uint8>( any, param );
             break;
         case co::TK_INT16:
-            anyWithTypeToPBParam<co::int16>( any, param );
+            simpleToPBParam<co::int16>( any, param );
             break;
         case co::TK_UINT16:
-            anyWithTypeToPBParam<co::uint16>( any, param );
+            simpleToPBParam<co::uint16>( any, param );
             break;
         case co::TK_INT32:
-            anyWithTypeToPBParam<co::int32>( any, param );
+            simpleToPBParam<co::int32>( any, param );
             break;
         case co::TK_UINT32:
-            anyWithTypeToPBParam<co::uint32>( any, param );
+            simpleToPBParam<co::uint32>( any, param );
             break;
         case co::TK_INT64:
-            anyWithTypeToPBParam<co::int64>( any, param );
+            simpleToPBParam<co::int64>( any, param );
             break;
         case co::TK_UINT64:
-            anyWithTypeToPBParam<co::uint64>( any, param );
+            simpleToPBParam<co::uint64>( any, param );
             break;
         case co::TK_FLOAT:
-            anyWithTypeToPBParam<float>( any, param );
+            simpleToPBParam<float>( any, param );
             break;
         case co::TK_DOUBLE:
-            anyWithTypeToPBParam<double>( any, param );
+            simpleToPBParam<double>( any, param );
             break;
         case co::TK_STRING:
-            anyWithTypeToPBParam<std::string>( any, param );
+            simpleToPBParam<std::string>( any, param );
             break;
         case co::TK_STRUCT:
         case co::TK_NATIVECLASS:
             complexToPBParam( any, param );
             break;
         case co::TK_ANY:
-        {
-            const co::Any& internalAny =  any.get<const co::Any&>();
-            param->set_any_type( static_cast<co::uint32>( internalAny.getKind() ) );
-            valueToPBParam( internalAny, param );
+            anyToPBParam( any, param );
             break;
-        }
         default:
             assert( false );
     }
 }
 
+void anyToPBParam( const co::Any& any, Parameter* param )
+{
+    Container* container = param->add_container();
+    Any_Type* any_type = container->mutable_any_type();
+    
+    const co::Any& internalAny =  any.get<const co::Any&>();
+    
+    co::TypeKind internalKind = internalAny.getKind();
+    
+    if( internalKind == co::TK_INTERFACE )
+        CORAL_THROW( RemotingException, "interfaces inside anys nyi" );
+    
+    any_type->set_kind( internalKind );
+    
+    
+    if( internalKind == co::TK_STRUCT || internalKind == co::TK_NATIVECLASS )
+        any_type->set_type( internalAny.getType()->getFullName() );
+        
+    if( internalKind != co::TK_NONE )
+        valueToPBParam( internalAny, any_type->mutable_param() );
+    
 
+}
+    
 void complexToPBParam( const co::Any& instance, Parameter* complexParam )
 {
     assert( instance.getKind() != co::TK_ARRAY );
     
     co::IRecordType* rt = co::cast<co::IRecordType>( instance.getType() );
     co::IReflector* refl = rt->getReflector();
-    Any_PB* container = complexParam->add_any();
+    Container* container = complexParam->add_container();
     Complex_Type* complexType = container->mutable_complex_type();
     
     for( co::Range<co::IField* const> fields = rt->getFields(); fields; fields.popFirst() )
@@ -186,7 +208,7 @@ void complexToPBParam( const co::Any& instance, Parameter* complexParam )
     
 void refToPBParam( const ReferenceType& refType, Parameter* refParam )
 {
-    Any_PB* PBAny = refParam->add_any();
+    Container* PBAny = refParam->add_container();
     Ref_Type* ref_type = PBAny->mutable_ref_type();
     
     ref_type->set_instance_id( refType.instanceID );

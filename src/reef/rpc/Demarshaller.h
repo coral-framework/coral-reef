@@ -43,6 +43,13 @@ private:
     
     co::int32 _currentParam;
     const Invocation* _invocation;
+    
+private: // Parameter conversion functions
+    void PBParamToValue( const Parameter& param, co::IType* descriptor, co::Any& any );
+    
+    void PBParamToComplex( const Parameter& param, co::IType* descriptor, co::Any& complexAny );
+    
+    void PBParamToAny( const Parameter& param, co::Any& any );
 };
   
 class Demarshaller
@@ -74,6 +81,7 @@ public:
     co::int32 getIntReturn();
     
     ExceptionType getException( outString exTypeName, outString what );
+    
 private:
     void checkIfCallMsg();
     

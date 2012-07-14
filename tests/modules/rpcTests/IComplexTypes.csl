@@ -2,4 +2,16 @@ interface IComplexTypes
 {
 	MotherStruct motherStruct;
 	StringNativeClass stringNativeClass;
+	
+	// Set the \param value in the field of \param stringNativeClass
+	any setNativeClassValue( in any stringNativeClass, in string value );
+	
+	// returns the child struct
+	any getChild( in any motherStruct );
+	
+	MotherStruct[] placeChilds( in MotherStruct[] mothers, in ChildStruct[] childs );
+	
+	ChildStruct[] placeNatives( in ChildStruct[] childs, in StringNativeClass[] natives );
+	// This method expects to receive a MotherStruct array even though it receives an any[]
+	any[] extractChilds( in any[] mothers );
 };
