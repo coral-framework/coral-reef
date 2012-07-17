@@ -1,6 +1,7 @@
 #include "Demarshaller.h"
 
 #include "Message.pb.h"
+#include "AnyArrayUtil.h"
 
 #include <co/IField.h>
 #include <co/IMethod.h>
@@ -124,7 +125,10 @@ co::IType* kind2Type( co::TypeKind kind )
     return 0;
 }
 
-void ParameterPuller::PBParamToValue( const Parameter& param, co::IType* descriptor, co::Any& any )
+void PBParamToComplex( const Parameter& param, co::IType* descriptor, co::Any& complexAny );
+void PBParamToAny( const Parameter& param, co::Any& any );
+
+void PBParamToValue( const Parameter& param, co::IType* descriptor, co::Any& any )
 {
     co::TypeKind kind = descriptor->getKind();
     co::IType* elementType = 0; // only used for arrays
@@ -192,7 +196,7 @@ void ParameterPuller::PBParamToValue( const Parameter& param, co::IType* descrip
     }
 }
     
-void ParameterPuller::PBParamToAny( const Parameter& param, co::Any& any )
+void PBParamToAny( const Parameter& param, co::Any& any )
 {
     const Any_Type& any_type = param.container( 0 ).any_type();
     co::TypeKind internalKind = static_cast<co::TypeKind>( any_type.kind() );
@@ -200,30 +204,24 @@ void ParameterPuller::PBParamToAny( const Parameter& param, co::Any& any )
     if( internalKind == co::TK_NONE )
         return;
     
-    // Need to keep local references for the Anys (in coral 0.8 this will end)
-    static co::Any _tempRefs[10];
-    static int anyCount = 0;
-    
     co::IType* internalType;
     if( internalKind == co::TK_STRUCT || internalKind == co::TK_NATIVECLASS )
         internalType = co::getType( any_type.type() );
     else
         internalType = kind2Type( internalKind );
     
-    PBParamToValue( any_type.param(), internalType, _tempRefs[anyCount] );
-    any.set<const co::Any&>( _tempRefs[anyCount] );
-    anyCount = (anyCount + 1) % 10;
+    co::Any& internalAny = any.createAny();
+    PBParamToValue( any_type.param(), internalType, internalAny );
 }
     
-void ParameterPuller::PBParamToComplex( const Parameter& param, co::IType* descriptor, co::Any& complexAny )
+void PBContainerToComplex( const Container& container, co::IType* descriptor, 
+                                           co::Any& complexAny )
 {
     assert( descriptor->getKind() != co::TK_ARRAY );
     
     complexAny.createComplexValue( descriptor );
     co::IRecordType* rt = co::cast<co::IRecordType>( descriptor );
     co::IReflector* refl = rt->getReflector();
-    
-    const Container& container = param.container( 0 );
     
     if( !container.has_complex_type() )
         throw std::string( "No complex type data in parameter" );
@@ -240,6 +238,29 @@ void ParameterPuller::PBParamToComplex( const Parameter& param, co::IType* descr
         PBParamToValue( fieldArg, field->getType(), fieldAny );
         if( fieldAny.isValid() )
             refl->setField( complexAny, field, fieldAny );
+    }
+
+}
+    
+void PBParamToComplex( const Parameter& param, co::IType* descriptor, co::Any& complexAny )
+{
+    if( descriptor->getKind() != co::TK_ARRAY )
+    {
+        PBContainerToComplex( param.container( 0 ), descriptor, complexAny );
+        return;
+    }
+    
+    AnyArrayUtil aau;
+    co::IType* elementType = co::cast<co::IArray>( descriptor )->getElementType();
+    
+    co::int32 size = param.container().size();
+    complexAny.createArray( elementType, size );
+    
+    for( co::int32 i = 0; i < size; i++ )
+    {
+        co::Any element;
+        PBContainerToComplex( param.container( i ), elementType, element );
+        aau.setArrayComplexTypeElement( complexAny, i, element );
     }
 }
     
@@ -310,7 +331,6 @@ void ParameterPuller::setInvocation( const Invocation* invocation )
 {
     _invocation = invocation;
     _currentParam = 0;
-    //_tempRefs.clear();
 }
     
 ParameterPuller::ParameterPuller() : _currentParam( 0 ), _invocation( 0 )
@@ -482,7 +502,7 @@ void Demarshaller::getValueTypeReturn( co::IType* descriptor, co::Any& valueAny 
 
     try
     {
-        _puller.PBParamToValue( returnValue, descriptor, valueAny );
+        PBParamToValue( returnValue, descriptor, valueAny );
     }
     catch( std::string& e )
     {

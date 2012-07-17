@@ -16,6 +16,19 @@
 #include <co/IObject.h>
 #include <co/RefVector.h>
 
+#define INT1 10
+#define INT2 20
+#define INT3 30
+#define INT4 40
+#define BOOL1 true
+#define DOUBLE1 10.0
+#define STRING1 "string1"
+#define STRING2 "string2"
+#define TESTVECSIZE 10
+#define CHAR1 65
+#define CHAR2 75
+#define CHAR3 85
+
 namespace reef {
 namespace rpc {
 
@@ -188,6 +201,7 @@ TEST( ParameterTests, complexTypeParameterTest )
     cs.myNativeClass = native;
     cs.id = 2;
     cs.name = "setChild";
+    cs.anything.set<co::int32>( INT1 );
     ms.id = 1;
     ms.name = "setMother";
     ms.child = cs;
@@ -200,6 +214,7 @@ TEST( ParameterTests, complexTypeParameterTest )
     EXPECT_STREQ( ms_.name.c_str(), "setMother" );
     EXPECT_EQ( cs_.id, 2 );
     EXPECT_STREQ( cs_.name.c_str(), "setChild" );
+    EXPECT_EQ( cs_.anything.get<co::int32>(), INT1 );
 
     rpcTests::StringNativeClass native_ = cs_.myNativeClass;
     
@@ -258,7 +273,87 @@ TEST( ParameterTests, complexTypeParameterTest )
     
     setup->tearDown();
 }
+    
+TEST( ParameterTests, complexArrayTest )
+{
+    co::RefPtr<co::IObject> testSetup = co::newInstance( "rpcTests.TestSetup" );
+    rpcTests::ITestSetup* setup = testSetup->getService<rpcTests::ITestSetup>();
+    setup->initTest( 2 );
+    
+    reef::rpc::INode* server = setup->getNode( 1 );
+    reef::rpc::INode* client = setup->getNode( 2 );
+    
+    co::RefPtr<co::IObject> instance = co::newInstance( "rpcTests.TestComponent" );
+    server->publishInstance( instance.get(), "instance" );
+    
+    co::RefPtr<co::IObject> rmtInstance = client->findRemoteInstance( "rpcTests.TestComponent", 
+                                                                     "instance", "address1" );
+    
+    rpcTests::IComplexTypes* remoteCT = rmtInstance->getService<rpcTests::IComplexTypes>();
+    
+    
+    // After the default initial setup, create the arrays
+    std::vector<rpcTests::MotherStruct> mss; mss.resize( TESTVECSIZE );
+    std::vector<rpcTests::ChildStruct> css; css.resize( TESTVECSIZE );
+    std::vector<rpcTests::StringNativeClass> natives; natives.resize( TESTVECSIZE );
 
+    // Fill the arrays with testable data
+    char testString[2];
+    testString[1] = '\0';
+    for( int i = 0; i < TESTVECSIZE; i++ )
+    {
+        testString[0] = CHAR1 + i;
+        
+        // Setting up the Motherstructs array
+        mss[i].name = std::string( testString );
+        mss[i].id = INT1 + i;
+        mss[i].child.id = INT1 + i;
+        mss[i].child.name = std::string( testString );
+        mss[i].child.myNativeClass.data = std::string( testString );
+        mss[i].child.anything.set<co::int32>( INT1 + i );
+        
+        testString[0] = CHAR2 + i;
+        
+        // Setting up the ChildStructs Array
+        css[i].id = INT2 + i;
+        css[i].name = std::string( testString );
+        css[i].myNativeClass.data = std::string( testString );
+        css[i].anything.set<co::int32>( INT2 + i );
+        
+        // Setting up the Native classes array
+        testString[0] = CHAR3 + i;
+        natives[i].data = std::string( testString );
+    }
+    
+    // Call the methods
+    co::Range<const rpcTests::MotherStruct> mss_ = remoteCT->placeChilds( mss, css );
+    testString[1] = '\0';
+    for( int i = 0; i < TESTVECSIZE; i++ )
+    {
+        testString[0] = CHAR1 + i;
+        EXPECT_STREQ( mss_[i].name.c_str(), testString );
+        EXPECT_EQ( mss_[i].id , INT1 + i );
+        EXPECT_EQ( mss_[i].child.id , INT2 + i );
+        testString[0] = CHAR2 + i;
+        EXPECT_STREQ( mss_[i].child.name.c_str(), testString );
+        EXPECT_STREQ( mss_[i].child.myNativeClass.data.c_str(), testString );
+        EXPECT_EQ( mss_[i].child.anything.get<co::int32>(), INT2 + i );
+    }
+    
+    co::Range<const rpcTests::ChildStruct> css_ = remoteCT->placeNatives( css, natives );
+    testString[1] = '\0';
+    for( int i = 0; i < TESTVECSIZE; i++ )
+    {
+        testString[0] = CHAR2 + i;
+        EXPECT_STREQ( css_[i].name.c_str(), testString );
+        EXPECT_EQ( css_[i].anything.get<co::int32>(), INT2 + i );
+        testString[0] = CHAR3 + i;
+        EXPECT_STREQ( css_[i].myNativeClass.data.c_str(), testString );
+    }
+
+    setup->tearDown();
+}
+    
 }
 
 }

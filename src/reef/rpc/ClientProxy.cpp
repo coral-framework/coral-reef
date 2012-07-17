@@ -114,7 +114,10 @@ const co::Any& ClientProxy::dynamicInvoke( co::int32 dynFacetId, co::IMethod* me
     if( !returnType )
         _requestor->requestAsynchCall( mo, method, args );
     else
+    {
+        _resultBuffer.clear();
         _requestor->requestSynchCall( mo, method, args, _resultBuffer );
+    }
     
     return _resultBuffer;
 }

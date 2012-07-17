@@ -1,6 +1,7 @@
 #include "Marshaller.h"
 
 #include "Message.pb.h"
+#include "AnyArrayUtil.h"
 
 #include <co/IField.h>
 #include <co/IMethod.h>
@@ -101,7 +102,7 @@ void simpleToPBParam<bool>( const co::Any& any, Parameter* param )
     }
 }
 
-void complexToPBParam( const co::Any& instance, Parameter* complexParam );
+void complexToPBParam( const co::Any& complex, Parameter* complexParam );
 void anyToPBParam( const co::Any& any, Parameter* param );
     
 // Converts an any containing a vlue type to a protobuf Parameter
@@ -178,21 +179,36 @@ void anyToPBParam( const co::Any& any, Parameter* param )
     
     any_type->set_kind( internalKind );
     
-    
     if( internalKind == co::TK_STRUCT || internalKind == co::TK_NATIVECLASS )
         any_type->set_type( internalAny.getType()->getFullName() );
         
     if( internalKind != co::TK_NONE )
         valueToPBParam( internalAny, any_type->mutable_param() );
+}
+ 
+void complexToPBParam( const co::Any& complex, Parameter* complexParam );
     
-
+void complexArrayToPBParam( const co::Any& complexArray, Parameter* complexArrayParam )
+{
+    AnyArrayUtil aau;
+    co::int32 size = aau.getArraySize( complexArray );
+    for( int i = 0; i < size; i++ )
+    {
+        co::Any element;
+        aau.getArrayElement( complexArray, i, element );
+        complexToPBParam( element, complexArrayParam );
+    }
 }
     
-void complexToPBParam( const co::Any& instance, Parameter* complexParam )
+void complexToPBParam( const co::Any& complex, Parameter* complexParam )
 {
-    assert( instance.getKind() != co::TK_ARRAY );
+    if( complex.getKind() == co::TK_ARRAY )
+    {
+        complexArrayToPBParam( complex, complexParam );
+        return;
+    }
     
-    co::IRecordType* rt = co::cast<co::IRecordType>( instance.getType() );
+    co::IRecordType* rt = co::cast<co::IRecordType>( complex.getType() );
     co::IReflector* refl = rt->getReflector();
     Container* container = complexParam->add_container();
     Complex_Type* complexType = container->mutable_complex_type();
@@ -201,7 +217,7 @@ void complexToPBParam( const co::Any& instance, Parameter* complexParam )
     {
         Parameter* fieldArg = complexType->add_field();
         co::Any fieldAny;
-        refl->getField( instance, fields.getFirst(), fieldAny );
+        refl->getField( complex, fields.getFirst(), fieldAny );
         valueToPBParam( fieldAny, fieldArg );
     }
 }

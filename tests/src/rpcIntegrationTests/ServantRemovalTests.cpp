@@ -121,6 +121,5 @@ TEST( InvokerRemovalTests, repeatedReferenceTest )
     setup->tearDown();
 }
     
-}
-    
+}  
 }

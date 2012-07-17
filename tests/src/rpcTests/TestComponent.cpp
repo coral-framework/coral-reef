@@ -89,7 +89,7 @@ public:
         assert( mothers.getSize() == childs.getSize() );
         _motherStructs.clear();
         
-		for( int i = 0; mothers.getSize(); i++ )
+		for( int i = 0; i < mothers.getSize(); i++ )
         {
             _motherStructs.push_back( mothers[i] );
             _motherStructs[i].child = childs[i];
@@ -103,7 +103,7 @@ public:
 		assert( natives.getSize() == childs.getSize() );
         _childStructs.clear();
         
-		for( int i = 0; childs.getSize(); i++ )
+		for( int i = 0; i < childs.getSize(); i++ )
         {
             _childStructs.push_back( childs[i] );
             _childStructs[i].myNativeClass = natives[i];
