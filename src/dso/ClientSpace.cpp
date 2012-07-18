@@ -28,6 +28,7 @@
 
 #include <dso/IServerSpace.h>
 #include <dso/ChangeSet.h>
+#include <dso/NewObject.h>
 #include <dso/IRemoteSpaceObserver.h>
 
 #include <fstream>
@@ -137,19 +138,18 @@ public:
 		return true;
 	}
 
-	bool onNewObject( co::uint32 objectId, const std::string& typeName )
+	bool onNewObjects( co::Range<const dso::NewObject> newObjects )
 	{
 		try
 		{
 			const std::string& script = "dso.SpaceSyncClient";
-			const std::string& function = "applyReceivedNewObject";
+			const std::string& function = "applyReceivedNewObjects";
 
 			co::Range<const co::Any> results;
 
 			co::Any args[4];
 			args[0].set<ca::ISpace*>( _space.get() );
-			args[1].set<co::uint32>( objectId );
-			args[2].set<const std::string&>( typeName );
+			args[1].setArray(co::Any::AK_Range, co::typeOf<dso::NewObject>::get(), 0, ( (void*)newObjects.getStart() ), newObjects.getSize() );
 
 			co::getService<lua::IState>()->callFunction( script, function,
 				co::Range<const co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),

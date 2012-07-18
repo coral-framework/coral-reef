@@ -1,0 +1,5 @@
+struct NewObject
+{
+	uint32 newId;
+	string typeName;
+};

@@ -18,8 +18,8 @@ function M.processAllSpaceChanges( space, allSpaceChanges, observers )
 	end
 	
 	for _, observer in ipairs( observers ) do
-		for i, newObject in ipairs( newObjects ) do
-			observer:onNewObject( newObject.newId, newObject.newType )
+		if #newObjects > 0 then
+			observer:onNewObjects( newObjects )
 		end
 		local changeSetArray = {}
 	
@@ -28,7 +28,6 @@ function M.processAllSpaceChanges( space, allSpaceChanges, observers )
 			local changeSet = co.new "dso.ChangeSet"
 			changeSet.serviceId = i
 			changeSet.changes = changes
-			
 			
 			changeSetArray[ #changeSetArray + 1 ] = changeSet
 			
@@ -44,7 +43,11 @@ function processSpaceChanges( spaceChanges, resultChangesTable, newObjectsTable 
 	
 	for i, newObject in ipairs( newObjects ) do
 		cache:objectId( newObject )
-		newObjectsTable[ #newObjectsTable + 1 ] = { newId = cache:getId( newObject ), newType = newObject.component.fullName }
+		local newObjectStruct = co.new "dso.NewObject"
+		local objectId = cache:getId( newObject )
+		newObjectStruct.newId = objectId
+		newObjectStruct.typeName = newObject.component.fullName
+		newObjectsTable[ #newObjectsTable + 1 ] = newObjectStruct
 	end
 	
 	-- put new object values like regular changes

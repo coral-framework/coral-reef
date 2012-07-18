@@ -30,9 +30,20 @@ function M.applyReceivedNewObject( graph, newId, newType )
 	getCache( graph ):objectId( newObject )
 end
 
+function M.applyReceivedNewObjects( graph, newObjects )
+	for i, newObject in ipairs( newObjects ) do
+		local newObjectCoral = co.new( newObject.typeName )
+		getCache( graph ):objectId( newObjectCoral )
+		if newObject.newId ~= getCache( graph ):getId( newObjectCoral ) then
+			error( "graph inconsistent" )
+		end
+	end
+end
+
 function applyRefChange( graph, service, memberName, str )
 	if str == "nil" then
 		service[memberName] = nil
+		
 	elseif str:sub(1,1) == '#' then
 		if str:sub(2,2) == '{' then
 			--refVec

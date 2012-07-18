@@ -1,7 +1,5 @@
 interface IRemoteSpaceObserver
 {
-	bool onRemoteSpaceChanged( in ChangeSet[] changes );  //that what should be
-
-	// all these methods should be changed for one method only, receiving a ChangeSet
-	bool onNewObject( in uint32 newId, in string newObjectType );
+	bool onRemoteSpaceChanged( in ChangeSet[] changes );
+	bool onNewObjects( in NewObject[] newObjects );
 };
