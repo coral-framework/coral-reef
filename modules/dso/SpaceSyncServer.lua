@@ -21,15 +21,20 @@ function M.processAllSpaceChanges( space, allSpaceChanges, observers )
 		for i, newObject in ipairs( newObjects ) do
 			observer:onNewObject( newObject.newId, newObject.newType )
 		end
+		local changeSetArray = {}
 	
-		for i, changeSet in pairs( accumulatedChanges ) do
-			for j, change in ipairs( changeSet ) do
-				if change.newRefValue == nil then
-					observer:onChange( i, change.name, change.newValue )
-				else
-					observer:onRefChange( i, change.name, change.newRefValue )
-				end
-			end
+		for i, changes in pairs( accumulatedChanges ) do
+			
+			local changeSet = co.new "dso.ChangeSet"
+			changeSet.serviceId = i
+			changeSet.changes = changes
+			
+			
+			changeSetArray[ #changeSetArray + 1 ] = changeSet
+			
+		end
+		if #changeSetArray > 0 then
+			observer:onRemoteSpaceChanged( changeSetArray )
 		end
 	end
 end
@@ -133,26 +138,26 @@ end
 
 function createChange( member, value )
 	
-	change = { name = member.name }
-
+	change = co.new "dso.Change"
+	change.name = member.name
+	
 	if member.type.kind == 'TK_INTERFACE' then
 		if value == nil then
-			change.newRefValue = nil
+			change.newRefValue = "nil"
 		else
 			change.newRefValue = "#" .. cache:getId( value )
 		end
-	end
-	
-	if member.type.kind == 'TK_ARRAY' and member.type.elementType.kind == 'TK_INTERFACE' then
+	elseif member.type.kind == 'TK_ARRAY' and member.type.elementType.kind == 'TK_INTERFACE' then
 		local refVecStr = "#{"
 		for i, refVecService in ipairs( value ) do
 			refVecStr = refVecStr .. cache:getId( refVecService ) .. ","
 		end
 		refVecStr = refVecStr .. "}"
 		change.newRefValue = refVecStr
+	else
+		change.newValue = value
 	end
 	
-	change.newValue = value
 	return change
 end
 

@@ -112,20 +112,18 @@ public:
 		
 	}
 
-	bool onChange( co::uint32 serviceId, const std::string& memberName, const co::Any& newValue )
+	bool onRemoteSpaceChanged(  co::Range<const dso::ChangeSet> changes )
 	{
 		try
 		{
 			const std::string& script = "dso.SpaceSyncClient";
-			const std::string& function = "applyReceivedChange";
+			const std::string& function = "applyReceivedChangeSet";
 		
 			co::Range<const co::Any> results;
 
-			co::Any args[4];
+			co::Any args[2];
 			args[0].set<ca::ISpace*>( _space.get() );
-			args[1].set<co::uint32>( serviceId );
-			args[2].set<const std::string&>( memberName );
-			args[3].set<const co::Any&>( newValue );
+			args[1].setArray(co::Any::AK_Range, co::typeOf<dso::ChangeSet>::get(), 0, ( (void*)changes.getStart() ), changes.getSize() );
 
 			co::getService<lua::IState>()->callFunction( script, function,
 				co::Range<const co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
@@ -138,7 +136,7 @@ public:
 		}
 		return true;
 	}
-	
+
 	bool onNewObject( co::uint32 objectId, const std::string& typeName )
 	{
 		try
@@ -152,34 +150,6 @@ public:
 			args[0].set<ca::ISpace*>( _space.get() );
 			args[1].set<co::uint32>( objectId );
 			args[2].set<const std::string&>( typeName );
-
-			co::getService<lua::IState>()->callFunction( script, function,
-				co::Range<const co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
-				results );
-		}
-		catch( std::exception& e )
-		{
-			CORAL_LOG(ERROR) << e.what();
-			return false;
-		}
-
-		return true;
-	}
-
-	bool onRefChange( co::uint32 serviceId, const std::string& memberName, const std::string& newRefValue )
-	{
-		try
-		{
-			const std::string& script = "dso.SpaceSyncClient";
-			const std::string& function = "applyReceivedRefChange";
-
-			co::Range<const co::Any> results;
-
-			co::Any args[4];
-			args[0].set<ca::ISpace*>( _space.get() );
-			args[1].set<co::uint32>( serviceId );
-			args[2].set<const std::string&>( memberName );
-			args[3].set<const std::string&>( newRefValue );
 
 			co::getService<lua::IState>()->callFunction( script, function,
 				co::Range<const co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),

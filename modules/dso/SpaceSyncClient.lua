@@ -13,22 +13,16 @@ end
 function M.applyReceivedChangeSet( graph, changeSets )
 	local service
 	for i, changeSet in ipairs( changeSets ) do
-		for j, change in ipairs( changeSet ) do
-			service = getCache( graph ):getService( changeSet.serviceId )
-			if change.newRefValue == nil then
+		service = getCache( graph ):getService( changeSet.serviceId )
+		for i, change in ipairs( changeSet.changes ) do
+			if change.newRefValue == nil or change.newRefValue == "" then
 				service[ change.name ] = change.newValue
 			else
 				local str = change.newRefValue
-				applyRefChange( service, str )
+				applyRefChange( graph, service, change.name, str )
 			end
 		end
 	end
-end
-
-function M.applyReceivedChange( graph, serviceId, memberName, newValue )
-	local service = getCache( graph ):getService( serviceId )
-	service[memberName] = newValue
-	
 end
 
 function M.applyReceivedNewObject( graph, newId, newType )
@@ -36,14 +30,10 @@ function M.applyReceivedNewObject( graph, newId, newType )
 	getCache( graph ):objectId( newObject )
 end
 
-function M.applyReceivedRefChange( graph, serviceId, memberName, newRefValue )
-	local service
-	service = getCache( graph ):getService( serviceId )
-	applyRefChange( graph, service, memberName, newRefValue )
-end
-
 function applyRefChange( graph, service, memberName, str )
-	if str:sub(1,1) == '#' then
+	if str == "nil" then
+		service[memberName] = nil
+	elseif str:sub(1,1) == '#' then
 		if str:sub(2,2) == '{' then
 			--refVec
 			local refVec = {}
