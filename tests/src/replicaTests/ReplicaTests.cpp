@@ -147,6 +147,8 @@ public:
 
 		changedEmployees.push_back( employees[4] );
 
+		//more than one change in a object
+		employees[4]->setName( "Jacob Lua Son" );
 		employees[4]->setSalary( 4000 );
 		space->addChange( employees[4] );
 		space->notifyChanges();
@@ -218,7 +220,7 @@ public:
 		EXPECT_EQ( "Software1.0 Maintenance", devService->getName() );
 		EXPECT_EQ( 60000.0, devService->getMonthlyIncome() );
 
-		EXPECT_EQ( "Jacob Lua Junior", employees[3]->getName() );
+		EXPECT_EQ( "Jacob Lua Son", employees[3]->getName() );
 		EXPECT_EQ( 4000, employees[3]->getSalary() );
 		EXPECT_EQ( "Developer", employees[3]->getRole() );
 		EXPECT_EQ( NULL, employees[3]->getLeading() );

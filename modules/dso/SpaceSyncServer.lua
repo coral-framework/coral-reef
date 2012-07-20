@@ -4,12 +4,18 @@ require "dso.GraphIds"
 local cache
 local model
 
+require "table"
+
 function M.initializeIds( space )
 	cache = GraphIds:new( space )
 	model = space.universe.model
 end
 
 function M.processAllSpaceChanges( space, allSpaceChanges, observers )
+	if #observers == 0 then
+		return
+	end
+
 	local accumulatedChanges = {}
 	local newObjects = {}
 
@@ -17,21 +23,22 @@ function M.processAllSpaceChanges( space, allSpaceChanges, observers )
 		processSpaceChanges( spaceChanges, accumulatedChanges, newObjects )
 	end
 	
+	local changeSetArray = {}
+	for i, changes in pairs( accumulatedChanges ) do
+			
+		local changeSet = co.new "dso.ChangeSet"
+		changeSet.serviceId = i
+		changeSet.changes = changes
+		
+		changeSetArray[ #changeSetArray + 1 ] = changeSet
+		
+	end
+	
 	for _, observer in ipairs( observers ) do
 		if #newObjects > 0 then
 			observer:onNewObjects( newObjects )
 		end
-		local changeSetArray = {}
-	
-		for i, changes in pairs( accumulatedChanges ) do
-			
-			local changeSet = co.new "dso.ChangeSet"
-			changeSet.serviceId = i
-			changeSet.changes = changes
-			
-			changeSetArray[ #changeSetArray + 1 ] = changeSet
-			
-		end
+		
 		if #changeSetArray > 0 then
 			observer:onRemoteSpaceChanged( changeSetArray )
 		end
@@ -68,7 +75,7 @@ function getNewObjectChanges( newObject, resultChangesTable )
 	
 	local objectId = cache:getId( newObject )
 	local ports = model:getPorts( newObject.component )
-	local receptacleChanges = {}
+	local receptacleChanges = resultChangesTable[ objectId ] or {}
 	for i, port in ipairs( ports ) do
 		if port.isFacet then
 			getNewServiceChanges( newObject[port.name], resultChangesTable )
@@ -88,7 +95,7 @@ function getNewServiceChanges( newService, resultChangesTable )
 	local serviceId = cache:getId( newService )
 	local fields = model:getFields( newService.interface )
 	
-	local fieldChanges = {}
+	local fieldChanges = resultChangesTable[ serviceId ] or {}
 	local fieldValue
 	for i, field in ipairs( fields ) do
 		fieldValue = newService[ field.name ]
@@ -119,7 +126,7 @@ end
 
 function processServiceChanges( serviceChanges, resultChangesTable )
 	local serviceId = cache:getId( serviceChanges.service )
-	local allChanges = {}
+	local allChanges = resultChangesTable[ serviceId ] or {}
 	
 	local changedValueFields = serviceChanges.changedValueFields 
 	for i, value in ipairs( changedValueFields ) do
