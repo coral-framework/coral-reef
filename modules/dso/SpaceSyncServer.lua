@@ -34,6 +34,8 @@ function M.processAllSpaceChanges( space, allSpaceChanges, observers )
 		
 	end
 	
+	table.sort( newObjects, function( x, y ) return x.newId < y.newId end )
+	
 	for _, observer in ipairs( observers ) do
 		if #newObjects > 0 then
 			observer:onNewObjects( newObjects )
