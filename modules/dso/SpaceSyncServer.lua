@@ -20,7 +20,13 @@ function M.processAllSpaceChanges( space, allSpaceChanges, observers )
 	local newObjects = {}
 
 	for i, spaceChanges in ipairs( allSpaceChanges ) do
-		processSpaceChanges( spaceChanges, accumulatedChanges, newObjects )
+		processNewObjects( spaceChanges, newObjects )
+	end
+	
+	local newObjectStructs = generateValueForNewObjects( newObjects, accumulatedChanges )
+		
+	for i, spaceChanges in ipairs( allSpaceChanges ) do
+		processChanges( spaceChanges, accumulatedChanges )
 	end
 	
 	local changeSetArray = {}
@@ -31,14 +37,12 @@ function M.processAllSpaceChanges( space, allSpaceChanges, observers )
 		changeSet.changes = changes
 		
 		changeSetArray[ #changeSetArray + 1 ] = changeSet
-		
 	end
 	
-	table.sort( newObjects, function( x, y ) return x.newId < y.newId end )
-	
 	for _, observer in ipairs( observers ) do
-		if #newObjects > 0 then
-			observer:onNewObjects( newObjects )
+		if #newObjectStructs > 0 then
+			table.sort( newObjectStructs, function( x, y ) return x.newId < y.newId end )
+			observer:onNewObjects( newObjectStructs )
 		end
 		
 		if #changeSetArray > 0 then
@@ -47,29 +51,39 @@ function M.processAllSpaceChanges( space, allSpaceChanges, observers )
 	end
 end
 
-function processSpaceChanges( spaceChanges, resultChangesTable, newObjectsTable )
+function processNewObjects( spaceChanges, newObjectsList )
 	local newObjects = spaceChanges.addedObjects
-	
 	for i, newObject in ipairs( newObjects ) do
+		newObjectsList[ newObject ] = true
+	end
+	local removedObjects = spaceChanges.removedObjects
+	for i, removed in ipairs( removedObjects ) do
+		newObjectsList[ removed ] = nil
+	end
+end
+
+function generateValueForNewObjects( newObjects, resultChangesTable )
+	
+	local newObjectResult = {}
+	
+	for newObject, _ in pairs( newObjects ) do
 		cache:objectId( newObject )
+		
 		local newObjectStruct = co.new "dso.NewObject"
 		local objectId = cache:getId( newObject )
 		newObjectStruct.newId = objectId
 		newObjectStruct.typeName = newObject.component.fullName
-		newObjectsTable[ #newObjectsTable + 1 ] = newObjectStruct
-	end
-	
-	-- put new object values like regular changes
-	for i, newObject in ipairs( newObjects ) do
+		newObjectResult[ #newObjectResult + 1 ] = newObjectStruct
+		
 		getNewObjectChanges( newObject, resultChangesTable )
 	end
 	
+	return newObjectResult
+end
+
+function processChanges( spaceChanges, resultChangesTable )
 	for i, objectChange in ipairs( spaceChanges.changedObjects ) do
 		processObjectChanges( objectChange, resultChangesTable )
-	end
-	
-	for i, removedObject in ipairs( spaceChanges.removedObjects ) do
-		resultChangesTable[ cache:getId( removedObject ) ] = nil	
 	end
 end
 
@@ -169,7 +183,6 @@ function createChange( member, value )
 	else
 		change.newValue = value
 	end
-	
 	return change
 end
 
