@@ -244,6 +244,32 @@ public:
 		EXPECT_EQ( 60000.0, devService->getMonthlyIncome() );
 	}
 
+	void removeAndReturnObject( ca::ISpace* space )
+	{
+		co::IObject*  root = space->getRootObject();
+		dom::ICompany* company = root->getService<dom::ICompany>();
+
+		co::Range<dom::IEmployee* const> employees = company->getEmployees();
+
+		std::vector<dom::IEmployee*> changedEmployess;
+		dom::IEmployee* removedEmployee = employees[0];
+
+		for( int i = 1; i < employees.getSize(); i++ )
+		{
+			changedEmployess.push_back( employees[i] );
+		}
+		company->setEmployees( changedEmployess );
+		space->addChange( company );
+
+		space->notifyChanges();
+
+		changedEmployess.insert( changedEmployess.begin(), removedEmployee );
+		company->setEmployees( changedEmployess );
+		space->addChange( company );
+		space->notifyChanges();
+	}
+
+
 	co::RefPtr<rpcTests::ITestSetup> _setup;
 
 	co::RefPtr<reef::rpc::INode> _server;
@@ -295,16 +321,6 @@ TEST_F( ReplicaTests, clientServerConfigErrorTests )
 
 	ASSERT_THROW( clientSpace->initialize( "", "publishedOk" ), co::IllegalArgumentException ); // valid key, but address not set
 
-	//tests for reef fails
-	//clientSpace->setServerAddress( "addressx" );
-	//clientSpace->setServerSpaceKey( "publishedOk" );
-	//ASSERT_ANY_THROW( clientSpace->replicateServerSpace( universe ) ); // invalid address
-
-	//clientSpace->setServerAddress( "address1" );
-	//clientSpace->setServerSpaceKey( "publishedPeh" );
-
-	//ASSERT_ANY_THROW( clientSpace->replicateServerSpace( universe ) ); // invalid key
-
 	ASSERT_TRUE( clientSpace->getSpace() == NULL );
 
 	ASSERT_NO_THROW( clientSpace->initialize( "address1", "publishedOk" ) ); // everything ok
@@ -354,6 +370,12 @@ TEST_F( ReplicaTests, clientServerSpaceTests )
 	//client after change
 	checkSpaceAfterChange( replica->getSpace() );
 
+	//=== remove and return
+	removeAndReturnObject( serverSpace->getSpace() );
+	serverSpace->notifyRemoteChanges();
+	//it shouldn't change at all
+	checkSpaceAfterChange( replica->getSpace() );
+
 }
 
 TEST_F( ReplicaTests, multipleClientsServerSpaceTests )
@@ -401,6 +423,15 @@ TEST_F( ReplicaTests, multipleClientsServerSpaceTests )
 		checkSpaceAfterChange( replicaObj[i]->getService<dso::IClientSpace>()->getSpace() );
 	}
 
+		//=== remove and return
+	removeAndReturnObject( serverSpace->getSpace() );
+	serverSpace->notifyRemoteChanges();
+	//it shouldn't change at all
+	for( int i = 0; i < 3; i++ )
+	{
+		checkSpaceAfterChange( replicaObj[i]->getService<dso::IClientSpace>()->getSpace() );
+	}
+
 }
 
 TEST_F( ReplicaTests, replicaAfterChangeTests )
@@ -433,7 +464,7 @@ TEST_F( ReplicaTests, replicaAfterChangeTests )
 	checkInitialSpace( replicaBeforeObj->getService<dso::IClientSpace>()->getSpace() );
 		
 
-	//============================================= changes to server space
+	//============================================= changes to server spaec
 	applyChanges( serverSpace->getSpace() );
 
 	ASSERT_NO_THROW( serverSpace->notifyRemoteChanges() ); 
