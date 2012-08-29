@@ -51,7 +51,6 @@ public:
 
 	virtual ~ClientSpace()
 	{
-
 	}
 	
 	ca::ISpace* getSpace()
@@ -207,8 +206,10 @@ private:
 
 private:
 	co::RefPtr<ca::ISpace> _space;
+
 	co::RefPtr<ca::IUniverse> _universe;
 	co::RefPtr<reef::rpc::INode> _node;
+	
 	co::RefPtr<ca::IArchive> _archive;
 	co::RefPtr<co::IObject> _archiveObj;
 

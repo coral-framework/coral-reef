@@ -47,7 +47,7 @@ public:
 
 	virtual ~ServerSpace()
 	{
-
+		_space->removeGraphObserver( this );
 	}
 	
 	ca::ISpace* getSpace()
@@ -127,6 +127,7 @@ public:
 		results );
 		
 		_allChanges.clear();
+
 
 	}
 	

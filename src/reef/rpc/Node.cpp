@@ -28,7 +28,12 @@ Node::~Node()
     if( !_publicEndpoint.empty() ) // Node needs to be stopped
         stop();
 }
-    
+
+const std::string& Node::getPublicAddress()
+{
+	return _publicEndpoint;
+}
+
 co::IObject* Node::newRemoteInstance( const std::string& instanceType, 
                                            const std::string& address )
 {

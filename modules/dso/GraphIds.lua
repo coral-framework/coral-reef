@@ -34,6 +34,20 @@ function GraphIds:getService( id )
 	return self.idObjectMap[id]
 end
 
+function GraphIds:removeObject( object )
+	if self:hasId( object ) then
+		local ports = self.model:getPorts( object.component )
+		
+		for i, port in ipairs( ports ) do
+			local service = object[port.name]
+			if service ~= nil then
+				self.objectIdMap[ service ] = nil
+			end
+		end
+		self.objectIdMap[object] = nil
+	end
+end
+
 function GraphIds:objectId( object )
 	if not self:hasId( object ) then
 		self:insertInMap( object )

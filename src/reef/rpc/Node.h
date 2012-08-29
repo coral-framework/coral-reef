@@ -30,6 +30,9 @@ public:
     virtual ~Node();
     
     // INode methods
+
+	const std::string& getPublicAddress();
+
     co::IObject* newRemoteInstance( const std::string& instanceType, const std::string& address );
      
     co::IObject* findRemoteInstance( const std::string& instanceType, const std::string& key, 

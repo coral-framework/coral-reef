@@ -187,7 +187,14 @@ TEST( ParameterTests, complexTypeParameterTest )
     rpcTests::IComplexTypes* complexTypes = instance->getService<rpcTests::IComplexTypes>();
     server->publishInstance( instance.get(), "instance" );
     
-    co::RefPtr<co::IObject> rmtInstance = client->findRemoteInstance( "rpcTests.TestComponent", 
+	// non-published key
+	co::RefPtr<co::IObject> rmtInstance;
+	EXPECT_NO_THROW( rmtInstance = client->findRemoteInstance( "rpcTests.TestComponent", 
+                                                                     "notAnInstance", "address1" ) );
+
+	EXPECT_FALSE( rmtInstance.isValid() );
+
+    rmtInstance = client->findRemoteInstance( "rpcTests.TestComponent", 
                                                                      "instance", "address1" );
     
     rpcTests::IComplexTypes* rmtComplexTypes = rmtInstance->getService<rpcTests::IComplexTypes>();

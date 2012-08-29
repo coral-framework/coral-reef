@@ -13,6 +13,9 @@
 */
 interface INode
 {
+	
+	readonly string publicAddress;
+
 	/*
 		Creates a new remote instance for a component of type named \a componentTypeName
 		at \a specified address.
