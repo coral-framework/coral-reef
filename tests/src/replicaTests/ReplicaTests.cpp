@@ -378,7 +378,71 @@ TEST_F( ReplicaTests, clientServerSpaceTests )
 
 }
 
-TEST_F( ReplicaTests, multipleClientsServerSpaceTests )
+TEST_F( ReplicaTests, multipleClientsInitializeFromServerTests )
+{
+
+	co::IObject* serverSpaceObj = co::newInstance( "dso.ServerSpace" );
+	serverSpaceObj->setService( "serverNode", _server.get() );
+
+	dso::IServerSpace* serverSpace = serverSpaceObj->getService<dso::IServerSpace>();
+	serverSpace->publishSpace( _space.get(), "publishedSpace" );
+
+	co::IObject* replicaObj[3];
+	std::stringstream ss;
+	for( int i = 0; i < 3; i++ )
+	{	
+		replicaObj[i] = co::newInstance( "dso.ClientSpace" );
+		replicaObj[i]->setService( "clientNode", _client.get() );
+
+		ss << "client_" << i;
+		std::string clientKey = ss.str();
+		_client->publishInstance( replicaObj[i], clientKey );
+		ss.str("");
+		ss.clear();
+		co::RefPtr<dso::IClientSpace> replica = replicaObj[i]->getService<dso::IClientSpace>();
+		
+		co::IObject* universeObj = co::newInstance( "ca.Universe" );
+		co::IObject* modelObj = co::newInstance( "ca.Model" );
+		ca::IModel* model = modelObj->getService<ca::IModel>();
+		model->setName( "dom" );
+		universeObj->setService( "model", model );
+		replicaObj[i]->setService( "universe", universeObj->getService<ca::IUniverse>() );
+		
+		ASSERT_NO_THROW( serverSpace->initializeClient( _client->getPublicAddress(), clientKey )  );
+	}
+
+
+	// initial copy test
+	for( int i = 0; i < 3; i++ )
+	{
+		checkInitialSpace( replicaObj[i]->getService<dso::IClientSpace>()->getSpace() );
+	}
+	
+
+	//============================================= changes to server space
+	applyChanges( serverSpace->getSpace() );
+
+	ASSERT_NO_THROW( serverSpace->notifyRemoteChanges() ); 
+
+	//======================================================
+	//client after change
+	for( int i = 0; i < 3; i++ )
+	{
+		checkSpaceAfterChange( replicaObj[i]->getService<dso::IClientSpace>()->getSpace() );
+	}
+
+		//=== remove and return
+	removeAndReturnObject( serverSpace->getSpace() );
+	serverSpace->notifyRemoteChanges();
+	//it shouldn't change at all
+	for( int i = 0; i < 3; i++ )
+	{
+		checkSpaceAfterChange( replicaObj[i]->getService<dso::IClientSpace>()->getSpace() );
+	}
+
+}
+
+TEST_F( ReplicaTests, multipleClientsServerSpaceTests  )
 {
 
 	co::IObject* serverSpaceObj = co::newInstance( "dso.ServerSpace" );

@@ -76,7 +76,6 @@ public:
 		}
 
 		co::RefPtr<co::IObject> object = _node->findRemoteInstance( "dso.ServerSpace", _serverSpaceKey, _serverAddress );
-
 		
 		if( !object )
 		{
@@ -87,6 +86,14 @@ public:
 
 		co::Range<co::int8 const> byteData = serverSpace->getPublishedSpaceData();
 
+		initializeData( byteData );
+
+		serverSpace->addRemoteSpaceObserver( this );
+
+	}
+
+	bool initializeData( co::Range<co::int8 const> byteData  )
+	{
 		std::ofstream of ( "tmp.lua" );
 
 		for( int i = 0; i < byteData.getSize(); i++ )
@@ -106,10 +113,8 @@ public:
 		_archive->getProvider()->setService( "model", _space->getModel() );
 		
 		_space->initialize( root.get() );
-		initializeIds( _serverAddress, _serverSpaceKey );
-
-		serverSpace->addRemoteSpaceObserver( this );
-		
+		initializeIds();
+		return true;
 	}
 
 	bool onRemoteSpaceChanged(  co::Range<const dso::ChangeSet> changes )
@@ -185,16 +190,12 @@ protected:
 		_node = node;
 	}
 private:
-	void initializeIds( const std::string& _serverAddress, const std::string& _serverSpaceKey )
+	void initializeIds()
 	{
 		const std::string& script = "dso.SpaceSyncClient";
 		const std::string& function = "initializeIds";
 
 		co::Range<const co::Any> results;
-
-		co::IObject* object = _node->findRemoteInstance( "dso.ServerSpace", _serverSpaceKey, _serverAddress );
-
-		dso::IServerSpace* serverSpace = object->getService<dso::IServerSpace>();
 
 		co::Any args[1];
 		args[0].set<ca::ISpace*>( _space.get() );

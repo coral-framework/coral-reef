@@ -17,6 +17,7 @@
 #include <ca/IArchive.h>
 #include <ca/INamed.h>
 #include <ca/IGraphChanges.h>
+#include <dso/IClientSpace.h>
 
 #include <reef/rpc/INode.h>
 
@@ -78,6 +79,15 @@ public:
 		initializeIds();
 	}
 	
+	void initializeClient( const std::string& clientAddress, const std::string& clientKey )
+	{
+		co::RefPtr<co::IObject> object = _node->findRemoteInstance( "dso.ClientSpace", clientKey, clientAddress );
+		co::RefPtr<dso::IClientSpace> clientSpace = object->getService<dso::IClientSpace>();
+
+		clientSpace->initializeData( getPublishedSpaceData() );
+		addRemoteSpaceObserver( object->getService<dso::IRemoteSpaceObserver>() );
+	}
+
 	co::Range<co::int8 const> getPublishedSpaceData()
 	{
 		if( !_space.isValid() )
