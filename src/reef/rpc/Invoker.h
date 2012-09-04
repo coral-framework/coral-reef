@@ -39,17 +39,6 @@ public:
     
 private:
     
-    enum RemotingResult
-    {
-        RR_OK,
-        RR_UNKNOWN_COMPONENT_TYPE,
-        RR_NO_SUCH_LEASE,
-        RR_NO_SUCH_INSTANCE,
-        RR_NO_SUCH_FACET,
-        RR_NO_SUCH_MEMBER_OWNER,
-        RR_NO_SUCH_MEMBER,
-    };
-    
     void invokeManager( Demarshaller& demarshaller, MessageType msgType, 
                                  std::string& returned );
     
@@ -78,8 +67,6 @@ private:
     // Identify and marshals an interface that has been returned from an invoke
     void getRefTypeInfo( co::IService* service, std::string& senderEndpoint, 
                              ReferenceType& refType );
-    
-    void handleRemotingError( RemotingResult rr, std::string& returnValue );
 
 private:
     

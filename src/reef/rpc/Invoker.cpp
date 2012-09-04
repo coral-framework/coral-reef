@@ -323,49 +323,6 @@ void Invoker::getRefTypeInfo( co::IService* service, std::string& senderEndpoint
         }
     }
 }
-
-void Invoker::handleRemotingError( RemotingResult rr, std::string& returnValue )
-{
-    std::string errorMsg;
-    
-    switch( rr )
-    {
-        case RR_UNKNOWN_COMPONENT_TYPE:
-        {
-            errorMsg = "Unknown component type";
-            return;
-        }
-        case RR_NO_SUCH_LEASE:
-        {
-            errorMsg = "No such lease";
-            return;
-        }
-        case RR_NO_SUCH_INSTANCE:
-        {
-            errorMsg = "No such instance";
-            return;
-        }
-        case RR_NO_SUCH_FACET:
-        {
-            errorMsg = "No such facet";
-            return;
-        }
-        case RR_NO_SUCH_MEMBER_OWNER:
-        {
-            errorMsg = "No such member owner";
-            return;
-        }
-        case RR_NO_SUCH_MEMBER:
-        {
-            errorMsg = "No such member";
-            return;
-        }
-        default:
-            assert( false );
-    }
-    
-    _marshaller.marshalException( EX_REMOTING, "reef.rpc.RemotingError", errorMsg, returnValue );
-}
     
 }
     
