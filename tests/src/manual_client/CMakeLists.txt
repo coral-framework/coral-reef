@@ -19,7 +19,7 @@ file( GLOB _HEADERS *.h )
 file( GLOB _SOURCES *.cpp )
 
 add_executable( manual_client EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} )
-add_dependencies( manual_client moduleA reef dso dom )
+add_dependencies( manual_client rpcTests rpc )
 
 CORAL_TARGET( manual_client )
 

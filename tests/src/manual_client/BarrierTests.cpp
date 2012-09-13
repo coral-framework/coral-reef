@@ -27,7 +27,7 @@
 
 #define NUM_SERVERS 7
 
-TEST( SmokeTests, simpleTypesTest )
+TEST( BarrierTests, incrementTest )
 {
     // Creates the node instance
     co::IObject* nodeObj = co::newInstance( "reef.rpc.Node" );

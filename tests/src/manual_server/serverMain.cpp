@@ -37,7 +37,7 @@
 #include <gtest/gtest.h>
 
 
-int main( int argc, char** argv )
+/*int main( int argc, char** argv )
 {
 	// set up the system
 	co::addPath( CORAL_PATH );
@@ -98,4 +98,4 @@ int main( int argc, char** argv )
 	co::shutdown();
     
 	return 0;
-}
+}*/
