@@ -140,14 +140,17 @@ void Invoker::invokeManagement( Demarshaller& demarshaller, MessageType msgType,
             _demarshaller.getBarrierCreator( requesterEndpoint );
             
             _barrierCreator = _requestorMan->getOrCreateRequestor( requesterEndpoint );
+            return;
         }
         case BARRIER_HIT:
         {
             _barrierMan->onBarrierHit();
+            return;
         }
         case BARRIER_DOWN:
         {
             _barrierUp = false;
+            return;
         }
         default:
             assert( false );

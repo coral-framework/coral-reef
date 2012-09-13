@@ -6,7 +6,8 @@
 namespace reef {
 namespace rpc {
 
-BarrierManager::BarrierManager( RequestorManager* reqMan ) : _reqMan( reqMan ), _capacity( 0 )
+BarrierManager::BarrierManager( RequestorManager* reqMan ) : _reqMan( reqMan ), _capacity( 0 ),
+        _numHits( 0 )
 {
 }
 

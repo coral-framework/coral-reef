@@ -93,6 +93,7 @@ void Node::stop()
     
     _srh->setInvoker( 0 );
     delete _invoker; _invoker = 0;
+    delete _barrierMan;
     delete _requestorMan; _requestorMan = 0;
     delete _instanceMan; _instanceMan = 0;
     delete _srh; _srh = 0;
