@@ -26,6 +26,9 @@ enum MessageType
     REQUEST_LEASE,
     REQUEST_CANCEL_LEASE,
     EXCEPTION,
+    BARRIER_UP,
+    BARRIER_HIT,
+    BARRIER_DOWN,
     INVALID
 };
 
@@ -75,6 +78,9 @@ public:
     co::int32 getIntReturn();
     
     ExceptionType getException( outString exTypeName, outString what );
+    
+    // Synchronization Barrier
+    void getBarrierCreator( outString creatorEndpoint );
     
 private:
     void checkIfCallMsg();

@@ -37,150 +37,54 @@
 #include <gtest/gtest.h>
 
 
-void publishSpace( co::RefPtr<co::IObject>& serverSpaceObj, co::RefPtr<ca::ISpace>& space, reef::rpc::INode* server )
-{
-	co::IObject* modelObj = co::newInstance( "ca.Model" );
-	modelObj->getComponent();
-	ca::IModel* model = modelObj->getService<ca::IModel>();
-	model->setName( "dom" );
-
-	co::IObject* archiveObj = co::newInstance( "ca.LuaArchive" );
-	ca::IArchive* archive = archiveObj->getService<ca::IArchive>();
-	archiveObj->getService<ca::INamed>()->setName( "initial.lua" );
-	archiveObj->setService( "model", model );
-
-	co::RefPtr<co::IObject> root = archive->restore();
-	dom::ICompany* comp = root->getService<dom::ICompany>();
-	co::Range<dom::IEmployee* const> employees = comp->getEmployees();
-
-	model->loadDefinitionsFor( "dom" );
-	// create an object universe and bind the model
-	co::IObject* universeObj = co::newInstance( "ca.Universe" );
-	ca::IUniverse* universe = universeObj->getService<ca::IUniverse>();
-
-	universeObj->setService( "model", model );
-
-	// create an object space and bind it to the universe
-	co::RefPtr<co::IObject> spaceObj = co::newInstance( "ca.Space" );
-	space = spaceObj->getService<ca::ISpace>();
-
-	spaceObj->setService( "universe", universe );
-
-	space->initialize( root.get() );
-	space->notifyChanges();
-
-	assert( space->getUniverse() );
-
-	serverSpaceObj = co::newInstance( "dso.ServerSpace" );
-	dso::IServerSpace* serverSpace = serverSpaceObj->getService<dso::IServerSpace>();
-	serverSpaceObj->setService( "serverNode", server );
-	serverSpace->publishSpace( space.get(), "published" );
-}
-
-void applyChanges( co::RefPtr<co::IObject>& serverSpaceObj, const co::RefPtr<ca::ISpace>& space )
-{
-	ca::ISpace* spaceOnServer = space.get();
-	co::IObject*  serverRoot = spaceOnServer->getRootObject();
-	dom::ICompany* company = serverRoot->getService<dom::ICompany>();
-
-	co::Range<dom::IEmployee* const> employees = company->getEmployees();
-
-	employees[0]->setName( "Joseph Java Newbie JR." ); //change without notify
-
-	std::vector<dom::IEmployee*> changedEmployees;
-
-	changedEmployees.push_back( employees[0] );
-
-	changedEmployees.push_back( employees[1] );
-
-	dom::IEmployee* promoted = employees[2];
-
-	employees[2]->setRole("Development Manager");
-	spaceOnServer->addChange( employees[2] );
-	spaceOnServer->notifyChanges();
-
-	changedEmployees.push_back( employees[3] );
-
-	changedEmployees.push_back( employees[4] );
-
-	employees[4]->setSalary( 4000 );
-	spaceOnServer->addChange( employees[4] );
-	spaceOnServer->notifyChanges();
-
-	dom::IService* devService = co::cast<dom::IService>( employees[4]->getWorking()[0] );
-
-	devService->setMonthlyIncome( 60000 );
-	spaceOnServer->addChange( devService );
-	spaceOnServer->notifyChanges();
-
-	company->setEmployees( changedEmployees );
-
-	co::IObject* newCEOObj = co::newInstance( "dom.Employee" );
-	dom::IEmployee* newCEO = newCEOObj->getService<dom::IEmployee>();
-	newCEO->setName( "newCEO" );
-	newCEO->setRole( "CEO" );
-	newCEO->setSalary( 1000000 );
-
-	serverRoot->setService( "ceo", newCEO );
-	newCEO->setLeading( devService );
-	
-	spaceOnServer->addChange( company );
-	spaceOnServer->addChange( serverRoot );
-
-	spaceOnServer->notifyChanges();
-
-	serverSpaceObj->getService<dso::IServerSpace>()->notifyRemoteChanges();
-
-	CORAL_LOG(INFO) << "Sync successfull";
-}
-
 int main( int argc, char** argv )
 {
 	// set up the system
 	co::addPath( CORAL_PATH );
 	co::getSystem()->setup();
-
+    
 	try
 	{
+        if( argc != 2 )
+            throw co::Exception( "No server number provided" );
+        
+        int serverNumber = atoi( argv[1] );
+        
         // Creates the node instance
 		co::IObject* node = co::newInstance( "reef.rpc.Node" );
 		
 		// Gets the INode interface, which is the interface with remote hosts
-        reef::rpc::INode* server = node->getService<reef::rpc::INode>();
-
+        co::RefPtr<reef::rpc::INode> server = node->getService<reef::rpc::INode>();
+        
 		// Creates the instance responsible for the transport layer
-        reef::rpc::ITransport* transport = co::newInstance( "zmq.ZMQTransport" )->getService<reef::rpc::ITransport>();
+        co::RefPtr<reef::rpc::ITransport> transport = co::newInstance( "zmq.ZMQTransport" )->getService<reef::rpc::ITransport>();
         
         // The node instance needs the transport layer to communicate
-        node->setService( "transport", transport );
-
-		server->start( "tcp://*:4020", "tcp://localhost:4020" );
-
-		co::RefPtr<ca::ISpace> space;
-		co::RefPtr<co::IObject> serverSpaceObj;
-		
-		publishSpace( serverSpaceObj, space, server );
-
-		CORAL_LOG(INFO) << "Space published";
+        node->setService( "transport", transport.get() );
+        
+        // Configuring the appropriate endpoint based on the serverNumber
+        std::stringstream endpoint( std::stringstream::in | std::stringstream::out );
+        endpoint << "ipc:///tmp/server" << serverNumber << ".pipe";
+		server->start( endpoint.str(), endpoint.str() );
+        
+		CORAL_LOG(INFO) << "Server " << endpoint.str() << " Created";
         
         
 	    // Start the node server at given port
-		co::IObject* simpleTypesObj = co::newInstance( "moduleA.TestComponent" );
+		co::RefPtr<co::IObject> simpleTypesObj = co::newInstance( "rpcTests.TestComponent" );
 		rpcTests::ISimpleTypes* st = simpleTypesObj->getService<rpcTests::ISimpleTypes>();
 		st->setStoredInt( 0 );
-
-		server->publishInstance( simpleTypesObj, "control" );
-
+        
+		server->publishInstance( simpleTypesObj.get(), "control" );
+        
         // Just update the node forever
-		while( true )
+		while( !st->getStoredInt() )
 		{
 			server->update();
-			if( st->getStoredInt() )
-			{
-				applyChanges( serverSpaceObj, space );
-				st->setStoredInt( 0 );
-			}
 		}
+        
+        server->unpublishInstance( "control" );
+        server->stop();
         
 	}
 	catch( std::exception& e ) 
@@ -192,6 +96,6 @@ int main( int argc, char** argv )
 		std::cerr << "Unknown Exception" << std::endl;
 	}
 	co::shutdown();
-
+    
 	return 0;
 }

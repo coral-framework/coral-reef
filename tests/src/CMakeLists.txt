@@ -14,6 +14,7 @@ add_subdirectory( rpcTests )
 add_subdirectory( rpcUnitTests )
 add_subdirectory( rpcIntegrationTests )
 add_subdirectory( replicaTests )
+#add_subdirectory( multiprocessTests )
 
 set( MANUAL_TESTING_DISABLED ON CACHE BOOL "Manual client server testing" )
 if( NOT MANUAL_TESTING_DISABLED )

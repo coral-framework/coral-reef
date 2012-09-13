@@ -10,8 +10,10 @@ namespace zmq {
 class ZMQPassiveLink : public ZMQPassiveLink_Base
 {
 public:    
-	ZMQPassiveLink();
+	ZMQPassiveLink( zmq::context_t& context );
 
+    ZMQPassiveLink();
+    
 	virtual ~ZMQPassiveLink();
     
     bool bind( const std::string& address );
@@ -26,11 +28,10 @@ public:
 
 private:
     std::string _address;
-    zmq::context_t _context;
+    
     zmq::socket_t _socket;
     
     zmq::message_t _lastSender;
-    std::string _senderAddress;
 };
 
 } // namespace reef

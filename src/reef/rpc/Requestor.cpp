@@ -178,6 +178,36 @@ void Requestor::requestCancelLease( co::int32 instanceID )
     assert( result );
 }
     
+void Requestor::requestBarrierUp()
+{
+    if( !_connected )
+        return; //REMOTINGLOG cancelling lease after node stopped (should del CPs before stopping)
+    
+    std::string msg;
+    _marshaller.marshalBarrierUp( _publicEndpoint, msg );
+    _handler->handleAsynchRequest( msg );
+}
+  
+void Requestor::requestBarrierHit()
+{
+    if( !_connected )
+        return; //REMOTINGLOG cancelling lease after node stopped (should del CPs before stopping)
+    
+    std::string msg;
+    _marshaller.marshalBarrierHit( _publicEndpoint, msg );
+    _handler->handleAsynchRequest( msg );
+}
+    
+void Requestor::requestBarrierDown()
+{
+    if( !_connected )
+        return; //REMOTINGLOG cancelling lease after node stopped (should del CPs before stopping)
+    
+    std::string msg;
+    _marshaller.marshalBarrierDown( _publicEndpoint, msg );
+    _handler->handleAsynchRequest( msg );
+}
+    
 ClientProxy* Requestor::getOrCreateProxy( co::int32 instanceID, const std::string& componentName )
 {
     std::map<co::int32, ClientProxy*>::iterator it = _proxies.find( instanceID );

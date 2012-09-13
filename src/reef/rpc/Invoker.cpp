@@ -3,6 +3,7 @@
 #include "Node.h"
 #include "Requestor.h"
 #include "ClientProxy.h"
+#include "BarrierManager.h"
 #include "InstanceManager.h"
 #include "RequestorManager.h"
 #include "InstanceContainer.h"
@@ -29,9 +30,9 @@ namespace reef {
 namespace rpc {
 
     
-Invoker::Invoker( InstanceManager* instanceMan, ServerRequestHandler* srh, 
-                 RequestorManager* requestorMan ) : _instanceMan( instanceMan ),
-                _srh( srh ), _requestorMan( requestorMan )
+Invoker::Invoker( InstanceManager* instanceMan, BarrierManager* barrierMan, ServerRequestHandler* srh, 
+            RequestorManager* requestorMan ) : _instanceMan( instanceMan ), _barrierMan( barrierMan ),
+                _srh( srh ), _requestorMan( requestorMan ), _barrierUp( false )
 {
 }
     
@@ -48,7 +49,7 @@ void Invoker::dispatchInvocation( const std::string& invocationData )
         MessageType msgType = _demarshaller.demarshal( invocationData );
         
         if( msgType != INVOCATION )
-            invokeManager( _demarshaller, msgType, returnValue );
+            invokeManagement( _demarshaller, msgType, returnValue );
         else
             invokeInstance( _demarshaller, returnValue );
     }
@@ -69,7 +70,18 @@ void Invoker::dispatchInvocation( const std::string& invocationData )
         _srh->reply( returnValue );
 }
 
-void Invoker::invokeManager( Demarshaller& demarshaller, MessageType msgType, 
+void Invoker::hitBarrier()
+{
+    while( !_barrierUp ) // tried to enter the barrier before its raising
+        _srh->react();
+    
+    _barrierCreator->requestBarrierHit();
+    
+    while( _barrierUp )
+        _srh->react();
+}
+    
+void Invoker::invokeManagement( Demarshaller& demarshaller, MessageType msgType, 
                             std::string& returnValue )
 {
     co::int32 returnID;
@@ -120,6 +132,22 @@ void Invoker::invokeManager( Demarshaller& demarshaller, MessageType msgType,
             
             _instanceMan->cancelLease( instanceID, requesterEndpoint );
             return;
+        }
+        case BARRIER_UP:
+        {
+            _barrierUp = true;
+            
+            _demarshaller.getBarrierCreator( requesterEndpoint );
+            
+            _barrierCreator = _requestorMan->getOrCreateRequestor( requesterEndpoint );
+        }
+        case BARRIER_HIT:
+        {
+            _barrierMan->onBarrierHit();
+        }
+        case BARRIER_DOWN:
+        {
+            _barrierUp = false;
         }
         default:
             assert( false );

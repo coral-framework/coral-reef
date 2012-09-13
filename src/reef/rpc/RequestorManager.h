@@ -25,6 +25,10 @@ public:
     
     void onRequestorDestroyed( const std::string& endpoint );
     
+    void broadcastBarrierUp();
+    
+    void broadcastBarrierDown();
+    
     inline InstanceManager* getInstanceManager() { return _instanceMan; }
 private:
     InstanceManager* _instanceMan;

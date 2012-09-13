@@ -13,7 +13,7 @@ class ZMQActiveLink : public ZMQActiveLink_Base
 {
 public:
     // The \a creator wil be notified upon the destruction of this object.
-    ZMQActiveLink( ZMQTransport* creator );
+    ZMQActiveLink( zmq::context_t& context );
     
 	ZMQActiveLink();
 
@@ -31,10 +31,8 @@ public:
 
 private:
 	std::string _address;
-	zmq::context_t _context;
-    zmq::socket_t _socket;
     
-    ZMQTransport* _creator;
+    zmq::socket_t _socket;    
 };
 
 } // namespace reef

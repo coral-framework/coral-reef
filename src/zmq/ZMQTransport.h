@@ -6,6 +6,7 @@
 
 #include "ZMQTransport_Base.h"
 
+#include <zmq.hpp>
 #include <map>
 
 namespace zmq {
@@ -22,17 +23,9 @@ public:
     reef::rpc::IPassiveLink* bind( const std::string& addressToListen );
     
     reef::rpc::IActiveLink* connect( const std::string& addressToConnect );
-    
-    // ------ C++ only Methods ------ //
-    
-    void onLinkDestructor( const std::string& address );
-    
+
 private:
-    reef::rpc::IActiveLink* createActiveLink( const std::string& address );
-    
-private:
-    typedef std::map<std::string, reef::rpc::IActiveLink*> ActiveLinks;
-    ActiveLinks _activeLinks;
+    zmq::context_t _context;
 };
     
 } // namespace reef

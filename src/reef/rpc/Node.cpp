@@ -2,6 +2,7 @@
 
 #include "Invoker.h"
 #include "Requestor.h"
+#include "BarrierManager.h"
 #include "InstanceManager.h"
 #include "RequestorManager.h"
 #include "InstanceContainer.h"
@@ -48,6 +49,21 @@ co::IObject* Node::findRemoteInstance( const std::string& instanceType, const st
     return req->requestPublicInstance( key, instanceType );
 }
     
+void Node::raiseBarrier( co::int32 capacity )
+{
+    assert( _srh );
+    
+    _barrierMan->raiseBarrier( capacity );
+    
+    while( _barrierMan->isBarrierUp() )
+        update();
+}
+ 
+void Node::hitBarrier()
+{
+    _invoker->hitBarrier();
+}
+    
 void Node::start( const std::string&  boundAddress, const std::string& publicAddress )
 {
     _publicEndpoint = publicAddress;
@@ -58,7 +74,9 @@ void Node::start( const std::string&  boundAddress, const std::string& publicAdd
  
     _requestorMan = new RequestorManager( _instanceMan, _transport, _srh );
     
-    _invoker = new Invoker( _instanceMan, _srh, _requestorMan );
+    _barrierMan = new BarrierManager( _requestorMan );
+    
+    _invoker = new Invoker( _instanceMan, _barrierMan, _srh, _requestorMan );
     _srh->setInvoker( _invoker );
 }
     

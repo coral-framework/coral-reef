@@ -11,6 +11,9 @@ message Message
 		REQUEST_CANCEL_LEASE = 4;
 		RETURN = 5;
 		EXCEPTION = 6;
+		BARRIER_UP = 7;
+		BARRIER_HIT = 8;
+		BARRIER_DOWN = 9;
 	}
 	
 	optional string requester_endpoint = 1;

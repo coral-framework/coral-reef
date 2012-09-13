@@ -30,6 +30,18 @@ interface INode
 	co.IObject findRemoteInstance( in string componentTypeName, in string key, in string address );
 	
 	/*
+		Blocking. Starts the barrier that will be available for all the nodes which this node
+		has proxies for and blocks until the barrier is down. \a capacity the number of nodes 
+		needed to hit the barrier down. Currently, only one barrier exists in a network at a given time.
+	*/
+	void raiseBarrier( in int32 capacity );
+	
+	/*
+		Enters the barrier, blocks until the barrier height has been reached.
+	*/
+	void hitBarrier();
+	
+	/*
 		Starts a local server which answer remote requests in the provided port.
 		\throws ConnectionFailureExpection if Port is not available
 	*/

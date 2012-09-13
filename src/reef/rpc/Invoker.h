@@ -3,6 +3,7 @@
 
 #include "Marshaller.h"
 #include "Demarshaller.h"
+#include "Requestor.h"
 
 #include <co/Any.h>
 #include <co/RefPtr.h>
@@ -15,6 +16,7 @@ namespace reef {
 namespace rpc {
 
 class Node;
+class BarrierManager;
 class InstanceManager;
 class RequestorManager;
 class InstanceContainer;
@@ -30,16 +32,19 @@ public:
         proxys for reference parameters
         \param object The object that will be controlled by this Invoker
     */
-    Invoker( InstanceManager* instanceMan, ServerRequestHandler* srh, 
+    Invoker( InstanceManager* instanceMan, BarrierManager* barrierMan, ServerRequestHandler* srh, 
             RequestorManager* requestorMan );
     
      ~Invoker();
     
     void dispatchInvocation( const std::string& invocationData );
     
+    // Waits for other node to raise a barrier if it is still not risen, blocks until barrier is down
+    void hitBarrier();
+    
 private:
     
-    void invokeManager( Demarshaller& demarshaller, MessageType msgType, 
+    void invokeManagement( Demarshaller& demarshaller, MessageType msgType,
                                  std::string& returned );
     
     /*!
@@ -71,12 +76,16 @@ private:
 private:
     
     InstanceManager* _instanceMan;
+    BarrierManager* _barrierMan;
     ServerRequestHandler* _srh;
     
     RequestorManager* _requestorMan;
     
     Marshaller _marshaller;
     Demarshaller _demarshaller;
+    
+    bool _barrierUp;
+    co::RefPtr<Requestor> _barrierCreator;
 };
     
 }

@@ -1,0 +1,9 @@
+import reef.rpc.INode;
+
+// Component used to test the synchronization barrier
+component Incrementer
+{
+	provides IIncrementer incrementer;
+	
+	receives INode node;
+};

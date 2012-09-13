@@ -18,6 +18,7 @@ namespace rpc {
 
 class Client;
 class Invoker;
+class BarrierManager;
 class InstanceManager;
 class RequestorManager;
 class ServerRequestHandler;
@@ -38,12 +39,14 @@ public:
     co::IObject* findRemoteInstance( const std::string& instanceType, const std::string& key, 
                                     const std::string& address );
 
+    void raiseBarrier( co::int32 capacity );
+    void hitBarrier();
+    
     void start( const std::string& boundAddress, const std::string& publicEndpoint );
     
 	void update();
 
     void stop();
-       
 
 	co::IObject* getInstance( co::int32 instanceId );
     
@@ -69,6 +72,7 @@ private:
     RequestorManager* _requestorMan;
     
     InstanceManager* _instanceMan;
+    BarrierManager* _barrierMan;
     Invoker* _invoker;
     ServerRequestHandler* _srh;
     

@@ -411,6 +411,21 @@ MessageType Demarshaller::demarshal( inString data )
             
             break;
         }
+        case Message::BARRIER_UP:
+        {
+            _msgType = BARRIER_UP;
+            break;
+        }
+        case Message::BARRIER_HIT:
+        {
+            _msgType = BARRIER_HIT;
+            break;
+        }
+        case Message::BARRIER_DOWN:
+        {
+            _msgType = BARRIER_DOWN;
+            break;
+        }
     }
     
     if( _msgType == INVALID )
@@ -581,6 +596,13 @@ ExceptionType Demarshaller::getException( outString exTypeName, outString what )
             return EX_STD;
     }
     
+}
+    
+void Demarshaller::getBarrierCreator( outString creatorEndpoint )
+{
+    assert( _msgType == BARRIER_UP );
+    
+    creatorEndpoint = _message->requester_endpoint();
 }
     
 }

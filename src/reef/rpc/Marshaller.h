@@ -113,6 +113,11 @@ public:
     // Exceptions
     void marshalException( ExceptionType exType, inString exTypeName, inString what, outString msg );
     
+    // Synchronization Barrier
+    void marshalBarrierUp( inString requesterEndpoint, outString msg );
+    void marshalBarrierHit( inString requesterEndpoint, outString msg );
+    void marshalBarrierDown( inString requesterEndpoint, outString msg );
+    
 private:
     Message* _message;
     Request* _request;

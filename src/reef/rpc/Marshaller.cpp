@@ -433,5 +433,38 @@ void Marshaller::marshalException( ExceptionType exType, inString exTypeName, in
     _message->Clear();
 }
 
+void Marshaller::marshalBarrierUp( inString requesterEndpoint, outString msg )
+{
+    assert( _msgClear );
+    
+    _message->set_type( Message::BARRIER_UP );
+    _message->set_requester_endpoint( requesterEndpoint );
+    
+    _message->SerializeToString( &msg );
+    _message->Clear();
+}
+    
+void Marshaller::marshalBarrierHit( inString requesterEndpoint, outString msg )
+{
+    assert( _msgClear );
+    
+    _message->set_type( Message::BARRIER_HIT );
+    _message->set_requester_endpoint( requesterEndpoint );
+    
+    _message->SerializeToString( &msg );
+    _message->Clear();
+}
+    
+void Marshaller::marshalBarrierDown( inString requesterEndpoint, outString msg )
+{
+    assert( _msgClear );
+    
+    _message->set_type( Message::BARRIER_DOWN );
+    _message->set_requester_endpoint( requesterEndpoint );
+    
+    _message->SerializeToString( &msg );
+    _message->Clear();
+}
+    
 }
 }

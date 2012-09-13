@@ -50,11 +50,14 @@ enum Message_Type {
   Message_Type_REQUEST_LEASE = 3,
   Message_Type_REQUEST_CANCEL_LEASE = 4,
   Message_Type_RETURN = 5,
-  Message_Type_EXCEPTION = 6
+  Message_Type_EXCEPTION = 6,
+  Message_Type_BARRIER_UP = 7,
+  Message_Type_BARRIER_HIT = 8,
+  Message_Type_BARRIER_DOWN = 9
 };
 bool Message_Type_IsValid(int value);
 const Message_Type Message_Type_Type_MIN = Message_Type_INVOCATION;
-const Message_Type Message_Type_Type_MAX = Message_Type_EXCEPTION;
+const Message_Type Message_Type_Type_MAX = Message_Type_BARRIER_DOWN;
 const int Message_Type_Type_ARRAYSIZE = Message_Type_Type_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* Message_Type_descriptor();
@@ -169,6 +172,9 @@ class Message : public ::google::protobuf::Message {
   static const Type REQUEST_CANCEL_LEASE = Message_Type_REQUEST_CANCEL_LEASE;
   static const Type RETURN = Message_Type_RETURN;
   static const Type EXCEPTION = Message_Type_EXCEPTION;
+  static const Type BARRIER_UP = Message_Type_BARRIER_UP;
+  static const Type BARRIER_HIT = Message_Type_BARRIER_HIT;
+  static const Type BARRIER_DOWN = Message_Type_BARRIER_DOWN;
   static inline bool Type_IsValid(int value) {
     return Message_Type_IsValid(value);
   }

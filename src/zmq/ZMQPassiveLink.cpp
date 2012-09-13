@@ -4,7 +4,11 @@
 
 namespace zmq {
 
-ZMQPassiveLink::ZMQPassiveLink() : _context( 1 ), _socket( _context, ZMQ_ROUTER )
+ZMQPassiveLink::ZMQPassiveLink( zmq::context_t& context ) : _socket( context, ZMQ_ROUTER )
+{
+}
+
+ZMQPassiveLink::ZMQPassiveLink() : _socket( *((zmq::context_t*)0), ZMQ_ROUTER )
 {
 }
 

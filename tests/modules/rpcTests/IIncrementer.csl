@@ -1,0 +1,13 @@
+// Interface used to test the synchronization barrier
+
+interface IIncrementer
+{
+	// Starts with value of 1
+	readonly int32 numberOne;
+	
+	// Increments numberOne
+	void incrementAsync();
+	
+	// Increments numberOne after syncing with other nodes in a barrier
+	void incrementSync();
+};

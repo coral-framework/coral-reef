@@ -4,19 +4,18 @@
 
 namespace zmq {
 
-ZMQActiveLink::ZMQActiveLink( ZMQTransport* creator ) :
-    _context( 1 ), _socket( _context, ZMQ_DEALER ), _creator( creator )
+ZMQActiveLink::ZMQActiveLink( zmq::context_t& context ) : _socket( context, ZMQ_DEALER )
 {
 }
 
-ZMQActiveLink::ZMQActiveLink()  : _context( 1 ), _socket( _context, ZMQ_DEALER )
+ZMQActiveLink::ZMQActiveLink() : _socket( *((zmq::context_t*)0), ZMQ_DEALER )
 {
-    // empty constructor
+    // NEVER USE THIS CONSTRUCTOR!!
 }
 
 ZMQActiveLink::~ZMQActiveLink()
 {
-    _creator->onLinkDestructor( _address );
+    _socket.close();
 }
 
 bool ZMQActiveLink::connect( const std::string& address )

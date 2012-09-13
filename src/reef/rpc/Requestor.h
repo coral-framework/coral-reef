@@ -103,6 +103,12 @@ public:
      */
     void requestCancelLease( co::int32 instanceID );
     
+    void requestBarrierUp();
+    
+    void requestBarrierHit();
+    
+    void requestBarrierDown();
+    
     ClientProxy* getOrCreateProxy( co::int32 instanceID, const std::string& componentName );
     
     inline const std::string& getEndpoint(){ return _endpoint; }

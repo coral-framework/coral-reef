@@ -26,6 +26,24 @@ RequestorManager::~RequestorManager()
         it->second->disconnect();
     }
 }
+
+void RequestorManager::broadcastBarrierUp()
+{
+    std::map<std::string, Requestor*>::iterator it = _requestors.begin();
+    for( ; it != _requestors.end(); it++ )
+    {
+        it->second->requestBarrierUp();
+    }
+}
+   
+void RequestorManager::broadcastBarrierDown()
+{
+    std::map<std::string, Requestor*>::iterator it = _requestors.begin();
+    for( ; it != _requestors.end(); it++ )
+    {
+        it->second->requestBarrierDown();
+    }
+}
     
 Requestor* RequestorManager::getOrCreateRequestor( const std::string& endpoint )
 {
