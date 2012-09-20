@@ -438,9 +438,10 @@ public:
 		_storedString = str;
 	}
     
-    void throwException( const std::string& exceptionType, const std::string& exceptionMsg )
+    co::int32 throwException( const std::string& exceptionType, const std::string& exceptionMsg )
     {
         co::getType( exceptionType )->getReflector()->raise( exceptionMsg );
+        return 0;
     }
 
 private:

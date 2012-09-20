@@ -3,7 +3,10 @@
 #include "LeaseManager.h"
 #include "InstanceContainer.h"
 
+#include <co/Log.h>
 #include <co/Coral.h>
+
+#include <sstream>
 
 namespace reef {
 namespace rpc {
@@ -52,8 +55,11 @@ co::int32 InstanceManager::findInstance( const std::string& key, const std::stri
 {
     std::map<std::string, co::int32>::iterator it = _published.find( key );
     
-    if( it == _published.end() ) //REMOTINGERROR LOG not found
+    if( it == _published.end() )
+    {
+        CORAL_LOG( WARNING ) << "Node: " << lesseeEndpoint << " requested the invalid key: " << key;
         return -1;
+    }
     
     createLease( it->second, lesseeEndpoint );
     

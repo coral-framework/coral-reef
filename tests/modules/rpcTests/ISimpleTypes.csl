@@ -40,5 +40,5 @@ interface ISimpleTypes extends ISimpleParent
 	any concatenateFromAny( in any str1, in any str2 );
 	any mergeListsFromAny( in any l1, in any l2 );
 	
-	void throwException( in string exceptionType, in string exceptionMsg );
+	int32 throwException( in string exceptionType, in string exceptionMsg );
 };

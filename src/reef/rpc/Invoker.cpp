@@ -11,6 +11,7 @@
 
 #include <reef/rpc/RemotingException.h>
 
+#include <co/Log.h>
 #include <co/IPort.h>
 #include <co/IType.h>
 #include <co/IField.h>
@@ -55,6 +56,7 @@ void Invoker::dispatchInvocation( const std::string& invocationData )
     }
     catch( RemotingException& e )
     {
+        CORAL_LOG( ERROR ) << "Request triggered a remoting exception: " << e.what();
         _marshaller.marshalException( EX_REMOTING, e.getTypeName(), e.what(), returnValue );
     }
     catch( co::Exception& e )
@@ -95,6 +97,9 @@ void Invoker::invokeManagement( Demarshaller& demarshaller, MessageType msgType,
             _demarshaller.getNew( requesterEndpoint, instanceType );
             
             co::IType* type = co::getSystem()->getTypes()->findType( instanceType );
+            
+            CORAL_DLOG( INFO ) << "Received request for New instance of type " << type->getName() << 
+                        " from: " <<  requesterEndpoint;
             if( !type )
                 CORAL_THROW( RemotingException, "Unknown component type: " << instanceType );
             
@@ -106,6 +111,9 @@ void Invoker::invokeManagement( Demarshaller& demarshaller, MessageType msgType,
         {
             std::string key;
             _demarshaller.getLookup( requesterEndpoint, key );
+            
+            CORAL_DLOG( INFO ) << "Received request for Looking up key " << key << " from: " << requesterEndpoint;
+            
             returnID = _instanceMan->findInstance( key, requesterEndpoint );
             break;
         }
@@ -114,6 +122,8 @@ void Invoker::invokeManagement( Demarshaller& demarshaller, MessageType msgType,
             co::int32 instanceID;
             
             _demarshaller.getLease( requesterEndpoint, instanceID );
+            
+            CORAL_DLOG( INFO ) << "Received request for lease to " << instanceID << " from: " << requesterEndpoint;
             
             if( !_instanceMan->getInstance( instanceID ) )
                 CORAL_THROW( RemotingException, "No such instance of id: " << instanceID );
@@ -127,6 +137,8 @@ void Invoker::invokeManagement( Demarshaller& demarshaller, MessageType msgType,
             
             _demarshaller.getLease( requesterEndpoint, instanceID );
             
+            CORAL_DLOG( INFO ) << "Received request for cancel lease to " << instanceID << " from: " << requesterEndpoint;
+            
             if( !_instanceMan->getInstance( instanceID ) )
                 CORAL_THROW( RemotingException, "No such instance of id: " << instanceID );
             
@@ -139,16 +151,21 @@ void Invoker::invokeManagement( Demarshaller& demarshaller, MessageType msgType,
             
             _demarshaller.getBarrierCreator( requesterEndpoint );
             
+            CORAL_DLOG( INFO ) << "Received barrier up signal from " << requesterEndpoint;
+            
             _barrierCreator = _requestorMan->getOrCreateRequestor( requesterEndpoint );
             return;
         }
         case BARRIER_HIT:
         {
+            CORAL_DLOG( INFO ) << "Received a barrier hit signal";            
             _barrierMan->onBarrierHit();
             return;
         }
         case BARRIER_DOWN:
         {
+            CORAL_DLOG( INFO ) << "Received a barrier down signal";
+            
             _barrierUp = false;
             return;
         }
@@ -168,6 +185,9 @@ void Invoker::invokeInstance( Demarshaller& demarshaller, std::string& returnMsg
     ParameterPuller& puller = demarshaller.getInvocation( senderEndpoint, details );
     
     InstanceContainer* container = _instanceMan->getInstance( details.instanceID );
+    
+    CORAL_DLOG( INFO ) << "Received an invocation from " << senderEndpoint << " for instance " 
+                             << details.instanceID;
     
     if( !container )
         CORAL_THROW( RemotingException, "No such instance of id: " << details.instanceID );
@@ -206,6 +226,7 @@ void Invoker::invokeInstance( Demarshaller& demarshaller, std::string& returnMsg
     if( kind == co::MK_METHOD )
     {
         onMethod( puller, facet, co::cast<co::IMethod>( member ), reflector, returnAny );
+        
         if( !details.hasReturn )
             return;
     }   
@@ -262,12 +283,18 @@ void Invoker::onMethod( ParameterPuller& puller, co::IService* facet, co::IMetho
     }
     
     refl->invoke( facet, method, args, returned );
+    
+    CORAL_DLOG( INFO ) << "Invoked method " << method->getName() << " of service "
+    << facet->getInterface()->getName();
 }
     
 void Invoker::onGetField( co::IService* facet, co::IField* field, 
                              co::IReflector* refl, co::Any& returned )
 {
     refl->getField( facet, field, returned );
+    
+    CORAL_DLOG( INFO ) << "Got field " << field->getName() << " of service "
+    << facet->getInterface()->getName();
 }
 
 void Invoker::onSetField( ParameterPuller& puller, co::IService* facet, co::IField* field, 
@@ -292,6 +319,9 @@ void Invoker::onSetField( ParameterPuller& puller, co::IService* facet, co::IFie
     }
     
     refl->setField( facet, field, value );
+    
+    CORAL_DLOG( INFO ) << "Set field " << field->getName() << " of service "
+    << facet->getInterface()->getName();
 }
     
 void Invoker::getRefType( ReferenceType& refTypeInfo, co::Any& param, 
@@ -301,13 +331,24 @@ void Invoker::getRefType( ReferenceType& refTypeInfo, co::Any& param,
     switch( refTypeInfo.owner )
     {
         case OWNER_RECEIVER:
+        {
             instance = _instanceMan->getInstance( refTypeInfo.instanceID )->getInstance();
+            
+            CORAL_DLOG( INFO ) << "A Parameter is a reference to local instance " << 
+                    refTypeInfo.instanceID;
             break;
+        }
         case OWNER_SENDER:
         case OWNER_ANOTHER:
+        {
             Requestor* req = _requestorMan->getOrCreateRequestor( refTypeInfo.ownerEndpoint );
             instance = req->getOrCreateProxy( refTypeInfo.instanceID, refTypeInfo.instanceType );
+            
+            CORAL_DLOG( INFO ) << "A Parameter is a reference to a remote instance " << 
+                    refTypeInfo.instanceID << " from : " << refTypeInfo.ownerEndpoint;
+            
             break;
+        }
     }
     tempRefs.push_back( instance ); // TODO: remove
     
@@ -348,6 +389,8 @@ void Invoker::getRefTypeInfo( co::IService* service, std::string& senderEndpoint
         }
         else
         {
+            CORAL_DLOG( INFO ) << "The return value is a remote reference to a third node, requesting a lease now.";
+            
             requestor->requestLease( refType.instanceID, senderEndpoint );
             refType.owner = OWNER_ANOTHER;
             refType.ownerEndpoint = requestor->getEndpoint();

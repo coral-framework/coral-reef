@@ -55,7 +55,7 @@ void LeaseManager::addLease( co::int32 lessorID, const std::string lesseeEndpoin
 bool LeaseManager::removeLease( co::int32 lessorID, const std::string lesseeEndpoint )
 {
     std::map<std::string, Lessee*>::iterator lesseeIt = _lessees.find( lesseeEndpoint );
-    if( lesseeIt == _lessees.end() ) //REMOTINGERROR There is no Lessee associated with ip
+    if( lesseeIt == _lessees.end() )
 		CORAL_THROW( RemotingException, "The lessee has 0 leases to cancel" )
     
     // Remove the reference to the lessor from the lessee, and if empty, remove the lessee
@@ -77,7 +77,10 @@ bool LeaseManager::removeLease( co::int32 lessorID, const std::string lesseeEndp
     Lessor* lessor = lessorIt->second;
     
     if( !lessor->removeLease( lessee ) )
-        assert( false ); //REMOTINGERROR There is no reference to the Id
+    {
+        CORAL_THROW( RemotingException, lessor << " requested a removal of an inexistant lease for id: "  
+                    << lessee; )
+    }
     
     // Check if lessor is empty, if true, remove the lessor and return true
     if( !lessor->numLeases() )

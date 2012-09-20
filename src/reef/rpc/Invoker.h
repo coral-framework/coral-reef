@@ -55,7 +55,6 @@ private:
      */
     void invokeInstance( Demarshaller& demarshaller, std::string& returned );
     
-    // TODO REMOTINGERROR when mismatching parameter types/return facetIds ...
     void onMethod( ParameterPuller& puller, co::IService* facet, co::IMethod* method, 
                   co::IReflector* refl, co::Any& returned );
     
@@ -66,6 +65,8 @@ private:
                     co::IReflector* refl );
     
     // TODO: remove the last param in coral 0.8
+    // Whenever a ref type parameter arrives from a invocation, this method decodes it into an 
+    // actual instance. This function may call another node and possibly block.
     void getRefType( ReferenceType& refTypeInfo, co::Any& param, 
                     co::RefVector<co::IObject>& tempRefs );
     

@@ -7,6 +7,9 @@
 #include "RequestorManager.h"
 #include "ClientRequestHandler.h"
 
+#include <reef/rpc/RemotingException.h>
+
+#include <co/Log.h>
 #include <co/IReflector.h>
 #include <co/IComponent.h>
 
@@ -35,7 +38,8 @@ Requestor::~Requestor()
 
 co::IObject* Requestor::requestNewInstance( const std::string& componentName )
 {
-    assert( _connected ); //REMOTINGERROR requesting with node stopped
+    if( !_connected )
+        CORAL_THROW( RemotingException, "Trying to request with the node stopped");
     
     std::string msg;
     _marshaller.marshalNew( _publicEndpoint, componentName, msg );
@@ -56,7 +60,8 @@ co::IObject* Requestor::requestNewInstance( const std::string& componentName )
 co::IObject* Requestor::requestPublicInstance( const std::string& key, 
                                               const std::string& componentName )
 {
-    assert( _connected ); //REMOTINGERROR requesting with node stopped
+    if( !_connected )
+        CORAL_THROW( RemotingException, "Trying to request with the node stopped");
     
     std::string msg;
     _marshaller.marshalLookup( _publicEndpoint, key, msg );
@@ -84,7 +89,8 @@ co::IObject* Requestor::requestPublicInstance( const std::string& key,
 void Requestor::requestAsynchCall( MemberOwner& owner, co::IMethod* method,  
                                             co::Range<co::Any const> args )
 {
-    assert( _connected ); //REMOTINGERROR requesting with node stopped
+    if( !_connected )
+        CORAL_THROW( RemotingException, "Trying to request with the node stopped");
     
     InvocationDetails details( owner.instanceID, owner.facetID, method->getIndex(), 
                               owner.inheritanceDepth, false );
@@ -100,7 +106,8 @@ void Requestor::requestAsynchCall( MemberOwner& owner, co::IMethod* method,
 void Requestor::requestSynchCall( MemberOwner& owner, co::IMethod* method, 
                                            co::Range<co::Any const> args, co::Any& ret  )
 {
-    assert( _connected ); //REMOTINGERROR requesting with node stopped
+    if( !_connected )
+        CORAL_THROW( RemotingException, "Trying to request with the node stopped");
     
     InvocationDetails details( owner.instanceID, owner.facetID, method->getIndex(), 
                               owner.inheritanceDepth, true );
@@ -118,7 +125,8 @@ void Requestor::requestSynchCall( MemberOwner& owner, co::IMethod* method,
     
 void Requestor::requestSetField( MemberOwner& owner, co::IField* field, const co::Any arg )
 {
-    assert( _connected ); //REMOTINGERROR requesting with node stopped
+    if( !_connected )
+        CORAL_THROW( RemotingException, "Trying to request with the node stopped");
     
     InvocationDetails details( owner.instanceID, owner.facetID, field->getIndex(), 
                               owner.inheritanceDepth, false );
@@ -142,7 +150,8 @@ void Requestor::requestSetField( MemberOwner& owner, co::IField* field, const co
     
 void Requestor::requestGetField( MemberOwner& owner, co::IField* field, co::Any& ret )
 {
-    assert( _connected ); //REMOTINGERROR requesting with node stopped
+    if( !_connected )
+        CORAL_THROW( RemotingException, "Trying to request with the node stopped");
     
     InvocationDetails details( owner.instanceID, owner.facetID, field->getIndex(), 
                               owner.inheritanceDepth, true );
@@ -157,7 +166,8 @@ void Requestor::requestGetField( MemberOwner& owner, co::IField* field, co::Any&
     
 void Requestor::requestLease( co::int32 instanceID, std::string lessee )
 {
-    assert( _connected ); //REMOTINGERROR requesting with node stopped
+    if( !_connected )
+        CORAL_THROW( RemotingException, "Trying to request with the node stopped");
     
     Marshaller marshaller; // cannot use the member instance (conflicts with other marshalling)
     std::string msg;
@@ -168,7 +178,10 @@ void Requestor::requestLease( co::int32 instanceID, std::string lessee )
 void Requestor::requestCancelLease( co::int32 instanceID )
 {
     if( !_connected )
-        return; //REMOTINGLOG cancelling lease after node stopped (should del CPs before stopping)
+    {
+        CORAL_LOG( WARNING ) << "Proxy request a lease cancelling with node stopped. Ideally the proxies should  be deleted before stopping the node.";
+        return;
+    }
         
     std::string msg;
     _marshaller.marshalCancelLease( _publicEndpoint, instanceID, msg );
@@ -181,7 +194,7 @@ void Requestor::requestCancelLease( co::int32 instanceID )
 void Requestor::requestBarrierUp()
 {
     if( !_connected )
-        return; //REMOTINGLOG cancelling lease after node stopped (should del CPs before stopping)
+        CORAL_THROW( RemotingException, "Trying to request with the node stopped");
     
     std::string msg;
     _marshaller.marshalBarrierUp( _publicEndpoint, msg );
@@ -191,8 +204,8 @@ void Requestor::requestBarrierUp()
 void Requestor::requestBarrierHit()
 {
     if( !_connected )
-        return; //REMOTINGLOG cancelling lease after node stopped (should del CPs before stopping)
-    
+        CORAL_THROW( RemotingException, "Trying to request with the node stopped");
+
     std::string msg;
     _marshaller.marshalBarrierHit( _publicEndpoint, msg );
     _handler->handleAsynchRequest( msg );
@@ -201,8 +214,8 @@ void Requestor::requestBarrierHit()
 void Requestor::requestBarrierDown()
 {
     if( !_connected )
-        return; //REMOTINGLOG cancelling lease after node stopped (should del CPs before stopping)
-    
+        CORAL_THROW( RemotingException, "Trying to request with the node stopped");
+
     std::string msg;
     _marshaller.marshalBarrierDown( _publicEndpoint, msg );
     _handler->handleAsynchRequest( msg );
@@ -270,6 +283,9 @@ void Requestor::getProviderInfo( co::IService* param, ReferenceType& refType )
         }
         else
         {
+            CORAL_DLOG( INFO ) << "Passing a parameter that is a reference to a remote instance in : "
+                        << requestor->getEndpoint() << " requesting a lease now.";
+            
             requestor->requestLease( refType.instanceID, _endpoint );
             refType.owner = OWNER_ANOTHER;
             refType.ownerEndpoint = requestor->getEndpoint();
@@ -312,8 +328,12 @@ void Requestor::getReturn( const std::string& data, co::IType* returnedType, co:
     switch( refType.owner )
     {
         case OWNER_RECEIVER:
+        {
             instance = _instanceMan->getInstance( refType.instanceID )->getInstance();
+            if( !instance )
+                CORAL_THROW( reef::rpc::RemotingException, "Server returned an invalid reference to a local instance" );
             break;
+        }
         case OWNER_SENDER:
         case OWNER_ANOTHER:
             Requestor* req = _manager->getOrCreateRequestor( refType.ownerEndpoint );
