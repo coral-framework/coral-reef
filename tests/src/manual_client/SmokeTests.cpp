@@ -4,10 +4,10 @@
 #include <rpcTests/IComplexTypes.h>
 #include <rpcTests/IReferenceTypes.h>
 
-#include <reef/rpc/INode.h>
-#include <reef/rpc/ITransport.h>
+#include <rpc/INode.h>
+#include <rpc/ITransport.h>
 
-#include <dso/IClientSpace.h>
+#include <flow/IClientSpace.h>
 
 #include <dom/ICompany.h>
 #include <dom/IEmployee.h>
@@ -24,24 +24,23 @@
 #include <co/RefVector.h>
 #include <co/Log.h>
 
-namespace reef {
 namespace rpc {
 
 TEST( SmokeTests, clientServerSpaceTests )
 {
 	//client setup
-	co::IObject* nodeObj = co::newInstance( "reef.rpc.Node" );
+	co::IObject* nodeObj = co::newInstance( "rpc.Node" );
     
-    reef::rpc::INode* node = nodeObj->getService<reef::rpc::INode>();
+    rpc::INode* node = nodeObj->getService<rpc::INode>();
     
-    reef::rpc::ITransport* transport = co::newInstance( "zmq.ZMQTransport" )->getService<reef::rpc::ITransport>();
+    rpc::ITransport* transport = co::newInstance( "zmq.ZMQTransport" )->getService<rpc::ITransport>();
     
     nodeObj->setService( "transport", transport );
     
     node->start( "tcp://*:4021", "tcp://localhost:4021" );
 
 	co::IObject* obj = co::newInstance( "dom.Company" );
-	co::IObject* replicaObj = co::newInstance( "dso.ClientSpace" );
+	co::IObject* replicaObj = co::newInstance( "flow.ClientSpace" );
 	replicaObj->setService( "clientNode", node );
 
 	co::IObject* universeObj = co::newInstance( "ca.Universe" );
@@ -54,7 +53,7 @@ TEST( SmokeTests, clientServerSpaceTests )
 
 	std::vector<dom::IEmployee*> changedEmployees;
 	
-	co::RefPtr<dso::IClientSpace> replica = replicaObj->getService<dso::IClientSpace>();
+	co::RefPtr<flow::IClientSpace> replica = replicaObj->getService<flow::IClientSpace>();
 
 	co::RefPtr<ca::ISpace> spaceRestored;
 	co::RefPtr<ca::IUniverse> universe = universeObj->getService<ca::IUniverse>();
@@ -204,13 +203,13 @@ TEST( SmokeTests, clientServerSpaceTests )
 TEST( SmokeTests, simpleTypesTest )
 {
     // Creates the node instance
-    co::IObject* nodeObj = co::newInstance( "reef.rpc.Node" );
+    co::IObject* nodeObj = co::newInstance( "rpc.Node" );
     
     // Gets the INode interface, which is the interface with remote hosts
-    reef::rpc::INode* node = nodeObj->getService<reef::rpc::INode>();
+    rpc::INode* node = nodeObj->getService<rpc::INode>();
     
     // Creates the instance responsible for the transport layer
-    reef::rpc::ITransport* transport = co::newInstance( "zmq.ZMQTransport" )->getService<reef::rpc::ITransport>();
+    rpc::ITransport* transport = co::newInstance( "zmq.ZMQTransport" )->getService<rpc::ITransport>();
     
     // The node instance needs the transport layer to communicate
     nodeObj->setService( "transport", transport );
@@ -234,6 +233,4 @@ TEST( SmokeTests, simpleTypesTest )
 	node->stop();
 }
 
-    
-}
-}
+} // namespace rpc

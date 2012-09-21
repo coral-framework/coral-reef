@@ -1,5 +1,5 @@
-#ifndef __REEF_ZMQACTIVELINK_H__
-#define __REEF_ZMQACTIVELINK_H__
+#ifndef __RPC_ZMQACTIVELINK_H__
+#define __RPC_ZMQACTIVELINK_H__
 
 #include "ZMQActiveLink_Base.h"
 
@@ -21,7 +21,7 @@ public:
     
     bool connect( const std::string& address );
 
-	// ------ reef.IActiveLink Methods ------ //
+	// ------ rpc.IActiveLink Methods ------ //
 
 	const std::string& getAddress() { return _address; }
 
@@ -35,6 +35,6 @@ private:
     zmq::socket_t _socket;    
 };
 
-} // namespace reef
+} // namespace zmq
 
 #endif

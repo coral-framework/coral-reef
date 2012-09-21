@@ -3,12 +3,12 @@
 ################################################################################
 
 project( RPCUNITTESTS )
-CORAL_GENERATE_MODULE( _GENERATED_RPC_FILES reef.rpc )
+CORAL_GENERATE_MODULE( _GENERATED_RPC_FILES rpc )
 CORAL_GENERATE_MAPPINGS( _GENERATED_MAPPINGS "rpcTests.IFakeLink" "rpcTests.ITestSetup" )
 
 include_directories(
 	${GTEST_INCLUDE_DIRS}
-	${REEF_SOURCE_DIR}/src/reef/rpc
+	${CMAKE_SOURCE_DIR}/src/rpc
 	${CMAKE_CURRENT_BINARY_DIR}/generated
 	${rpcTests_BINARY_DIR}/generated
 )
@@ -17,8 +17,8 @@ include_directories(
 file( GLOB _HEADERS *.h )
 file( GLOB _SOURCES *.cpp )
 
-# Reef sources replicated here for testing
-file( GLOB _REPLICATED_MODULE_FILES	${REEF_SOURCE_DIR}/src/reef/rpc/*.cpp )
+#  sources replicated here for testing
+file( GLOB _REPLICATED_MODULE_FILES	${CMAKE_SOURCE_DIR}/src/rpc/*.cpp )
 list( REMOVE_ITEM _GENERATED_RPC_FILES "${CMAKE_CURRENT_BINARY_DIR}/generated/__Bootstrap.cpp" )
 
 add_executable( rpcUnitTests EXCLUDE_FROM_ALL ${_REPLICATED_MODULE_FILES} ${_HEADERS} ${_SOURCES} ${_GENERATED_RPC_FILES} ${_GENERATED_MAPPINGS} )

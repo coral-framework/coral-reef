@@ -19,17 +19,17 @@
 #include <dom/IProduct.h>
 #include <dom/IService.h>
 
-#include <reef/rpc/INode.h>
-#include <reef/rpc/ITransport.h>
+#include <rpc/INode.h>
+#include <rpc/ITransport.h>
 
 #include <ca/ISpace.h>
 #include <ca/IModel.h>
 #include <ca/IUniverse.h>
 #include <ca/IOException.h>
 
-#include <dso/IClientSpace.h>
-#include <dso/IServerSpace.h>
-#include <dso/IRemoteSpaceObserver.h>
+#include <flow/IClientSpace.h>
+#include <flow/IServerSpace.h>
+#include <flow/IRemoteSpaceObserver.h>
 
 #include <rpcTests/ITestSetup.h>
 
@@ -272,16 +272,16 @@ public:
 
 	co::RefPtr<rpcTests::ITestSetup> _setup;
 
-	co::RefPtr<reef::rpc::INode> _server;
-	co::RefPtr<reef::rpc::INode> _client;
+	co::RefPtr<rpc::INode> _server;
+	co::RefPtr<rpc::INode> _client;
 
 };
 
 TEST_F( ReplicaTests, clientServerConfigErrorTests )
 {
-	co::RefPtr<co::IObject> serverSpaceObj = co::newInstance( "dso.ServerSpace" );
+	co::RefPtr<co::IObject> serverSpaceObj = co::newInstance( "flow.ServerSpace" );
 
-	co::RefPtr<dso::IServerSpace> serverSpace = serverSpaceObj->getService<dso::IServerSpace>();
+	co::RefPtr<flow::IServerSpace> serverSpace = serverSpaceObj->getService<flow::IServerSpace>();
 
 	ASSERT_THROW( serverSpace->publishSpace( _space.get(), "anyName" ), co::IllegalStateException ); // server node not set
 
@@ -295,8 +295,8 @@ TEST_F( ReplicaTests, clientServerConfigErrorTests )
 
 	ASSERT_NO_THROW( serverSpace->publishSpace( _space.get(), "publishedOk" ) ); // publishing ok
 
-	co::RefPtr<co::IObject> clientSpaceObj = co::newInstance( "dso.ClientSpace" );
-	co::RefPtr<dso::IClientSpace> clientSpace = clientSpaceObj->getService<dso::IClientSpace>();
+	co::RefPtr<co::IObject> clientSpaceObj = co::newInstance( "flow.ClientSpace" );
+	co::RefPtr<flow::IClientSpace> clientSpace = clientSpaceObj->getService<flow::IClientSpace>();
 
 	co::IObject* universeObj = co::newInstance( "ca.Universe" );
 
@@ -333,13 +333,13 @@ TEST_F( ReplicaTests, clientServerConfigErrorTests )
 TEST_F( ReplicaTests, clientServerSpaceTests )
 {
 
-	co::IObject* serverSpaceObj = co::newInstance( "dso.ServerSpace" );
+	co::IObject* serverSpaceObj = co::newInstance( "flow.ServerSpace" );
 	serverSpaceObj->setService( "serverNode", _server.get() );
 
-	dso::IServerSpace* serverSpace = serverSpaceObj->getService<dso::IServerSpace>();
+	flow::IServerSpace* serverSpace = serverSpaceObj->getService<flow::IServerSpace>();
 	serverSpace->publishSpace( _space.get(), "publishedSpace" );
 
-	co::IObject* replicaObj = co::newInstance( "dso.ClientSpace" );
+	co::IObject* replicaObj = co::newInstance( "flow.ClientSpace" );
 	replicaObj->setService( "clientNode", _client.get() );
 
 	co::IObject* universeObj = co::newInstance( "ca.Universe" );
@@ -350,7 +350,7 @@ TEST_F( ReplicaTests, clientServerSpaceTests )
 	
 	universeObj->setService( "model", model );
 
-	co::RefPtr<dso::IClientSpace> replica = replicaObj->getService<dso::IClientSpace>();
+	co::RefPtr<flow::IClientSpace> replica = replicaObj->getService<flow::IClientSpace>();
 
 	co::RefPtr<ca::ISpace> spaceRestored;
 	replicaObj->setService( "universe", universeObj->getService<ca::IUniverse>() );
@@ -381,17 +381,17 @@ TEST_F( ReplicaTests, clientServerSpaceTests )
 TEST_F( ReplicaTests, multipleClientsInitializeFromServerTests )
 {
 
-	co::IObject* serverSpaceObj = co::newInstance( "dso.ServerSpace" );
+	co::IObject* serverSpaceObj = co::newInstance( "flow.ServerSpace" );
 	serverSpaceObj->setService( "serverNode", _server.get() );
 
-	dso::IServerSpace* serverSpace = serverSpaceObj->getService<dso::IServerSpace>();
+	flow::IServerSpace* serverSpace = serverSpaceObj->getService<flow::IServerSpace>();
 	serverSpace->publishSpace( _space.get(), "publishedSpace" );
 
 	co::IObject* replicaObj[3];
 	std::stringstream ss;
 	for( int i = 0; i < 3; i++ )
 	{	
-		replicaObj[i] = co::newInstance( "dso.ClientSpace" );
+		replicaObj[i] = co::newInstance( "flow.ClientSpace" );
 		replicaObj[i]->setService( "clientNode", _client.get() );
 
 		ss << "client_" << i;
@@ -399,7 +399,7 @@ TEST_F( ReplicaTests, multipleClientsInitializeFromServerTests )
 		_client->publishInstance( replicaObj[i], clientKey );
 		ss.str("");
 		ss.clear();
-		co::RefPtr<dso::IClientSpace> replica = replicaObj[i]->getService<dso::IClientSpace>();
+		co::RefPtr<flow::IClientSpace> replica = replicaObj[i]->getService<flow::IClientSpace>();
 		
 		co::IObject* universeObj = co::newInstance( "ca.Universe" );
 		co::IObject* modelObj = co::newInstance( "ca.Model" );
@@ -415,7 +415,7 @@ TEST_F( ReplicaTests, multipleClientsInitializeFromServerTests )
 	// initial copy test
 	for( int i = 0; i < 3; i++ )
 	{
-		checkInitialSpace( replicaObj[i]->getService<dso::IClientSpace>()->getSpace() );
+		checkInitialSpace( replicaObj[i]->getService<flow::IClientSpace>()->getSpace() );
 	}
 	
 
@@ -428,7 +428,7 @@ TEST_F( ReplicaTests, multipleClientsInitializeFromServerTests )
 	//client after change
 	for( int i = 0; i < 3; i++ )
 	{
-		checkSpaceAfterChange( replicaObj[i]->getService<dso::IClientSpace>()->getSpace() );
+		checkSpaceAfterChange( replicaObj[i]->getService<flow::IClientSpace>()->getSpace() );
 	}
 
 		//=== remove and return
@@ -437,7 +437,7 @@ TEST_F( ReplicaTests, multipleClientsInitializeFromServerTests )
 	//it shouldn't change at all
 	for( int i = 0; i < 3; i++ )
 	{
-		checkSpaceAfterChange( replicaObj[i]->getService<dso::IClientSpace>()->getSpace() );
+		checkSpaceAfterChange( replicaObj[i]->getService<flow::IClientSpace>()->getSpace() );
 	}
 
 }
@@ -445,18 +445,18 @@ TEST_F( ReplicaTests, multipleClientsInitializeFromServerTests )
 TEST_F( ReplicaTests, multipleClientsServerSpaceTests  )
 {
 
-	co::IObject* serverSpaceObj = co::newInstance( "dso.ServerSpace" );
+	co::IObject* serverSpaceObj = co::newInstance( "flow.ServerSpace" );
 	serverSpaceObj->setService( "serverNode", _server.get() );
 
-	dso::IServerSpace* serverSpace = serverSpaceObj->getService<dso::IServerSpace>();
+	flow::IServerSpace* serverSpace = serverSpaceObj->getService<flow::IServerSpace>();
 	serverSpace->publishSpace( _space.get(), "publishedSpace" );
 
 	co::IObject* replicaObj[3];
 	for( int i = 0; i < 3; i++ )
 	{	
-		replicaObj[i] = co::newInstance( "dso.ClientSpace" );
+		replicaObj[i] = co::newInstance( "flow.ClientSpace" );
 		replicaObj[i]->setService( "clientNode", _client.get() );
-		co::RefPtr<dso::IClientSpace> replica = replicaObj[i]->getService<dso::IClientSpace>();
+		co::RefPtr<flow::IClientSpace> replica = replicaObj[i]->getService<flow::IClientSpace>();
 		
 		co::IObject* universeObj = co::newInstance( "ca.Universe" );
 		co::IObject* modelObj = co::newInstance( "ca.Model" );
@@ -471,7 +471,7 @@ TEST_F( ReplicaTests, multipleClientsServerSpaceTests  )
 	// initial copy test
 	for( int i = 0; i < 3; i++ )
 	{
-		checkInitialSpace( replicaObj[i]->getService<dso::IClientSpace>()->getSpace() );
+		checkInitialSpace( replicaObj[i]->getService<flow::IClientSpace>()->getSpace() );
 	}
 	
 
@@ -484,7 +484,7 @@ TEST_F( ReplicaTests, multipleClientsServerSpaceTests  )
 	//client after change
 	for( int i = 0; i < 3; i++ )
 	{
-		checkSpaceAfterChange( replicaObj[i]->getService<dso::IClientSpace>()->getSpace() );
+		checkSpaceAfterChange( replicaObj[i]->getService<flow::IClientSpace>()->getSpace() );
 	}
 
 		//=== remove and return
@@ -493,7 +493,7 @@ TEST_F( ReplicaTests, multipleClientsServerSpaceTests  )
 	//it shouldn't change at all
 	for( int i = 0; i < 3; i++ )
 	{
-		checkSpaceAfterChange( replicaObj[i]->getService<dso::IClientSpace>()->getSpace() );
+		checkSpaceAfterChange( replicaObj[i]->getService<flow::IClientSpace>()->getSpace() );
 	}
 
 }
@@ -501,17 +501,17 @@ TEST_F( ReplicaTests, multipleClientsServerSpaceTests  )
 TEST_F( ReplicaTests, replicaAfterChangeTests )
 {
 
-	co::IObject* serverSpaceObj = co::newInstance( "dso.ServerSpace" );
+	co::IObject* serverSpaceObj = co::newInstance( "flow.ServerSpace" );
 	serverSpaceObj->setService( "serverNode", _server.get() );
 
-	dso::IServerSpace* serverSpace = serverSpaceObj->getService<dso::IServerSpace>();
+	flow::IServerSpace* serverSpace = serverSpaceObj->getService<flow::IServerSpace>();
 	serverSpace->publishSpace( _space.get(), "publishedSpace" );
 
-	co::IObject* replicaBeforeObj = co::newInstance( "dso.ClientSpace" );
+	co::IObject* replicaBeforeObj = co::newInstance( "flow.ClientSpace" );
 	
 	replicaBeforeObj->setService( "clientNode", _client.get() );
 	
-	co::RefPtr<dso::IClientSpace> replica = replicaBeforeObj->getService<dso::IClientSpace>();
+	co::RefPtr<flow::IClientSpace> replica = replicaBeforeObj->getService<flow::IClientSpace>();
 
 	co::IObject* universeObj = co::newInstance( "ca.Universe" );
 	co::IObject* modelObj = co::newInstance( "ca.Model" );
@@ -525,7 +525,7 @@ TEST_F( ReplicaTests, replicaAfterChangeTests )
 
 
 	// initial copy test
-	checkInitialSpace( replicaBeforeObj->getService<dso::IClientSpace>()->getSpace() );
+	checkInitialSpace( replicaBeforeObj->getService<flow::IClientSpace>()->getSpace() );
 		
 
 	//============================================= changes to server spaec
@@ -535,12 +535,12 @@ TEST_F( ReplicaTests, replicaAfterChangeTests )
 
 	//======================================================
 	//client after change
-	checkSpaceAfterChange( replicaBeforeObj->getService<dso::IClientSpace>()->getSpace() );
+	checkSpaceAfterChange( replicaBeforeObj->getService<flow::IClientSpace>()->getSpace() );
 
-	co::IObject* replicaAfterObj = co::newInstance( "dso.ClientSpace" );
+	co::IObject* replicaAfterObj = co::newInstance( "flow.ClientSpace" );
 	replicaAfterObj->setService( "clientNode", _client.get() );
 	
-	replica = replicaAfterObj->getService<dso::IClientSpace>();
+	replica = replicaAfterObj->getService<flow::IClientSpace>();
 	replicaAfterObj->setService( "universe", universeObj->getService<ca::IUniverse>() );
 	ASSERT_NO_THROW( replica->initialize( "address1", "publishedSpace" ) );
 

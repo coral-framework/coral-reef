@@ -1,5 +1,5 @@
-#ifndef __REEF_ZMQPASSIVELINK_H__
-#define __REEF_ZMQPASSIVELINK_H__
+#ifndef __RPC_ZMQPASSIVELINK_H__
+#define __RPC_ZMQPASSIVELINK_H__
 
 #include "ZMQPassiveLink_Base.h"
 
@@ -18,7 +18,7 @@ public:
     
     bool bind( const std::string& address );
 
-	// ------ reef.IPassiveLink Methods ------ //
+	// ------ rpc.IPassiveLink Methods ------ //
 
 	const std::string& getAddress() { return _address; }
 
@@ -34,6 +34,6 @@ private:
     zmq::message_t _lastSender;
 };
 
-} // namespace reef
+} // namespace zmq
 
 #endif

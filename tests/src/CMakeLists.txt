@@ -20,7 +20,7 @@ if( NOT MANUAL_TESTING_DISABLED )
 	add_subdirectory( manual_client )
 	add_subdirectory( manual_server )
 	# Add a custom target to build all test artifacts
-	ADD_CUSTOM_TARGET( tests DEPENDS reef rpcTests rpcUnitTests rpcIntegrationTests
+	ADD_CUSTOM_TARGET( tests DEPENDS rpc rpcTests rpcUnitTests rpcIntegrationTests
 		manual_client manual_server replica
 	)
 else()

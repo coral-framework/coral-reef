@@ -1,7 +1,7 @@
-import reef.rpc.IActiveLink;
+import rpc.IActiveLink;
 
 component ZMQActiveLink
 {
-	provides reef.rpc.IActiveLink active;
+	provides rpc.IActiveLink active;
 
 };

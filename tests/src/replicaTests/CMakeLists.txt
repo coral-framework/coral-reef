@@ -22,10 +22,10 @@ set_property( DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS "CORAL_PATH=\"${CORA
 include_directories(
 	${GTEST_INCLUDE_DIRS}
 	${CMAKE_CURRENT_BINARY_DIR}/generated
-	${CMAKE_BINARY_DIR}/src/reef/rpc/generated
-	${CMAKE_SOURCE_DIR}/src/reef/rpc
-	${CMAKE_BINARY_DIR}/src/dso/generated
-	${CMAKE_SOURCE_DIR}/src/dso
+	${CMAKE_BINARY_DIR}/src/rpc/generated
+	${CMAKE_SOURCE_DIR}/src/rpc
+	${CMAKE_BINARY_DIR}/src/flow/generated
+	${CMAKE_SOURCE_DIR}/src/flow
 	${rpcTests_BINARY_DIR}/generated
 	${dom_BINARY_DIR}/generated
 )
@@ -38,7 +38,7 @@ file( GLOB _SOURCES CompanySpace.cpp Main.cpp )
 
 # Create test executable
 add_executable( replica EXCLUDE_FROM_ALL ${_TESTS} ${_HEADERS} ${_SOURCES} ${_GENERATED_MAPPINGS} )
-add_dependencies( replica dom rpcTests rpc dso)
+add_dependencies( replica dom rpcTests rpc flow)
 
 CORAL_TARGET( replica )
 
@@ -46,7 +46,7 @@ set_target_properties( replica PROPERTIES
 	PROJECT_LABEL "replica"
 )
 
-target_link_libraries( replica ${GTEST_LIBRARIES} ${CORAL_LIBRARIES} ${CALCIUM_LIBRARIES} ${REEF_LIBRARIES} )
+target_link_libraries( replica ${GTEST_LIBRARIES} ${CORAL_LIBRARIES} ${CALCIUM_LIBRARIES} ${_LIBRARIES} )
 
 source_group( "@Generated" FILES ${_GENERATED_FILES} )
 

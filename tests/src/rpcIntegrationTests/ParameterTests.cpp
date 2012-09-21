@@ -8,8 +8,8 @@
 #include <rpcTests/StringNativeClass.h>
 #include <rpcTests/ITestSetup.h>
 
-#include <reef/rpc/INode.h>
-#include <reef/rpc/ITransport.h>
+#include <rpc/INode.h>
+#include <rpc/ITransport.h>
 
 #include <co/Coral.h>
 #include <co/RefPtr.h>
@@ -29,7 +29,6 @@
 #define CHAR2 75
 #define CHAR3 85
 
-namespace reef {
 namespace rpc {
 
     
@@ -39,7 +38,7 @@ TEST( ParameterTests, simpleTypesTest )
     rpcTests::ITestSetup* setup = testSetup->getService<rpcTests::ITestSetup>();
     setup->initTest( 2 );
     
-    reef::rpc::INode* client = setup->getNode( 1 );
+    rpc::INode* client = setup->getNode( 1 );
     
     co::RefPtr<co::IObject> remoteInstance = client->newRemoteInstance( "rpcTests.TestComponent",
                                                             "address2" );
@@ -131,8 +130,8 @@ TEST( ParameterTests, refTypeParameterTest )
     rpcTests::ITestSetup* setup = testSetup->getService<rpcTests::ITestSetup>();
     setup->initTest( 3 );
     
-    reef::rpc::INode* serverB = setup->getNode( 2 );
-    reef::rpc::INode* client = setup->getNode( 3 );
+    rpc::INode* serverB = setup->getNode( 2 );
+    rpc::INode* client = setup->getNode( 3 );
 
     co::RefPtr<co::IObject> instanceInA = client->newRemoteInstance( "rpcTests.TestComponent",
                                                                 "address1" );
@@ -180,8 +179,8 @@ TEST( ParameterTests, complexTypeParameterTest )
     rpcTests::ITestSetup* setup = testSetup->getService<rpcTests::ITestSetup>();
     setup->initTest( 2 );
     
-    reef::rpc::INode* server = setup->getNode( 1 );
-    reef::rpc::INode* client = setup->getNode( 2 );
+    rpc::INode* server = setup->getNode( 1 );
+    rpc::INode* client = setup->getNode( 2 );
     
     co::RefPtr<co::IObject> instance = co::newInstance( "rpcTests.TestComponent" );
     rpcTests::IComplexTypes* complexTypes = instance->getService<rpcTests::IComplexTypes>();
@@ -287,8 +286,8 @@ TEST( ParameterTests, complexArrayTest )
     rpcTests::ITestSetup* setup = testSetup->getService<rpcTests::ITestSetup>();
     setup->initTest( 2 );
     
-    reef::rpc::INode* server = setup->getNode( 1 );
-    reef::rpc::INode* client = setup->getNode( 2 );
+    rpc::INode* server = setup->getNode( 1 );
+    rpc::INode* client = setup->getNode( 2 );
     
     co::RefPtr<co::IObject> instance = co::newInstance( "rpcTests.TestComponent" );
     server->publishInstance( instance.get(), "instance" );
@@ -361,6 +360,4 @@ TEST( ParameterTests, complexArrayTest )
     setup->tearDown();
 }
     
-}
-
-}
+} // namespace rpc

@@ -1,8 +1,8 @@
 #Use solution folders.
 SET_PROPERTY( GLOBAL PROPERTY USE_FOLDERS ON )
 
-add_subdirectory( reef )
-add_subdirectory( dso )
+add_subdirectory( rpc )
+add_subdirectory( flow )
 
 set( BUILD_ZMQ ON CACHE BOOL "Building ZMQ also" )
 if( BUILD_ZMQ )

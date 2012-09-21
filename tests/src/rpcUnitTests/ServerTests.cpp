@@ -18,7 +18,6 @@
 
 #include <iostream>
 
-namespace reef {
 namespace rpc {
     
 TEST( ServerTests, invokerValueTypeTest )
@@ -33,6 +32,4 @@ TEST( ServerTests, nodeTest )
 {
 }
     
-}
-            
-}
+} // namespace rpc

@@ -19,7 +19,6 @@
 #define STRING1 "string1"
 #define STRING2 "string2"
 
-namespace reef {
 namespace rpc {
 
 
@@ -209,6 +208,4 @@ TEST( CodecTests, simpleTypesTest )
     }
 }
     
-}
-    
-}
+} // namespace rpc

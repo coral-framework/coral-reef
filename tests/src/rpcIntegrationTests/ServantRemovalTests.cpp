@@ -5,15 +5,14 @@
 #include <rpcTests/IReferenceTypes.h>
 #include <rpcTests/ITestSetup.h>
 
-#include <reef/rpc/INode.h>
-#include <reef/rpc/ITransport.h>
+#include <rpc/INode.h>
+#include <rpc/ITransport.h>
 
 #include <co/Coral.h>
 #include <co/RefPtr.h>
 #include <co/IObject.h>
 #include <co/RefVector.h>
 
-namespace reef {
 namespace rpc {
 
     
@@ -23,9 +22,9 @@ TEST( InvokerRemovalTests, simpleTest )
     rpcTests::ITestSetup* setup = testSetup->getService<rpcTests::ITestSetup>();
     setup->initTest( 3 );
     
-    reef::rpc::INode* hostA = setup->getNode( 1 );
-    reef::rpc::INode* hostB = setup->getNode( 2 );
-    reef::rpc::INode* hostC = setup->getNode( 3 );
+    rpc::INode* hostA = setup->getNode( 1 );
+    rpc::INode* hostB = setup->getNode( 2 );
+    rpc::INode* hostC = setup->getNode( 3 );
     
     co::RefVector<co::IObject> objects;
     objects.push_back( hostC->newRemoteInstance( "rpcTests.TestComponent", "address1" ) );
@@ -89,8 +88,8 @@ TEST( InvokerRemovalTests, repeatedReferenceTest )
     rpcTests::ITestSetup* setup = testSetup->getService<rpcTests::ITestSetup>();
     setup->initTest( 3 );
     
-    reef::rpc::INode* hostA = setup->getNode( 1 );
-    reef::rpc::INode* hostC = setup->getNode( 3 );
+    rpc::INode* hostA = setup->getNode( 1 );
+    rpc::INode* hostC = setup->getNode( 3 );
     
     EXPECT_EQ( hostC->getInstanceNumLeases( 0 ), 0 );
     
@@ -120,6 +119,5 @@ TEST( InvokerRemovalTests, repeatedReferenceTest )
     
     setup->tearDown();
 }
-    
-}  
-}
+
+} // namespace rpc

@@ -1,4 +1,4 @@
-import reef.rpc.INode;
+import rpc.INode;
 
 // Component used to test the synchronization barrier
 component Incrementer

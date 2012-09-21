@@ -1,6 +1,0 @@
-component ServerSpace
-{
-	provides IServerSpace serverSpace;
-	provides ca.IGraphObserver observer;
-	receives reef.rpc.INode serverNode;
-};

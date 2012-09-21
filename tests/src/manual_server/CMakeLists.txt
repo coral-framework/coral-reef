@@ -8,10 +8,10 @@ include_directories(
 	${GTEST_INCLUDE_DIRS}
 	${dom_BINARY_DIR}/generated
 	${rpcTests_BINARY_DIR}/generated
-	${CMAKE_BINARY_DIR}/src/reef/rpc/generated
-	${CMAKE_SOURCE_DIR}/src/reef/rpc
-	${CMAKE_BINARY_DIR}/src/dso/generated
-	${CMAKE_SOURCE_DIR}/src/dso
+	${CMAKE_BINARY_DIR}/src/rpc/generated
+	${CMAKE_SOURCE_DIR}/src/rpc
+	${CMAKE_BINARY_DIR}/src/flow/generated
+	${CMAKE_SOURCE_DIR}/src/flow
 )
 
 # Gather source files in the current directory

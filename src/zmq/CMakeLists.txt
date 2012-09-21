@@ -11,7 +11,7 @@ file( GLOB _SOURCES *.cpp )
 file( GLOB _HEADERS *.h )
 
 add_library( zmq MODULE ${_HEADERS} ${_SOURCES} ${_GENERATED_FILES} )
-add_dependencies( zmq reef )
+add_dependencies( zmq rpc )
 
 CORAL_MODULE_TARGET( "zmq" zmq )
 

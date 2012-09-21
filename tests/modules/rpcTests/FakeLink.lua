@@ -1,4 +1,4 @@
-local FakeLink = co.Component( "mockReef.FakeLink" )
+local FakeLink = co.Component( "mock.FakeLink" )
 
 -- IActiveLink methods
 function FakeLink:send( msg )

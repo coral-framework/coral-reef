@@ -23,7 +23,7 @@ int main( int argc, char** argv )
 	// set up the system
 	co::addPath( CORAL_PATH );
 	co::getSystem()->setup();
-    reef::rpc::ModuleInstaller& moduleInstaller = reef::rpc::ModuleInstaller::instance();
+    rpc::ModuleInstaller& moduleInstaller = rpc::ModuleInstaller::instance();
     moduleInstaller.install();
     
 	int res;

@@ -25,7 +25,7 @@ bool ZMQActiveLink::connect( const std::string& address )
     return true;
 }
     
-// ------ reef.IActiveLink Methods ------ //
+// ------ rpc.IActiveLink Methods ------ //
 
 bool ZMQActiveLink::receiveReply( std::string& msg )
 {
@@ -50,4 +50,4 @@ void ZMQActiveLink::send( const std::string& msg )
 
 CORAL_EXPORT_COMPONENT( ZMQActiveLink, ZMQActiveLink );
 
-} // namespace reef
+} // namespace zmq

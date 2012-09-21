@@ -1,8 +1,8 @@
-#ifndef __REEF_ZMQTRANSPORT_H__
-#define __REEF_ZMQTRANSPORT_H__
+#ifndef __RPC_ZMQTRANSPORT_H__
+#define __RPC_ZMQTRANSPORT_H__
 
-#include <reef/rpc/IActiveLink.h>
-#include <reef/rpc/IPassiveLink.h>
+#include <rpc/IActiveLink.h>
+#include <rpc/IPassiveLink.h>
 
 #include "ZMQTransport_Base.h"
 
@@ -18,16 +18,16 @@ public:
     
     virtual ~ZMQTransport();
     
-    // ------ reef.ITransport Methods ------ //
+    // ------ rpc.ITransport Methods ------ //
     
-    reef::rpc::IPassiveLink* bind( const std::string& addressToListen );
+    rpc::IPassiveLink* bind( const std::string& addressToListen );
     
-    reef::rpc::IActiveLink* connect( const std::string& addressToConnect );
+    rpc::IActiveLink* connect( const std::string& addressToConnect );
 
 private:
     zmq::context_t _context;
 };
     
-} // namespace reef
+} // namespace zmq
 
 #endif

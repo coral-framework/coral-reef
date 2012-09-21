@@ -24,7 +24,7 @@ bool ZMQPassiveLink::bind( const std::string& address )
     return true;
 }
 
-// ------ reef.IPassiveLink Methods ------ //
+// ------ rpc.IPassiveLink Methods ------ //
 
 bool ZMQPassiveLink::receive( std::string& msg )
 {
@@ -61,4 +61,4 @@ void ZMQPassiveLink::sendReply( const std::string& msg )
 
 CORAL_EXPORT_COMPONENT( ZMQPassiveLink, ZMQPassiveLink );
 
-} // namespace reef
+} // namespace zmq

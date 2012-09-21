@@ -1,5 +1,5 @@
 /*
- * Reef
+ * 
  * See copyright notice in LICENSE.md
  */
 
@@ -9,10 +9,10 @@
 #include <co/reserved/OS.h>
 #include <co/Log.h>
 
-#include <reef/rpc/INode.h>
-#include <reef/rpc/ITransport.h>
+#include <rpc/INode.h>
+#include <rpc/ITransport.h>
 
-#include <dso/IServerSpace.h>
+#include <flow/IServerSpace.h>
 
 #include <dom/ICompany.h>
 #include <dom/IEmployee.h>
@@ -51,13 +51,13 @@ int main( int argc, char** argv )
         int serverNumber = atoi( argv[1] );
         
         // Creates the node instance
-		co::IObject* node = co::newInstance( "reef.rpc.Node" );
+		co::IObject* node = co::newInstance( "rpc.Node" );
 		
 		// Gets the INode interface, which is the interface with remote hosts
-        co::RefPtr<reef::rpc::INode> server = node->getService<reef::rpc::INode>();
+        co::RefPtr<rpc::INode> server = node->getService<rpc::INode>();
         
 		// Creates the instance responsible for the transport layer
-        co::RefPtr<reef::rpc::ITransport> transport = co::newInstance( "zmq.ZMQTransport" )->getService<reef::rpc::ITransport>();
+        co::RefPtr<rpc::ITransport> transport = co::newInstance( "zmq.ZMQTransport" )->getService<rpc::ITransport>();
         
         // The node instance needs the transport layer to communicate
         node->setService( "transport", transport.get() );

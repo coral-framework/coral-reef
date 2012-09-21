@@ -1,0 +1,105 @@
+package rpc;
+
+message Message
+{
+	enum Type
+	{
+		INVOCATION = 0;
+		REQUEST_NEW = 1;
+		REQUEST_LOOKUP = 2;
+		REQUEST_LEASE = 3;
+		REQUEST_CANCEL_LEASE = 4;
+		RETURN = 5;
+		EXCEPTION = 6;
+		BARRIER_UP = 7;
+		BARRIER_HIT = 8;
+		BARRIER_DOWN = 9;
+	}
+	
+	optional string requester_endpoint = 1;
+	required Type type = 2;
+	
+	optional Invocation invocation = 3;
+	optional Request request = 4;
+	optional Parameter ret_value = 5;
+	optional int32 ret_int = 6;
+	optional Exception exception = 7;
+}
+
+message Request
+{
+	optional string new_instance_type = 2;
+	optional string lookup_key = 3;
+	optional uint32 lease_instance_id = 4;
+}
+
+message Exception
+{
+	enum Type
+	{
+		CORAL = 0;
+		REMOTING = 1;
+		STD = 2;
+	}
+	required Type type = 1;
+	required string type_name = 2;
+	required string what = 3;
+}
+
+// Commands (triggers actions into destination nodes)
+message Invocation
+{
+	required uint32 instance_id = 1;
+	required uint32 facet_idx = 2;
+	required uint32 member_idx = 3;
+	required int32 type_depth = 4;
+	required bool synch = 5;
+	repeated Parameter params = 6;
+}
+
+message Parameter
+{
+	repeated Container container = 1;
+}
+
+// Data types (information transfer):
+message Container
+{
+	optional bool boolean = 1;
+	optional string str = 2;
+	optional double numeric = 3;
+	
+	optional Complex_Type complex_type = 4;
+	
+	optional Any_Type any_type = 5;
+	
+	optional Ref_Type ref_type = 6;
+}
+
+message Any_Type
+{
+	required int32 kind = 1;
+	optional string type = 2;
+	optional Parameter param = 3;
+}
+
+message Complex_Type
+{
+	repeated Parameter field = 1;
+}
+
+message Ref_Type
+{
+	enum Owner
+	{
+		OWNER_SENDER = 0;
+		OWNER_RECEIVER = 1;
+		OWNER_ANOTHER = 2;
+	}
+	
+	required Owner owner = 1;
+	required uint32 instance_id = 2;
+	required uint32 facet_idx = 3;
+	optional string instance_type = 4;
+	optional string owner_endpoint = 5;
+}

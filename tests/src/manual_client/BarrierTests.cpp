@@ -3,10 +3,10 @@
 #include <rpcTests/ISimpleTypes.h>
 #include <rpcTests/IIncrementer.h>
 
-#include <reef/rpc/INode.h>
-#include <reef/rpc/ITransport.h>
+#include <rpc/INode.h>
+#include <rpc/ITransport.h>
 
-#include <dso/IClientSpace.h>
+#include <flow/IClientSpace.h>
 
 #include <dom/ICompany.h>
 #include <dom/IEmployee.h>
@@ -30,13 +30,13 @@
 TEST( BarrierTests, incrementTest )
 {
     // Creates the node instance
-    co::IObject* nodeObj = co::newInstance( "reef.rpc.Node" );
+    co::IObject* nodeObj = co::newInstance( "rpc.Node" );
     
     // Gets the INode interface, which is the interface with remote hosts
-    reef::rpc::INode* node = nodeObj->getService<reef::rpc::INode>();
+    rpc::INode* node = nodeObj->getService<rpc::INode>();
     
     // Creates the instance responsible for the transport layer
-    reef::rpc::ITransport* transport = co::newInstance( "zmq.ZMQTransport" )->getService<reef::rpc::ITransport>();
+    rpc::ITransport* transport = co::newInstance( "zmq.ZMQTransport" )->getService<rpc::ITransport>();
     
     // The node instance needs the transport layer to communicate
     nodeObj->setService( "transport", transport );

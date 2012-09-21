@@ -9,8 +9,8 @@ CORAL_GENERATE_MAPPINGS( _GENERATED_MAPPINGS "rpcTests.ITestSetup" )
 include_directories(
 	${GTEST_INCLUDE_DIRS}
 	${rpcTests_BINARY_DIR}/generated
-	${CMAKE_BINARY_DIR}/src/reef/rpc/generated
-	${CMAKE_SOURCE_DIR}/src/reef/rpc
+	${CMAKE_BINARY_DIR}/src/rpc/generated
+	${CMAKE_SOURCE_DIR}/src/rpc
 	${CMAKE_CURRENT_BINARY_DIR}/generated
 )
 

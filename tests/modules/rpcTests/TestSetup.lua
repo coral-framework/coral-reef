@@ -8,8 +8,8 @@ function TestSetup:initTest( numNodes )
 	self.transports = {}
 	
 	for i = 1, numNodes do
-		self.transports[i] = co.new "reef.rpc.Transport"
-		self.nodes[i] = co.new "reef.rpc.Node"
+		self.transports[i] = co.new "rpc.Transport"
+		self.nodes[i] = co.new "rpc.Node"
 		self.nodes[i].transport = self.transports[i].transport
 		self.transports[i].node = self.nodes[i].node
 		
@@ -47,8 +47,8 @@ function TestSetup:spawnNode( address )
 		address = "address" .. i
 	end
 
-	self.transports[i] = co.new "reef.rpc.Transport"
-	self.nodes[i] = co.new "reef.rpc.Node"
+	self.transports[i] = co.new "rpc.Transport"
+	self.nodes[i] = co.new "rpc.Node"
 	self.nodes[i].transport = self.transports[i].transport
 	self.transports[i].node = self.nodes[i].node
 	

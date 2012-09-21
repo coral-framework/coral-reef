@@ -1,5 +1,5 @@
 /*
- * Reef
+ * 
  * See copyright notice in LICENSE.md
  */
 
@@ -9,10 +9,10 @@
 #include <co/reserved/OS.h>
 #include <co/Log.h>
 
-#include <reef/rpc/INode.h>
-#include <reef/rpc/ITransport.h>
+#include <rpc/INode.h>
+#include <rpc/ITransport.h>
 
-#include <dso/IServerSpace.h>
+#include <flow/IServerSpace.h>
 
 #include <dom/ICompany.h>
 #include <dom/IEmployee.h>
@@ -37,7 +37,7 @@
 #include <gtest/gtest.h>
 
 
-/*void publishSpace( co::RefPtr<co::IObject>& serverSpaceObj, co::RefPtr<ca::ISpace>& space, reef::rpc::INode* server )
+/*void publishSpace( co::RefPtr<co::IObject>& serverSpaceObj, co::RefPtr<ca::ISpace>& space, rpc::INode* server )
 {
 	co::IObject* modelObj = co::newInstance( "ca.Model" );
 	modelObj->getComponent();
@@ -71,8 +71,8 @@
 
 	assert( space->getUniverse() );
 
-	serverSpaceObj = co::newInstance( "dso.ServerSpace" );
-	dso::IServerSpace* serverSpace = serverSpaceObj->getService<dso::IServerSpace>();
+	serverSpaceObj = co::newInstance( "flow.ServerSpace" );
+	flow::IServerSpace* serverSpace = serverSpaceObj->getService<flow::IServerSpace>();
 	serverSpaceObj->setService( "serverNode", server );
 	serverSpace->publishSpace( space.get(), "published" );
 }
@@ -129,7 +129,7 @@ void applyChanges( co::RefPtr<co::IObject>& serverSpaceObj, const co::RefPtr<ca:
 
 	spaceOnServer->notifyChanges();
 
-	serverSpaceObj->getService<dso::IServerSpace>()->notifyRemoteChanges();
+	serverSpaceObj->getService<flow::IServerSpace>()->notifyRemoteChanges();
 
 	CORAL_LOG(INFO) << "Sync successfull";
 }
@@ -143,13 +143,13 @@ int main( int argc, char** argv )
 	try
 	{
         // Creates the node instance
-		co::IObject* node = co::newInstance( "reef.rpc.Node" );
+		co::IObject* node = co::newInstance( "rpc.Node" );
 		
 		// Gets the INode interface, which is the interface with remote hosts
-        reef::rpc::INode* server = node->getService<reef::rpc::INode>();
+        rpc::INode* server = node->getService<rpc::INode>();
 
 		// Creates the instance responsible for the transport layer
-        reef::rpc::ITransport* transport = co::newInstance( "zmq.ZMQTransport" )->getService<reef::rpc::ITransport>();
+        rpc::ITransport* transport = co::newInstance( "zmq.ZMQTransport" )->getService<rpc::ITransport>();
         
         // The node instance needs the transport layer to communicate
         node->setService( "transport", transport );

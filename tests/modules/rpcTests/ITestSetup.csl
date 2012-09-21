@@ -1,4 +1,4 @@
-import reef.rpc.INode;
+import rpc.INode;
 
 /*
 	Creates a mock transportLayer with the provided number of Nodes bound to it.

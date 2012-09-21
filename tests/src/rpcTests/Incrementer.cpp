@@ -2,7 +2,7 @@
 
 #include "Incrementer_Base.h"
 
-#include <reef/rpc/INode.h>
+#include <rpc/INode.h>
 
 #include <co/RefPtr.h>
 
@@ -38,14 +38,14 @@ public:
 	}
 
 protected:
-	// ------ Receptacle 'node' (reef.rpc.INode) ------ //
+	// ------ Receptacle 'node' (rpc.INode) ------ //
     
-	reef::rpc::INode* getNodeService()
+	rpc::INode* getNodeService()
 	{
 		return _nodeService.get();
 	}
     
-	void setNodeService( reef::rpc::INode* nodeService )
+	void setNodeService( rpc::INode* nodeService )
 	{
 		_nodeService = nodeService;
 	}
@@ -53,7 +53,7 @@ protected:
 private:
 	// member variables
 	co::int32 _numberOne;
-	co::RefPtr<reef::rpc::INode> _nodeService;
+	co::RefPtr<rpc::INode> _nodeService;
     
 };
 
