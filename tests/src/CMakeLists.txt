@@ -10,10 +10,14 @@ CORAL_GET_PATH_STRING( CORAL_PATH_STR )
 set_property( DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS "CORAL_PATH=\"${CORAL_PATH_STR}\"" )
 
 add_subdirectory( rpcTests )
-add_subdirectory( flowTests )
 
-set( BUILD_MANUAL_TESTS ON CACHE BOOL "Manual client server testing" )
-if( BUILD_MANUAL_TESTS )
+set( RPC_ONLY "OFF" CACHE BOOL "No flow module, rpc only" )
+if( RPC_ONLY STREQUAL "OFF" )
+	add_subdirectory( flowTests )
+endif()
+
+set( BUILD_MANUAL_TESTS "OFF" CACHE BOOL "Manual client server testing" )
+if( BUILD_MANUAL_TESTS STREQUAL "ON" )
 	message( "Building manual tests" )
 	add_subdirectory( manualTests )
 endif()
