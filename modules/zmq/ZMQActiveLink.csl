@@ -1,7 +1,0 @@
-import rpc.IActiveLink;
-
-component ZMQActiveLink
-{
-	provides rpc.IActiveLink active;
-
-};

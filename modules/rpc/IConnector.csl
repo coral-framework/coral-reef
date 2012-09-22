@@ -1,5 +1,5 @@
-// Sends messages and optionally receive replies, should be paired with an IPassiveLink.
-interface IActiveLink
+// Sends messages and optionally receive replies, should be paired with an IAcceptor.
+interface IConnector
 {
 	readonly string address;
 

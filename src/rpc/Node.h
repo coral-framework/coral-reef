@@ -8,7 +8,7 @@
 #include "Marshaller.h"
 
 #include <rpc/ITransport.h>
-#include <rpc/IPassiveLink.h>
+#include <rpc/IAcceptor.h>
 
 #include <map>
 #include <stack>

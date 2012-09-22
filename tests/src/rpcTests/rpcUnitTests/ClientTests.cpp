@@ -8,7 +8,7 @@
 #include <stubs/ISimpleTypes.h>
 #include <stubs/IReferenceTypes.h>
 #include <rpc/ITransport.h>
-#include <rpc/IActiveLink.h>
+#include <rpc/IConnector.h>
 #include <co/Coral.h>
 #include <co/IPort.h>
 #include <co/IField.h>

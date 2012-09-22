@@ -1,24 +1,24 @@
 #ifndef __RPC_ZMQPASSIVELINK_H__
 #define __RPC_ZMQPASSIVELINK_H__
 
-#include "ZMQPassiveLink_Base.h"
+#include "ZMQAcceptor_Base.h"
 
 #include <zmq.hpp>
 
 namespace zmq {
 
-class ZMQPassiveLink : public ZMQPassiveLink_Base
+class ZMQAcceptor : public ZMQAcceptor_Base
 {
 public:    
-	ZMQPassiveLink( zmq::context_t& context );
+	ZMQAcceptor( zmq::context_t& context );
 
-    ZMQPassiveLink();
+    ZMQAcceptor();
     
-	virtual ~ZMQPassiveLink();
+	virtual ~ZMQAcceptor();
     
     bool bind( const std::string& address );
 
-	// ------ rpc.IPassiveLink Methods ------ //
+	// ------ rpc.IAcceptor Methods ------ //
 
 	const std::string& getAddress() { return _address; }
 

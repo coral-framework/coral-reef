@@ -1,32 +1,32 @@
-#include "ZMQPassiveLink.h"
+#include "ZMQAcceptor.h"
 
 #include <string.h>
 
 namespace zmq {
 
-ZMQPassiveLink::ZMQPassiveLink( zmq::context_t& context ) : _socket( context, ZMQ_ROUTER )
+ZMQAcceptor::ZMQAcceptor( zmq::context_t& context ) : _socket( context, ZMQ_ROUTER )
 {
 }
 
-ZMQPassiveLink::ZMQPassiveLink() : _socket( *((zmq::context_t*)0), ZMQ_ROUTER )
+ZMQAcceptor::ZMQAcceptor() : _socket( *((zmq::context_t*)0), ZMQ_ROUTER )
 {
 }
 
-ZMQPassiveLink::~ZMQPassiveLink()
+ZMQAcceptor::~ZMQAcceptor()
 {
     _socket.close();
 }
     
-bool ZMQPassiveLink::bind( const std::string& address )
+bool ZMQAcceptor::bind( const std::string& address )
 {
     _address = address;
     _socket.bind( address.c_str() );
     return true;
 }
 
-// ------ rpc.IPassiveLink Methods ------ //
+// ------ rpc.IAcceptor Methods ------ //
 
-bool ZMQPassiveLink::receive( std::string& msg )
+bool ZMQAcceptor::receive( std::string& msg )
 {
     // check if there is a message and save its sender
     if( _socket.recv( &_lastSender, ZMQ_NOBLOCK ) )
@@ -50,7 +50,7 @@ bool ZMQPassiveLink::receive( std::string& msg )
     }
 }
 
-void ZMQPassiveLink::sendReply( const std::string& msg )
+void ZMQAcceptor::sendReply( const std::string& msg )
 {
     _socket.send( _lastSender, ZMQ_SNDMORE );
     
@@ -59,6 +59,6 @@ void ZMQPassiveLink::sendReply( const std::string& msg )
     _socket.send( zmsg );
 }
 
-CORAL_EXPORT_COMPONENT( ZMQPassiveLink, ZMQPassiveLink );
+CORAL_EXPORT_COMPONENT( ZMQAcceptor, ZMQAcceptor );
 
 } // namespace zmq

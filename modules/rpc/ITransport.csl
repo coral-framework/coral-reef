@@ -5,8 +5,8 @@ level connections will be removed upon the destruction of the link objects.
 interface ITransport
 {
 	// Opens a link for sending messages and receiving replies
-	IActiveLink connect( in string addressToConnect );
+	IConnector connect( in string addressToConnect );
 
 	// Opens a link for receiving messages and sending replies
-	IPassiveLink bind( in string addressToListen );
+	IAcceptor bind( in string addressToListen );
 };

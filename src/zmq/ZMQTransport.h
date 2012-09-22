@@ -1,8 +1,8 @@
 #ifndef __RPC_ZMQTRANSPORT_H__
 #define __RPC_ZMQTRANSPORT_H__
 
-#include <rpc/IActiveLink.h>
-#include <rpc/IPassiveLink.h>
+#include <rpc/IConnector.h>
+#include <rpc/IAcceptor.h>
 
 #include "ZMQTransport_Base.h"
 
@@ -20,9 +20,9 @@ public:
     
     // ------ rpc.ITransport Methods ------ //
     
-    rpc::IPassiveLink* bind( const std::string& addressToListen );
+    rpc::IAcceptor* bind( const std::string& addressToListen );
     
-    rpc::IActiveLink* connect( const std::string& addressToConnect );
+    rpc::IConnector* connect( const std::string& addressToConnect );
 
 private:
     zmq::context_t _context;

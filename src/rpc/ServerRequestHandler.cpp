@@ -6,7 +6,7 @@
 
 namespace rpc {
 
-ServerRequestHandler::ServerRequestHandler( IPassiveLink* link, const std::string& publicEndpoint ) 
+ServerRequestHandler::ServerRequestHandler( IAcceptor* link, const std::string& publicEndpoint ) 
         : _link( link ), _publicEndpoint( publicEndpoint )
 {
     assert( _link.get() );

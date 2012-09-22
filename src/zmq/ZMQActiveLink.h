@@ -1,7 +1,7 @@
 #ifndef __RPC_ZMQACTIVELINK_H__
 #define __RPC_ZMQACTIVELINK_H__
 
-#include "ZMQActiveLink_Base.h"
+#include "ZMQConnector_Base.h"
 
 #include <zmq.hpp>
 
@@ -9,19 +9,19 @@ namespace zmq {
     
 class ZMQTransport;
 
-class ZMQActiveLink : public ZMQActiveLink_Base
+class ZMQConnector : public ZMQConnector_Base
 {
 public:
     // The \a creator wil be notified upon the destruction of this object.
-    ZMQActiveLink( zmq::context_t& context );
+    ZMQConnector( zmq::context_t& context );
     
-	ZMQActiveLink();
+	ZMQConnector();
 
-	virtual ~ZMQActiveLink();
+	virtual ~ZMQConnector();
     
     bool connect( const std::string& address );
 
-	// ------ rpc.IActiveLink Methods ------ //
+	// ------ rpc.IConnector Methods ------ //
 
 	const std::string& getAddress() { return _address; }
 

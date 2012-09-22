@@ -3,7 +3,7 @@
 #include "Node.h"
 #include "Requestor.h"
 
-#include <rpc/IActiveLink.h>
+#include <rpc/IConnector.h>
 #include <co/IPort.h>
 #include <co/IField.h>
 #include <co/IMethod.h>

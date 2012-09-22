@@ -1,6 +1,6 @@
 local FakeLink = co.Component( "mock.FakeLink" )
 
--- IActiveLink methods
+-- IConnector methods
 function FakeLink:send( msg )
 	self.msg = msg
 end

@@ -1,5 +1,5 @@
-local ActiveLink = require "rpc.ActiveLink"
-local PassiveLink = require "rpc.PassiveLink"
+local Connector = require "rpc.Connector"
+local Acceptor = require "rpc.Acceptor"
 
 local Transport = co.Component( "rpc.Transport" )
 
@@ -60,14 +60,14 @@ function Transport:__init()
 end
 
 function Transport:bind( address )
-	return PassiveLink { net = net, address = address }.passive
+	return Acceptor { net = net, address = address }.passive
 end
 
 function Transport:connect( address )
 	local link = self.openLinks[address]
 	
 	if not link then
-		link = ActiveLink { net = net, address = address }.active
+		link = Connector { net = net, address = address }.active
 		self.openLinks[address] = link
 	end
 	return link

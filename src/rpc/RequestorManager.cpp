@@ -6,7 +6,7 @@
 #include "ServerRequestHandler.h"
 
 #include <rpc/ITransport.h>
-#include <rpc/IActiveLink.h>
+#include <rpc/IConnector.h>
 
 namespace rpc {
 
@@ -52,7 +52,7 @@ Requestor* RequestorManager::getOrCreateRequestor( const std::string& endpoint )
     if( it != _requestors.end() )
         return it->second;
     
-    IActiveLink* link = _transport->connect( endpoint );
+    IConnector* link = _transport->connect( endpoint );
     ClientRequestHandler* crh = new ClientRequestHandler( link, _srh );
     
     Requestor* req = new Requestor( this, crh, _publicEndpoint );

@@ -1,10 +1,10 @@
 #include "ZMQTransport.h"
 
-#include "ZMQActiveLink.h"
-#include "ZMQPassiveLink.h"
+#include "ZMQConnector.h"
+#include "ZMQAcceptor.h"
 
-#include <rpc/IActiveLink.h>
-#include <rpc/IPassiveLink.h>
+#include <rpc/IConnector.h>
+#include <rpc/IAcceptor.h>
 
 namespace zmq {
     
@@ -20,16 +20,16 @@ ZMQTransport::~ZMQTransport()
 
 // ------ rpc.ITransport Methods ------ //
 
-rpc::IPassiveLink* ZMQTransport::bind( const std::string& addressToListen )
+rpc::IAcceptor* ZMQTransport::bind( const std::string& addressToListen )
 {
-    ZMQPassiveLink* link = new ZMQPassiveLink( _context );
+    ZMQAcceptor* link = new ZMQAcceptor( _context );
     link->bind( addressToListen );
     return link;
 }
 
-rpc::IActiveLink* ZMQTransport::connect( const std::string& addressToConnect )
+rpc::IConnector* ZMQTransport::connect( const std::string& addressToConnect )
 {
-    ZMQActiveLink* link = new ZMQActiveLink( _context );
+    ZMQConnector* link = new ZMQConnector( _context );
     link->connect( addressToConnect );
     return link;
 }

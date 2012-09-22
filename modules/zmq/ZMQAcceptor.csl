@@ -1,0 +1,6 @@
+import rpc.IAcceptor;
+
+component ZMQAcceptor
+{
+	provides rpc.IAcceptor passive;
+};

@@ -1,9 +1,9 @@
 @lua.Scripted( "mock.FakeLink" ) 
-import rpc.IActiveLink;
+import rpc.IConnector;
 
 component FakeLink
 {
-	provides IActiveLink active;
+	provides IConnector active;
 	
 	provides IFakeLink fake;
 };

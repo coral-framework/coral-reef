@@ -2,7 +2,7 @@
 
 #include "ServerRequestHandler.h"
 
-#include <rpc/IActiveLink.h>
+#include <rpc/IConnector.h>
 #include <rpc/RemotingException.h>
 
 #include <ctime>
@@ -10,7 +10,7 @@
 
 namespace rpc {
 
-ClientRequestHandler::ClientRequestHandler( IActiveLink* link, ServerRequestHandler* srh ) : 
+ClientRequestHandler::ClientRequestHandler( IConnector* link, ServerRequestHandler* srh ) : 
                         _link( link ), _srh( srh ), _endpoint( link->getAddress() ), _timeout( 10 )
 {}
 

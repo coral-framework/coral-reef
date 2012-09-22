@@ -1,0 +1,7 @@
+import rpc.IConnector;
+
+component ZMQConnector
+{
+	provides rpc.IConnector active;
+
+};

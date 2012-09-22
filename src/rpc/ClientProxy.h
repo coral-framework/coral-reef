@@ -6,7 +6,7 @@
 #include "Demarshaller.h"
 #include "Marshaller.h"
 
-#include <rpc/IActiveLink.h>
+#include <rpc/IConnector.h>
 #include <co/RefPtr.h>
 #include <co/IService.h>
 #include <co/RefVector.h>

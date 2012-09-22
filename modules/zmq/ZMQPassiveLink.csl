@@ -1,6 +1,0 @@
-import rpc.IPassiveLink;
-
-component ZMQPassiveLink
-{
-	provides rpc.IPassiveLink passive;
-};

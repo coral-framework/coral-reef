@@ -8,8 +8,8 @@
 #include "InstanceContainer.h"
 #include "ServerRequestHandler.h"
 
-#include <rpc/IActiveLink.h>
-#include <rpc/IPassiveLink.h>
+#include <rpc/IConnector.h>
+#include <rpc/IAcceptor.h>
 #include <co/Exception.h>
 
 #include <iostream>

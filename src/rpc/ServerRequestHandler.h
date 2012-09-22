@@ -3,7 +3,7 @@
 
 #include "Demarshaller.h"
 
-#include <rpc/IPassiveLink.h>
+#include <rpc/IAcceptor.h>
 
 #include <co/RefPtr.h>
 #include <co/IObject.h>
@@ -15,7 +15,7 @@ class Invoker;
 class ServerRequestHandler
 {
 public:
-    ServerRequestHandler( IPassiveLink* link, const std::string& publicEndpoint );
+    ServerRequestHandler( IAcceptor* link, const std::string& publicEndpoint );
     
     ~ServerRequestHandler();
     
@@ -27,7 +27,7 @@ public:
     inline const std::string& getPublicEndpoint(){ return _publicEndpoint; }
     
 private:
-    co::RefPtr<IPassiveLink> _link;
+    co::RefPtr<IAcceptor> _link;
     Invoker* _invoker;
     std::string _publicEndpoint;
 };
