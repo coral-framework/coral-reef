@@ -1,0 +1,19 @@
+native class StringNativeClass
+{
+	<c++
+		namespace stubs
+		{ 
+			struct StringNativeClass
+			{
+				std::string data;
+				
+				bool operator == ( const StringNativeClass& strnc ) const
+				{
+					return data == strnc.data;
+				}
+			};
+		}
+	c++>
+	
+	string value;
+};

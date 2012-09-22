@@ -1,0 +1,6 @@
+@lua.Scripted( "stubs.TestSetup" )
+
+component TestSetup
+{
+	provides ITestSetup setup;
+};

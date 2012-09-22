@@ -1,6 +1,0 @@
-@lua.Scripted( "rpcTests.TestSetup" )
-
-component TestSetup
-{
-	provides ITestSetup setup;
-};
