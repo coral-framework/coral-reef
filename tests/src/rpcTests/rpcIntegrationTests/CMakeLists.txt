@@ -4,11 +4,12 @@
 
 project( RPCINTEGRATIONTESTS )
 
-CORAL_GENERATE_MAPPINGS( _GENERATED_MAPPINGS "stubs.ITestSetup" )
+CORAL_GENERATE_MAPPINGS( _GENERATED_MAPPINGS "stubs.ITestSetup" "stubs.ISimpleTypes" 
+"stubs.IComplexTypes" "stubs.IGrandParent" "stubs.IReferenceTypes" "stubs.IRefParent" 
+"stubs.ISimpleParent" "stubs.IFakeLink" )
 
 include_directories(
 	${GTEST_INCLUDE_DIRS}
-	${CMAKE_BINARY_DIR}/tests/src/rpcTests/stubs/generated
 	${CMAKE_BINARY_DIR}/src/rpc/generated
 	${CMAKE_SOURCE_DIR}/src/rpc
 	${CMAKE_CURRENT_BINARY_DIR}/generated

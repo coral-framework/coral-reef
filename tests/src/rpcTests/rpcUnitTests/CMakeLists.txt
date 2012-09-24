@@ -4,13 +4,14 @@
 
 project( RPCUNITTESTS )
 CORAL_GENERATE_MODULE( _GENERATED_RPC_FILES rpc )
-CORAL_GENERATE_MAPPINGS( _GENERATED_MAPPINGS "stubs.IFakeLink" "stubs.ITestSetup" )
+CORAL_GENERATE_MAPPINGS( _GENERATED_MAPPINGS "stubs.ITestSetup" "stubs.ISimpleTypes" 
+"stubs.IComplexTypes" "stubs.IGrandParent" "stubs.IReferenceTypes" "stubs.IRefParent" 
+"stubs.ISimpleParent" "stubs.IFakeLink" )
 
 include_directories(
 	${GTEST_INCLUDE_DIRS}
 	${CMAKE_SOURCE_DIR}/src/rpc
 	${CMAKE_CURRENT_BINARY_DIR}/generated
-	${CMAKE_BINARY_DIR}/tests/src/rpcTests/stubs/generated
 )
 
 # Gather source files in the current directory

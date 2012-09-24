@@ -34,15 +34,6 @@ find_package( Protobuf REQUIRED )
 include_directories( ${CORAL_INCLUDE_DIRS} ${ZMQ_INCLUDE_DIRS} ${PROTOBUF_INCLUDE_DIRS} )
 
 ################################################################################
-# Installation
-################################################################################
-
-# enforce a safe default CMAKE_INSTALL_PREFIX
-if( NOT CMAKE_INSTALL_PREFIX MATCHES "coral-reef" )
-	set( CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/coral-reef" )
-endif()
-
-################################################################################
 # Packaging
 ################################################################################
 

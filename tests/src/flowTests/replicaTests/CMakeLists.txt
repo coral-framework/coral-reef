@@ -1,7 +1,8 @@
 
 project( replicaTests )
 
-CORAL_GENERATE_MAPPINGS( _GENERATED_MAPPINGS "stubs.ITestSetup" )
+CORAL_GENERATE_MAPPINGS( _GENERATED_MAPPINGS "stubs.ITestSetup" "dom.IEmployee" "dom.IProduct" 
+"dom.IService" "dom.ICompany")
 
 # set the tests 'module' dir as the CORAL_PATH along with the CORAL_ROOT
 set( CORAL_PATH ${CORAL_PATH} 
@@ -26,8 +27,6 @@ include_directories(
 	${CMAKE_SOURCE_DIR}/src/rpc
 	${CMAKE_BINARY_DIR}/src/flow/generated
 	${CMAKE_SOURCE_DIR}/src/flow
-	${stubs_BINARY_DIR}/generated
-	${dom_BINARY_DIR}/generated
 )
 
 # Gather test source files in the current directory
