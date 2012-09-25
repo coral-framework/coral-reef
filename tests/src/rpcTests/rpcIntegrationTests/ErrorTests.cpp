@@ -34,5 +34,6 @@ TEST( ErrorTests, throwTest )
     
     EXPECT_THROW( simple->throwException( "rpc.RemotingException", "test" ), RemotingException );
     
+    setup->tearDown();
 }    
 } // namespace rpc
