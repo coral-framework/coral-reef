@@ -25,7 +25,7 @@
 
 #include <sstream>
 
-#define NUM_SERVERS 7
+#define NUM_SERVERS 5
 
 TEST( BarrierTests, incrementTest )
 {
@@ -44,7 +44,7 @@ TEST( BarrierTests, incrementTest )
     /* Even though this node wont be acting as a server, it is necessary to be bound to a public
      address. This happens because whenever a local service is passed as a reference argument, 
      the receiver will need to send messages to this node. */
-    node->start( "ipc:///tmp/client.pipe", "ipc:///tmp/client.pipe" );
+    node->start( "tcp://127.0.0.1:5559", "tcp://127.0.0.1:5559" );
     
     CORAL_LOG(INFO) << "Client Node started";
     
@@ -55,7 +55,7 @@ TEST( BarrierTests, incrementTest )
     for( int i = 0; i < NUM_SERVERS; i++ )
     {
         std::stringstream ss( std::stringstream::in | std::stringstream::out );
-        ss << "ipc:///tmp/server" << i << ".pipe";
+        ss << "tcp://127.0.0.1:555" << i;
         endpointVec.push_back( ss.str() );
     }
     
