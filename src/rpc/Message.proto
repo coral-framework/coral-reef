@@ -28,7 +28,7 @@ message Message
 
 message Request
 {
-	optional string new_instance_type = 2;
+	optional string instance_type = 2;
 	optional string lookup_key = 3;
 	optional uint32 lease_instance_id = 4;
 }
@@ -40,6 +40,7 @@ message Exception
 		CORAL = 0;
 		REMOTING = 1;
 		STD = 2;
+		UNKNOWN = 3;
 	}
 	required Type type = 1;
 	required string type_name = 2;

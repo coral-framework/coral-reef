@@ -81,7 +81,7 @@ void protobuf_AssignDesc_Message_2eproto() {
   Message_Type_descriptor_ = Message_descriptor_->enum_type(0);
   Request_descriptor_ = file->message_type(1);
   static const int Request_offsets_[3] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request, new_instance_type_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request, instance_type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request, lookup_key_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request, lease_instance_id_),
   };
@@ -293,29 +293,30 @@ void protobuf_AddDesc_Message_2eproto() {
     "UEST_NEW\020\001\022\022\n\016REQUEST_LOOKUP\020\002\022\021\n\rREQUES"
     "T_LEASE\020\003\022\030\n\024REQUEST_CANCEL_LEASE\020\004\022\n\n\006R"
     "ETURN\020\005\022\r\n\tEXCEPTION\020\006\022\016\n\nBARRIER_UP\020\007\022\017"
-    "\n\013BARRIER_HIT\020\010\022\020\n\014BARRIER_DOWN\020\t\"S\n\007Req"
-    "uest\022\031\n\021new_instance_type\030\002 \001(\t\022\022\n\nlooku"
-    "p_key\030\003 \001(\t\022\031\n\021lease_instance_id\030\004 \001(\r\"y"
-    "\n\tException\022!\n\004type\030\001 \002(\0162\023.rpc.Exceptio"
-    "n.Type\022\021\n\ttype_name\030\002 \002(\t\022\014\n\004what\030\003 \002(\t\""
-    "(\n\004Type\022\t\n\005CORAL\020\000\022\014\n\010REMOTING\020\001\022\007\n\003STD\020"
-    "\002\"\213\001\n\nInvocation\022\023\n\013instance_id\030\001 \002(\r\022\021\n"
-    "\tfacet_idx\030\002 \002(\r\022\022\n\nmember_idx\030\003 \002(\r\022\022\n\n"
-    "type_depth\030\004 \002(\005\022\r\n\005synch\030\005 \002(\010\022\036\n\006param"
-    "s\030\006 \003(\0132\016.rpc.Parameter\".\n\tParameter\022!\n\t"
-    "container\030\001 \003(\0132\016.rpc.Container\"\245\001\n\tCont"
-    "ainer\022\017\n\007boolean\030\001 \001(\010\022\013\n\003str\030\002 \001(\t\022\017\n\007n"
-    "umeric\030\003 \001(\001\022\'\n\014complex_type\030\004 \001(\0132\021.rpc"
-    ".Complex_Type\022\037\n\010any_type\030\005 \001(\0132\r.rpc.An"
-    "y_Type\022\037\n\010ref_type\030\006 \001(\0132\r.rpc.Ref_Type\""
-    "E\n\010Any_Type\022\014\n\004kind\030\001 \002(\005\022\014\n\004type\030\002 \001(\t\022"
-    "\035\n\005param\030\003 \001(\0132\016.rpc.Parameter\"-\n\014Comple"
-    "x_Type\022\035\n\005field\030\001 \003(\0132\016.rpc.Parameter\"\307\001"
-    "\n\010Ref_Type\022\"\n\005owner\030\001 \002(\0162\023.rpc.Ref_Type"
-    ".Owner\022\023\n\013instance_id\030\002 \002(\r\022\021\n\tfacet_idx"
-    "\030\003 \002(\r\022\025\n\rinstance_type\030\004 \001(\t\022\026\n\016owner_e"
-    "ndpoint\030\005 \001(\t\"@\n\005Owner\022\020\n\014OWNER_SENDER\020\000"
-    "\022\022\n\016OWNER_RECEIVER\020\001\022\021\n\rOWNER_ANOTHER\020\002", 1319);
+    "\n\013BARRIER_HIT\020\010\022\020\n\014BARRIER_DOWN\020\t\"O\n\007Req"
+    "uest\022\025\n\rinstance_type\030\002 \001(\t\022\022\n\nlookup_ke"
+    "y\030\003 \001(\t\022\031\n\021lease_instance_id\030\004 \001(\r\"\206\001\n\tE"
+    "xception\022!\n\004type\030\001 \002(\0162\023.rpc.Exception.T"
+    "ype\022\021\n\ttype_name\030\002 \002(\t\022\014\n\004what\030\003 \002(\t\"5\n\004"
+    "Type\022\t\n\005CORAL\020\000\022\014\n\010REMOTING\020\001\022\007\n\003STD\020\002\022\013"
+    "\n\007UNKNOWN\020\003\"\213\001\n\nInvocation\022\023\n\013instance_i"
+    "d\030\001 \002(\r\022\021\n\tfacet_idx\030\002 \002(\r\022\022\n\nmember_idx"
+    "\030\003 \002(\r\022\022\n\ntype_depth\030\004 \002(\005\022\r\n\005synch\030\005 \002("
+    "\010\022\036\n\006params\030\006 \003(\0132\016.rpc.Parameter\".\n\tPar"
+    "ameter\022!\n\tcontainer\030\001 \003(\0132\016.rpc.Containe"
+    "r\"\245\001\n\tContainer\022\017\n\007boolean\030\001 \001(\010\022\013\n\003str\030"
+    "\002 \001(\t\022\017\n\007numeric\030\003 \001(\001\022\'\n\014complex_type\030\004"
+    " \001(\0132\021.rpc.Complex_Type\022\037\n\010any_type\030\005 \001("
+    "\0132\r.rpc.Any_Type\022\037\n\010ref_type\030\006 \001(\0132\r.rpc"
+    ".Ref_Type\"E\n\010Any_Type\022\014\n\004kind\030\001 \002(\005\022\014\n\004t"
+    "ype\030\002 \001(\t\022\035\n\005param\030\003 \001(\0132\016.rpc.Parameter"
+    "\"-\n\014Complex_Type\022\035\n\005field\030\001 \003(\0132\016.rpc.Pa"
+    "rameter\"\307\001\n\010Ref_Type\022\"\n\005owner\030\001 \002(\0162\023.rp"
+    "c.Ref_Type.Owner\022\023\n\013instance_id\030\002 \002(\r\022\021\n"
+    "\tfacet_idx\030\003 \002(\r\022\025\n\rinstance_type\030\004 \001(\t\022"
+    "\026\n\016owner_endpoint\030\005 \001(\t\"@\n\005Owner\022\020\n\014OWNE"
+    "R_SENDER\020\000\022\022\n\016OWNER_RECEIVER\020\001\022\021\n\rOWNER_"
+    "ANOTHER\020\002", 1329);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "Message.proto", &protobuf_RegisterTypes);
   Message::default_instance_ = new Message();
@@ -887,7 +888,7 @@ void Message::Swap(Message* other) {
 // ===================================================================
 
 #ifndef _MSC_VER
-const int Request::kNewInstanceTypeFieldNumber;
+const int Request::kInstanceTypeFieldNumber;
 const int Request::kLookupKeyFieldNumber;
 const int Request::kLeaseInstanceIdFieldNumber;
 #endif  // !_MSC_VER
@@ -908,7 +909,7 @@ Request::Request(const Request& from)
 
 void Request::SharedCtor() {
   _cached_size_ = 0;
-  new_instance_type_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  instance_type_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   lookup_key_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   lease_instance_id_ = 0u;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -919,8 +920,8 @@ Request::~Request() {
 }
 
 void Request::SharedDtor() {
-  if (new_instance_type_ != &::google::protobuf::internal::kEmptyString) {
-    delete new_instance_type_;
+  if (instance_type_ != &::google::protobuf::internal::kEmptyString) {
+    delete instance_type_;
   }
   if (lookup_key_ != &::google::protobuf::internal::kEmptyString) {
     delete lookup_key_;
@@ -951,9 +952,9 @@ Request* Request::New() const {
 
 void Request::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (has_new_instance_type()) {
-      if (new_instance_type_ != &::google::protobuf::internal::kEmptyString) {
-        new_instance_type_->clear();
+    if (has_instance_type()) {
+      if (instance_type_ != &::google::protobuf::internal::kEmptyString) {
+        instance_type_->clear();
       }
     }
     if (has_lookup_key()) {
@@ -973,14 +974,14 @@ bool Request::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // optional string new_instance_type = 2;
+      // optional string instance_type = 2;
       case 2: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_new_instance_type()));
+                input, this->mutable_instance_type()));
           ::google::protobuf::internal::WireFormat::VerifyUTF8String(
-            this->new_instance_type().data(), this->new_instance_type().length(),
+            this->instance_type().data(), this->instance_type().length(),
             ::google::protobuf::internal::WireFormat::PARSE);
         } else {
           goto handle_uninterpreted;
@@ -1040,13 +1041,13 @@ bool Request::MergePartialFromCodedStream(
 
 void Request::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // optional string new_instance_type = 2;
-  if (has_new_instance_type()) {
+  // optional string instance_type = 2;
+  if (has_instance_type()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
-      this->new_instance_type().data(), this->new_instance_type().length(),
+      this->instance_type().data(), this->instance_type().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
     ::google::protobuf::internal::WireFormatLite::WriteString(
-      2, this->new_instance_type(), output);
+      2, this->instance_type(), output);
   }
   
   // optional string lookup_key = 3;
@@ -1071,14 +1072,14 @@ void Request::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* Request::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // optional string new_instance_type = 2;
-  if (has_new_instance_type()) {
+  // optional string instance_type = 2;
+  if (has_instance_type()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
-      this->new_instance_type().data(), this->new_instance_type().length(),
+      this->instance_type().data(), this->instance_type().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->new_instance_type(), target);
+        2, this->instance_type(), target);
   }
   
   // optional string lookup_key = 3;
@@ -1107,11 +1108,11 @@ int Request::ByteSize() const {
   int total_size = 0;
   
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // optional string new_instance_type = 2;
-    if (has_new_instance_type()) {
+    // optional string instance_type = 2;
+    if (has_instance_type()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
-          this->new_instance_type());
+          this->instance_type());
     }
     
     // optional string lookup_key = 3;
@@ -1155,8 +1156,8 @@ void Request::MergeFrom(const ::google::protobuf::Message& from) {
 void Request::MergeFrom(const Request& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from.has_new_instance_type()) {
-      set_new_instance_type(from.new_instance_type());
+    if (from.has_instance_type()) {
+      set_instance_type(from.instance_type());
     }
     if (from.has_lookup_key()) {
       set_lookup_key(from.lookup_key());
@@ -1187,7 +1188,7 @@ bool Request::IsInitialized() const {
 
 void Request::Swap(Request* other) {
   if (other != this) {
-    std::swap(new_instance_type_, other->new_instance_type_);
+    std::swap(instance_type_, other->instance_type_);
     std::swap(lookup_key_, other->lookup_key_);
     std::swap(lease_instance_id_, other->lease_instance_id_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
@@ -1216,6 +1217,7 @@ bool Exception_Type_IsValid(int value) {
     case 0:
     case 1:
     case 2:
+    case 3:
       return true;
     default:
       return false;
@@ -1226,6 +1228,7 @@ bool Exception_Type_IsValid(int value) {
 const Exception_Type Exception::CORAL;
 const Exception_Type Exception::REMOTING;
 const Exception_Type Exception::STD;
+const Exception_Type Exception::UNKNOWN;
 const Exception_Type Exception::Type_MIN;
 const Exception_Type Exception::Type_MAX;
 const int Exception::Type_ARRAYSIZE;

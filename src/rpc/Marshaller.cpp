@@ -289,13 +289,14 @@ void Marshaller::marshalNew( inString requesterEndpoint, inString instanceType, 
     _message->set_type( Message::REQUEST_NEW );
     
     Request* request = _message->mutable_request();
-    request->set_new_instance_type( instanceType );
+    request->set_instance_type( instanceType );
     
     _message->SerializeToString( &msg );
     _message->Clear();
 }
 
-void Marshaller::marshalLookup( inString requesterEndpoint, inString lookupKey, outString msg )
+void Marshaller::marshalLookup( inString requesterEndpoint, inString lookupKey, inString instanceType,
+                               outString msg )
 {
     assert( _msgClear );
     
@@ -304,6 +305,7 @@ void Marshaller::marshalLookup( inString requesterEndpoint, inString lookupKey, 
     
     Request* request = _message->mutable_request();
     request->set_lookup_key( lookupKey );
+    request->set_instance_type( instanceType );
     
     _message->SerializeToString( &msg );
     _message->Clear();
@@ -427,7 +429,9 @@ void Marshaller::marshalException( ExceptionType exType, inString exTypeName, in
         case EX_STD:
             ex->set_type( Exception::STD );
             break;
-            
+        case EX_UNKNOWN:
+            ex->set_type( Exception::UNKNOWN );
+            break;
     }
     ex->set_type_name( exTypeName );
     ex->set_what( what );

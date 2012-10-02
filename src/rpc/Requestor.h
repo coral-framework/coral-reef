@@ -122,6 +122,7 @@ private:
     
     void getReturn( const std::string& data, co::IType* returnedType, co::Any& ret );
 
+    void raiseReturnedException( Demarshaller& _demarshaller );
 private:
         
     Marshaller _marshaller;

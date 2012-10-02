@@ -72,11 +72,12 @@ inline bool Message_Type_Parse(
 enum Exception_Type {
   Exception_Type_CORAL = 0,
   Exception_Type_REMOTING = 1,
-  Exception_Type_STD = 2
+  Exception_Type_STD = 2,
+  Exception_Type_UNKNOWN = 3
 };
 bool Exception_Type_IsValid(int value);
 const Exception_Type Exception_Type_Type_MIN = Exception_Type_CORAL;
-const Exception_Type Exception_Type_Type_MAX = Exception_Type_STD;
+const Exception_Type Exception_Type_Type_MAX = Exception_Type_UNKNOWN;
 const int Exception_Type_Type_ARRAYSIZE = Exception_Type_Type_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* Exception_Type_descriptor();
@@ -347,16 +348,16 @@ class Request : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // optional string new_instance_type = 2;
-  inline bool has_new_instance_type() const;
-  inline void clear_new_instance_type();
-  static const int kNewInstanceTypeFieldNumber = 2;
-  inline const ::std::string& new_instance_type() const;
-  inline void set_new_instance_type(const ::std::string& value);
-  inline void set_new_instance_type(const char* value);
-  inline void set_new_instance_type(const char* value, size_t size);
-  inline ::std::string* mutable_new_instance_type();
-  inline ::std::string* release_new_instance_type();
+  // optional string instance_type = 2;
+  inline bool has_instance_type() const;
+  inline void clear_instance_type();
+  static const int kInstanceTypeFieldNumber = 2;
+  inline const ::std::string& instance_type() const;
+  inline void set_instance_type(const ::std::string& value);
+  inline void set_instance_type(const char* value);
+  inline void set_instance_type(const char* value, size_t size);
+  inline ::std::string* mutable_instance_type();
+  inline ::std::string* release_instance_type();
   
   // optional string lookup_key = 3;
   inline bool has_lookup_key() const;
@@ -378,8 +379,8 @@ class Request : public ::google::protobuf::Message {
   
   // @@protoc_insertion_point(class_scope:rpc.Request)
  private:
-  inline void set_has_new_instance_type();
-  inline void clear_has_new_instance_type();
+  inline void set_has_instance_type();
+  inline void clear_has_instance_type();
   inline void set_has_lookup_key();
   inline void clear_has_lookup_key();
   inline void set_has_lease_instance_id();
@@ -387,7 +388,7 @@ class Request : public ::google::protobuf::Message {
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
-  ::std::string* new_instance_type_;
+  ::std::string* instance_type_;
   ::std::string* lookup_key_;
   ::google::protobuf::uint32 lease_instance_id_;
   
@@ -459,6 +460,7 @@ class Exception : public ::google::protobuf::Message {
   static const Type CORAL = Exception_Type_CORAL;
   static const Type REMOTING = Exception_Type_REMOTING;
   static const Type STD = Exception_Type_STD;
+  static const Type UNKNOWN = Exception_Type_UNKNOWN;
   static inline bool Type_IsValid(int value) {
     return Exception_Type_IsValid(value);
   }
@@ -1472,60 +1474,60 @@ inline ::rpc::Exception* Message::release_exception() {
 
 // Request
 
-// optional string new_instance_type = 2;
-inline bool Request::has_new_instance_type() const {
+// optional string instance_type = 2;
+inline bool Request::has_instance_type() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void Request::set_has_new_instance_type() {
+inline void Request::set_has_instance_type() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void Request::clear_has_new_instance_type() {
+inline void Request::clear_has_instance_type() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void Request::clear_new_instance_type() {
-  if (new_instance_type_ != &::google::protobuf::internal::kEmptyString) {
-    new_instance_type_->clear();
+inline void Request::clear_instance_type() {
+  if (instance_type_ != &::google::protobuf::internal::kEmptyString) {
+    instance_type_->clear();
   }
-  clear_has_new_instance_type();
+  clear_has_instance_type();
 }
-inline const ::std::string& Request::new_instance_type() const {
-  return *new_instance_type_;
+inline const ::std::string& Request::instance_type() const {
+  return *instance_type_;
 }
-inline void Request::set_new_instance_type(const ::std::string& value) {
-  set_has_new_instance_type();
-  if (new_instance_type_ == &::google::protobuf::internal::kEmptyString) {
-    new_instance_type_ = new ::std::string;
+inline void Request::set_instance_type(const ::std::string& value) {
+  set_has_instance_type();
+  if (instance_type_ == &::google::protobuf::internal::kEmptyString) {
+    instance_type_ = new ::std::string;
   }
-  new_instance_type_->assign(value);
+  instance_type_->assign(value);
 }
-inline void Request::set_new_instance_type(const char* value) {
-  set_has_new_instance_type();
-  if (new_instance_type_ == &::google::protobuf::internal::kEmptyString) {
-    new_instance_type_ = new ::std::string;
+inline void Request::set_instance_type(const char* value) {
+  set_has_instance_type();
+  if (instance_type_ == &::google::protobuf::internal::kEmptyString) {
+    instance_type_ = new ::std::string;
   }
-  new_instance_type_->assign(value);
+  instance_type_->assign(value);
 }
-inline void Request::set_new_instance_type(const char* value, size_t size) {
-  set_has_new_instance_type();
-  if (new_instance_type_ == &::google::protobuf::internal::kEmptyString) {
-    new_instance_type_ = new ::std::string;
+inline void Request::set_instance_type(const char* value, size_t size) {
+  set_has_instance_type();
+  if (instance_type_ == &::google::protobuf::internal::kEmptyString) {
+    instance_type_ = new ::std::string;
   }
-  new_instance_type_->assign(reinterpret_cast<const char*>(value), size);
+  instance_type_->assign(reinterpret_cast<const char*>(value), size);
 }
-inline ::std::string* Request::mutable_new_instance_type() {
-  set_has_new_instance_type();
-  if (new_instance_type_ == &::google::protobuf::internal::kEmptyString) {
-    new_instance_type_ = new ::std::string;
+inline ::std::string* Request::mutable_instance_type() {
+  set_has_instance_type();
+  if (instance_type_ == &::google::protobuf::internal::kEmptyString) {
+    instance_type_ = new ::std::string;
   }
-  return new_instance_type_;
+  return instance_type_;
 }
-inline ::std::string* Request::release_new_instance_type() {
-  clear_has_new_instance_type();
-  if (new_instance_type_ == &::google::protobuf::internal::kEmptyString) {
+inline ::std::string* Request::release_instance_type() {
+  clear_has_instance_type();
+  if (instance_type_ == &::google::protobuf::internal::kEmptyString) {
     return NULL;
   } else {
-    ::std::string* temp = new_instance_type_;
-    new_instance_type_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    ::std::string* temp = instance_type_;
+    instance_type_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
     return temp;
   }
 }

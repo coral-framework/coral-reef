@@ -442,13 +442,13 @@ void Demarshaller::getNew( outString requesterEndpoint, outString instanceType )
     
     const Request& request = _message->request();
     
-    if( !request.IsInitialized() || !request.has_new_instance_type() )
+    if( !request.IsInitialized() || !request.has_instance_type() )
         CORAL_THROW( RemotingException, "Invalid request data" );
     
-    instanceType = request.new_instance_type();
+    instanceType = request.instance_type();
 }
 
-void Demarshaller::getLookup( outString requesterEndpoint, outString lookupKey )
+void Demarshaller::getLookup( outString requesterEndpoint, outString lookupKey, outString instanceType )
 {
     assert( _msgType == REQUEST_LOOKUP );
     
@@ -456,10 +456,11 @@ void Demarshaller::getLookup( outString requesterEndpoint, outString lookupKey )
     
     const Request& request = _message->request();
     
-    if( !request.IsInitialized() || !request.has_lookup_key() )
+    if( !request.IsInitialized() || !request.has_lookup_key() || !request.has_instance_type() )
         CORAL_THROW( RemotingException, "Invalid request data" );
     
     lookupKey = request.lookup_key();
+    instanceType = request.instance_type();
 }
     
 void Demarshaller::getLease( outString requesterEndpoint, co::int32& leaseInstanceID )

@@ -45,7 +45,11 @@ co::IObject* Requestor::requestNewInstance( const std::string& componentName )
  
     _handler->handleSynchRequest( msg, msg );
     
-    _demarshaller.demarshal( msg );
+    MessageType type = _demarshaller.demarshal( msg );
+    
+    if( type == EXCEPTION )
+        raiseReturnedException( _demarshaller );
+    
     co::int32 instanceID = _demarshaller.getIntReturn();
     
     co::IComponent* component = co::cast<co::IComponent>( co::getType( componentName ) );
@@ -63,11 +67,15 @@ co::IObject* Requestor::requestPublicInstance( const std::string& key,
         CORAL_THROW( RemotingException, "Trying to request with the node stopped");
     
     std::string msg;
-    _marshaller.marshalLookup( _publicEndpoint, key, msg );
+    _marshaller.marshalLookup( _publicEndpoint, key, componentName, msg );
     
     _handler->handleSynchRequest( msg, msg );
     
-    _demarshaller.demarshal( msg );
+    MessageType type = _demarshaller.demarshal( msg );
+    
+    if( type == EXCEPTION )
+        raiseReturnedException( _demarshaller );
+    
     co::int32 instanceID = _demarshaller.getIntReturn();
     if( instanceID == -1 )
         return 0;
@@ -297,21 +305,7 @@ void Requestor::getReturn( const std::string& data, co::IType* returnedType, co:
     MessageType type = _demarshaller.demarshal( data );
     
     if( type == EXCEPTION )
-    {
-        std::string exTypeName;
-        std::string what;
-        ExceptionType exType = _demarshaller.getException( exTypeName, what );
-        if( exType == EX_REMOTING )
-        {
-            // TODO try to resolve the problem if possible
-            //if not resolved then:
-            co::getType( exTypeName )->getReflector()->raise( what );
-        }
-        else
-        {
-            co::getType( exTypeName )->getReflector()->raise( what );
-        }
-    }
+        raiseReturnedException( _demarshaller );
     
     
     if( returnedType->getKind() != co::TK_INTERFACE )
@@ -345,6 +339,23 @@ void Requestor::getReturn( const std::string& data, co::IType* returnedType, co:
     co::IPort* port = ports[refType.facetIdx];
     co::IService* service = instance->getServiceAt( port );
     ret.set<co::IService*>( service );
+}
+    
+void Requestor::raiseReturnedException( Demarshaller& demarshaller )
+{
+    std::string exTypeName;
+    std::string what;
+    ExceptionType exType = demarshaller.getException( exTypeName, what );
+    if( exType == EX_REMOTING )
+    {
+        // TODO try to resolve the problem if possible
+        //if not resolved then:
+        co::getType( exTypeName )->getReflector()->raise( what );
+    }
+    else
+    {
+        co::getType( exTypeName )->getReflector()->raise( what );
+    }
 }
     
 } // namespace rpc

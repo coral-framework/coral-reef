@@ -21,7 +21,8 @@ public:
     
     void unpublishInstance( const std::string& key );
     
-    co::int32 findInstance( const std::string& key, const std::string& lesseeEndpoint ); 
+    co::int32 findInstance( const std::string& key, const std::string& instanceType, 
+                           const std::string& lesseeEndpoint ); 
     
     co::int32 addInstance( co::IObject* instance, const std::string& lesseeEndpoint );
     

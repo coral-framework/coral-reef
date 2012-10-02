@@ -27,9 +27,19 @@ TEST( ErrorTests, throwTest )
     setup->initTest( 2 );
     
     rpc::INode* client = setup->getNode( 1 );
+    rpc::INode* server = setup->getNode( 2 );
     
-    co::RefPtr<co::IObject> remoteInstance = client->newRemoteInstance( "stubs.TestComponent",
+    EXPECT_THROW( client->newRemoteInstance( "invalidComponent", "address2" ), RemotingException );
+    
+    co::IObject* obj = co::newInstance( "stubs.TestComponent" );
+    server->publishInstance( obj, "obj" );
+    
+    EXPECT_THROW( client->findRemoteInstance( "stubs.Incrementer", "obj", "address2" ), 
+                 RemotingException );
+                 
+    co::RefPtr<co::IObject> remoteInstance = client->findRemoteInstance( "stubs.TestComponent", "obj",
                                                             "address2" );
+    
     stubs::ISimpleTypes* simple = remoteInstance->getService<stubs::ISimpleTypes>();
     
     EXPECT_THROW( simple->throwException( "rpc.RemotingException", "test" ), RemotingException );

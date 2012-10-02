@@ -3,8 +3,11 @@
 #include "LeaseManager.h"
 #include "InstanceContainer.h"
 
+#include <rpc/RemotingException.h>
+
 #include <co/Log.h>
 #include <co/Coral.h>
+#include <co/Exception.h>
 
 #include <sstream>
 
@@ -50,7 +53,8 @@ void InstanceManager::unpublishInstance( const std::string& key )
     cancelLease( it->second, "self" );
 }
 
-co::int32 InstanceManager::findInstance( const std::string& key, const std::string& lesseeEndpoint ) 
+co::int32 InstanceManager::findInstance( const std::string& key, const std::string& instanceType,
+                                        const std::string& lesseeEndpoint ) 
 {
     std::map<std::string, co::int32>::iterator it = _published.find( key );
     
@@ -59,6 +63,11 @@ co::int32 InstanceManager::findInstance( const std::string& key, const std::stri
         CORAL_LOG( WARNING ) << "Node: " << lesseeEndpoint << " requested the invalid key: " << key;
         return -1;
     }
+    
+    co::IComponent* component = _instances[it->second]->getComponent();
+    if( component->getFullName() != instanceType )
+        CORAL_THROW( RemotingException, "Published instance type " << component->getFullName() 
+        << " differs from requested type " << instanceType );
     
     createLease( it->second, lesseeEndpoint );
     

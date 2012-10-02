@@ -97,7 +97,8 @@ public:
     
     // Requests for the instanceManager
     void marshalNew( inString requesterEndpoint, inString instanceType, outString msg );
-    void marshalLookup( inString requesterEndpoint, inString lookupKey, outString msg );
+    void marshalLookup( inString requesterEndpoint, inString lookupKey, inString instanceType,
+                       outString msg );
     void marshalLease( inString requesterEndpoint, co::int32 leaseInstanceID, outString msg );
     void marshalCancelLease( inString requesterEndpoint, co::int32 leaseInstanceID, outString msg );
     

@@ -18,6 +18,7 @@
 #define DOUBLE1 10.0
 #define STRING1 "string1"
 #define STRING2 "string2"
+#define STRING3 "string3"
 
 namespace rpc {
 
@@ -60,13 +61,14 @@ TEST( CodecTests, simpleTypesTest )
     EXPECT_STREQ( instanceType.c_str(), STRING2 );
     
     std::string key;
-    marshaller.marshalLookup( STRING1, STRING2, msg );
+    marshaller.marshalLookup( STRING1, STRING2, STRING3, msg );
     msgType = demarshaller.demarshal( msg );
-    demarshaller.getLookup( requester, key );
+    demarshaller.getLookup( requester, key, instanceType );
     
     EXPECT_EQ( msgType, REQUEST_LOOKUP );
     EXPECT_STREQ( requester.c_str(), STRING1 );
     EXPECT_STREQ( key.c_str(), STRING2 );
+    EXPECT_STREQ( instanceType.c_str(), STRING3 );
 
     co::int32 leaseInstanceID;
     marshaller.marshalLease( STRING1, INT1, msg );

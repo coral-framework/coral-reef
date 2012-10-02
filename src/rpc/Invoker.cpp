@@ -97,11 +97,12 @@ void Invoker::invokeManagement( Demarshaller& demarshaller, MessageType msgType,
             
             co::IType* type = co::getSystem()->getTypes()->findType( instanceType );
             
-            CORAL_DLOG( INFO ) << "Received request for New instance of type " << type->getName() << 
-                        " from: " <<  requesterEndpoint;
             if( !type )
                 CORAL_THROW( RemotingException, "Unknown component type: " << instanceType );
             
+            CORAL_DLOG( INFO ) << "Received request for New instance of type " << type->getName() << 
+                        " from: " <<  requesterEndpoint;
+
             co::IObject* instance = type->getReflector()->newInstance();
             returnID = _instanceMan->addInstance( instance, requesterEndpoint );
             break;
@@ -109,11 +110,12 @@ void Invoker::invokeManagement( Demarshaller& demarshaller, MessageType msgType,
         case REQUEST_LOOKUP:
         {
             std::string key;
-            _demarshaller.getLookup( requesterEndpoint, key );
+            std::string instanceType;
+            _demarshaller.getLookup( requesterEndpoint, key, instanceType );
             
             CORAL_DLOG( INFO ) << "Received request for Looking up key " << key << " from: " << requesterEndpoint;
             
-            returnID = _instanceMan->findInstance( key, requesterEndpoint );
+            returnID = _instanceMan->findInstance( key, instanceType, requesterEndpoint );
             break;
         }
         case REQUEST_LEASE:

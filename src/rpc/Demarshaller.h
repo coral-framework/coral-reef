@@ -64,7 +64,7 @@ public:
     MessageType demarshal( inString data );
     
     void getNew( outString requesterEndpoint, outString instanceType );
-    void getLookup( outString requesterEndpoint, outString lookupKey );
+    void getLookup( outString requesterEndpoint, outString lookupKey, outString instanceType );
     void getLease( outString requesterEndpoint, co::int32& leaseInstanceID );
     void getCancelLease( outString requesterEndpoint, co::int32& leaseInstanceID );
     
