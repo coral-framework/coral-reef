@@ -41,7 +41,7 @@ public:
     void raiseBarrier( co::int32 capacity );
     void hitBarrier();
     
-    void start( const std::string& boundAddress, const std::string& publicEndpoint );
+    void start( const std::string& boundAddress );
     
 	void update();
 

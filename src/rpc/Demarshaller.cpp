@@ -594,7 +594,7 @@ ExceptionType Demarshaller::getException( outString exTypeName, outString what )
         case Exception::STD:
             return EX_STD;
     }
-    
+    return EX_UNKNOWN;
 }
     
 void Demarshaller::getBarrierCreator( outString creatorEndpoint )

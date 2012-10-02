@@ -111,7 +111,11 @@ void valueToPBParam( const co::Any& any, Parameter* param )
     co::TypeKind kind = any.getKind();
     
     if( kind == co::TK_ARRAY )
+    {
         kind = any.getType()->getKind();
+        if( kind == co::TK_ANY )
+            CORAL_THROW( RemotingException, "Arrays of co.Any not supported yet" );
+    }
     
     
     switch( kind )

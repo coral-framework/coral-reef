@@ -13,7 +13,7 @@ function TestSetup:initTest( numNodes )
 		self.nodes[i].transport = self.transports[i].transport
 		self.transports[i].node = self.nodes[i].node
 		
-		self.nodes[i].node:start( "address"..i, "address"..i )
+		self.nodes[i].node:start( "address"..i )
 	end
 end
 

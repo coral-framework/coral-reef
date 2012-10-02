@@ -64,8 +64,8 @@ int main( int argc, char** argv )
         
         // Configuring the appropriate endpoint based on the serverNumber
         std::stringstream endpoint( std::stringstream::in | std::stringstream::out );
-        endpoint << "tcp://127.0.0.1:555" << serverNumber;
-		server->start( endpoint.str(), endpoint.str() );
+        endpoint << "tcp://*:555" << serverNumber;
+		server->start( endpoint.str() );
         
 		CORAL_LOG(INFO) << "Server " << endpoint.str() << " Created";
         

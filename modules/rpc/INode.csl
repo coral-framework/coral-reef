@@ -45,8 +45,7 @@ interface INode
 		Starts a local server which answer remote requests in the provided port.
 		\throws ConnectionFailureExpection if Port is not available
 	*/
-// TODO remove second parameter and get from system
-	void start( in string boundAddress, in string publicAddress );
+	void start( in string boundAddress );
 	
 	void stop();
 	

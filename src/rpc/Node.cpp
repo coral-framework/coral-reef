@@ -63,9 +63,9 @@ void Node::hitBarrier()
     _invoker->hitBarrier();
 }
     
-void Node::start( const std::string&  boundAddress, const std::string& publicAddress )
+void Node::start( const std::string&  boundAddress )
 {
-    _publicEndpoint = publicAddress;
+    _publicEndpoint = boundAddress;
     
     _srh = new ServerRequestHandler( _transport->bind( boundAddress ), _publicEndpoint );
 

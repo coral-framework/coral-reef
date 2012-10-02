@@ -69,7 +69,8 @@ enum ExceptionType
 {
     EX_CORAL,
     EX_REMOTING,
-    EX_STD
+    EX_STD,
+    EX_UNKNOWN
 };
     
 typedef const std::string& inString;
