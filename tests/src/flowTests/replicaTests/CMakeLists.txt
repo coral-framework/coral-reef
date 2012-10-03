@@ -32,8 +32,8 @@ include_directories(
 # Gather test source files in the current directory
 file( GLOB _TESTS *Tests.cpp )
 
-file( GLOB _HEADERS CompanySpace.h )
-file( GLOB _SOURCES CompanySpace.cpp Main.cpp )
+file( GLOB _HEADERS CompanySpace.h LocalSpaceObserver.h )
+file( GLOB _SOURCES CompanySpace.cpp LocalSpaceObserver.cpp Main.cpp )
 
 # Create test executable
 add_executable( replicaTests EXCLUDE_FROM_ALL ${_TESTS} ${_HEADERS} ${_SOURCES} ${_GENERATED_MAPPINGS} )
