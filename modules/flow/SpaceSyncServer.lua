@@ -50,12 +50,14 @@ function M.processAllSpaceChanges( space, allSpaceChanges, observers )
 	for _, observer in ipairs( observers ) do
 		if #newObjectStructs > 0 then
 			table.sort( newObjectStructs, function( x, y ) return x.newId < y.newId end )
-			observer:onNewObjects( newObjectStructs )
+			--observer:onNewObjects( newObjectStructs )
 		end
 		
 		if #changeSetArray > 0 then
-			observer:onRemoteSpaceChanged( changeSetArray )
+			table.sort( changeSetArray, function( x, y ) return x.serviceId < y.serviceId end )
+			--observer:onRemoteSpaceChanged( changeSetArray )
 		end
+		observer:onRemoteSpaceChanged( newObjectStructs, changeSetArray )
 	end
 end
 
@@ -72,7 +74,6 @@ function processNewObjects( space, spaceChanges, newObjectsList )
 end
 
 function generateValueForNewObjects( space, newObjects, resultChangesTable )
-	
 	local newObjectResult = {}
 	
 	for newObject, _ in pairs( newObjects ) do

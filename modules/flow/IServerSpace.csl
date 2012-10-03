@@ -3,7 +3,6 @@ interface IServerSpace
 	readonly ca.ISpace space;
 	
 	void publishSpace( in ca.ISpace space, in string key );
-	int8[] getPublishedSpaceData();
 	void initializeClient( in string clientAddress, in string clientKey );
 	
 	void addRemoteSpaceObserver( in IRemoteSpaceObserver observer );

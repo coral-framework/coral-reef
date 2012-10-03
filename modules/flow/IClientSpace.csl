@@ -1,6 +1,9 @@
 interface IClientSpace
 {
-	readonly ca.ISpace space;
-	void initialize( in string serverAddress, in string serverSpaceKey );
-	bool initializeData( in int8[] bytes );
+	readonly co.IObject rootObject;
+	ca.ISpace space;
+	
+	bool initializeData( in int8[] bytes, in string modelName );
+	
+	void registerRemoteSpaceObserver( in string serverAddress, in string serverSpaceKey );
 };

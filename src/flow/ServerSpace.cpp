@@ -43,7 +43,6 @@ public:
 		_archiveObj->getService<ca::INamed>()->setName( "serverTmp.lua" );
 
 		_archive = _archiveObj->getService<ca::IArchive>();
-
 	}
 
 	virtual ~ServerSpace()
@@ -81,11 +80,27 @@ public:
 	
 	void initializeClient( const std::string& clientAddress, const std::string& clientKey )
 	{
-		co::RefPtr<co::IObject> object = _node->findRemoteInstance( "flow.ClientSpace", clientKey, clientAddress );
-		co::RefPtr<flow::IClientSpace> clientSpace = object->getService<flow::IClientSpace>();
 
-		clientSpace->initializeData( getPublishedSpaceData() );
-		addRemoteSpaceObserver( object->getService<flow::IRemoteSpaceObserver>() );
+		if( !_node.isValid() )
+		{
+			CORAL_THROW( co::IllegalStateException, "client node not set" );
+		}
+
+		if( clientKey.empty() || clientAddress.empty() )
+		{
+			CORAL_THROW( co::IllegalArgumentException, "Server information not set properly" );
+		}
+
+		co::RefPtr<co::IObject> object = _node->findRemoteInstance( "flow.ClientSpace", clientKey, clientAddress );
+		
+		if( !object )
+		{
+			CORAL_THROW( co::IllegalStateException, "Could not initialize client space. space with key " << clientKey << " not found on server " << clientAddress  );
+		}
+
+		co::RefPtr<flow::IClientSpace> clientSpace = object->getService<flow::IClientSpace>();
+		
+		clientSpace->initializeData( getPublishedSpaceData(), _space->getUniverse()->getModel()->getName() );
 	}
 
 	co::Range<co::int8 const> getPublishedSpaceData()
@@ -137,7 +152,6 @@ public:
 		results );
 		
 		_allChanges.clear();
-
 
 	}
 	

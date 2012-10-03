@@ -2,6 +2,5 @@ component ClientSpace
 {
 	provides IClientSpace clientSpace;
 	provides IRemoteSpaceObserver remoteObserver;
-	receives ca.IUniverse universe;
 	receives rpc.INode clientNode;
 };

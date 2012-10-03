@@ -1,5 +1,4 @@
 interface IRemoteSpaceObserver
 {
-	bool onRemoteSpaceChanged( in ChangeSet[] changes );
-	bool onNewObjects( in NewObject[] newObjects );
+	bool onRemoteSpaceChanged( in NewObject[] newObjects, in ChangeSet[] changes );
 };

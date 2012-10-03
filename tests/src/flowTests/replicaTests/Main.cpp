@@ -8,12 +8,16 @@
 #include <co/reserved/LibraryManager.h>
 #include <gtest/gtest.h>
 
+#include <co/Log.h>
+
 int main( int argc, char** argv )
 {
 	testing::InitGoogleTest( &argc, argv );
 
 	// skip dlclose() so we get proper valgrind reports
 	co::LibraryManager::setNoDlClose();
+
+	co::Logger::setMinSeverity( co::LOG_WARNING );
 
 	// set up the system
 	co::addPath( CORAL_PATH );

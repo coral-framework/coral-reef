@@ -53,21 +53,48 @@ public:
 	{
 	}
 	
+	co::IObject* getRootObject()
+	{
+		return _rootObject.get();
+	}
+	
+
+	void setSpace( ca::ISpace* space )
+	{
+		_space = space;
+	}
+
 	ca::ISpace* getSpace()
 	{
 		return _space.get();
 	}
 	
-	void initialize( const std::string& _serverAddress, const std::string& _serverSpaceKey )
+	bool initializeData( co::Range<co::int8 const> byteData, const std::string& modelName  )
 	{
-		if( !_universe.isValid() )
-		{
-			CORAL_THROW( co::IllegalStateException, "universe not set" );
-		}
+		std::ofstream of ( "tmp.lua" );
 
+		for( int i = 0; i < byteData.getSize(); i++ )
+		{
+			of << byteData[i];
+		}
+		of.close();
+		_archiveObj->setService( "model", getModel( modelName ).get() );
+
+		_rootObject = _archive->restore();
+
+		return true;
+	}
+
+	void registerRemoteSpaceObserver( const std::string& _serverAddress, const std::string& _serverSpaceKey )
+	{
 		if( !_node.isValid() )
 		{
 			CORAL_THROW( co::IllegalStateException, "client node not set" );
+		}
+
+		if( !_space.isValid() )
+		{
+			CORAL_THROW( co::IllegalStateException, "local space not set" );
 		}
 
 		if( _serverSpaceKey.empty() || _serverAddress.empty() )
@@ -84,76 +111,26 @@ public:
 
 		co::RefPtr<flow::IServerSpace> serverSpace = object->getService<flow::IServerSpace>();
 
-		co::Range<co::int8 const> byteData = serverSpace->getPublishedSpaceData();
+		_space->initialize( getRootObject() );
 
-		initializeData( byteData );
-
+		initializeIds();
 		serverSpace->addRemoteSpaceObserver( this );
 
 	}
-
-	bool initializeData( co::Range<co::int8 const> byteData  )
-	{
-		std::ofstream of ( "tmp.lua" );
-
-		for( int i = 0; i < byteData.getSize(); i++ )
-		{
-			of << byteData[i];
-		}
-		of.close();
-		_archiveObj->setService( "model", _universe->getModel() );
-
-		co::RefPtr<co::IObject> root = _archive->restore();
-
-		co::RefPtr<co::IObject> spaceObj = co::newInstance( "ca.Space" );
-		spaceObj->setService( "universe", _universe.get() );
-		
-
-		_space = spaceObj->getService<ca::ISpace>();
-		_archive->getProvider()->setService( "model", _space->getModel() );
-		
-		_space->initialize( root.get() );
-		initializeIds();
-		return true;
-	}
-
-	bool onRemoteSpaceChanged(  co::Range<const flow::ChangeSet> changes )
+	
+	bool onRemoteSpaceChanged( co::Range<const flow::NewObject> newObjects, co::Range<const flow::ChangeSet> changes )
 	{
 		try
 		{
 			const std::string& script = "flow.SpaceSyncClient";
-			const std::string& function = "applyReceivedChangeSet";
+			const std::string& function = "applyReceivedChanges";
 		
 			co::Range<const co::Any> results;
 
-			co::Any args[2];
-			args[0].set<ca::ISpace*>( _space.get() );
-			args[1].setArray(co::Any::AK_Range, co::typeOf<flow::ChangeSet>::get(), 0, ( (void*)changes.getStart() ), changes.getSize() );
-
-			co::getService<lua::IState>()->callFunction( script, function,
-				co::Range<const co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
-				results );
-		}
-		catch( std::exception& e )
-		{
-			CORAL_LOG(ERROR) << e.what();
-			return false;
-		}
-		return true;
-	}
-
-	bool onNewObjects( co::Range<const flow::NewObject> newObjects )
-	{
-		try
-		{
-			const std::string& script = "flow.SpaceSyncClient";
-			const std::string& function = "applyReceivedNewObjects";
-
-			co::Range<const co::Any> results;
-
-			co::Any args[4];
+			co::Any args[3];
 			args[0].set<ca::ISpace*>( _space.get() );
 			args[1].setArray(co::Any::AK_Range, co::typeOf<flow::NewObject>::get(), 0, ( (void*)newObjects.getStart() ), newObjects.getSize() );
+			args[2].setArray(co::Any::AK_Range, co::typeOf<flow::ChangeSet>::get(), 0, ( (void*)changes.getStart() ), changes.getSize() );
 
 			co::getService<lua::IState>()->callFunction( script, function,
 				co::Range<const co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
@@ -164,21 +141,10 @@ public:
 			CORAL_LOG(ERROR) << e.what();
 			return false;
 		}
-
 		return true;
 	}
 
 protected:
-
-	ca::IUniverse* getUniverseService()
-	{
-		return _universe.get();
-	}
-
-	void setUniverseService( ca::IUniverse* universe )
-	{
-		_universe = universe;
-	}
 
 	rpc::INode* getClientNodeService()
 	{
@@ -205,10 +171,18 @@ private:
 			results );
 	}
 
+	co::RefPtr<ca::IModel> getModel( const std::string& modelName )
+	{
+		co::IObject* modelObj = co::newInstance( "ca.Model" );
+		co::RefPtr<ca::IModel> model = modelObj->getService<ca::IModel>();
+		model->setName( modelName );
+		return model;
+	}
+
 private:
+	co::RefPtr<co::IObject> _rootObject;
 	co::RefPtr<ca::ISpace> _space;
 
-	co::RefPtr<ca::IUniverse> _universe;
 	co::RefPtr<rpc::INode> _node;
 	
 	co::RefPtr<ca::IArchive> _archive;
