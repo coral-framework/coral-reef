@@ -3,7 +3,7 @@
  * See copyright notice in LICENSE.md
  */
 
-#include "ClientSpace_Base.h"
+#include "SpaceSubscriber_Base.h"
 
 #include <co/Coral.h>
 #include <co/IObject.h>
@@ -26,7 +26,7 @@
 
 #include <rpc/INode.h>
 
-#include <flow/IServerSpace.h>
+#include <flow/ISpacePublisher.h>
 #include <flow/ChangeSet.h>
 #include <flow/NewObject.h>
 #include <flow/IRemoteSpaceObserver.h>
@@ -36,10 +36,10 @@
 
 namespace flow {
 
-class ClientSpace : public ClientSpace_Base
+class SpaceSubscriber : public SpaceSubscriber_Base
 {
 public:
-	ClientSpace()
+	SpaceSubscriber()
 	{
 		_archiveObj = co::newInstance( "ca.LuaArchive" );
 
@@ -49,7 +49,7 @@ public:
 
 	}
 
-	virtual ~ClientSpace()
+	virtual ~SpaceSubscriber()
 	{
 	}
 	
@@ -85,7 +85,7 @@ public:
 		return true;
 	}
 
-	void registerRemoteSpaceObserver( const std::string& _serverAddress, const std::string& _serverSpaceKey )
+	void registerRemoteSpaceObserver( const std::string& _serverAddress, const std::string& _spacePublisherKey )
 	{
 		if( !_node.isValid() )
 		{
@@ -97,24 +97,24 @@ public:
 			CORAL_THROW( co::IllegalStateException, "local space not set" );
 		}
 
-		if( _serverSpaceKey.empty() || _serverAddress.empty() )
+		if( _spacePublisherKey.empty() || _serverAddress.empty() )
 		{
 			CORAL_THROW( co::IllegalArgumentException, "Server information not set properly" );
 		}
 
-		co::RefPtr<co::IObject> object = _node->findRemoteInstance( "flow.ServerSpace", _serverSpaceKey, _serverAddress );
+		co::RefPtr<co::IObject> object = _node->findRemoteInstance( "flow.SpacePublisher", _spacePublisherKey, _serverAddress );
 		
 		if( !object )
 		{
-			CORAL_THROW( co::IllegalStateException, "Could not replicate space. space with key " << _serverSpaceKey << " not found on server " << _serverAddress  );
+			CORAL_THROW( co::IllegalStateException, "Could not replicate space. space with key " << _spacePublisherKey << " not found on server " << _serverAddress  );
 		}
 
-		co::RefPtr<flow::IServerSpace> serverSpace = object->getService<flow::IServerSpace>();
+		co::RefPtr<flow::ISpacePublisher> spacePublisher = object->getService<flow::ISpacePublisher>();
 
 		_space->initialize( getRootObject() );
 
 		initializeIds();
-		serverSpace->addRemoteSpaceObserver( this );
+		spacePublisher->addRemoteSpaceObserver( this );
 
 	}
 	
@@ -190,6 +190,6 @@ private:
 
 };
 
-CORAL_EXPORT_COMPONENT( ClientSpace, ClientSpace );
+CORAL_EXPORT_COMPONENT( SpaceSubscriber, SpaceSubscriber );
 
 } // namespace flow

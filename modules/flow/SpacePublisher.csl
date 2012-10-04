@@ -1,6 +1,6 @@
-component ServerSpace
+component SpacePublisher
 {
-	provides IServerSpace serverSpace;
+	provides ISpacePublisher publisher;
 	provides ca.IGraphObserver observer;
 	receives rpc.INode serverNode;
 };

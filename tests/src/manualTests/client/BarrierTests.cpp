@@ -6,7 +6,7 @@
 #include <rpc/INode.h>
 #include <rpc/ITransport.h>
 
-#include <flow/IClientSpace.h>
+#include <flow/ISpaceSubscriber.h>
 
 #include <dom/ICompany.h>
 #include <dom/IEmployee.h>

@@ -12,7 +12,7 @@
 #include <rpc/INode.h>
 #include <rpc/ITransport.h>
 
-#include <flow/IServerSpace.h>
+#include <flow/ISpacePublisher.h>
 
 #include <dom/ICompany.h>
 #include <dom/IEmployee.h>
@@ -37,7 +37,7 @@
 #include <gtest/gtest.h>
 
 
-/*void publishSpace( co::RefPtr<co::IObject>& serverSpaceObj, co::RefPtr<ca::ISpace>& space, rpc::INode* server )
+/*void publishSpace( co::RefPtr<co::IObject>& spacePublisherObj, co::RefPtr<ca::ISpace>& space, rpc::INode* server )
 {
 	co::IObject* modelObj = co::newInstance( "ca.Model" );
 	modelObj->getComponent();
@@ -71,13 +71,13 @@
 
 	assert( space->getUniverse() );
 
-	serverSpaceObj = co::newInstance( "flow.ServerSpace" );
-	flow::IServerSpace* serverSpace = serverSpaceObj->getService<flow::IServerSpace>();
-	serverSpaceObj->setService( "serverNode", server );
-	serverSpace->publishSpace( space.get(), "published" );
+	spacePublisherObj = co::newInstance( "flow.SpacePublisher" );
+	flow::ISpacePublisher* spacePublisher = spacePublisherObj->getService<flow::ISpacePublisher>();
+	spacePublisherObj->setService( "serverNode", server );
+	spacePublisher->publishSpace( space.get(), "published" );
 }
 
-void applyChanges( co::RefPtr<co::IObject>& serverSpaceObj, const co::RefPtr<ca::ISpace>& space )
+void applyChanges( co::RefPtr<co::IObject>& spacePublisherObj, const co::RefPtr<ca::ISpace>& space )
 {
 	ca::ISpace* spaceOnServer = space.get();
 	co::IObject*  serverRoot = spaceOnServer->getRootObject();
@@ -129,7 +129,7 @@ void applyChanges( co::RefPtr<co::IObject>& serverSpaceObj, const co::RefPtr<ca:
 
 	spaceOnServer->notifyChanges();
 
-	serverSpaceObj->getService<flow::IServerSpace>()->notifyRemoteChanges();
+	spacePublisherObj->getService<flow::ISpacePublisher>()->notifyRemoteChanges();
 
 	CORAL_LOG(INFO) << "Sync successfull";
 }
@@ -157,9 +157,9 @@ int main( int argc, char** argv )
 		server->start( "tcp://*:4020", "tcp://localhost:4020" );
 
 		co::RefPtr<ca::ISpace> space;
-		co::RefPtr<co::IObject> serverSpaceObj;
+		co::RefPtr<co::IObject> spacePublisherObj;
 		
-		publishSpace( serverSpaceObj, space, server );
+		publishSpace( spacePublisherObj, space, server );
 
 		CORAL_LOG(INFO) << "Space published";
         
@@ -177,7 +177,7 @@ int main( int argc, char** argv )
 			server->update();
 			if( st->getStoredInt() )
 			{
-				applyChanges( serverSpaceObj, space );
+				applyChanges( spacePublisherObj, space );
 				st->setStoredInt( 0 );
 			}
 		}

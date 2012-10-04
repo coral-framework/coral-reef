@@ -12,7 +12,7 @@
 #include <rpc/INode.h>
 #include <rpc/ITransport.h>
 
-#include <flow/IServerSpace.h>
+#include <flow/ISpacePublisher.h>
 
 #include <dom/ICompany.h>
 #include <dom/IEmployee.h>

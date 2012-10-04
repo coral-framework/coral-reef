@@ -32,8 +32,8 @@
 #include <ca/IOException.h>
 #include <ca/IObjectChanges.h>
 
-#include <flow/IClientSpace.h>
-#include <flow/IServerSpace.h>
+#include <flow/ISpaceSubscriber.h>
+#include <flow/ISpacePublisher.h>
 #include <flow/IRemoteSpaceObserver.h>
 
 #include <stubs/ITestSetup.h>
@@ -332,22 +332,22 @@ public:
 
 TEST_F( ReplicaTests, clientServerConfigErrorTests )
 {
-	co::RefPtr<co::IObject> serverSpaceObj = co::newInstance( "flow.ServerSpace" );
+	co::RefPtr<co::IObject> spacePublisherObj = co::newInstance( "flow.SpacePublisher" );
 
-	co::RefPtr<flow::IServerSpace> serverSpace = serverSpaceObj->getService<flow::IServerSpace>();
+	co::RefPtr<flow::ISpacePublisher> spacePublisher = spacePublisherObj->getService<flow::ISpacePublisher>();
 
-	ASSERT_THROW( serverSpace->publishSpace( _space.get(), "anyName" ), co::IllegalStateException ); // server node not set
+	ASSERT_THROW( spacePublisher->publishSpace( _space.get(), "anyName" ), co::IllegalStateException ); // server node not set
 
-	serverSpaceObj->setService( "serverNode", _server.get() );
+	spacePublisherObj->setService( "serverNode", _server.get() );
 
-	ASSERT_THROW( serverSpace->publishSpace( NULL, "anyName" ), co::IllegalArgumentException ); // NULL space
+	ASSERT_THROW( spacePublisher->publishSpace( NULL, "anyName" ), co::IllegalArgumentException ); // NULL space
 
-	ASSERT_THROW( serverSpace->publishSpace( _space.get(), "" ), co::IllegalArgumentException ); // empty name
+	ASSERT_THROW( spacePublisher->publishSpace( _space.get(), "" ), co::IllegalArgumentException ); // empty name
 
-	ASSERT_NO_THROW( serverSpace->publishSpace( _space.get(), "publishedOk" ) ); // publishing ok
+	ASSERT_NO_THROW( spacePublisher->publishSpace( _space.get(), "publishedOk" ) ); // publishing ok
 
-	co::RefPtr<co::IObject> clientSpaceObj = co::newInstance( "flow.ClientSpace" );
-	co::RefPtr<flow::IClientSpace> clientSpace = clientSpaceObj->getService<flow::IClientSpace>();
+	co::RefPtr<co::IObject> spaceSubscriberObj = co::newInstance( "flow.SpaceSubscriber" );
+	co::RefPtr<flow::ISpaceSubscriber> spaceSubscriber = spaceSubscriberObj->getService<flow::ISpaceSubscriber>();
 
 	co::IObject* universeObj = co::newInstance( "ca.Universe" );
 
@@ -358,36 +358,36 @@ TEST_F( ReplicaTests, clientServerConfigErrorTests )
 	universeObj->setService( "model", model );
 	co::RefPtr<ca::IUniverse> universe = universeObj->getService<ca::IUniverse>();
 
-	ASSERT_THROW( serverSpace->initializeClient( "address2", "publishedOk" ), co::IllegalStateException ); // client space not published
+	ASSERT_THROW( spacePublisher->initializeClient( "address2", "publishedOk" ), co::IllegalStateException ); // client space not published
 	
-	clientSpaceObj->setService( "clientNode", _client.get() );
+	spaceSubscriberObj->setService( "clientNode", _client.get() );
 		
-	ASSERT_THROW( serverSpace->initializeClient( "", "" ), co::IllegalArgumentException ); // address and key not set
+	ASSERT_THROW( spacePublisher->initializeClient( "", "" ), co::IllegalArgumentException ); // address and key not set
 
-	ASSERT_THROW( serverSpace->initializeClient( "address1", ""), co::IllegalArgumentException ); // valid address, but key not set
+	ASSERT_THROW( spacePublisher->initializeClient( "address1", ""), co::IllegalArgumentException ); // valid address, but key not set
 
-	ASSERT_THROW( serverSpace->initializeClient( "", "publishedOk" ), co::IllegalArgumentException ); // valid key, but address not set
+	ASSERT_THROW( spacePublisher->initializeClient( "", "publishedOk" ), co::IllegalArgumentException ); // valid key, but address not set
 
-	ASSERT_TRUE( clientSpace->getRootObject() == NULL );
+	ASSERT_TRUE( spaceSubscriber->getRootObject() == NULL );
 
-	_client->publishInstance( clientSpaceObj.get(), "publishedOk" );
+	_client->publishInstance( spaceSubscriberObj.get(), "publishedOk" );
 
-	ASSERT_NO_THROW( serverSpace->initializeClient( "address2", "publishedOk" ) ); // everything ok
+	ASSERT_NO_THROW( spacePublisher->initializeClient( "address2", "publishedOk" ) ); // everything ok
 
-	ASSERT_TRUE( clientSpace->getRootObject() != NULL );
+	ASSERT_TRUE( spaceSubscriber->getRootObject() != NULL );
 
 }
 
-TEST_F( ReplicaTests, clientServerSpaceTests )
+TEST_F( ReplicaTests, clientSpacePublisherTests )
 {
 
-	co::IObject* serverSpaceObj = co::newInstance( "flow.ServerSpace" );
-	serverSpaceObj->setService( "serverNode", _server.get() );
+	co::IObject* spacePublisherObj = co::newInstance( "flow.SpacePublisher" );
+	spacePublisherObj->setService( "serverNode", _server.get() );
 
-	flow::IServerSpace* serverSpace = serverSpaceObj->getService<flow::IServerSpace>();
-	serverSpace->publishSpace( _space.get(), "publishedSpace" );
+	flow::ISpacePublisher* spacePublisher = spacePublisherObj->getService<flow::ISpacePublisher>();
+	spacePublisher->publishSpace( _space.get(), "publishedSpace" );
 
-	co::IObject* replicaObj = co::newInstance( "flow.ClientSpace" );
+	co::IObject* replicaObj = co::newInstance( "flow.SpaceSubscriber" );
 	replicaObj->setService( "clientNode", _client.get() );
 
 	co::IObject* universeObj = co::newInstance( "ca.Universe" );
@@ -409,11 +409,11 @@ TEST_F( ReplicaTests, clientServerSpaceTests )
 
 	_space->addGraphObserver( server );
 
-	co::RefPtr<flow::IClientSpace> replica = replicaObj->getService<flow::IClientSpace>();
+	co::RefPtr<flow::ISpaceSubscriber> replica = replicaObj->getService<flow::ISpaceSubscriber>();
 
 	_client->publishInstance( replicaObj , "publishedSpace" );
 
-	ASSERT_NO_THROW( serverSpace->initializeClient( "address2", "publishedSpace" ) );
+	ASSERT_NO_THROW( spacePublisher->initializeClient( "address2", "publishedSpace" ) );
 	
 
 	// initial copy test
@@ -424,12 +424,12 @@ TEST_F( ReplicaTests, clientServerSpaceTests )
 
 	localSpace->notifyChanges();
 	//============================================= changes to server space
-	applyChanges( serverSpace->getSpace() );
+	applyChanges( spacePublisher->getSpace() );
 	
 	LocalSpaceObserver* client = new LocalSpaceObserver();
 	localSpace->addGraphObserver( client );
 
-	serverSpace->notifyRemoteChanges();
+	spacePublisher->notifyRemoteChanges();
 
 	compareChanges( server->getLastChanges(), client->getLastChanges() );
 
@@ -440,13 +440,13 @@ TEST_F( ReplicaTests, clientServerSpaceTests )
 	ASSERT_FALSE( client->getLastChanges() == NULL );
 
 	//=== remove and return
-	removeAndReturnObject( serverSpace->getSpace() );
-	serverSpace->notifyRemoteChanges();
+	removeAndReturnObject( spacePublisher->getSpace() );
+	spacePublisher->notifyRemoteChanges();
 	//it shouldn't change at all
 	checkSpaceAfterChange( localSpace->getRootObject() );
 
-	applyChangeOnNewObject( serverSpace->getSpace() );
-	serverSpace->notifyRemoteChanges();
+	applyChangeOnNewObject( spacePublisher->getSpace() );
+	spacePublisher->notifyRemoteChanges();
 
 	compareChanges( server->getLastChanges(), client->getLastChanges() );
 
@@ -462,47 +462,47 @@ TEST_F( ReplicaTests, clientServerSpaceTests )
 TEST_F( ReplicaTests, replicaAfterChangeTests )
 {
 
-	co::IObject* serverSpaceObj = co::newInstance( "flow.ServerSpace" );
-	serverSpaceObj->setService( "serverNode", _server.get() );
+	co::IObject* spacePublisherObj = co::newInstance( "flow.SpacePublisher" );
+	spacePublisherObj->setService( "serverNode", _server.get() );
 
-	flow::IServerSpace* serverSpace = serverSpaceObj->getService<flow::IServerSpace>();
-	serverSpace->publishSpace( _space.get(), "publishedSpace" );
+	flow::ISpacePublisher* spacePublisher = spacePublisherObj->getService<flow::ISpacePublisher>();
+	spacePublisher->publishSpace( _space.get(), "publishedSpace" );
 
 	//============================================= changes to server space
-	applyChanges( serverSpace->getSpace() );
+	applyChanges( spacePublisher->getSpace() );
 
-	ASSERT_NO_THROW( serverSpace->notifyRemoteChanges() ); 
+	ASSERT_NO_THROW( spacePublisher->notifyRemoteChanges() ); 
 
 	//======================================================
 
-	co::IObject* replicaAfterObj = co::newInstance( "flow.ClientSpace" );
+	co::IObject* replicaAfterObj = co::newInstance( "flow.SpaceSubscriber" );
 	
 	replicaAfterObj->setService( "clientNode", _client.get() );
 	
 	_client->publishInstance( replicaAfterObj, "publishedSpace" );
 
-	co::RefPtr<flow::IClientSpace> replica = replicaAfterObj->getService<flow::IClientSpace>();
+	co::RefPtr<flow::ISpaceSubscriber> replica = replicaAfterObj->getService<flow::ISpaceSubscriber>();
 	
-	ASSERT_NO_THROW( serverSpace->initializeClient( "address2", "publishedSpace" ) );
+	ASSERT_NO_THROW( spacePublisher->initializeClient( "address2", "publishedSpace" ) );
 
-	checkSpaceAfterChange( replicaAfterObj->getService<flow::IClientSpace>()->getRootObject() );
+	checkSpaceAfterChange( replicaAfterObj->getService<flow::ISpaceSubscriber>()->getRootObject() );
 	
 }
 
 TEST_F( ReplicaTests, multipleClientsInitializeFromServerTests )
 {
 
-	co::IObject* serverSpaceObj = co::newInstance( "flow.ServerSpace" );
-	serverSpaceObj->setService( "serverNode", _server.get() );
+	co::IObject* spacePublisherObj = co::newInstance( "flow.SpacePublisher" );
+	spacePublisherObj->setService( "serverNode", _server.get() );
 
-	flow::IServerSpace* serverSpace = serverSpaceObj->getService<flow::IServerSpace>();
-	serverSpace->publishSpace( _space.get(), "publishedSpace" );
+	flow::ISpacePublisher* spacePublisher = spacePublisherObj->getService<flow::ISpacePublisher>();
+	spacePublisher->publishSpace( _space.get(), "publishedSpace" );
 
 	co::IObject* replicaObj[3];
 	std::stringstream ss;
 	for( int i = 0; i < 3; i++ )
 	{	
-		replicaObj[i] = co::newInstance( "flow.ClientSpace" );
+		replicaObj[i] = co::newInstance( "flow.SpaceSubscriber" );
 		replicaObj[i]->setService( "clientNode", _client.get() );
 
 		ss << "client_" << i;
@@ -510,16 +510,16 @@ TEST_F( ReplicaTests, multipleClientsInitializeFromServerTests )
 		_client->publishInstance( replicaObj[i], clientKey );
 		ss.str("");
 		ss.clear();
-		co::RefPtr<flow::IClientSpace> replica = replicaObj[i]->getService<flow::IClientSpace>();
+		co::RefPtr<flow::ISpaceSubscriber> replica = replicaObj[i]->getService<flow::ISpaceSubscriber>();
 		
-		ASSERT_NO_THROW( serverSpace->initializeClient( _client->getPublicAddress(), clientKey )  );
+		ASSERT_NO_THROW( spacePublisher->initializeClient( _client->getPublicAddress(), clientKey )  );
 	}
 
 
 	// initial copy test
 	for( int i = 0; i < 3; i++ )
 	{
-		checkInitialSpace( replicaObj[i]->getService<flow::IClientSpace>()->getRootObject() );
+		checkInitialSpace( replicaObj[i]->getService<flow::ISpaceSubscriber>()->getRootObject() );
 	}
 	
 	co::IObject* modelObj = co::newInstance( "ca.Model" );
@@ -536,16 +536,16 @@ TEST_F( ReplicaTests, multipleClientsInitializeFromServerTests )
 		co::IObject* spaceObj  = co::newInstance( "ca.Space" );
 		spaceObj->setService( "universe", universeObj->getService<ca::IUniverse>() );
 		localSpaces.push_back( spaceObj->getService<ca::ISpace>() );
-		flow::IClientSpace* replica = replicaObj[i]->getService<flow::IClientSpace>();
+		flow::ISpaceSubscriber* replica = replicaObj[i]->getService<flow::ISpaceSubscriber>();
 		replica->setSpace( localSpaces[i].get() );
 		replica->registerRemoteSpaceObserver( "address1", "publishedSpace" );
 
 	}
 
 	//============================================= changes to server space
-	applyChanges( serverSpace->getSpace() );
+	applyChanges( spacePublisher->getSpace() );
 
-	ASSERT_NO_THROW( serverSpace->notifyRemoteChanges() ); 
+	ASSERT_NO_THROW( spacePublisher->notifyRemoteChanges() ); 
 
 	//======================================================
 	//client after change
@@ -555,16 +555,16 @@ TEST_F( ReplicaTests, multipleClientsInitializeFromServerTests )
 	}
 
 		//=== remove and return
-	removeAndReturnObject( serverSpace->getSpace() );
-	serverSpace->notifyRemoteChanges();
+	removeAndReturnObject( spacePublisher->getSpace() );
+	spacePublisher->notifyRemoteChanges();
 	//it shouldn't change at all
 	for( int i = 0; i < 3; i++ )
 	{
 		checkSpaceAfterChange( localSpaces[i]->getRootObject()  );
 	}
 
-	applyChangeOnNewObject( serverSpace->getSpace() );
-	serverSpace->notifyRemoteChanges();
+	applyChangeOnNewObject( spacePublisher->getSpace() );
+	spacePublisher->notifyRemoteChanges();
 
 	for( int i = 0; i < 3; i++ )
 	{

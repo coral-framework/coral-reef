@@ -1,6 +1,6 @@
-component ClientSpace
+component SpaceSubscriber
 {
-	provides IClientSpace clientSpace;
+	provides ISpaceSubscriber subscriber;
 	provides IRemoteSpaceObserver remoteObserver;
 	receives rpc.INode clientNode;
 };

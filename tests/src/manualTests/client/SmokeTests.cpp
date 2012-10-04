@@ -7,7 +7,7 @@
 #include <rpc/INode.h>
 #include <rpc/ITransport.h>
 
-#include <flow/IClientSpace.h>
+#include <flow/ISpaceSubscriber.h>
 
 #include <dom/ICompany.h>
 #include <dom/IEmployee.h>
@@ -26,7 +26,7 @@
 
 //namespace rpc {
 //
-//TEST( SmokeTests, clientServerSpaceTests )
+//TEST( SmokeTests, clientSpacePublisherTests )
 //{
 //	//client setup
 //	co::IObject* nodeObj = co::newInstance( "rpc.Node" );
@@ -40,7 +40,7 @@
 //    node->start( "tcp://*:4021", "tcp://localhost:4021" );
 //
 //	co::IObject* obj = co::newInstance( "dom.Company" );
-//	co::IObject* replicaObj = co::newInstance( "flow.ClientSpace" );
+//	co::IObject* replicaObj = co::newInstance( "flow.SpaceSubscriber" );
 //	replicaObj->setService( "clientNode", node );
 //
 //	co::IObject* universeObj = co::newInstance( "ca.Universe" );
@@ -53,7 +53,7 @@
 //
 //	std::vector<dom::IEmployee*> changedEmployees;
 //	
-//	co::RefPtr<flow::IClientSpace> replica = replicaObj->getService<flow::IClientSpace>();
+//	co::RefPtr<flow::ISpaceSubscriber> replica = replicaObj->getService<flow::ISpaceSubscriber>();
 //
 //	co::RefPtr<ca::ISpace> spaceRestored;
 //	co::RefPtr<ca::IUniverse> universe = universeObj->getService<ca::IUniverse>();

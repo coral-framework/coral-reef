@@ -3,7 +3,7 @@
  * See copyright notice in LICENSE.md
  */
 
-#include "ServerSpace_Base.h"
+#include "SpacePublisher_Base.h"
 
 #include <co/Coral.h>
 #include <co/RefPtr.h>
@@ -17,7 +17,7 @@
 #include <ca/IArchive.h>
 #include <ca/INamed.h>
 #include <ca/IGraphChanges.h>
-#include <flow/IClientSpace.h>
+#include <flow/ISpaceSubscriber.h>
 
 #include <rpc/INode.h>
 
@@ -34,10 +34,10 @@
 
 namespace flow {
 
-class ServerSpace : public ServerSpace_Base
+class SpacePublisher : public SpacePublisher_Base
 {
 public:
-	ServerSpace()
+	SpacePublisher()
 	{
 		_archiveObj = co::newInstance( "ca.LuaArchive" );
 		_archiveObj->getService<ca::INamed>()->setName( "serverTmp.lua" );
@@ -45,7 +45,7 @@ public:
 		_archive = _archiveObj->getService<ca::IArchive>();
 	}
 
-	virtual ~ServerSpace()
+	virtual ~SpacePublisher()
 	{
 		_space->removeGraphObserver( this );
 	}
@@ -91,16 +91,16 @@ public:
 			CORAL_THROW( co::IllegalArgumentException, "Server information not set properly" );
 		}
 
-		co::RefPtr<co::IObject> object = _node->findRemoteInstance( "flow.ClientSpace", clientKey, clientAddress );
+		co::RefPtr<co::IObject> object = _node->findRemoteInstance( "flow.SpaceSubscriber", clientKey, clientAddress );
 		
 		if( !object )
 		{
 			CORAL_THROW( co::IllegalStateException, "Could not initialize client space. space with key " << clientKey << " not found on server " << clientAddress  );
 		}
 
-		co::RefPtr<flow::IClientSpace> clientSpace = object->getService<flow::IClientSpace>();
+		co::RefPtr<flow::ISpaceSubscriber> spaceSubscriber = object->getService<flow::ISpaceSubscriber>();
 		
-		clientSpace->initializeData( getPublishedSpaceData(), _space->getUniverse()->getModel()->getName() );
+		spaceSubscriber->initializeData( getPublishedSpaceData(), _space->getUniverse()->getModel()->getName() );
 	}
 
 	co::Range<co::int8 const> getPublishedSpaceData()
@@ -197,6 +197,6 @@ private:
 	std::vector<co::int8> data;
 };
 
-CORAL_EXPORT_COMPONENT( ServerSpace, ServerSpace );
+CORAL_EXPORT_COMPONENT( SpacePublisher, SpacePublisher );
 
 } // namespace flow
