@@ -1,11 +1,10 @@
 interface ISpaceSubscriber
 {
+	void setSpace( in ca.ISpace space );
+
 	readonly co.IObject rootObject;
 	
-	void setSpace( in ca.ISpace space );
-	
-	bool subscribe( in int8[] bytes, in string modelName );
+	bool onSubscribed( in int8[] bytes, in string modelName );
 	
 	bool onPublish( in NewObject[] newObjects, in ChangeSet[] changes );
-	
 };

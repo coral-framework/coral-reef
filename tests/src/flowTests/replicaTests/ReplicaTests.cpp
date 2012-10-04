@@ -23,9 +23,6 @@
 #include <dom/IProduct.h>
 #include <dom/IService.h>
 
-#include <rpc/INode.h>
-#include <rpc/ITransport.h>
-
 #include <ca/ISpace.h>
 #include <ca/IModel.h>
 #include <ca/IUniverse.h>
@@ -34,9 +31,6 @@
 
 #include <flow/ISpaceSubscriber.h>
 #include <flow/ISpacePublisher.h>
-#include <flow/IRemoteSpaceObserver.h>
-
-#include <stubs/ITestSetup.h>
 
 class ReplicaTests : public CompanySpace
 {
@@ -45,21 +39,11 @@ public:
 	void SetUp()
 	{
 		CompanySpace::SetUp();
-
-		co::RefPtr<co::IObject> setupObj = co::newInstance( "stubs.TestSetup" );
-		_setup = setupObj->getService<stubs::ITestSetup>();
-		_setup->initTest( 2 );
-
-		_server = _setup->getNode( 1 );
-		_client = _setup->getNode( 2 );
-
 	}
 
 	void TearDown()
 	{
 		CompanySpace::TearDown();
-		_setup->tearDown();
-
 	}
 
 	void checkInitialSpace( co::IObject* objRest )
@@ -298,6 +282,20 @@ public:
 
 	}
 
+	co::RefPtr<ca::ISpace> createLocalSpace( const std::string& modelName )
+	{
+		co::IObject* universeObj = co::newInstance( "ca.Universe" );
+		co::IObject* modelObj = co::newInstance( "ca.Model" );
+		ca::IModel* model = modelObj->getService<ca::IModel>();
+		model->setName( modelName );
+		universeObj->setService( "model", model );
+		co::IObject* localSpaceObj = co::newInstance( "ca.Space" );
+		localSpaceObj->setService( "universe", universeObj->getService<ca::IUniverse>() );
+		co::RefPtr<ca::ISpace> localSpace = localSpaceObj->getService<ca::ISpace>();
+
+		return localSpace;
+	}
+
 	// name should identify the objects in this specific case, cause our case test doesn't have name conflicts and, except for the Company, all objects has a name.
 
 	void compareAllNames( co::Range<co::IObject* const> rangeOne, co::Range<co::IObject* const> rangeAnother )
@@ -322,12 +320,6 @@ public:
 		compareAllNames( one->getAddedObjects(), another->getAddedObjects() );
 	}
 
-
-	co::RefPtr<stubs::ITestSetup> _setup;
-
-	co::RefPtr<rpc::INode> _server;
-	co::RefPtr<rpc::INode> _client;
-
 };
 
 TEST_F( ReplicaTests, clientServerConfigErrorTests )
@@ -336,45 +328,26 @@ TEST_F( ReplicaTests, clientServerConfigErrorTests )
 
 	co::RefPtr<flow::ISpacePublisher> spacePublisher = spacePublisherObj->getService<flow::ISpacePublisher>();
 
-	ASSERT_THROW( spacePublisher->publishSpace( _space.get(), "anyName" ), co::IllegalStateException ); // server node not set
+	ASSERT_THROW( spacePublisher->publish(), co::IllegalStateException ); // space not set
 
-	spacePublisherObj->setService( "serverNode", _server.get() );
+	ASSERT_THROW( spacePublisher->setSpace( NULL ), co::IllegalArgumentException );
 
-	ASSERT_THROW( spacePublisher->publishSpace( NULL, "anyName" ), co::IllegalArgumentException ); // NULL space
+	spacePublisher->setSpace( _space.get() );
 
-	ASSERT_THROW( spacePublisher->publishSpace( _space.get(), "" ), co::IllegalArgumentException ); // empty name
-
-	ASSERT_NO_THROW( spacePublisher->publishSpace( _space.get(), "publishedOk" ) ); // publishing ok
+	ASSERT_NO_THROW( spacePublisher->publish() ); // just a warning, no subscribers
 
 	co::RefPtr<co::IObject> spaceSubscriberObj = co::newInstance( "flow.SpaceSubscriber" );
 	co::RefPtr<flow::ISpaceSubscriber> spaceSubscriber = spaceSubscriberObj->getService<flow::ISpaceSubscriber>();
 
-	co::IObject* universeObj = co::newInstance( "ca.Universe" );
+	ASSERT_THROW( spacePublisher->addSubscriber( spaceSubscriber.get() ), co::IllegalStateException ); // NULL space on subscriber
 
-	co::RefPtr<co::IObject> modelObj = co::newInstance( "ca.Model" );
-	ca::IModel* model = modelObj->getService<ca::IModel>();
-	model->setName( "dom" );
-	
-	universeObj->setService( "model", model );
-	co::RefPtr<ca::IUniverse> universe = universeObj->getService<ca::IUniverse>();
+	spaceSubscriber->setSpace( createLocalSpace( "otherName" ).get() );
 
-	ASSERT_THROW( spacePublisher->initializeClient( "address2", "publishedOk" ), co::IllegalStateException ); // client space not published
-	
-	spaceSubscriberObj->setService( "clientNode", _client.get() );
-		
-	ASSERT_THROW( spacePublisher->initializeClient( "", "" ), co::IllegalArgumentException ); // address and key not set
+	ASSERT_THROW( spacePublisher->addSubscriber( spaceSubscriber.get() ), co::IllegalStateException ); // incompatible model names
 
-	ASSERT_THROW( spacePublisher->initializeClient( "address1", ""), co::IllegalArgumentException ); // valid address, but key not set
+	spaceSubscriber->setSpace( createLocalSpace( "dom" ).get() );
 
-	ASSERT_THROW( spacePublisher->initializeClient( "", "publishedOk" ), co::IllegalArgumentException ); // valid key, but address not set
-
-	ASSERT_TRUE( spaceSubscriber->getRootObject() == NULL );
-
-	_client->publishInstance( spaceSubscriberObj.get(), "publishedOk" );
-
-	ASSERT_NO_THROW( spacePublisher->initializeClient( "address2", "publishedOk" ) ); // everything ok
-
-	ASSERT_TRUE( spaceSubscriber->getRootObject() != NULL );
+	ASSERT_NO_THROW( spacePublisher->addSubscriber( spaceSubscriber.get() ) ); // ok
 
 }
 
@@ -382,54 +355,33 @@ TEST_F( ReplicaTests, clientSpacePublisherTests )
 {
 
 	co::IObject* spacePublisherObj = co::newInstance( "flow.SpacePublisher" );
-	spacePublisherObj->setService( "serverNode", _server.get() );
 
 	flow::ISpacePublisher* spacePublisher = spacePublisherObj->getService<flow::ISpacePublisher>();
-	spacePublisher->publishSpace( _space.get(), "publishedSpace" );
-
-	co::IObject* replicaObj = co::newInstance( "flow.SpaceSubscriber" );
-	replicaObj->setService( "clientNode", _client.get() );
-
-	co::IObject* universeObj = co::newInstance( "ca.Universe" );
-
-	co::IObject* modelObj = co::newInstance( "ca.Model" );
-	ca::IModel* model = modelObj->getService<ca::IModel>();
-	model->setName( "dom" );
-	
-	universeObj->setService( "model", model );
-
-	co::IObject* localSpaceObj = co::newInstance( "ca.Space" );
-	
-	localSpaceObj->setService( "universe", universeObj->getService<ca::IUniverse>() );
-
-	ca::ISpace* localSpace = localSpaceObj->getService<ca::ISpace>();
-
+	spacePublisher->setSpace( _space.get() );
 	
 	LocalSpaceObserver* server = new LocalSpaceObserver();
-
 	_space->addGraphObserver( server );
 
-	co::RefPtr<flow::ISpaceSubscriber> replica = replicaObj->getService<flow::ISpaceSubscriber>();
-
-	_client->publishInstance( replicaObj , "publishedSpace" );
-
-	ASSERT_NO_THROW( spacePublisher->initializeClient( "address2", "publishedSpace" ) );
+	co::IObject* spaceSubscriberObj = co::newInstance( "flow.SpaceSubscriber" );
 	
+	co::RefPtr<ca::ISpace> localSpace = createLocalSpace( "dom" );
+
+	co::RefPtr<flow::ISpaceSubscriber> spaceSubscriber = spaceSubscriberObj->getService<flow::ISpaceSubscriber>();
+	spaceSubscriber->setSpace( localSpace.get() );
+
+	ASSERT_NO_THROW( spacePublisher->addSubscriber( spaceSubscriber.get() ) );
+	localSpace->notifyChanges();
 
 	// initial copy test
-	checkInitialSpace( replica->getRootObject() );
+	checkInitialSpace( spaceSubscriber->getRootObject() );
 
-	replica->setSpace( localSpace );
-	replica->registerRemoteSpaceObserver( "address1", "publishedSpace" );
-
-	localSpace->notifyChanges();
 	//============================================= changes to server space
-	applyChanges( spacePublisher->getSpace() );
+	applyChanges( _space.get() );
 	
 	LocalSpaceObserver* client = new LocalSpaceObserver();
 	localSpace->addGraphObserver( client );
 
-	spacePublisher->notifyRemoteChanges();
+	spacePublisher->publish();
 
 	compareChanges( server->getLastChanges(), client->getLastChanges() );
 
@@ -440,21 +392,19 @@ TEST_F( ReplicaTests, clientSpacePublisherTests )
 	ASSERT_FALSE( client->getLastChanges() == NULL );
 
 	//=== remove and return
-	removeAndReturnObject( spacePublisher->getSpace() );
-	spacePublisher->notifyRemoteChanges();
+	removeAndReturnObject( _space.get() );
+	spacePublisher->publish();
 	//it shouldn't change at all
 	checkSpaceAfterChange( localSpace->getRootObject() );
 
-	applyChangeOnNewObject( spacePublisher->getSpace() );
-	spacePublisher->notifyRemoteChanges();
+	applyChangeOnNewObject( _space.get() );
+	spacePublisher->publish();
 
 	compareChanges( server->getLastChanges(), client->getLastChanges() );
 
 	dom::IEmployee* ceo = co::cast<dom::IEmployee>( localSpace->getRootObject()->getService( "ceo" ) );
 	EXPECT_EQ( 200000, ceo->getSalary() );
 	EXPECT_EQ( "newCEO Super", ceo->getName() );
-
-
 
 }
 
@@ -463,29 +413,25 @@ TEST_F( ReplicaTests, replicaAfterChangeTests )
 {
 
 	co::IObject* spacePublisherObj = co::newInstance( "flow.SpacePublisher" );
-	spacePublisherObj->setService( "serverNode", _server.get() );
-
 	flow::ISpacePublisher* spacePublisher = spacePublisherObj->getService<flow::ISpacePublisher>();
-	spacePublisher->publishSpace( _space.get(), "publishedSpace" );
-
+	spacePublisher->setSpace( _space.get() );
 	//============================================= changes to server space
-	applyChanges( spacePublisher->getSpace() );
+	applyChanges( _space.get() );
 
-	ASSERT_NO_THROW( spacePublisher->notifyRemoteChanges() ); 
+	ASSERT_NO_THROW( spacePublisher->publish() ); 
 
 	//======================================================
 
-	co::IObject* replicaAfterObj = co::newInstance( "flow.SpaceSubscriber" );
-	
-	replicaAfterObj->setService( "clientNode", _client.get() );
-	
-	_client->publishInstance( replicaAfterObj, "publishedSpace" );
+	co::RefPtr<ca::ISpace> localSpace = createLocalSpace( "dom" );
 
-	co::RefPtr<flow::ISpaceSubscriber> replica = replicaAfterObj->getService<flow::ISpaceSubscriber>();
+	co::IObject* spaceSubscriberObj = co::newInstance( "flow.SpaceSubscriber" );
 	
-	ASSERT_NO_THROW( spacePublisher->initializeClient( "address2", "publishedSpace" ) );
+	co::RefPtr<flow::ISpaceSubscriber> spaceSubscriber = spaceSubscriberObj->getService<flow::ISpaceSubscriber>();
+	spaceSubscriber->setSpace( localSpace.get() );
+	
+	ASSERT_NO_THROW( spacePublisher->addSubscriber( spaceSubscriber.get() ) );
 
-	checkSpaceAfterChange( replicaAfterObj->getService<flow::ISpaceSubscriber>()->getRootObject() );
+	checkSpaceAfterChange( spaceSubscriberObj->getService<flow::ISpaceSubscriber>()->getRootObject() );
 	
 }
 
@@ -493,26 +439,30 @@ TEST_F( ReplicaTests, multipleClientsInitializeFromServerTests )
 {
 
 	co::IObject* spacePublisherObj = co::newInstance( "flow.SpacePublisher" );
-	spacePublisherObj->setService( "serverNode", _server.get() );
-
+	
 	flow::ISpacePublisher* spacePublisher = spacePublisherObj->getService<flow::ISpacePublisher>();
-	spacePublisher->publishSpace( _space.get(), "publishedSpace" );
+	spacePublisher->setSpace( _space.get() );
 
 	co::IObject* replicaObj[3];
 	std::stringstream ss;
+
+	co::RefVector<ca::ISpace> localSpaces;
+
 	for( int i = 0; i < 3; i++ )
 	{	
 		replicaObj[i] = co::newInstance( "flow.SpaceSubscriber" );
-		replicaObj[i]->setService( "clientNode", _client.get() );
-
+		
 		ss << "client_" << i;
 		std::string clientKey = ss.str();
-		_client->publishInstance( replicaObj[i], clientKey );
 		ss.str("");
 		ss.clear();
 		co::RefPtr<flow::ISpaceSubscriber> replica = replicaObj[i]->getService<flow::ISpaceSubscriber>();
+
+		localSpaces.push_back( createLocalSpace( "dom" ) );
+		flow::ISpaceSubscriber* spaceSubscriber = replicaObj[i]->getService<flow::ISpaceSubscriber>();
+		spaceSubscriber->setSpace( localSpaces[i].get() );
 		
-		ASSERT_NO_THROW( spacePublisher->initializeClient( _client->getPublicAddress(), clientKey )  );
+		ASSERT_NO_THROW( spacePublisher->addSubscriber( spaceSubscriber )  );
 	}
 
 
@@ -522,30 +472,11 @@ TEST_F( ReplicaTests, multipleClientsInitializeFromServerTests )
 		checkInitialSpace( replicaObj[i]->getService<flow::ISpaceSubscriber>()->getRootObject() );
 	}
 	
-	co::IObject* modelObj = co::newInstance( "ca.Model" );
-	ca::IModel* model = modelObj->getService<ca::IModel>();
-	model->setName( "dom" );
-
-	co::RefVector<ca::ISpace> localSpaces;
-
-	for( int i = 0; i < 3; i++ )
-	{
-		co::IObject* universeObj = co::newInstance( "ca.Universe" );
-		universeObj->setService( "model", model );
-
-		co::IObject* spaceObj  = co::newInstance( "ca.Space" );
-		spaceObj->setService( "universe", universeObj->getService<ca::IUniverse>() );
-		localSpaces.push_back( spaceObj->getService<ca::ISpace>() );
-		flow::ISpaceSubscriber* replica = replicaObj[i]->getService<flow::ISpaceSubscriber>();
-		replica->setSpace( localSpaces[i].get() );
-		replica->registerRemoteSpaceObserver( "address1", "publishedSpace" );
-
-	}
 
 	//============================================= changes to server space
-	applyChanges( spacePublisher->getSpace() );
+	applyChanges( _space.get() );
 
-	ASSERT_NO_THROW( spacePublisher->notifyRemoteChanges() ); 
+	ASSERT_NO_THROW( spacePublisher->publish() ); 
 
 	//======================================================
 	//client after change
@@ -555,16 +486,16 @@ TEST_F( ReplicaTests, multipleClientsInitializeFromServerTests )
 	}
 
 		//=== remove and return
-	removeAndReturnObject( spacePublisher->getSpace() );
-	spacePublisher->notifyRemoteChanges();
+	removeAndReturnObject( _space.get() );
+	spacePublisher->publish();
 	//it shouldn't change at all
 	for( int i = 0; i < 3; i++ )
 	{
 		checkSpaceAfterChange( localSpaces[i]->getRootObject()  );
 	}
 
-	applyChangeOnNewObject( spacePublisher->getSpace() );
-	spacePublisher->notifyRemoteChanges();
+	applyChangeOnNewObject( _space.get() );
+	spacePublisher->publish();
 
 	for( int i = 0; i < 3; i++ )
 	{

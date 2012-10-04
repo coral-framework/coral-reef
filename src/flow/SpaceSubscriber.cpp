@@ -24,12 +24,9 @@
 #include <ca/IGraphObserver.h>
 #include <ca/IGraphChanges.h>
 
-#include <rpc/INode.h>
-
 #include <flow/ISpacePublisher.h>
 #include <flow/ChangeSet.h>
 #include <flow/NewObject.h>
-#include <flow/IRemoteSpaceObserver.h>
 
 #include <fstream>
 #include <sstream>
@@ -61,64 +58,48 @@ public:
 
 	void setSpace( ca::ISpace* space )
 	{
+		if( !space )
+		{
+			CORAL_THROW( co::IllegalArgumentException, "NULL space" );
+		}
 		_space = space;
 	}
 
-	ca::ISpace* getSpace()
+	bool onSubscribed( co::Range<co::int8 const> byteData, const std::string& modelName  )
 	{
-		return _space.get();
-	}
-	
-	bool initializeData( co::Range<co::int8 const> byteData, const std::string& modelName  )
-	{
+		if( !_space.isValid() )
+		{
+			CORAL_THROW( co::IllegalStateException, "NULL space" );
+		}
+
+		ca::IModel* model = _space->getUniverse()->getModel();
+
+		if( model->getName() != modelName )
+		{
+			CORAL_THROW( co::IllegalStateException, "Space's model different from the publisher" );
+		}
+
 		std::ofstream of ( "tmp.lua" );
 
 		for( int i = 0; i < byteData.getSize(); i++ )
 		{
 			of << byteData[i];
 		}
+		
 		of.close();
-		_archiveObj->setService( "model", getModel( modelName ).get() );
+
+		_archiveObj->setService( "model", model );
 
 		_rootObject = _archive->restore();
-
-		return true;
-	}
-
-	void registerRemoteSpaceObserver( const std::string& _serverAddress, const std::string& _spacePublisherKey )
-	{
-		if( !_node.isValid() )
-		{
-			CORAL_THROW( co::IllegalStateException, "client node not set" );
-		}
-
-		if( !_space.isValid() )
-		{
-			CORAL_THROW( co::IllegalStateException, "local space not set" );
-		}
-
-		if( _spacePublisherKey.empty() || _serverAddress.empty() )
-		{
-			CORAL_THROW( co::IllegalArgumentException, "Server information not set properly" );
-		}
-
-		co::RefPtr<co::IObject> object = _node->findRemoteInstance( "flow.SpacePublisher", _spacePublisherKey, _serverAddress );
-		
-		if( !object )
-		{
-			CORAL_THROW( co::IllegalStateException, "Could not replicate space. space with key " << _spacePublisherKey << " not found on server " << _serverAddress  );
-		}
-
-		co::RefPtr<flow::ISpacePublisher> spacePublisher = object->getService<flow::ISpacePublisher>();
 
 		_space->initialize( getRootObject() );
 
 		initializeIds();
-		spacePublisher->addRemoteSpaceObserver( this );
 
+		return true;
 	}
 	
-	bool onRemoteSpaceChanged( co::Range<const flow::NewObject> newObjects, co::Range<const flow::ChangeSet> changes )
+	bool onPublish( co::Range<const flow::NewObject> newObjects, co::Range<const flow::ChangeSet> changes )
 	{
 		try
 		{
@@ -144,17 +125,6 @@ public:
 		return true;
 	}
 
-protected:
-
-	rpc::INode* getClientNodeService()
-	{
-		return _node.get();
-	}
-	
-	void setClientNodeService( rpc::INode* node )
-	{
-		_node = node;
-	}
 private:
 	void initializeIds()
 	{
@@ -173,18 +143,13 @@ private:
 
 	co::RefPtr<ca::IModel> getModel( const std::string& modelName )
 	{
-		co::IObject* modelObj = co::newInstance( "ca.Model" );
-		co::RefPtr<ca::IModel> model = modelObj->getService<ca::IModel>();
-		model->setName( modelName );
-		return model;
+		return _space->getUniverse()->getModel();
 	}
 
 private:
 	co::RefPtr<co::IObject> _rootObject;
 	co::RefPtr<ca::ISpace> _space;
 
-	co::RefPtr<rpc::INode> _node;
-	
 	co::RefPtr<ca::IArchive> _archive;
 	co::RefPtr<co::IObject> _archiveObj;
 
