@@ -1,9 +1,11 @@
 interface ISpaceSubscriber
 {
 	readonly co.IObject rootObject;
-	ca.ISpace space;
 	
-	bool initializeData( in int8[] bytes, in string modelName );
+	void setSpace( in ca.ISpace space );
 	
-	void registerRemoteSpaceObserver( in string serverAddress, in string spacePublisherKey );
+	bool subscribe( in int8[] bytes, in string modelName );
+	
+	bool onPublish( in NewObject[] newObjects, in ChangeSet[] changes );
+	
 };

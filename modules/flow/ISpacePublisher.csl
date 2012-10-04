@@ -1,11 +1,8 @@
 interface ISpacePublisher
 {
-	readonly ca.ISpace space;
+	void setSpace( in ca.ISpace space );
+
+	void addSubscriber( in ISpaceSubscriber subscriber );
 	
-	void publishSpace( in ca.ISpace space, in string key );
-	void initializeClient( in string clientAddress, in string clientKey );
-	
-	void addRemoteSpaceObserver( in IRemoteSpaceObserver observer );
-	void notifyRemoteChanges();
-	
+	void publish();
 };
