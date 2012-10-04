@@ -2,5 +2,4 @@ component SpacePublisher
 {
 	provides ISpacePublisher publisher;
 	provides ca.IGraphObserver observer;
-	receives rpc.INode serverNode;
 };

@@ -9,6 +9,7 @@
 #include <co/RefPtr.h>
 #include <co/IllegalArgumentException.h>
 #include <co/IllegalStateException.h>
+#include <co/Log.h>
 
 #include <ca/IUniverse.h>
 #include <ca/IOException.h>
@@ -17,12 +18,9 @@
 #include <ca/IArchive.h>
 #include <ca/INamed.h>
 #include <ca/IGraphChanges.h>
+
 #include <flow/ISpaceSubscriber.h>
-
-#include <rpc/INode.h>
-
 #include <flow/ChangeSet.h>
-#include <flow/IRemoteSpaceObserver.h>
 
 #include <lua/IState.h>
 
@@ -55,78 +53,35 @@ public:
 		return _space.get();
 	}
 	
-	void publishSpace( ca::ISpace* space, const std::string& key )
+	void setSpace( ca::ISpace* space )
 	{
-		if( !_node.isValid() )
-		{
-			CORAL_THROW( co::IllegalStateException, "Server RPC node not set" );
-		}
-		
 		if( space == NULL )
 		{
 			CORAL_THROW( co::IllegalArgumentException, "NULL space" );
 		}
-
-		if( key.empty() )
-		{
-			CORAL_THROW( co::IllegalArgumentException, "empty key" );
-		}
 		
 		_space = space;
-		_node->publishInstance( this, key );
 		_space->addGraphObserver( this );
 		initializeIds();
 	}
 	
-	void initializeClient( const std::string& clientAddress, const std::string& clientKey )
-	{
-
-		if( !_node.isValid() )
-		{
-			CORAL_THROW( co::IllegalStateException, "client node not set" );
-		}
-
-		if( clientKey.empty() || clientAddress.empty() )
-		{
-			CORAL_THROW( co::IllegalArgumentException, "Server information not set properly" );
-		}
-
-		co::RefPtr<co::IObject> object = _node->findRemoteInstance( "flow.SpaceSubscriber", clientKey, clientAddress );
-		
-		if( !object )
-		{
-			CORAL_THROW( co::IllegalStateException, "Could not initialize client space. space with key " << clientKey << " not found on server " << clientAddress  );
-		}
-
-		co::RefPtr<flow::ISpaceSubscriber> spaceSubscriber = object->getService<flow::ISpaceSubscriber>();
-		
-		spaceSubscriber->initializeData( getPublishedSpaceData(), _space->getUniverse()->getModel()->getName() );
-	}
-
-	co::Range<co::int8 const> getPublishedSpaceData()
+	void addSubscriber( flow::ISpaceSubscriber* subscriber )
 	{
 		if( !_space.isValid() )
 		{
-			CORAL_THROW( co::IllegalStateException, "No space published" );
+			CORAL_THROW( co::IllegalStateException, "NULL space" );
 		}
-		_archiveObj->setService( "model", _space->getModel() );
-		_archive->save( _space->getRootObject() );
-
-		std::ifstream ifs( "serverTmp.lua" );
-
-		data.assign((std::istreambuf_iterator<char>(ifs)),
-                 std::istreambuf_iterator<char>());
-		ifs.close();
-		return data;
+		subscriber->onSubscribed( getPublishedSpaceData(), _space->getUniverse()->getModel()->getName() );
+		_subscribers.push_back( subscriber );
 	}
 
-	void addRemoteSpaceObserver( flow::IRemoteSpaceObserver* observer )
+	void publish()
 	{
-		_observers.push_back( observer );
-	}
+		if( _subscribers.empty() )
+		{
+			CORAL_LOG(WARNING) << "No subscribers";
+		}
 
-	void notifyRemoteChanges()
-	{
 		if( !_space.isValid() )
 		{
 			CORAL_THROW( co::IllegalStateException, "Space was not replicated from any server" );
@@ -145,11 +100,11 @@ public:
 		co::Any args[3];
 		args[0].set<ca::ISpace*>( _space.get() );
 		args[1].setArray( co::Any::AK_RefVector, co::getType( "ca.IGraphChanges" ), 0, &_allChanges );
-		args[2].setArray( co::Any::AK_RefVector, co::getType( "flow.IRemoteSpaceObserver" ), 0, &_observers );
+		args[2].setArray( co::Any::AK_RefVector, co::getType( "flow.ISpaceSubscriber" ), 0, &_subscribers );
 		
 		co::getService<lua::IState>()->callFunction( script, function,
-		co::Range<const co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
-		results );
+			co::Range<const co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
+			results );
 		
 		_allChanges.clear();
 
@@ -162,16 +117,25 @@ protected:
 		_allChanges.push_back( changes );
 	}
 
-	void setServerNodeService( rpc::INode* node )
-	{
-		_node = node;
-	}
-	
-	rpc::INode* getServerNodeService()
-	{
-		return _node.get();
-	}
 private:
+
+	co::Range<co::int8 const> getPublishedSpaceData()
+	{
+		if( !_space.isValid() )
+		{
+			CORAL_THROW( co::IllegalStateException, "No space published" );
+		}
+		_archiveObj->setService( "model", _space->getModel() );
+		_archive->save( _space->getRootObject() );
+
+		std::ifstream ifs( "serverTmp.lua" );
+
+		data.assign((std::istreambuf_iterator<char>(ifs)),
+                 std::istreambuf_iterator<char>());
+		ifs.close();
+		return data;
+	}
+
 	void initializeIds()
 	{
 		const std::string& script = "flow.SpaceSyncServer";
@@ -188,12 +152,11 @@ private:
 	}
 private:
 	co::RefPtr<ca::ISpace> _space;
-	co::RefPtr<rpc::INode> _node;
 	co::RefPtr<ca::IArchive> _archive;
 	co::RefPtr<co::IObject> _archiveObj;
 	co::RefVector<ca::IGraphChanges> _allChanges;
 	
-	co::RefVector<flow::IRemoteSpaceObserver> _observers;
+	co::RefVector<flow::ISpaceSubscriber> _subscribers;
 	std::vector<co::int8> data;
 };
 

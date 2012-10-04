@@ -2,7 +2,7 @@
 # Build the Module RPC
 ################################################################################
 
-CORAL_GENERATE_MODULE( _GENERATED_FILES flow "ca.IArchive" "ca.ISpacePersister" "ca.INamed" "lua.IState" )
+CORAL_GENERATE_MODULE( _GENERATED_FILES flow "ca.IArchive" "ca.INamed" "lua.IState" )
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/generated )
 
@@ -15,8 +15,6 @@ SET_TARGET_PROPERTIES( flow PROPERTIES
 )
 
 CORAL_MODULE_TARGET( "flow" flow )
-
-add_dependencies( flow rpc )
 
 target_link_libraries( flow ${CORAL_LIBRARIES} )
 

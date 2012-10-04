@@ -1,6 +1,4 @@
 component SpaceSubscriber
 {
 	provides ISpaceSubscriber subscriber;
-	provides IRemoteSpaceObserver remoteObserver;
-	receives rpc.INode clientNode;
 };
