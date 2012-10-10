@@ -66,8 +66,11 @@ function processNewObjects( space, spaceChanges, newObjectsList )
 	end
 	local removedObjects = spaceChanges.removedObjects
 	for i, removed in ipairs( removedObjects ) do
-		newObjectsList[ removed ] = nil
-		getCache( space ):removeObject( removed )
+		if newObjectsList[ removed ] then
+			newObjectsList[ removed ] = nil
+		else
+			getCache( space ):removeObject( removed )
+		end
 	end
 end
 
