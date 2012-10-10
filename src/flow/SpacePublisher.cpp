@@ -45,7 +45,10 @@ public:
 
 	virtual ~SpacePublisher()
 	{
-		_space->removeGraphObserver( this );
+		if( _space.isValid() )
+		{
+			_space->removeGraphObserver( this );
+		}
 	}
 	
 	ca::ISpace* getSpace()

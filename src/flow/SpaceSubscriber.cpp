@@ -44,6 +44,8 @@ public:
 
 		_archive = _archiveObj->getService<ca::IArchive>();
 
+		ready = false;
+
 	}
 
 	virtual ~SpaceSubscriber()
@@ -63,16 +65,13 @@ public:
 			CORAL_THROW( co::IllegalArgumentException, "NULL space" );
 		}
 		_space = space;
+		initializeIds();
+
 	}
 
 	bool onSubscribed( co::Range<co::int8 const> byteData, const std::string& modelName  )
 	{
-		if( !_space.isValid() )
-		{
-			CORAL_THROW( co::IllegalStateException, "NULL space" );
-		}
-
-		ca::IModel* model = _space->getUniverse()->getModel();
+		ca::IModel* model = getModel( modelName ).get();
 
 		if( model->getName() != modelName )
 		{
@@ -92,8 +91,6 @@ public:
 
 		_rootObject = _archive->restore();
 
-		_space->initialize( getRootObject() );
-
 		initializeIds();
 
 		return true;
@@ -101,6 +98,11 @@ public:
 	
 	bool onPublish( co::Range<const flow::NewObject> newObjects, co::Range<const flow::ChangeSet> changes )
 	{
+		if( !ready )
+		{
+			return false;	
+		}
+
 		try
 		{
 			const std::string& script = "flow.SpaceSyncClient";
@@ -126,32 +128,57 @@ public:
 	}
 
 private:
+	
 	void initializeIds()
 	{
-		const std::string& script = "flow.SpaceSyncClient";
-		const std::string& function = "initializeIds";
+		if( _space.isValid() && _space->getRootObject() == NULL && _rootObject.isValid() )
+		{
+			_space->initialize( _rootObject.get() );
+		}
 
-		co::Range<const co::Any> results;
+		if( _space.isValid() && _rootObject.isValid() && _space->getRootObject() == _rootObject.get() )
+		{
+			const std::string& script = "flow.SpaceSyncClient";
+			const std::string& function = "initializeIds";
 
-		co::Any args[1];
-		args[0].set<ca::ISpace*>( _space.get() );
+			co::Range<const co::Any> results;
 
-		co::getService<lua::IState>()->callFunction( script, function,
-			co::Range<const co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
-			results );
+			co::Any args[1];
+			args[0].set<ca::ISpace*>( _space.get() );
+
+			co::getService<lua::IState>()->callFunction( script, function,
+				co::Range<const co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
+				results );
+			ready = true;
+		}
 	}
 
 	co::RefPtr<ca::IModel> getModel( const std::string& modelName )
 	{
-		return _space->getUniverse()->getModel();
+		if( _space.isValid() )
+		{
+			return _space->getUniverse()->getModel();
+		}
+		else
+		{
+			co::IObject* object = co::newInstance( "ca.Model" );
+			_model = object->getService<ca::IModel>();
+			_model->setName( modelName );
+			return _model;
+		}
+
 	}
 
 private:
 	co::RefPtr<co::IObject> _rootObject;
 	co::RefPtr<ca::ISpace> _space;
-
+	
 	co::RefPtr<ca::IArchive> _archive;
 	co::RefPtr<co::IObject> _archiveObj;
+
+	co::RefPtr<ca::IModel> _model;
+
+	bool ready;
 
 };
 

@@ -339,8 +339,6 @@ TEST_F( ReplicaTests, clientServerConfigErrorTests )
 	co::RefPtr<co::IObject> spaceSubscriberObj = co::newInstance( "flow.SpaceSubscriber" );
 	co::RefPtr<flow::ISpaceSubscriber> spaceSubscriber = spaceSubscriberObj->getService<flow::ISpaceSubscriber>();
 
-	ASSERT_THROW( spacePublisher->addSubscriber( spaceSubscriber.get() ), co::IllegalStateException ); // NULL space on subscriber
-
 	spaceSubscriber->setSpace( createLocalSpace( "otherName" ).get() );
 
 	ASSERT_THROW( spacePublisher->addSubscriber( spaceSubscriber.get() ), co::IllegalStateException ); // incompatible model names
@@ -367,10 +365,12 @@ TEST_F( ReplicaTests, clientSpacePublisherTests )
 	co::RefPtr<ca::ISpace> localSpace = createLocalSpace( "dom" );
 
 	co::RefPtr<flow::ISpaceSubscriber> spaceSubscriber = spaceSubscriberObj->getService<flow::ISpaceSubscriber>();
-	spaceSubscriber->setSpace( localSpace.get() );
+
 
 	ASSERT_NO_THROW( spacePublisher->addSubscriber( spaceSubscriber.get() ) );
+	localSpace->initialize( spaceSubscriber->getRootObject() );
 	localSpace->notifyChanges();
+	spaceSubscriber->setSpace( localSpace.get() );
 
 	// initial copy test
 	checkInitialSpace( spaceSubscriber->getRootObject() );
