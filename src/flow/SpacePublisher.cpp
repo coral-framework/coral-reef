@@ -62,6 +62,11 @@ public:
 		{
 			CORAL_THROW( co::IllegalArgumentException, "NULL space" );
 		}
+
+		if( _space.isValid() )
+		{
+			_space->removeGraphObserver( this );
+		}
 		
 		_space = space;
 		_space->addGraphObserver( this );
@@ -76,6 +81,11 @@ public:
 		}
 		subscriber->onSubscribed( getPublishedSpaceData(), _space->getUniverse()->getModel()->getName() );
 		_subscribers.push_back( subscriber );
+	}
+
+	void clearSubscribers()
+	{
+		_subscribers.clear();
 	}
 
 	void publish()

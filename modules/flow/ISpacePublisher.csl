@@ -4,5 +4,7 @@ interface ISpacePublisher
 
 	void addSubscriber( in ISpaceSubscriber subscriber );
 	
+	void clearSubscribers();
+	
 	void publish();
 };
