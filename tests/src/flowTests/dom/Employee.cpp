@@ -18,7 +18,7 @@ namespace dom {
 			// empty
 		}
 
-		const std::string& getRole()
+		std::string getRole()
 		{
 			return _role;
 		}
@@ -28,12 +28,12 @@ namespace dom {
 			_role = role;
 		}
 
-		co::Range<IProject* const> getWorking()
+		co::Range<IProject*> getWorking()
 		{
 			return _working;
 		}
 
-		void setWorking( co::Range<IProject* const> working )
+		void setWorking( co::Range<IProject*> working )
 		{
 			co::assign( working, _working );
 		}
@@ -41,7 +41,7 @@ namespace dom {
 		IProject* getLeading() { return _leading.get(); }
 		void setLeading( IProject* leading ) { _leading = leading; }
 
-		const std::string& getName() { return _name; }
+		std::string getName() { return _name; }
 		void setName( const std::string& name ) { _name = name; }
 
 		co::int32 getSalary() { return _salary; }
