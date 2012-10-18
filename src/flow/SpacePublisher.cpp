@@ -108,15 +108,15 @@ public:
 		const std::string& script = "flow.SpaceSyncServer";
 		const std::string& function = "processAllSpaceChanges";
 
-		co::Range<const co::Any> results;
+		co::Range<co::Any> results;
 
 		co::Any args[3];
-		args[0].set<ca::ISpace*>( _space.get() );
-		args[1].setArray( co::Any::AK_RefVector, co::getType( "ca.IGraphChanges" ), 0, &_allChanges );
-		args[2].setArray( co::Any::AK_RefVector, co::getType( "flow.ISpaceSubscriber" ), 0, &_subscribers );
+		args[0] = _space.get();
+		args[1] = co::Any( _allChanges ).asIn();
+		args[2] = co::Any( _subscribers ).asIn();
 		
-		co::getService<lua::IState>()->callFunction( script, function,
-			co::Range<const co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
+		co::getService<lua::IState>()->call( script, function,
+			co::Range<co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
 			results );
 		
 		_allChanges.clear();
@@ -132,7 +132,7 @@ protected:
 
 private:
 
-	co::Range<co::int8 const> getPublishedSpaceData()
+	co::Range<co::int8> getPublishedSpaceData()
 	{
 		if( !_space.isValid() )
 		{
@@ -154,13 +154,13 @@ private:
 		const std::string& script = "flow.SpaceSyncServer";
 		const std::string& function = "initializeIds";
 
-		co::Range<const co::Any> results;
+		co::Range<co::Any> results;
 
 		co::Any args[1];
-		args[0].set<ca::ISpace*>( _space.get() );
+		args[0] = _space.get();
 
-		co::getService<lua::IState>()->callFunction( script, function,
-			co::Range<const co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
+		co::getService<lua::IState>()->call( script, function,
+			co::Range<co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
 			results );
 	}
 private:

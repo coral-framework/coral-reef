@@ -19,18 +19,18 @@ namespace dom {
 			// empty
 		}
 
-		const std::string& getName() { return _name; }
+		std::string getName() { return _name; }
 		void setName( const std::string& name ) { _name = name; }
 
 		double getValue() { return _earnings; }
 		void setValue( double earnings ) { _earnings = earnings; }
 
-		co::Range<IEmployee* const> getDevelopers()
+		co::Range<IEmployee*> getDevelopers()
 		{
 			return _developers;
 		}
 
-		void setDevelopers( co::Range<IEmployee* const> developers )
+		void setDevelopers( co::Range<IEmployee*> developers )
 		{
 			co::assign( developers, _developers );
 		}

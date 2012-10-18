@@ -1,7 +1,7 @@
 
 project( replicaTests )
 
-CORAL_GENERATE_MAPPINGS( _GENERATED_MAPPINGS "stubs.ITestSetup" "dom.IEmployee" "dom.IProduct" 
+CORAL_GENERATE_MAPPINGS( _GENERATED_MAPPINGS "dom.IEmployee" "dom.IProduct" 
 "dom.IService" "dom.ICompany")
 
 # set the tests 'module' dir as the CORAL_PATH along with the CORAL_ROOT
@@ -37,7 +37,7 @@ file( GLOB _SOURCES CompanySpace.cpp LocalSpaceObserver.cpp Main.cpp )
 
 # Create test executable
 add_executable( replicaTests EXCLUDE_FROM_ALL ${_TESTS} ${_HEADERS} ${_SOURCES} ${_GENERATED_MAPPINGS} )
-add_dependencies( replicaTests dom stubs rpc flow)
+add_dependencies( replicaTests dom flow)
 
 CORAL_TARGET( replicaTests )
 

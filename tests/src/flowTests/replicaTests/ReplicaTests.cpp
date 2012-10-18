@@ -51,7 +51,7 @@ public:
 		dom::ICompany* company = objRest->getService<dom::ICompany>();
 		ASSERT_TRUE( company != NULL );
 
-		co::Range<dom::IEmployee* const> employees = company->getEmployees();
+		co::Range<dom::IEmployee*> employees = company->getEmployees();
 		ASSERT_EQ( 5, employees.getSize() );
 	
 		EXPECT_EQ( "Joseph Java Newbie", employees[0]->getName() );
@@ -114,7 +114,7 @@ public:
 		co::IObject*  root = space->getRootObject();
 		dom::ICompany* company = root->getService<dom::ICompany>();
 
-		co::Range<dom::IEmployee* const> employees = company->getEmployees();
+		co::Range<dom::IEmployee*> employees = company->getEmployees();
 
 		//employees[0]->setName( "Joseph Java Newbie JR." ); //change without notify
 
@@ -178,7 +178,7 @@ public:
 		dom::ICompany* company = objRest->getService<dom::ICompany>();
 		ASSERT_TRUE( company != NULL );
 
-		co::Range<dom::IEmployee* const> employees = company->getEmployees();
+		co::Range<dom::IEmployee*> employees = company->getEmployees();
 		ASSERT_EQ( 4, employees.getSize() );
 	
 		EXPECT_EQ( "Joseph Java Newbie", employees[0]->getName() );
@@ -244,7 +244,7 @@ public:
 		co::IObject*  root = space->getRootObject();
 		dom::ICompany* company = root->getService<dom::ICompany>();
 
-		co::Range<dom::IEmployee* const> employees = company->getEmployees();
+		co::Range<dom::IEmployee*> employees = company->getEmployees();
 
 		std::vector<dom::IEmployee*> changedEmployess;
 		dom::IEmployee* removedEmployee = employees[0];
@@ -271,12 +271,14 @@ public:
 		
 		co::IField* field = co::cast<co::IField>( service->getInterface()->getMember( "name" ) );
 
-		co::Any value;
+		std::string name;
+
+		co::Any value( name );
 		if( field != NULL )
 		{
 			field->getOwner()->getReflector()->getField( service, field, value );
 
-			return value.get<const std::string&>();
+			return name;
 		}
 		return "no field name";
 
@@ -298,7 +300,7 @@ public:
 
 	// name should identify the objects in this specific case, cause our case test doesn't have name conflicts and, except for the Company, all objects has a name.
 
-	void compareAllNames( co::Range<co::IObject* const> rangeOne, co::Range<co::IObject* const> rangeAnother )
+	void compareAllNames( co::Range<co::IObject*> rangeOne, co::Range<co::IObject*> rangeAnother )
 	{
 		for( int i = 0; i < rangeOne.getSize(); i++ )
 		{

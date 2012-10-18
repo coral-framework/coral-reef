@@ -69,7 +69,7 @@ public:
 
 	}
 
-	bool onSubscribed( co::Range<co::int8 const> byteData, const std::string& modelName  )
+	bool onSubscribed(  co::Range<co::int8> bytes, const std::string& modelName  )
 	{
 		ca::IModel* model = getModel( modelName ).get();
 
@@ -80,9 +80,9 @@ public:
 
 		std::ofstream of ( "tmp.lua" );
 
-		for( int i = 0; i < byteData.getSize(); i++ )
+		for( int i = 0; i < bytes.getSize(); i++ )
 		{
-			of << byteData[i];
+			of << bytes[i];
 		}
 		
 		of.close();
@@ -96,7 +96,7 @@ public:
 		return true;
 	}
 	
-	bool onPublish( co::Range<const flow::NewObject> newObjects, co::Range<const flow::ChangeSet> changes )
+	bool onPublish( co::Range<flow::NewObject> newObjects, co::Range<flow::ChangeSet> changes )
 	{
 		if( !ready )
 		{
@@ -108,15 +108,15 @@ public:
 			const std::string& script = "flow.SpaceSyncClient";
 			const std::string& function = "applyReceivedChanges";
 		
-			co::Range<const co::Any> results;
+			co::Range<co::Any> results;
 
 			co::Any args[3];
-			args[0].set<ca::ISpace*>( _space.get() );
-			args[1].setArray(co::Any::AK_Range, co::typeOf<flow::NewObject>::get(), 0, ( (void*)newObjects.getStart() ), newObjects.getSize() );
-			args[2].setArray(co::Any::AK_Range, co::typeOf<flow::ChangeSet>::get(), 0, ( (void*)changes.getStart() ), changes.getSize() );
+			args[0] = _space.get();
+			args[1] = newObjects;
+			args[2] = changes;
 
-			co::getService<lua::IState>()->callFunction( script, function,
-				co::Range<const co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
+			co::getService<lua::IState>()->call( script, function,
+				args,
 				results );
 		}
 		catch( std::exception& e )
@@ -141,13 +141,13 @@ private:
 			const std::string& script = "flow.SpaceSyncClient";
 			const std::string& function = "initializeIds";
 
-			co::Range<const co::Any> results;
+			co::Range<co::Any> results;
 
 			co::Any args[1];
-			args[0].set<ca::ISpace*>( _space.get() );
+			args[0] = _space.get();
 
-			co::getService<lua::IState>()->callFunction( script, function,
-				co::Range<const co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
+			co::getService<lua::IState>()->call( script, function,
+				args,
 				results );
 			ready = true;
 		}
