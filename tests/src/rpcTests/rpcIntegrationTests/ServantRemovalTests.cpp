@@ -120,4 +120,34 @@ TEST( InvokerRemovalTests, repeatedReferenceTest )
     setup->tearDown();
 }
 
+TEST( InvokerRemovalTests, unpublishingTests )
+{
+    co::RefPtr<co::IObject> testSetup = co::newInstance( "stubs.TestSetup" );
+    stubs::ITestSetup* setup = testSetup->getService<stubs::ITestSetup>();
+    setup->initTest( 2 );
+    
+    rpc::INode* hostA = setup->getNode( 1 );
+    rpc::INode* hostB = setup->getNode( 2 );
+    
+    co::RefPtr<co::IObject> obj = co::newInstance( "stubs.TestComponent" );
+    hostA->publishInstance( obj.get(), "key" );
+    
+    co::RefPtr<stubs::ISimpleTypes> st = hostB->findRemoteInstance( "stubs.TestComponent", "key", 
+                                                "address1" )->getService<stubs::ISimpleTypes>();
+    
+    EXPECT_EQ( hostA->getInstanceNumLeases( 0 ), 2 );
+    
+    EXPECT_EQ( st->incrementInt( 1 ), 2 );
+    
+    hostA->unpublishInstance( "key" );
+    
+    EXPECT_EQ( st->incrementInt( 1 ), 2 );
+    
+    EXPECT_EQ( hostA->getInstanceNumLeases( 0 ), 1 );
+    
+    st = 0;
+    
+    EXPECT_EQ( hostA->getInstanceNumLeases( 0 ), 0 );
+}
+    
 } // namespace rpc
