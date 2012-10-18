@@ -112,8 +112,8 @@ public:
 
 		co::Any args[3];
 		args[0] = _space.get();
-		args[1] = co::Any( _allChanges ).asIn();
-		args[2] = co::Any( _subscribers ).asIn();
+		args[1] = co::Range<ca::IGraphChanges*>( _allChanges );
+		args[2] = co::Range<flow::ISpaceSubscriber*>( _subscribers );
 		
 		co::getService<lua::IState>()->call( script, function,
 			co::Range<co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
