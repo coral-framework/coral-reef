@@ -79,14 +79,6 @@ TEST( CodecTests, simpleTypesTest )
     EXPECT_STREQ( requester.c_str(), STRING1 );
     EXPECT_EQ( leaseInstanceID, INT1 );
     
-    marshaller.marshalCancelLease( STRING1, INT2, msg );
-    msgType = demarshaller.demarshal( msg );
-    demarshaller.getLease( requester, leaseInstanceID );
-    
-    EXPECT_EQ( msgType, REQUEST_CANCEL_LEASE );
-    EXPECT_STREQ( requester.c_str(), STRING1 );
-    EXPECT_EQ( leaseInstanceID, INT2 );
-    
     // ------ call value types TODO:Complex types
     
     // all the possible parameter types

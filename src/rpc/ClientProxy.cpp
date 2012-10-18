@@ -35,8 +35,6 @@ ClientProxy::~ClientProxy()
     }
     delete [] _interfaces;
     delete [] _facets;
-    
-    _requestor->requestCancelLease( _instanceID );
 }
     
 void ClientProxy::setComponent( co::IComponent* component )

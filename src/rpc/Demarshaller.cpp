@@ -396,13 +396,6 @@ MessageType Demarshaller::demarshal( inString data )
             
             break;
         }
-        case Message::REQUEST_CANCEL_LEASE:
-        {
-            if( _message->has_request() )
-                _msgType = REQUEST_CANCEL_LEASE;
-            
-            break;
-        }
         case Message::EXCEPTION:
         {
             if( _message->has_exception() )
@@ -465,7 +458,7 @@ void Demarshaller::getLookup( outString requesterEndpoint, outString lookupKey, 
     
 void Demarshaller::getLease( outString requesterEndpoint, co::int32& leaseInstanceID )
 {
-    assert( _msgType == REQUEST_LEASE || _msgType == REQUEST_CANCEL_LEASE );
+    assert( _msgType == REQUEST_LEASE );
     
     requesterEndpoint = _message->requester_endpoint();
     
@@ -476,12 +469,7 @@ void Demarshaller::getLease( outString requesterEndpoint, co::int32& leaseInstan
     
     leaseInstanceID = request.lease_instance_id();
 }
-   
-void Demarshaller::getCancelLease( outString requesterEndpoint, co::int32& leaseInstanceID )
-{
-    getLease( requesterEndpoint, leaseInstanceID );
-}
-    
+       
 /* 
  Starts a decoding state of call/field msg. 
  The decoding state will only be reset after all params are decoded.

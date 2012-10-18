@@ -23,7 +23,6 @@ enum MessageType
     REQUEST_NEW,
     REQUEST_LOOKUP,
     REQUEST_LEASE,
-    REQUEST_CANCEL_LEASE,
     EXCEPTION,
     BARRIER_UP,
     BARRIER_HIT,
@@ -66,7 +65,6 @@ public:
     void getNew( outString requesterEndpoint, outString instanceType );
     void getLookup( outString requesterEndpoint, outString lookupKey, outString instanceType );
     void getLease( outString requesterEndpoint, co::int32& leaseInstanceID );
-    void getCancelLease( outString requesterEndpoint, co::int32& leaseInstanceID );
     
     // If message type is Invocation, then this method gets the parameters
     ParameterPuller& getInvocation( outString requesterEndpoint, InvocationDetails& details );

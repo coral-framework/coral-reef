@@ -8,12 +8,11 @@ message Message
 		REQUEST_NEW = 1;
 		REQUEST_LOOKUP = 2;
 		REQUEST_LEASE = 3;
-		REQUEST_CANCEL_LEASE = 4;
-		RETURN = 5;
-		EXCEPTION = 6;
-		BARRIER_UP = 7;
-		BARRIER_HIT = 8;
-		BARRIER_DOWN = 9;
+		RETURN = 4;
+		EXCEPTION = 5;
+		BARRIER_UP = 6;
+		BARRIER_HIT = 7;
+		BARRIER_DOWN = 8;
 	}
 	
 	optional string requester_endpoint = 1;

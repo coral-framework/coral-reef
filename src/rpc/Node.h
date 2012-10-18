@@ -49,8 +49,6 @@ public:
 
 	co::IObject* getInstance( co::int32 instanceId );
     
-    co::int32 getInstanceNumLeases( co::int32 instanceId );
-    
 	co::int32 publishInstance( co::IObject* instance, const std::string& key );
     
     void unpublishInstance( const std::string& key );

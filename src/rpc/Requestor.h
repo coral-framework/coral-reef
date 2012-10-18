@@ -72,35 +72,7 @@ public:
     
     void requestGetField( MemberOwner& owner, co::IField* field, co::Any& ret );
     
-    /* 
-    Sends a lease request to the destination node (lessor) of this requestor. 
-    A lease request means that \param lessee node is going to start accessing lessor's public
-    instance of \param instanceID id. So the lessor needs to increase its reference count in
-    case \param lessee node does not already have a lease for the instance.
-    
-    One node requesting a lease for another may seem awkward but is necessary to avoid 
-    inconsistency. A small explanation of the problem follows:
-     
-     The case is when A pass a reference parameter R to B, and that reference is to an object in C.
-     Therefore, C needs to increment R's refcounting before A sends R to B, else there could be an
-     inconsistent state if A removed its reference to R before B got the chance to increase it, C
-     would delete the object and B would get an invalid reference. 
-     Moreover, this request is always issued by A to C and not by B to C, as it should intuitively be.
-     However, B's ip is the one passed as \param lessee.
-     
-     \param instanceID the id of the instance whose lease for is required
-     \param lessee the endpoint of the node that needs the lease.
-     */
     void requestLease( co::int32 instanceID, std::string lessee );
-    
-    /*! 
-     Informs the lessor that this node (lessee) is not accessing to the instance anymore 
-     (decrease instance's ref count). Notice that this method does not require a lessee to be
-     provided as a parameter as opposed to requestLease. The reason is that a "lease cancellation" 
-     request is always issued by the lessee. Whereas in a "lease creation", the accessor may not be 
-     the one issuing the request. 
-     */
-    void requestCancelLease( co::int32 instanceID );
     
     void requestBarrierUp();
     

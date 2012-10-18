@@ -181,22 +181,6 @@ void Requestor::requestLease( co::int32 instanceID, std::string lessee )
     marshaller.marshalLease( lessee, instanceID, msg );
     _handler->handleAsynchRequest( msg );
 }
-
-void Requestor::requestCancelLease( co::int32 instanceID )
-{
-    if( !_connected )
-    {
-        CORAL_LOG( WARNING ) << "Proxy request a lease cancelling with node stopped. Ideally the proxies should  be deleted before stopping the node.";
-        return;
-    }
-        
-    std::string msg;
-    _marshaller.marshalCancelLease( _publicEndpoint, instanceID, msg );
-    _handler->handleAsynchRequest( msg );
-    
-    size_t result = _proxies.erase( instanceID );
-    assert( result );
-}
     
 void Requestor::requestBarrierUp()
 {

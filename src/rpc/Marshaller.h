@@ -100,7 +100,6 @@ public:
     void marshalLookup( inString requesterEndpoint, inString lookupKey, inString instanceType,
                        outString msg );
     void marshalLease( inString requesterEndpoint, co::int32 leaseInstanceID, outString msg );
-    void marshalCancelLease( inString requesterEndpoint, co::int32 leaseInstanceID, outString msg );
     
     // Invocations for actual instances
     ParameterPusher& beginInvocation( inString requesterEndpoint, InvocationDetails details );

@@ -325,24 +325,8 @@ void Marshaller::marshalLease( inString requesterEndpoint, co::int32 leaseInstan
     _message->SerializeToString( &msg );
     _message->Clear();
 }
-
-void Marshaller::marshalCancelLease( inString requesterEndpoint, co::int32 leaseInstanceID, 
-                                    outString msg )
-{
-    assert( _msgClear );
-    
-    _message->set_requester_endpoint( requesterEndpoint );
-    _message->set_type( Message::REQUEST_CANCEL_LEASE );
-    
-    Request* request = _message->mutable_request();
-    request->set_lease_instance_id( leaseInstanceID );
-    
-    _message->SerializeToString( &msg );
-    _message->Clear();
-}
     
 ParameterPusher& Marshaller::beginInvocation( inString requesterEndpoint, InvocationDetails details )
-                                                   
 {   
     assert( _msgClear );
     

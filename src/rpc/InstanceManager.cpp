@@ -1,6 +1,5 @@
 #include "InstanceManager.h"
 
-#include "LeaseManager.h"
 #include "InstanceContainer.h"
 
 #include <rpc/RemotingException.h>
@@ -15,7 +14,6 @@ namespace rpc {
 
 InstanceManager::InstanceManager()
 {
-    _leaseMan = new LeaseManager();
 }
 
 InstanceManager::~InstanceManager()
@@ -28,17 +26,13 @@ InstanceManager::~InstanceManager()
 		if( it == _freedIds.end() )
 			delete _instances[i];
     }
-
-    delete _leaseMan;
 }
     
 co::int32 InstanceManager::publishInstance( co::IObject* instance, const std::string& key )
 {
     co::int32 instanceID = newID();
     _instances[instanceID] = new InstanceContainer( instance );
-    
-    createLease( instanceID, "self" );
-    
+
     _published.insert( std::pair<std::string, co::int32>( key, instanceID ) );
     
     return instanceID;
@@ -50,7 +44,7 @@ void InstanceManager::unpublishInstance( const std::string& key )
     
     assert( it != _published.end() );
     
-    cancelLease( it->second, "self" );
+    releaseInstance( it->second );
 }
 
 co::int32 InstanceManager::findInstance( const std::string& key, const std::string& instanceType,
@@ -69,8 +63,6 @@ co::int32 InstanceManager::findInstance( const std::string& key, const std::stri
         CORAL_THROW( RemotingException, "Published instance type " << component->getFullName() 
         << " differs from requested type " << instanceType );
     
-    createLease( it->second, lesseeEndpoint );
-    
     return it->second;
 }
 
@@ -79,22 +71,7 @@ co::int32 InstanceManager::addInstance( co::IObject* instance, const std::string
     co::int32 instanceID = newID();
     _instances[instanceID] = new InstanceContainer( instance );
     
-    _leaseMan->addLease( instanceID, lesseeEndpoint );
-    
     return instanceID;
-}
-
-void InstanceManager::createLease( co::int32 instanceID, const std::string& lesseeEndpoint )
-{
-    _leaseMan->addLease( instanceID, lesseeEndpoint );
-}
-
-void InstanceManager::cancelLease( co::int32 instanceID, const std::string& lesseeEndpoint )
-{
-    if( _leaseMan->removeLease( instanceID, lesseeEndpoint ) )
-    {
-        releaseInstance( instanceID );
-    }
 }
  
 InstanceContainer* InstanceManager::getInstance( co::int32 instanceID )
@@ -106,11 +83,6 @@ InstanceContainer* InstanceManager::getInstance( co::int32 instanceID )
         return _instances[instanceID]; 
     
     return 0;
-}
-    
-co::int32 InstanceManager::getInstanceNumLeases( co::int32 instanceID )
-{ 
-    return _leaseMan->numLeases( instanceID ); 
 }
     
 co::int32 InstanceManager::newID()

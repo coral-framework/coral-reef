@@ -283,40 +283,39 @@ void protobuf_AddDesc_Message_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\rMessage.proto\022\003rpc\"\232\003\n\007Message\022\032\n\022requ"
+    "\n\rMessage.proto\022\003rpc\"\200\003\n\007Message\022\032\n\022requ"
     "ester_endpoint\030\001 \001(\t\022\037\n\004type\030\002 \002(\0162\021.rpc"
     ".Message.Type\022#\n\ninvocation\030\003 \001(\0132\017.rpc."
     "Invocation\022\035\n\007request\030\004 \001(\0132\014.rpc.Reques"
     "t\022!\n\tret_value\030\005 \001(\0132\016.rpc.Parameter\022\017\n\007"
     "ret_int\030\006 \001(\005\022!\n\texception\030\007 \001(\0132\016.rpc.E"
-    "xception\"\266\001\n\004Type\022\016\n\nINVOCATION\020\000\022\017\n\013REQ"
+    "xception\"\234\001\n\004Type\022\016\n\nINVOCATION\020\000\022\017\n\013REQ"
     "UEST_NEW\020\001\022\022\n\016REQUEST_LOOKUP\020\002\022\021\n\rREQUES"
-    "T_LEASE\020\003\022\030\n\024REQUEST_CANCEL_LEASE\020\004\022\n\n\006R"
-    "ETURN\020\005\022\r\n\tEXCEPTION\020\006\022\016\n\nBARRIER_UP\020\007\022\017"
-    "\n\013BARRIER_HIT\020\010\022\020\n\014BARRIER_DOWN\020\t\"O\n\007Req"
-    "uest\022\025\n\rinstance_type\030\002 \001(\t\022\022\n\nlookup_ke"
-    "y\030\003 \001(\t\022\031\n\021lease_instance_id\030\004 \001(\r\"\206\001\n\tE"
-    "xception\022!\n\004type\030\001 \002(\0162\023.rpc.Exception.T"
-    "ype\022\021\n\ttype_name\030\002 \002(\t\022\014\n\004what\030\003 \002(\t\"5\n\004"
-    "Type\022\t\n\005CORAL\020\000\022\014\n\010REMOTING\020\001\022\007\n\003STD\020\002\022\013"
-    "\n\007UNKNOWN\020\003\"\213\001\n\nInvocation\022\023\n\013instance_i"
-    "d\030\001 \002(\r\022\021\n\tfacet_idx\030\002 \002(\r\022\022\n\nmember_idx"
-    "\030\003 \002(\r\022\022\n\ntype_depth\030\004 \002(\005\022\r\n\005synch\030\005 \002("
-    "\010\022\036\n\006params\030\006 \003(\0132\016.rpc.Parameter\".\n\tPar"
-    "ameter\022!\n\tcontainer\030\001 \003(\0132\016.rpc.Containe"
-    "r\"\245\001\n\tContainer\022\017\n\007boolean\030\001 \001(\010\022\013\n\003str\030"
-    "\002 \001(\t\022\017\n\007numeric\030\003 \001(\001\022\'\n\014complex_type\030\004"
-    " \001(\0132\021.rpc.Complex_Type\022\037\n\010any_type\030\005 \001("
-    "\0132\r.rpc.Any_Type\022\037\n\010ref_type\030\006 \001(\0132\r.rpc"
-    ".Ref_Type\"E\n\010Any_Type\022\014\n\004kind\030\001 \002(\005\022\014\n\004t"
-    "ype\030\002 \001(\t\022\035\n\005param\030\003 \001(\0132\016.rpc.Parameter"
-    "\"-\n\014Complex_Type\022\035\n\005field\030\001 \003(\0132\016.rpc.Pa"
-    "rameter\"\307\001\n\010Ref_Type\022\"\n\005owner\030\001 \002(\0162\023.rp"
-    "c.Ref_Type.Owner\022\023\n\013instance_id\030\002 \002(\r\022\021\n"
-    "\tfacet_idx\030\003 \002(\r\022\025\n\rinstance_type\030\004 \001(\t\022"
-    "\026\n\016owner_endpoint\030\005 \001(\t\"@\n\005Owner\022\020\n\014OWNE"
-    "R_SENDER\020\000\022\022\n\016OWNER_RECEIVER\020\001\022\021\n\rOWNER_"
-    "ANOTHER\020\002", 1329);
+    "T_LEASE\020\003\022\n\n\006RETURN\020\004\022\r\n\tEXCEPTION\020\005\022\016\n\n"
+    "BARRIER_UP\020\006\022\017\n\013BARRIER_HIT\020\007\022\020\n\014BARRIER"
+    "_DOWN\020\010\"O\n\007Request\022\025\n\rinstance_type\030\002 \001("
+    "\t\022\022\n\nlookup_key\030\003 \001(\t\022\031\n\021lease_instance_"
+    "id\030\004 \001(\r\"\206\001\n\tException\022!\n\004type\030\001 \002(\0162\023.r"
+    "pc.Exception.Type\022\021\n\ttype_name\030\002 \002(\t\022\014\n\004"
+    "what\030\003 \002(\t\"5\n\004Type\022\t\n\005CORAL\020\000\022\014\n\010REMOTIN"
+    "G\020\001\022\007\n\003STD\020\002\022\013\n\007UNKNOWN\020\003\"\213\001\n\nInvocation"
+    "\022\023\n\013instance_id\030\001 \002(\r\022\021\n\tfacet_idx\030\002 \002(\r"
+    "\022\022\n\nmember_idx\030\003 \002(\r\022\022\n\ntype_depth\030\004 \002(\005"
+    "\022\r\n\005synch\030\005 \002(\010\022\036\n\006params\030\006 \003(\0132\016.rpc.Pa"
+    "rameter\".\n\tParameter\022!\n\tcontainer\030\001 \003(\0132"
+    "\016.rpc.Container\"\245\001\n\tContainer\022\017\n\007boolean"
+    "\030\001 \001(\010\022\013\n\003str\030\002 \001(\t\022\017\n\007numeric\030\003 \001(\001\022\'\n\014"
+    "complex_type\030\004 \001(\0132\021.rpc.Complex_Type\022\037\n"
+    "\010any_type\030\005 \001(\0132\r.rpc.Any_Type\022\037\n\010ref_ty"
+    "pe\030\006 \001(\0132\r.rpc.Ref_Type\"E\n\010Any_Type\022\014\n\004k"
+    "ind\030\001 \002(\005\022\014\n\004type\030\002 \001(\t\022\035\n\005param\030\003 \001(\0132\016"
+    ".rpc.Parameter\"-\n\014Complex_Type\022\035\n\005field\030"
+    "\001 \003(\0132\016.rpc.Parameter\"\307\001\n\010Ref_Type\022\"\n\005ow"
+    "ner\030\001 \002(\0162\023.rpc.Ref_Type.Owner\022\023\n\013instan"
+    "ce_id\030\002 \002(\r\022\021\n\tfacet_idx\030\003 \002(\r\022\025\n\rinstan"
+    "ce_type\030\004 \001(\t\022\026\n\016owner_endpoint\030\005 \001(\t\"@\n"
+    "\005Owner\022\020\n\014OWNER_SENDER\020\000\022\022\n\016OWNER_RECEIV"
+    "ER\020\001\022\021\n\rOWNER_ANOTHER\020\002", 1303);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "Message.proto", &protobuf_RegisterTypes);
   Message::default_instance_ = new Message();
@@ -365,7 +364,6 @@ bool Message_Type_IsValid(int value) {
     case 6:
     case 7:
     case 8:
-    case 9:
       return true;
     default:
       return false;
@@ -377,7 +375,6 @@ const Message_Type Message::INVOCATION;
 const Message_Type Message::REQUEST_NEW;
 const Message_Type Message::REQUEST_LOOKUP;
 const Message_Type Message::REQUEST_LEASE;
-const Message_Type Message::REQUEST_CANCEL_LEASE;
 const Message_Type Message::RETURN;
 const Message_Type Message::EXCEPTION;
 const Message_Type Message::BARRIER_UP;

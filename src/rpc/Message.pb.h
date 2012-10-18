@@ -47,12 +47,11 @@ enum Message_Type {
   Message_Type_REQUEST_NEW = 1,
   Message_Type_REQUEST_LOOKUP = 2,
   Message_Type_REQUEST_LEASE = 3,
-  Message_Type_REQUEST_CANCEL_LEASE = 4,
-  Message_Type_RETURN = 5,
-  Message_Type_EXCEPTION = 6,
-  Message_Type_BARRIER_UP = 7,
-  Message_Type_BARRIER_HIT = 8,
-  Message_Type_BARRIER_DOWN = 9
+  Message_Type_RETURN = 4,
+  Message_Type_EXCEPTION = 5,
+  Message_Type_BARRIER_UP = 6,
+  Message_Type_BARRIER_HIT = 7,
+  Message_Type_BARRIER_DOWN = 8
 };
 bool Message_Type_IsValid(int value);
 const Message_Type Message_Type_Type_MIN = Message_Type_INVOCATION;
@@ -169,7 +168,6 @@ class Message : public ::google::protobuf::Message {
   static const Type REQUEST_NEW = Message_Type_REQUEST_NEW;
   static const Type REQUEST_LOOKUP = Message_Type_REQUEST_LOOKUP;
   static const Type REQUEST_LEASE = Message_Type_REQUEST_LEASE;
-  static const Type REQUEST_CANCEL_LEASE = Message_Type_REQUEST_CANCEL_LEASE;
   static const Type RETURN = Message_Type_RETURN;
   static const Type EXCEPTION = Message_Type_EXCEPTION;
   static const Type BARRIER_UP = Message_Type_BARRIER_UP;

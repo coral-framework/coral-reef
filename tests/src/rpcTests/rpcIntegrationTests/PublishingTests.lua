@@ -38,23 +38,11 @@ function publishTest()
 	-- Checks if the function returns the correct instance
 	EXPECT_EQ( server:getInstance( 0 ), instanceTC )
 	
-	-- Checks if clientA and clientB are referers
-	local references = server:getInstanceNumLeases( 0 )
-	EXPECT_EQ( references, 3 )
-	
-	-- Checks if returns 0 in case of an invalid id
-	references = server:getInstanceNumLeases( 2 )
-	EXPECT_EQ( references, 0 )
-	
 	-- Checks if a remotely created instance is accessible locally
 	local newInstProxy = clientA:newRemoteInstance( "stubs.TestComponent", "address3" )
 	newInstProxy.simple.storedInt = 8
 	local newInst = server:getInstance( 1 )
 	EXPECT_EQ( newInst.simple.storedInt, 8 )
-	
-	-- Checks if clientA is referer
-	references = server:getInstanceNumLeases( 1 )
-	EXPECT_EQ( references, 1 )
 	
 	-- Checks if the ID counting is correct
 	clientB:newRemoteInstance( "stubs.TestComponent", "address3" )
@@ -64,10 +52,6 @@ function publishTest()
 	newInstProxy.simple.storedInt = 9
 	newInst = server:getInstance( 5 )
 	EXPECT_EQ( newInst.simple.storedInt, 9 )
-	
-	-- Checks if clientA is referer
-	references = server:getInstanceNumLeases( 5 )
-	EXPECT_EQ( references, 1 )
 	
 	setup:tearDown()
 end

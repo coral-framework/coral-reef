@@ -129,21 +129,7 @@ void Invoker::invokeManagement( Demarshaller& demarshaller, MessageType msgType,
             if( !_instanceMan->getInstance( instanceID ) )
                 CORAL_THROW( RemotingException, "No such instance of id: " << instanceID );
             
-            _instanceMan->createLease( instanceID, requesterEndpoint );
-            return;
-        }
-        case REQUEST_CANCEL_LEASE:
-        {
-            co::int32 instanceID;
-            
-            _demarshaller.getLease( requesterEndpoint, instanceID );
-            
-            CORAL_DLOG( INFO ) << "Received request for cancel lease to " << instanceID << " from: " << requesterEndpoint;
-            
-            if( !_instanceMan->getInstance( instanceID ) )
-                CORAL_THROW( RemotingException, "No such instance of id: " << instanceID );
-            
-            _instanceMan->cancelLease( instanceID, requesterEndpoint );
+            //TODO implement the leasing system.
             return;
         }
         case BARRIER_UP:

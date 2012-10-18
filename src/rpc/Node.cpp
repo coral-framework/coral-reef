@@ -104,11 +104,6 @@ co::IObject* Node::getInstance( co::int32 instanceId )
 {
     return _instanceMan->getInstance( instanceId )->getInstance();
 }
-
-co::int32 Node::getInstanceNumLeases( co::int32 instanceId )
-{
-    return _instanceMan->getInstanceNumLeases( instanceId );
-}
  
 co::int32 Node::publishInstance( co::IObject* instance, const std::string& key )
 {
