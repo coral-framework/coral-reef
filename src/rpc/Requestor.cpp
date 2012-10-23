@@ -111,7 +111,7 @@ void Requestor::requestAsynchCall( MemberOwner& owner, co::IMethod* method,
 }
 
 void Requestor::requestSynchCall( MemberOwner& owner, co::IMethod* method, 
-                                           co::Range<co::Any const> args, co::Any& ret  )
+                                           co::Range<co::Any> args, co::Any& ret  )
 {
     if( !_connected )
         CORAL_THROW( RemotingException, "Trying to request with the node stopped");
@@ -155,7 +155,7 @@ void Requestor::requestSetField( MemberOwner& owner, co::IField* field, const co
     _handler->handleAsynchRequest( msg );
 }
     
-void Requestor::requestGetField( MemberOwner& owner, co::IField* field, co::Any& ret )
+void Requestor::requestGetField( MemberOwner& owner, co::IField* field, const co::Any& ret )
 {
     if( !_connected )
         CORAL_THROW( RemotingException, "Trying to request with the node stopped");
@@ -284,7 +284,7 @@ void Requestor::getProviderInfo( co::IService* param, ReferenceType& refType )
     }
 }
 
-void Requestor::getReturn( const std::string& data, co::IType* returnedType, co::Any& ret )
+void Requestor::getReturn( const std::string& data, co::IType* returnedType, const co::Any& ret )
 {
     MessageType type = _demarshaller.demarshal( data );
     

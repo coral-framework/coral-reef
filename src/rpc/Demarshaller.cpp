@@ -1,7 +1,6 @@
 #include "Demarshaller.h"
 
 #include "Message.pb.h"
-#include "AnyArrayUtil.h"
 
 #include <co/IField.h>
 #include <co/IMethod.h>
@@ -27,12 +26,12 @@ static T getPBContainerData( const Container& container )
 
 // ------------- get and set functions specialization for string and bool ----------- //
 template <>
-const std::string& getPBContainerData<const std::string&>( const Container& container )
+std::string getPBContainerData<std::string>( const Container& container )
 {
     if( !container.has_str() )
         throw std::string( "No string data in parameter" );
     
-    return container.str();
+    return std::string( container.str() );
 }
 
 template <>
@@ -46,11 +45,14 @@ bool getPBContainerData<bool>( const Container& container )
     
 // Extracts the provided type's data from Parameter (deals with arrays and values)
 template <typename T>
-static void PBParamWithTypeToAny( const Parameter& param, co::Any& any, co::IType* elementType )
+static void PBParamWithTypeToAny( const Parameter& param, const co::AnyValue& av, co::IType* elementType )
 {
+    co::Any any = av.getAny();
+    
     if( !elementType )
     {
-        any.set<T>( getPBContainerData<T>( param.container( 0 ) ) );
+        T value = getPBContainerData<T>( param.container( 0 ) );
+        any.put( value );
         return;
     }
     
@@ -58,34 +60,11 @@ static void PBParamWithTypeToAny( const Parameter& param, co::Any& any, co::ITyp
     if( size == 0 ) // required for vector subscript out of range assertion
         return;
     
-    std::vector<co::uint8>& vec = any.createArray( elementType, size );
-    T* toCast = reinterpret_cast<T*>( &vec[0] );
+    std::vector<T>& vec = any.get<std::vector<T>&>();
+    vec.reserve( size );
     for( int i = 0; i < size; i++ )
     {
-        toCast[i] = getPBContainerData<T>( param.container( i ) );
-    }
-}
-
-// ----------------- PBParamWithTypeToAny specializations for string and bool --------------- //
-template <>
-void PBParamWithTypeToAny<std::string>( const Parameter& param, co::Any& any, co::IType* elementType )
-{
-    if( !elementType )
-    {
-        std::string& anyString = any.createString();
-        anyString = getPBContainerData<const std::string&>( param.container( 0 ) );
-        return;
-    }
-    
-    size_t size = param.container().size();
-    if( size == 0 ) // required for vector subscript out of range assertion
-        return;
-    
-    std::vector<co::uint8>& vec = any.createArray( elementType, size );
-    std::string* toCast = reinterpret_cast<std::string*>( &vec[0] );
-    for( int i = 0; i < size; i++ )
-    {
-        toCast[i] = getPBContainerData<const std::string&>( param.container( i ) );
+        vec.push_back( getPBContainerData<T>( param.container( i ) ) );
     }
 }
     
@@ -94,7 +73,7 @@ co::IType* kind2Type( co::TypeKind kind )
 {
     switch( kind )
     {
-        case co::TK_BOOLEAN:
+        case co::TK_BOOL:
             return co::getType( "bool" );
         case co::TK_INT8:
             return co::getType( "int8" );
@@ -108,10 +87,6 @@ co::IType* kind2Type( co::TypeKind kind )
             return co::getType( "int32" );
         case co::TK_UINT32:
             return co::getType( "uint32" );
-        case co::TK_INT64:
-            return co::getType( "int64" );
-        case co::TK_UINT64:
-            return co::getType( "uint64" );
         case co::TK_FLOAT:
             return co::getType( "float" );
         case co::TK_DOUBLE:
@@ -124,10 +99,10 @@ co::IType* kind2Type( co::TypeKind kind )
     return 0;
 }
 
-void PBParamToComplex( const Parameter& param, co::IType* descriptor, co::Any& complexAny );
-void PBParamToAny( const Parameter& param, co::Any& any );
+void PBParamToComplex( const Parameter& param, co::IType* descriptor, const co::Any& complexAny );
+void PBParamToAny( const Parameter& param, const co::Any& any );
 
-void PBParamToValue( const Parameter& param, co::IType* descriptor, co::Any& any )
+void PBParamToValue( const Parameter& param, co::IType* descriptor, const co::AnyValue& ret )
 {
     co::TypeKind kind = descriptor->getKind();
     co::IType* elementType = 0; // only used for arrays
@@ -145,48 +120,42 @@ void PBParamToValue( const Parameter& param, co::IType* descriptor, co::Any& any
     
     switch( kind )
     {
-        case co::TK_BOOLEAN:
-            PBParamWithTypeToAny<bool>( param, any, elementType );
+        case co::TK_BOOL:
+            PBParamWithTypeToAny<bool>( param, ret, elementType );
             break;
         case co::TK_INT8:
-            PBParamWithTypeToAny<co::int8>( param, any, elementType );
+            PBParamWithTypeToAny<co::int8>( param, ret, elementType );
             break;
         case co::TK_UINT8:
-            PBParamWithTypeToAny<co::uint8>( param, any, elementType );
+            PBParamWithTypeToAny<co::uint8>( param, ret, elementType );
             break;
         case co::TK_INT16:
-            PBParamWithTypeToAny<co::int16>( param, any, elementType );
+            PBParamWithTypeToAny<co::int16>( param, ret, elementType );
             break;
         case co::TK_UINT16:
-            PBParamWithTypeToAny<co::uint16>( param, any, elementType );
+            PBParamWithTypeToAny<co::uint16>( param, ret, elementType );
             break;
         case co::TK_INT32:
-            PBParamWithTypeToAny<co::int32>( param, any, elementType );
+            PBParamWithTypeToAny<co::int32>( param, ret, elementType );
             break;
         case co::TK_UINT32:
-            PBParamWithTypeToAny<co::uint32>( param, any, elementType );
-            break;
-        case co::TK_INT64:
-            PBParamWithTypeToAny<co::int64>( param, any, elementType );
-            break;
-        case co::TK_UINT64:
-            PBParamWithTypeToAny<co::uint64>( param, any, elementType );
+            PBParamWithTypeToAny<co::uint32>( param, ret, elementType );
             break;
         case co::TK_FLOAT:
-            PBParamWithTypeToAny<float>( param, any, elementType );
+            PBParamWithTypeToAny<float>( param, ret, elementType );
             break;
         case co::TK_DOUBLE:
-            PBParamWithTypeToAny<double>( param, any, elementType );
+            PBParamWithTypeToAny<double>( param, ret, elementType );
             break;
         case co::TK_STRING:
-            PBParamWithTypeToAny<std::string>( param, any, elementType );
+            PBParamWithTypeToAny<std::string>( param, ret, elementType );
             break;
         case co::TK_STRUCT:
         case co::TK_NATIVECLASS:
-            PBParamToComplex( param, descriptor, any );
+            PBParamToComplex( param, descriptor, ret );
             break;
         case co::TK_ANY:
-            PBParamToAny( param, any );
+            PBParamToAny( param, ret );
         default:
         {
             if( elementType )
@@ -195,12 +164,12 @@ void PBParamToValue( const Parameter& param, co::IType* descriptor, co::Any& any
     }
 }
     
-void PBParamToAny( const Parameter& param, co::Any& any )
+void PBParamToAny( const Parameter& param, const co::AnyValue& av )
 {
     const Any_Type& any_type = param.container( 0 ).any_type();
     co::TypeKind internalKind = static_cast<co::TypeKind>( any_type.kind() );
     
-    if( internalKind == co::TK_NONE )
+    if( internalKind == co::TK_NULL )
         return;
     
     co::IType* internalType;
@@ -209,16 +178,18 @@ void PBParamToAny( const Parameter& param, co::Any& any )
     else
         internalType = kind2Type( internalKind );
     
-    co::Any& internalAny = any.createAny();
-    PBParamToValue( any_type.param(), internalType, internalAny );
+    co::AnyValue internalAv;
+
+    PBParamToValue( any_type.param(), internalType, internalAv );
+    
+    av.getAny().put( internalAv );
 }
     
 void PBContainerToComplex( const Container& container, co::IType* descriptor, 
-                                           co::Any& complexAny )
+                                          co::AnyValue& av )
 {
     assert( descriptor->getKind() != co::TK_ARRAY );
     
-    complexAny.createComplexValue( descriptor );
     co::IRecordType* rt = co::cast<co::IRecordType>( descriptor );
     co::IReflector* refl = rt->getReflector();
     
@@ -233,41 +204,42 @@ void PBContainerToComplex( const Container& container, co::IType* descriptor,
     {
         co::IField* field = fields[i];
         const Parameter& fieldArg = complex.field( i );
-        co::Any fieldAny;
-        PBParamToValue( fieldArg, field->getType(), fieldAny );
-        if( fieldAny.isValid() )
-            refl->setField( complexAny, field, fieldAny );
+        co::AnyValue fieldAv;
+        PBParamToValue( fieldArg, field->getType(), fieldAv );
+        if( fieldAv.getAny().isValid() )
+            refl->setField( av.getAny(), field, fieldAv.getAny() );
     }
-
 }
     
-void PBParamToComplex( const Parameter& param, co::IType* descriptor, co::Any& complexAny )
+void PBParamToComplex( const Parameter& param, co::IType* descriptor, co::AnyValue& av )
 {
     if( descriptor->getKind() != co::TK_ARRAY )
     {
-        PBContainerToComplex( param.container( 0 ), descriptor, complexAny );
+        PBContainerToComplex( param.container( 0 ), descriptor, av );
         return;
     }
     
-    AnyArrayUtil aau;
     co::IType* elementType = co::cast<co::IArray>( descriptor )->getElementType();
     
     co::int32 size = param.container().size();
-    complexAny.createArray( elementType, size );
+    av.create( descriptor );
+    co::Any any = av.getAny();
+    
+    any.resize( size );
     
     for( co::int32 i = 0; i < size; i++ )
     {
-        co::Any element;
-        PBContainerToComplex( param.container( i ), elementType, element );
-        aau.setArrayComplexTypeElement( complexAny, i, element );
+        co::AnyValue elementAv;
+        PBContainerToComplex( param.container( i ), elementType, elementAv );
+        any[i].put( elementAv );
     }
 }
     
-void ParameterPuller::pullValue( co::IType* descriptor, co::Any& valueType )
+void ParameterPuller::pullValue( co::IType* descriptor, co::AnyValue& ret )
 {
     try
     {
-        PBParamToValue( _invocation->params( _currentParam ), descriptor, valueType );
+        PBParamToValue( _invocation->params( _currentParam ), descriptor, ret );
         _currentParam++;
     }
     catch( std::string& e )
@@ -497,7 +469,7 @@ ParameterPuller& Demarshaller::getInvocation( outString requesterEndpoint,
     return _puller;
 }
 
-void Demarshaller::getValueTypeReturn( co::IType* descriptor, co::Any& valueAny )
+void Demarshaller::getValueTypeReturn( co::IType* descriptor, const co::Any& valueAny )
 {
     assert( _msgType == RETURN );
     

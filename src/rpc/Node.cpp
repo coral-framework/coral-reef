@@ -29,7 +29,7 @@ Node::~Node()
         stop();
 }
 
-const std::string& Node::getPublicAddress()
+std::string Node::getPublicAddress()
 {
 	return _publicEndpoint;
 }

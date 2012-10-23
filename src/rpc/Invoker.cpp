@@ -249,17 +249,20 @@ void Invoker::onMethod( ParameterPuller& puller, co::IService* facet, co::IMetho
     // TODO: remove this and maky the co::any's reference the objects themselves
     co::RefVector<co::IObject> tempReferences;
     
-    std::vector<co::Any> args;
+    std::vector<co::AnyValue> args;
+    std::vector<co::Any> argsAny;
     co::Range<co::IParameter* const> params = method->getParameters(); 
     
     size_t size = params.getSize();
     args.resize( size );
+    for( int i = 0;
     for( int i = 0; i < size; i++ )
     {
         co::IType* paramType = params[i]->getType();
         if( paramType->getKind() != co::TK_INTERFACE )
         {
             puller.pullValue( paramType, args[i] );
+            
         }
         else
         {

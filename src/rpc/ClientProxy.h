@@ -29,9 +29,9 @@ public:
     
     // IDynamicServiceProvider
     co::IPort* dynamicGetFacet( co::int32 dynFacetId );
-    const co::Any& dynamicGetField( co::int32 dynFacetId, co::IField* field );
-    const co::Any& dynamicInvoke( co::int32 dynFacetId, co::IMethod* method, 
-                                 co::Range<co::Any const> args );
+    void dynamicGetField( co::int32 dynFacetId, co::IField* field, const co::Any& value );
+    void dynamicInvoke( co::int32 dynFacetId, co::IMethod* method, 
+                                 co::Range<co::Any> args, const co::Any& result );
     co::int32 dynamicRegisterService( co::IService* dynamicServiceProxy );
     void dynamicSetField( co::int32 dynFacetId, co::IField* field, const co::Any& value );
     
@@ -58,8 +58,6 @@ private:
     
     Marshaller _marshaller;
     Demarshaller _demarshaller;
-    
-    co::Any _resultBuffer;
     
     co::int32 _numFacets;
     co::IService** _facets;

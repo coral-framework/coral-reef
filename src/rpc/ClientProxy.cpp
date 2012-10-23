@@ -81,14 +81,16 @@ co::IPort* ClientProxy::dynamicGetFacet( co::int32 cookie )
     return _component->getFacets()[cookie];
 }
         
-const co::Any& ClientProxy::dynamicGetField( co::int32 dynFacetId, co::IField* field )
+void ClientProxy::dynamicGetField( co::int32 dynFacetId, co::IField* field, 
+                                            const co::Any& value )
 {
     co::int32 depth = findDepth( _interfaces[dynFacetId], field->getOwner() );
 
     MemberOwner mo( _instanceID, dynFacetId, depth );
-    _requestor->requestGetField( mo, field, _resultBuffer );
     
-    return _resultBuffer;
+    co::AnyValue& av = value.get<co::AnyValue&>();
+    
+    _requestor->requestGetField( mo, field, av );
 }
     
 void ClientProxy::dynamicSetField( co::int32 dynFacetId, co::IField* field, const co::Any& value )
@@ -99,9 +101,11 @@ void ClientProxy::dynamicSetField( co::int32 dynFacetId, co::IField* field, cons
     _requestor->requestSetField( mo, field, value );
 }
 
-const co::Any& ClientProxy::dynamicInvoke( co::int32 dynFacetId, co::IMethod* method, 
-                                           co::Range<co::Any const> args )
+void ClientProxy::dynamicInvoke( co::int32 dynFacetId, co::IMethod* method, 
+                                           co::Range<co::Any> args, const co::Any& result )
 {
+    co::AnyValue& av = result.get<co::AnyValue&>();
+    
     co::int32 depth = findDepth( _interfaces[dynFacetId], method->getOwner() );
     
     MemberOwner mo( _instanceID, dynFacetId, depth );
@@ -111,12 +115,7 @@ const co::Any& ClientProxy::dynamicInvoke( co::int32 dynFacetId, co::IMethod* me
     if( !returnType )
         _requestor->requestAsynchCall( mo, method, args );
     else
-    {
-        _resultBuffer.clear();
-        _requestor->requestSynchCall( mo, method, args, _resultBuffer );
-    }
-    
-    return _resultBuffer;
+        _requestor->requestSynchCall( mo, method, args, av );
 }
 
 co::int32 ClientProxy::dynamicRegisterService( co::IService* dynamicServiceProxy )

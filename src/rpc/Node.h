@@ -31,7 +31,7 @@ public:
     
     // INode methods
 
-	const std::string& getPublicAddress();
+	std::string getPublicAddress();
 
     co::IObject* newRemoteInstance( const std::string& instanceType, const std::string& address );
      
