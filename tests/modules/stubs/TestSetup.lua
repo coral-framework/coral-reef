@@ -9,6 +9,11 @@ function TestSetup:initTest( numNodes )
 	
 	for i = 1, numNodes do
 		self.transports[i] = co.new "rpc.Transport"
+	end
+	
+	self.transports[1].config:clearNetwork()
+	
+	for i = 1, numNodes do
 		self.nodes[i] = co.new "rpc.Node"
 		self.nodes[i].transport = self.transports[i].transport
 		self.transports[i].node = self.nodes[i].node
@@ -58,9 +63,6 @@ function TestSetup:spawnNode( address )
 end
 
 function TestSetup:tearDown()
-	if #self.transports > 0 then
-		self.transports[1].config:clearNetwork()
-	end
 end
 
 return TestSetup

@@ -1,7 +1,6 @@
 #include "InstanceContainer.h"
 
 #include <co/IPort.h>
-#include <co/Range.h>
 
 namespace rpc {
 
@@ -11,7 +10,7 @@ InstanceContainer::InstanceContainer( co::IObject* instance )
 
     _instance = instance;
     _component = instance->getComponent();
-    co::Range<co::IPort* const> ports = _component->getFacets();
+    co::TSlice<co::IPort*> ports = _component->getFacets();
     co::int32 numPorts = static_cast<co::int32>( ports.getSize() );
     _openedServices.resize( numPorts );
 }
@@ -29,7 +28,7 @@ co::IService* InstanceContainer::getService( co::int32 facetIdx )
 
 co::IService* InstanceContainer::onServiceFirstAccess( co::int32 serviceId )
 {
-    co::Range<co::IPort* const> ports = _component->getFacets();
+    co::TSlice<co::IPort*> ports = _component->getFacets();
     
     co::IPort* port = ports[serviceId];
     if( !port->getIsFacet() )

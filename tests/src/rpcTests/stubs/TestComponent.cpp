@@ -7,6 +7,7 @@
 #include "TestComponent_Base.h"
 #include <stubs/MotherStruct.h>
 
+#include <co/Log.h>
 #include <co/IReflector.h>
 #include <co/RefPtr.h>
 
@@ -27,7 +28,7 @@ public:
 
 	// ------ stubs.IComplexTypes Methods ------ //
 
-	const stubs::StringNativeClass& getStringNativeClass()
+	stubs::StringNativeClass getStringNativeClass()
 	{
 		return _stringNativeClass;
 	}
@@ -37,7 +38,7 @@ public:
 		_stringNativeClass = stringNativeClass;
 	}
 
-	const stubs::MotherStruct& getMotherStruct()
+	stubs::MotherStruct getMotherStruct()
 	{
 		return _motherStruct;
 	}
@@ -46,32 +47,32 @@ public:
 	{
 		_motherStruct = motherStruct;
 	}
-
-    co::Range<co::Any const> extractChilds( co::Range<co::Any const> mothers )
-	{
-        _anys.clear();
-        _anys.resize( mothers.getSize() );
-        _motherStructs.clear();
-        _childStructs.clear();
-        
-        for( int i = 0; mothers; mothers.popFirst(), i++ )
-        {
-            _motherStructs.push_back( mothers.getFirst().get<const MotherStruct&>() );
-            _childStructs.push_back( _motherStructs[i].child );
-            _anys[i].set<const ChildStruct&>( _childStructs[i] );
-        }
-        
-        return _anys;
-	}
+//
+//    co::TSlice<co::Any> extractChilds( co::Slice<co::Any> mothers )
+//	{
+//        _anys.clear();
+//        _anys.resize( mothers.getSize() );
+//        _motherStructs.clear();
+//        _childStructs.clear();
+//        
+//        for( int i = 0; mothers; mothers.popFirst(), i++ )
+//        {
+//            _motherStructs.push_back( mothers.getFirst().get<const MotherStruct&>() );
+//            _childStructs.push_back( _motherStructs[i].child );
+//            _anys[i].set<const ChildStruct&>( _childStructs[i] );
+//        }
+//        
+//        return _anys;
+//	}
     
-	const co::Any& getChild( const co::Any& motherStruct )
+	co::AnyValue getChild( const co::Any& motherStruct )
 	{
         _childStruct = motherStruct.get<const MotherStruct&>().child;
         _tempAny.set<const ChildStruct&>( _childStruct );
         return _tempAny;
 	}
     
-	const co::Any& setNativeClassValue( const co::Any& stringNativeClass, const std::string& value )
+	co::AnyValue setNativeClassValue( const co::Any& stringNativeClass, const std::string& value )
 	{
 		_stringNativeClass = stringNativeClass.get<const StringNativeClass&>();
         _stringNativeClass.data = value;
@@ -84,7 +85,7 @@ public:
 		_stringNativeClass = stringNativeClass.get<const StringNativeClass&>();
 	}
     
-	co::Range<stubs::MotherStruct const> placeChilds( co::Range<stubs::MotherStruct const> mothers, co::Range<stubs::ChildStruct const> childs )
+	co::TSlice<stubs::MotherStruct> placeChilds( co::Slice<stubs::MotherStruct> mothers, co::Slice<stubs::ChildStruct> childs )
 	{
         assert( mothers.getSize() == childs.getSize() );
         _motherStructs.clear();
@@ -92,13 +93,14 @@ public:
 		for( int i = 0; i < mothers.getSize(); i++ )
         {
             _motherStructs.push_back( mothers[i] );
+            CORAL_LOG(INFO) << "Child " << i << " is " << childs[i].anything.get<co::int32>();
             _motherStructs[i].child = childs[i];
         }
         
         return _motherStructs;
 	}
     
-	co::Range<stubs::ChildStruct const> placeNatives( co::Range<stubs::ChildStruct const> childs, co::Range<stubs::StringNativeClass const> natives )
+	co::TSlice<stubs::ChildStruct> placeNatives( co::Slice<stubs::ChildStruct> childs, co::Slice<stubs::StringNativeClass> natives )
 	{
 		assert( natives.getSize() == childs.getSize() );
         _childStructs.clear();
@@ -186,7 +188,7 @@ public:
 		return service->incrementInt( number );
 	}
     
-	const std::string& concatenateString( stubs::ISimpleTypes* service, const std::string& str1, const std::string& str2 )
+	std::string concatenateString( stubs::ISimpleTypes* service, const std::string& str1, const std::string& str2 )
 	{
 		_storedString = service->concatenateString( str1, str2 );
         return _storedString;
@@ -204,12 +206,12 @@ public:
 		_storedDouble = storedDouble;
 	}
 
-	co::Range<double const> getStoredDoubleList()
+	co::TSlice<double> getStoredDoubleList()
 	{
 		return _storedDoubleList;
 	}
 
-	void setStoredDoubleList( co::Range<double const> storedDoubleList )
+	void setStoredDoubleList( co::Slice<double> storedDoubleList )
 	{
 		co::assign( storedDoubleList, _storedDoubleList );
 	}
@@ -244,17 +246,21 @@ public:
 		_storedParentInt = parentInt;
 	}
 
-	co::Range<co::int32 const> getStoredIntList()
+	co::TSlice<co::int32> getStoredIntList()
 	{
+        CORAL_LOG(INFO) << "Vector of size: " << _storedIntList.size(); 
+        for( int i = 0; i < _storedIntList.size(); i++ )
+            CORAL_LOG(INFO) << "Value " << i << " of vec is " << _storedIntList[i];
 		return _storedIntList;
 	}
 
-	void setStoredIntList( co::Range<co::int32 const> storedIntList )
+	void setStoredIntList( co::Slice<co::int32> storedIntList )
 	{
 		co::assign( storedIntList, _storedIntList );
+        
 	}
 
-	const std::string& getStoredString()
+	std::string getStoredString()
 	{
 		return _storedString;
 	}
@@ -264,29 +270,29 @@ public:
 		_storedString = storedString;
 	}
 
-	co::Range<std::string const> getStoredStringList()
+	co::TSlice<std::string> getStoredStringList()
 	{
 		return _storedStringList;
 	}
 
-	void setStoredStringList( co::Range<std::string const> storedStringList )
+	void setStoredStringList( co::Slice<std::string> storedStringList )
 	{
 		co::assign( storedStringList, _storedStringList );
 	}
 
-    co::Range<std::string const> getParentStringList()
+    co::TSlice<std::string> getParentStringList()
 	{
 		return _storedParentStringList;
 	}
     
-	void setParentStringList( co::Range<std::string const> parentStringList )
+	void setParentStringList( co::Slice<std::string> parentStringList )
 	{
 		co::assign( parentStringList, _storedParentStringList );
 	}
     
 	// -------------------- Methods --------------------- //
 
-	const std::string& concatenateString( const std::string& str1, const std::string& str2 )
+	std::string concatenateString( const std::string& str1, const std::string& str2 )
 	{
 		_storedString = str1;
 		_storedString.append( str2 );
@@ -298,7 +304,7 @@ public:
 		return dividend / divisor;
 	}
 
-	co::Range<co::int32 const> get10Ints()
+	co::TSlice<co::int32> get10Ints()
 	{
 		_storedIntList.clear();
 
@@ -308,7 +314,7 @@ public:
 		return _storedIntList;
 	}
 
-	co::Range<std::string const> getAlphabetList()
+	co::TSlice<std::string> getAlphabetList()
 	{
 		_storedStringList.clear();
 
@@ -323,7 +329,7 @@ public:
 		return _storedStringList;
 	}
 
-	const std::string& getHelloString()
+	std::string getHelloString()
 	{
 		_storedString.assign( "Hello" );
 		return _storedString;
@@ -339,7 +345,7 @@ public:
 		return 4;
 	}
 
-	co::Range<std::string const> getThirdElements( co::Range<std::string const> list1, co::Range<std::string const> list2 )
+	co::TSlice<std::string> getThirdElements( co::Slice<std::string> list1, co::Slice<std::string> list2 )
 	{
 		_storedStringList.clear();
 
@@ -355,7 +361,7 @@ public:
 		return number;
 	}
 
-	co::Range<double const> mergeLists( co::Range<double const> list1, co::Range<double const> list2 )
+	co::TSlice<double> mergeLists( co::Slice<double> list1, co::Slice<double> list2 )
 	{
 		_storedDoubleList.clear();
 
@@ -369,24 +375,21 @@ public:
 		return _storedDoubleList;
 	}
 
-    const co::Any& addDoublesFromAny( const co::Any& d1, const co::Any& d2 )
+    co::AnyValue addDoublesFromAny( const co::Any& d1, const co::Any& d2 )
 	{
-		static co::Any anyDouble;
-        anyDouble.set<double>( d1.get<double>() + d2.get<double>() );
-		return anyDouble;
+        co::AnyValue av( d1.get<double>() + d2.get<double>() );
+        return av;
 	}
     
-	const co::Any& concatenateFromAny( const co::Any& str1, const co::Any& str2 )
+	co::AnyValue concatenateFromAny( const co::Any& str1, const co::Any& str2 )
 	{
-		static co::Any anyString;
-        std::string& temp = anyString.createString();
+        std::string temp;
         temp = str1.get<const std::string&>();
 		temp.append( str2.get<const std::string&>() );
-        anyString.set<const std::string&>( temp );
-		return anyString;
+		return co::AnyValue( temp );
 	}
     
-    const co::Any& mergeListsFromAny( const co::Any& l1, const co::Any& l2 )
+    co::AnyValue mergeListsFromAny( const co::Any& l1, const co::Any& l2 )
 	{
         // NYI
         assert( false );
@@ -394,7 +397,7 @@ public:
 		return dummy;
 	}
     
-    co::Range<double const> parentMergeLists( co::Range<double const> list1, co::Range<double const> list2 )
+    co::TSlice<double> parentMergeLists( co::Slice<double> list1, co::Slice<double> list2 )
 	{
 		_storedParentDoubleList.clear();
         
@@ -423,12 +426,12 @@ public:
 		_storedInt = number;
 	}
 
-	void setIntList( co::Range<co::int32 const> intList )
+	void setIntList( co::Slice<co::int32> intList )
 	{
 		co::assign( intList, _storedIntList );
 	}
 
-	void setStrList( co::Range<std::string const> strList )
+	void setStrList( co::Slice<std::string> strList )
 	{
 		co::assign( strList, _storedStringList );
 	}

@@ -189,7 +189,7 @@ void Invoker::invokeInstance( Demarshaller& demarshaller, std::string& returnMsg
     // if method is inherited
     if( details.typeDepth != -1 )
     {
-        co::Range<co::IInterface* const> superTypes = memberOwner->getSuperTypes();
+        co::TSlice<co::IInterface*> superTypes = memberOwner->getSuperTypes();
         
         if( details.typeDepth >= superTypes.getSize() || details.typeDepth < -1 )
             CORAL_THROW( RemotingException, "No such member owner of depth: " << details.typeDepth );
@@ -199,7 +199,7 @@ void Invoker::invokeInstance( Demarshaller& demarshaller, std::string& returnMsg
         
     co::IReflector* reflector = memberOwner->getReflector();
     
-    co::Range<co::IMember* const> members = memberOwner->getMembers();
+    co::TSlice<co::IMember*> members = memberOwner->getMembers();
     
     if( details.memberIdx >= members.getSize() || details.memberIdx < 0 )
         CORAL_THROW( RemotingException, "No such member of index: " << details.memberIdx );
@@ -208,70 +208,78 @@ void Invoker::invokeInstance( Demarshaller& demarshaller, std::string& returnMsg
     co::MemberKind kind = member->getKind();
     
     // ------ Proceed to the actual invocation ------ //
-    co::Any returnAny;
+    co::AnyValue returnValue;
+    co::IType* returnType;
     
     if( kind == co::MK_METHOD )
     {
-        onMethod( puller, facet, co::cast<co::IMethod>( member ), reflector, returnAny );
+        co::IMethod* method = co::cast<co::IMethod>( member );
+        onMethod( puller, facet, method, reflector, returnValue );
         
         if( !details.hasReturn )
             return;
+        
+        returnType = method->getReturnType();
     }   
     else   
     {
+        co::IField* field = co::cast<co::IField>( member );
         if( !details.hasReturn )
         {
-            onSetField( puller, facet, co::cast<co::IField>( member ), reflector );
+            onSetField( puller, facet, field, reflector );
             return;
         }
         else
         {
-            onGetField( facet, co::cast<co::IField>( member ), reflector, returnAny );
+            onGetField( facet, field, reflector, returnValue );
+            returnType = field->getType();
         }
     }
-   
+    
     // Marshals the return from the call if applicable
-    if( returnAny.getKind() != co::TK_INTERFACE )
+    if( returnValue.getKind() != co::TK_INTERFACE )
     {
-        _marshaller.marshalValueTypeReturn( returnAny, returnMsg );
+        _marshaller.marshalValueTypeReturn( returnValue.getAny(), returnType, returnMsg );
     }
     else
     {
         ReferenceType refType;
-        getRefTypeInfo( returnAny.get<co::IService*>(), senderEndpoint, refType );
+        getRefTypeInfo( returnValue.get<co::IService*>(), senderEndpoint, refType );
         _marshaller.marshalRefTypeReturn( refType, returnMsg );
     }
 }
 
 void Invoker::onMethod( ParameterPuller& puller, co::IService* facet, co::IMethod* method, 
-                           co::IReflector* refl, co::Any& returned )
-{
-    // TODO: remove this and maky the co::any's reference the objects themselves
-    co::RefVector<co::IObject> tempReferences;
-    
-    std::vector<co::AnyValue> args;
-    std::vector<co::Any> argsAny;
-    co::Range<co::IParameter* const> params = method->getParameters(); 
+                           co::IReflector* refl, const co::Any& returned )
+{    
+    std::vector<co::AnyValue> anyValues;
+    std::vector<co::Any> args;
+    co::TSlice<co::IParameter*> params = method->getParameters(); 
     
     size_t size = params.getSize();
     args.resize( size );
-    for( int i = 0;
+    anyValues.resize( size );
+    
+    // Set the anys to point to the anyvalues
+    for( int i = 0; i < size; i++ )
+        args[i].set( anyValues[i] );
+    
     for( int i = 0; i < size; i++ )
     {
         co::IType* paramType = params[i]->getType();
-        if( paramType->getKind() != co::TK_INTERFACE )
+        if( paramType->getKind() != co::TK_INTERFACE && paramType->getKind() != co::TK_EXCEPTION )
         {
-            puller.pullValue( paramType, args[i] );
-            
+            anyValues[i].create( paramType );
+            puller.pullValue( paramType, anyValues[i].getAny() );
         }
         else
         {
             ReferenceType refTypeInfo;
             puller.pullReference( refTypeInfo );
-            getRefType( refTypeInfo, args[i], tempReferences );
+            getRefType( refTypeInfo, anyValues[i] );
         }
     }
-    
+
     refl->invoke( facet, method, args, returned );
     
     CORAL_DLOG( INFO ) << "Invoked method " << method->getName() << " of service "
@@ -279,7 +287,7 @@ void Invoker::onMethod( ParameterPuller& puller, co::IService* facet, co::IMetho
 }
     
 void Invoker::onGetField( co::IService* facet, co::IField* field, 
-                             co::IReflector* refl, co::Any& returned )
+                             co::IReflector* refl, const co::Any& returned )
 {
     refl->getField( facet, field, returned );
     
@@ -290,32 +298,29 @@ void Invoker::onGetField( co::IService* facet, co::IField* field,
 void Invoker::onSetField( ParameterPuller& puller, co::IService* facet, co::IField* field, 
                              co::IReflector* refl )
 {
-    // TODO: remove this and maky the co::any's reference the objects themselves
-    co::RefVector<co::IObject> tempReferences;
-    
-    co::Any value;
+    co::AnyValue av; co::Any arg( av );
     
     co::IType* fieldType = field->getType();
     
     if( fieldType->getKind() != co::TK_INTERFACE )
     {
-        puller.pullValue( fieldType, value );
+        av.create( fieldType );
+        puller.pullValue( fieldType, av.getAny() );
     }
     else
     {
         ReferenceType refTypeInfo;
         puller.pullReference( refTypeInfo );
-        getRefType( refTypeInfo, value, tempReferences );
+        getRefType( refTypeInfo, av );
     }
     
-    refl->setField( facet, field, value );
+    refl->setField( facet, field, arg );
     
     CORAL_DLOG( INFO ) << "Set field " << field->getName() << " of service "
     << facet->getInterface()->getName();
 }
     
-void Invoker::getRefType( ReferenceType& refTypeInfo, co::Any& param, 
-                             co::RefVector<co::IObject>& tempRefs )
+void Invoker::getRefType( ReferenceType& refTypeInfo, const co::Any& ret )
 {
     co::IObject* instance;
     switch( refTypeInfo.owner )
@@ -340,13 +345,12 @@ void Invoker::getRefType( ReferenceType& refTypeInfo, co::Any& param,
             break;
         }
     }
-    tempRefs.push_back( instance ); // TODO: remove
     
-    co::Range<co::IPort* const> ports = instance->getComponent()->getFacets();
+    co::TSlice<co::IPort*> ports = instance->getComponent()->getFacets();
     
     co::IPort* port = ports[refTypeInfo.facetIdx];
     co::IService* service = instance->getServiceAt( port );
-    param.set<co::IService*>( service );
+    ret.put( service );
 }
 
 void Invoker::getRefTypeInfo( co::IService* service, std::string& senderEndpoint, 

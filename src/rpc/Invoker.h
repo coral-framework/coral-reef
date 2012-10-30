@@ -7,7 +7,6 @@
 
 #include <co/Any.h>
 #include <co/RefPtr.h>
-#include <co/RefVector.h>
 #include <co/IObject.h>
 
 #include <string>
@@ -55,19 +54,17 @@ private:
     void invokeInstance( Demarshaller& demarshaller, std::string& returned );
     
     void onMethod( ParameterPuller& puller, co::IService* facet, co::IMethod* method, 
-                  co::IReflector* refl, co::Any& returned );
+                  co::IReflector* refl, const co::Any& returned );
     
     void onGetField( co::IService* facet, co::IField* field, 
-                    co::IReflector* refl, co::Any& returned );
+                    co::IReflector* refl, const co::Any& returned );
     
     void onSetField( ParameterPuller& puller, co::IService* facet, co::IField* field, 
                     co::IReflector* refl );
     
-    // TODO: remove the last param in coral 0.8
     // Whenever a ref type parameter arrives from a invocation, this method decodes it into an 
     // actual instance. This function may call another node and possibly block.
-    void getRefType( ReferenceType& refTypeInfo, co::Any& param, 
-                    co::RefVector<co::IObject>& tempRefs );
+    void getRefType( ReferenceType& refTypeInfo, const co::Any& ret );
     
     // Identify and marshals an interface that has been returned from an invoke
     void getRefTypeInfo( co::IService* service, std::string& senderEndpoint, 

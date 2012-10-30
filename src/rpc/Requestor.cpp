@@ -12,6 +12,7 @@
 #include <co/Log.h>
 #include <co/IReflector.h>
 #include <co/IComponent.h>
+#include <co/IParameter.h>
 
 namespace rpc {
 
@@ -94,7 +95,7 @@ co::IObject* Requestor::requestPublicInstance( const std::string& key,
 }
 
 void Requestor::requestAsynchCall( MemberOwner& owner, co::IMethod* method,  
-                                            co::Range<co::Any const> args )
+                                            co::Slice<co::Any> args )
 {
     if( !_connected )
         CORAL_THROW( RemotingException, "Trying to request with the node stopped");
@@ -111,7 +112,7 @@ void Requestor::requestAsynchCall( MemberOwner& owner, co::IMethod* method,
 }
 
 void Requestor::requestSynchCall( MemberOwner& owner, co::IMethod* method, 
-                                           co::Range<co::Any> args, co::Any& ret  )
+                                           co::Slice<co::Any> args, const co::Any& ret )
 {
     if( !_connected )
         CORAL_THROW( RemotingException, "Trying to request with the node stopped");
@@ -126,7 +127,6 @@ void Requestor::requestSynchCall( MemberOwner& owner, co::IMethod* method,
     _marshaller.marshalInvocation( msg );
 
     _handler->handleSynchRequest( msg, msg );
-    
     getReturn( msg, method->getReturnType(), ret );
 }
     
@@ -139,9 +139,10 @@ void Requestor::requestSetField( MemberOwner& owner, co::IField* field, const co
                               owner.inheritanceDepth, false );
     ParameterPusher& pusher = _marshaller.beginInvocation( _publicEndpoint, details );
     
-    if( arg.getKind() != co::TK_INTERFACE )
+    co::IType* fieldType = field->getType();
+    if( fieldType->getKind() != co::TK_INTERFACE )
     {
-        pusher.pushValue( arg );
+        pusher.pushValue( arg, fieldType );
     }
     else
     {
@@ -225,21 +226,21 @@ ClientProxy* Requestor::getOrCreateProxy( co::int32 instanceID, const std::strin
     return cp;
 }
     
-void Requestor::pushParameters( co::IMethod* method, co::Range<co::Any const> args, 
+void Requestor::pushParameters( co::IMethod* method, co::Slice<co::Any> args, 
                                    ParameterPusher& pusher )
 {
-    for( ; args; args.popFirst() )
+    co::TSlice<co::IParameter*> params = method->getParameters();
+    for( int i = 0; i < params.getSize(); i++ )
     {
-        const co::Any& arg = args.getFirst();
-        
-        if( arg.getKind() != co::TK_INTERFACE )
+        co::IType* paramType = params[i]->getType();
+        if( paramType->getKind() != co::TK_INTERFACE )
         {
-            pusher.pushValue( arg );
+            pusher.pushValue( args[i], paramType );
         }
         else
         {
             ReferenceType refType;
-            getProviderInfo( arg.get<co::IService*>(), refType );
+            getProviderInfo( args[i].get<co::IService*>(), refType );
             pusher.pushReference( refType );
         }
     }
@@ -292,7 +293,7 @@ void Requestor::getReturn( const std::string& data, co::IType* returnedType, con
         raiseReturnedException( _demarshaller );
     
     
-    if( returnedType->getKind() != co::TK_INTERFACE )
+    if( returnedType->getKind() != co::TK_INTERFACE && returnedType->getKind() != co::TK_EXCEPTION )
     {
         _demarshaller.getValueTypeReturn( returnedType, ret );
         return;
@@ -318,11 +319,11 @@ void Requestor::getReturn( const std::string& data, co::IType* returnedType, con
             break;
     }
     
-    co::Range<co::IPort* const> ports = instance->getComponent()->getFacets();
+    co::TSlice<co::IPort*> ports = instance->getComponent()->getFacets();
     
     co::IPort* port = ports[refType.facetIdx];
     co::IService* service = instance->getServiceAt( port );
-    ret.set<co::IService*>( service );
+    ret.put( service );
 }
     
 void Requestor::raiseReturnedException( Demarshaller& demarshaller )

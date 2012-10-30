@@ -2,6 +2,7 @@
 
 #include "Message.pb.h"
 
+#include <co/Log.h>
 #include <co/IField.h>
 #include <co/IMethod.h>
 #include <co/Exception.h>
@@ -45,14 +46,13 @@ bool getPBContainerData<bool>( const Container& container )
     
 // Extracts the provided type's data from Parameter (deals with arrays and values)
 template <typename T>
-static void PBParamWithTypeToAny( const Parameter& param, const co::AnyValue& av, co::IType* elementType )
+static void PBParamWithTypeToAny( const Parameter& param, const co::Any& ret, co::IType* elementType )
 {
-    co::Any any = av.getAny();
-    
     if( !elementType )
     {
         T value = getPBContainerData<T>( param.container( 0 ) );
-        any.put( value );
+        CORAL_LOG(INFO) << "Starting conversion of a basic type of value " << value;
+        ret.put( value );
         return;
     }
     
@@ -60,7 +60,7 @@ static void PBParamWithTypeToAny( const Parameter& param, const co::AnyValue& av
     if( size == 0 ) // required for vector subscript out of range assertion
         return;
     
-    std::vector<T>& vec = any.get<std::vector<T>&>();
+    std::vector<T>& vec = ret.get<std::vector<T>&>();
     vec.reserve( size );
     for( int i = 0; i < size; i++ )
     {
@@ -99,10 +99,10 @@ co::IType* kind2Type( co::TypeKind kind )
     return 0;
 }
 
-void PBParamToComplex( const Parameter& param, co::IType* descriptor, const co::Any& complexAny );
-void PBParamToAny( const Parameter& param, const co::Any& any );
+void PBParamToComplex( const Parameter& param, co::IType* descriptor, const co::Any& ret );
+void PBParamToAny( const Parameter& param, const co::Any& ret );
 
-void PBParamToValue( const Parameter& param, co::IType* descriptor, const co::AnyValue& ret )
+void PBParamToValue( const Parameter& param, co::IType* descriptor, const co::Any& ret )
 {
     co::TypeKind kind = descriptor->getKind();
     co::IType* elementType = 0; // only used for arrays
@@ -164,10 +164,12 @@ void PBParamToValue( const Parameter& param, co::IType* descriptor, const co::An
     }
 }
     
-void PBParamToAny( const Parameter& param, const co::AnyValue& av )
+void PBParamToAny( const Parameter& param, const co::Any& ret )
 {
     const Any_Type& any_type = param.container( 0 ).any_type();
     co::TypeKind internalKind = static_cast<co::TypeKind>( any_type.kind() );
+    
+    CORAL_LOG(INFO) << "Starting conversion of a n Any of internalKind " << internalKind;
     
     if( internalKind == co::TK_NULL )
         return;
@@ -178,16 +180,14 @@ void PBParamToAny( const Parameter& param, const co::AnyValue& av )
     else
         internalType = kind2Type( internalKind );
     
-    co::AnyValue internalAv;
-
-    PBParamToValue( any_type.param(), internalType, internalAv );
-    
-    av.getAny().put( internalAv );
+    ret.get<co::AnyValue&>().create( internalType );
+    PBParamToValue( any_type.param(), internalType, ret );
 }
     
 void PBContainerToComplex( const Container& container, co::IType* descriptor, 
-                                          co::AnyValue& av )
+                                          const co::Any& ret )
 {
+    CORAL_LOG(INFO) << "Starting conversion of a Complex " << descriptor->getName();
     assert( descriptor->getKind() != co::TK_ARRAY );
     
     co::IRecordType* rt = co::cast<co::IRecordType>( descriptor );
@@ -198,44 +198,45 @@ void PBContainerToComplex( const Container& container, co::IType* descriptor,
     
     const Complex_Type& complex = container.complex_type();
     
-    co::Range<co::IField* const> fields = rt->getFields();
+    co::TSlice<co::IField*> fields = rt->getFields();
     co::int32 fieldCount = fields.getSize();
     for( co::int32 i = 0; i < fieldCount; i++ )
     {
         co::IField* field = fields[i];
+        CORAL_LOG(INFO) << "Field " << field->getName() << " of Type " << field->getType()->getKind();
         const Parameter& fieldArg = complex.field( i );
-        co::AnyValue fieldAv;
-        PBParamToValue( fieldArg, field->getType(), fieldAv );
-        if( fieldAv.getAny().isValid() )
-            refl->setField( av.getAny(), field, fieldAv.getAny() );
+        co::AnyValue fieldAv; co::Any fieldAny( fieldAv );
+        fieldAv.create( field->getType() );
+        PBParamToValue( fieldArg, field->getType(), fieldAny );
+        if( fieldAny.isValid() )
+            refl->setField( ret, field, fieldAny );
     }
 }
     
-void PBParamToComplex( const Parameter& param, co::IType* descriptor, co::AnyValue& av )
+void PBParamToComplex( const Parameter& param, co::IType* descriptor, const co::Any& ret )
 {
     if( descriptor->getKind() != co::TK_ARRAY )
     {
-        PBContainerToComplex( param.container( 0 ), descriptor, av );
+        PBContainerToComplex( param.container( 0 ), descriptor, ret );
         return;
     }
     
     co::IType* elementType = co::cast<co::IArray>( descriptor )->getElementType();
     
     co::int32 size = param.container().size();
-    av.create( descriptor );
-    co::Any any = av.getAny();
     
-    any.resize( size );
-    
+    ret.resize( size );
+    CORAL_LOG(INFO) << "Starting conversion of a ComplexArray";
     for( co::int32 i = 0; i < size; i++ )
     {
         co::AnyValue elementAv;
+        elementAv.create( elementType );
         PBContainerToComplex( param.container( i ), elementType, elementAv );
-        any[i].put( elementAv );
+        ret[i].put( elementAv );
     }
 }
     
-void ParameterPuller::pullValue( co::IType* descriptor, co::AnyValue& ret )
+void ParameterPuller::pullValue( co::IType* descriptor, const co::Any& ret )
 {
     try
     {
@@ -469,7 +470,7 @@ ParameterPuller& Demarshaller::getInvocation( outString requesterEndpoint,
     return _puller;
 }
 
-void Demarshaller::getValueTypeReturn( co::IType* descriptor, const co::Any& valueAny )
+void Demarshaller::getValueTypeReturn( co::IType* descriptor, const co::Any& ret )
 {
     assert( _msgType == RETURN );
     
@@ -477,7 +478,7 @@ void Demarshaller::getValueTypeReturn( co::IType* descriptor, const co::Any& val
 
     try
     {
-        PBParamToValue( returnValue, descriptor, valueAny );
+        PBParamToValue( returnValue, descriptor, ret );
     }
     catch( std::string& e )
     {

@@ -56,7 +56,6 @@ end
 local net = setmetatable( { msgs = {}, replies = {}, nodes = {}, frozen = false }, { __index = net__index } )
 
 function Transport:__init()
-	self.openLinks = {}
 end
 
 function Transport:bind( address )
@@ -64,13 +63,7 @@ function Transport:bind( address )
 end
 
 function Transport:connect( address )
-	local link = self.openLinks[address]
-	
-	if not link then
-		link = Connector { net = net, address = address }.active
-		self.openLinks[address] = link
-	end
-	return link
+	return Connector { net = net, address = address }.active
 end
 
 function Transport:setNodeService( node )
@@ -88,7 +81,6 @@ function Transport:getNodeService()
 end
 
 function Transport:clearNetwork()
-	net:freeze()
 	net = setmetatable( { msgs = {}, replies = {}, nodes = {}, frozen = false }, { __index = net__index } )
 end
 

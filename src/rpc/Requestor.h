@@ -63,10 +63,10 @@ public:
     co::IObject* requestPublicInstance( const std::string& key, const std::string& componentName );
     
     void requestAsynchCall( MemberOwner& owner, co::IMethod* method,  
-                                 co::Range<co::Any> args );
+                                 co::Slice<co::Any> args );
     
     void requestSynchCall( MemberOwner& owner, co::IMethod* method, 
-                                co::Range<co::Any> args, const co::Any& ret );
+                                co::Slice<co::Any> args, const co::Any& ret );
     
     void requestSetField( MemberOwner& owner, co::IField* field, const co::Any arg );
     
@@ -86,7 +86,7 @@ public:
     
 private:
     
-    void pushParameters( co::IMethod* method, co::Range<co::Any const> args, 
+    void pushParameters( co::IMethod* method, co::Slice<co::Any> args, 
                            ParameterPusher& pusher );
     
     // Extracts all the necessary info from \param param and saves it on \param refType.

@@ -1,8 +1,8 @@
 #include "Marshaller.h"
 
 #include "Message.pb.h"
-#include "AnyArrayUtil.h"
 
+#include <co/Log.h>
 #include <co/IField.h>
 #include <co/IMethod.h>
 #include <co/Exception.h>
@@ -36,146 +36,95 @@ void setPBContainerData<const std::string&>( Container* container, const std::st
 
 // Extracts the provided type's data from Any (deals with arrays and values)
 template <typename T>
-static void simpleToPBParam( const co::Any& any, Parameter* param )
+static void simpleToPBParam( const co::Any& any, co::IType* descriptor, Parameter* param )
 {
+    co::TypeKind kind = descriptor->getKind();
+    
     // if the Any is a single value, set it directly 
-    if( any.getKind() != co::TK_ARRAY )
+    if( kind != co::TK_ARRAY )
     {
         Container* container = param->add_container();
         setPBContainerData<T>( container, any.get<T>() );
         return;
     }
     
-    // if the Any is an array, iterate through the values adding to the Parameter
-    const co::Range<const T> range = any.get<const co::Range<const T> >();
-    
-    size_t size = range.getSize();
+    size_t size = any.getCount();
     for( int i = 0; i < size; i++ )
     {
         Container* container = param->add_container();
-        setPBContainerData<T>( container, range[i] );
+        setPBContainerData<T>( container, any[i].get<T>() );
     }
 }
-
-template <>
-void simpleToPBParam<std::string>( const co::Any& any, Parameter* param )
-{
-    // if the Any is a single value, set it directly 
-    if( any.getKind() != co::TK_ARRAY )
-    {
-        Container* container = param->add_container();
-        setPBContainerData<const std::string&>( container, any.get<const std::string&>() );
-        return;
-    }
     
-    // if the Any is an array, iterate through the values adding to the Parameter
-    const co::Range<const std::string> range = any.get<const co::Range<const std::string> >();
-    
-    size_t size = range.getSize();
-    for( int i = 0; i < size; i++ )
-    {
-        Container* container = param->add_container();
-        setPBContainerData<const std::string&>( container, range[i] );
-    }
-}
-
-template <>
-void simpleToPBParam<bool>( const co::Any& any, Parameter* param )
-{
-    // if the Any is a single value, set it directly 
-    if( any.getKind() != co::TK_ARRAY )
-    {
-        Container* container = param->add_container();
-        setPBContainerData<bool>( container, any.get<bool>() );
-        return;
-    }
-    
-    // if the Any is an array, iterate through the values adding to the Parameter
-    const std::vector<bool>& vec = any.get<const std::vector<bool> &>();
-    
-    size_t size = vec.size();
-    for( int i = 0; i < size; i++ )
-    {
-        Container* container = param->add_container();
-        setPBContainerData<bool>( container, vec[i] );
-    }
-}
-
-void complexToPBParam( const co::Any& complex, Parameter* complexParam );
-void anyToPBParam( const co::Any& any, Parameter* param );
+void complexToPBParam( const co::Any& complex, co::IType* descriptor, Parameter* complexParam );
+void anyToPBParam( const co::Any& any, co::IType* descriptor, Parameter* param );
     
 // Converts an any containing a vlue type to a protobuf Parameter
-void valueToPBParam( const co::Any& any, Parameter* param )
+void valueToPBParam( const co::Any& any, co::IType* descriptor, Parameter* param )
 {
-    std::vector<co::Any> anyVec;
-    co::TypeKind kind = any.getKind();
+    co::TypeKind kind = descriptor->getKind();
     
     if( kind == co::TK_ARRAY )
     {
-        kind = any.getType()->getKind();
+        co::IType* elementType = co::cast<co::IArray>( descriptor )->getElementType();
+        kind = elementType->getKind();
+        
         if( kind == co::TK_ANY )
             CORAL_THROW( RemotingException, "Arrays of co.Any not supported yet" );
     }
     
-    
     switch( kind )
     {
-        case co::TK_BOOLEAN:
-            simpleToPBParam<bool>( any, param );
+        case co::TK_BOOL:
+            simpleToPBParam<bool>( any, descriptor, param );
             break;
         case co::TK_INT8:
-            simpleToPBParam<co::int8>( any, param );
+            simpleToPBParam<co::int8>( any, descriptor, param );
             break;
         case co::TK_UINT8:
-            simpleToPBParam<co::uint8>( any, param );
+            simpleToPBParam<co::uint8>( any, descriptor, param );
             break;
         case co::TK_INT16:
-            simpleToPBParam<co::int16>( any, param );
+            simpleToPBParam<co::int16>( any, descriptor, param );
             break;
         case co::TK_UINT16:
-            simpleToPBParam<co::uint16>( any, param );
+            simpleToPBParam<co::uint16>( any, descriptor, param );
             break;
         case co::TK_INT32:
-            simpleToPBParam<co::int32>( any, param );
+            simpleToPBParam<co::int32>( any, descriptor, param );
             break;
         case co::TK_UINT32:
-            simpleToPBParam<co::uint32>( any, param );
-            break;
-        case co::TK_INT64:
-            simpleToPBParam<co::int64>( any, param );
-            break;
-        case co::TK_UINT64:
-            simpleToPBParam<co::uint64>( any, param );
+            simpleToPBParam<co::uint32>( any, descriptor, param );
             break;
         case co::TK_FLOAT:
-            simpleToPBParam<float>( any, param );
+            simpleToPBParam<float>( any, descriptor, param );
             break;
         case co::TK_DOUBLE:
-            simpleToPBParam<double>( any, param );
+            simpleToPBParam<double>( any, descriptor, param );
             break;
         case co::TK_STRING:
-            simpleToPBParam<std::string>( any, param );
+            simpleToPBParam<const std::string&>( any, descriptor, param );
             break;
         case co::TK_STRUCT:
         case co::TK_NATIVECLASS:
-            complexToPBParam( any, param );
+            complexToPBParam( any, descriptor, param );
             break;
         case co::TK_ANY:
-            anyToPBParam( any, param );
+            anyToPBParam( any, descriptor, param );
             break;
         default:
             assert( false );
     }
 }
 
-void anyToPBParam( const co::Any& any, Parameter* param )
+void anyToPBParam( const co::Any& any, co::IType* descriptor, Parameter* param )
 {
     Container* container = param->add_container();
     Any_Type* any_type = container->mutable_any_type();
     
-    const co::Any& internalAny =  any.get<const co::Any&>();
+    co::Any asIn = any.asIn();
     
-    co::TypeKind internalKind = internalAny.getKind();
+    co::TypeKind internalKind = asIn.getKind();
     
     if( internalKind == co::TK_INTERFACE )
         CORAL_THROW( RemotingException, "interfaces inside anys nyi" );
@@ -183,45 +132,56 @@ void anyToPBParam( const co::Any& any, Parameter* param )
     any_type->set_kind( internalKind );
     
     if( internalKind == co::TK_STRUCT || internalKind == co::TK_NATIVECLASS )
-        any_type->set_type( internalAny.getType()->getFullName() );
+        any_type->set_type( asIn.getType()->getFullName() );
         
-    if( internalKind != co::TK_NONE )
-        valueToPBParam( internalAny, any_type->mutable_param() );
+    if( internalKind != co::TK_NULL )
+        valueToPBParam( asIn, asIn.getType(), any_type->mutable_param() );
 }
  
-void complexToPBParam( const co::Any& complex, Parameter* complexParam );
+void complexToPBParam( const co::Any& complex, co::IType* descriptor, Parameter* complexParam );
     
-void complexArrayToPBParam( const co::Any& complexArray, Parameter* complexArrayParam )
+void complexArrayToPBParam( const co::Any& complexArray, co::IType* descriptor, 
+                           Parameter* complexArrayParam )
 {
-    AnyArrayUtil aau;
-    co::int32 size = aau.getArraySize( complexArray );
+    co::IType* elementsType = co::cast<co::IArray>( descriptor )->getElementType();
+    co::int32 size = complexArray.getCount();
     for( int i = 0; i < size; i++ )
     {
-        co::Any element;
-        aau.getArrayElement( complexArray, i, element );
-        complexToPBParam( element, complexArrayParam );
+        const co::Any& element = complexArray[i];
+        complexToPBParam( element, elementsType, complexArrayParam );
     }
 }
     
-void complexToPBParam( const co::Any& complex, Parameter* complexParam )
+void complexToPBParam( const co::Any& complex, co::IType* descriptor, Parameter* complexParam )
 {
-    if( complex.getKind() == co::TK_ARRAY )
+    if( descriptor->getKind() == co::TK_ARRAY )
     {
-        complexArrayToPBParam( complex, complexParam );
+        complexArrayToPBParam( complex, descriptor, complexParam );
         return;
     }
     
-    co::IRecordType* rt = co::cast<co::IRecordType>( complex.getType() );
+    co::IRecordType* rt = co::cast<co::IRecordType>( descriptor );
     co::IReflector* refl = rt->getReflector();
     Container* container = complexParam->add_container();
     Complex_Type* complexType = container->mutable_complex_type();
     
-    for( co::Range<co::IField* const> fields = rt->getFields(); fields; fields.popFirst() )
+    for( co::TSlice<co::IField*> fields = rt->getFields(); fields; fields.popFirst() )
     {
+        co::IField* field = fields.getFirst();
+        co::IType* fieldType = field->getType();
         Parameter* fieldArg = complexType->add_field();
-        co::Any fieldAny;
+        
+        co::AnyValue av; co::Any fieldAny( av );
+        
         refl->getField( complex, fields.getFirst(), fieldAny );
-        valueToPBParam( fieldAny, fieldArg );
+        valueToPBParam( fieldAny, fieldType, fieldArg );
+        
+        if( fieldType->getKind() == co::TK_ANY )
+        {
+            const Any_Type& any_type = fieldArg->container( 0 ).any_type();
+            
+            CORAL_LOG(INFO) << "Int inside Any: " << any_type.param().container( 0 ).numeric();
+        }
     }
 }
     
@@ -255,12 +215,12 @@ ParameterPusher::ParameterPusher()
 {
 }
 
-void ParameterPusher::pushValue( const co::Any& valueType )
+void ParameterPusher::pushValue( const co::Any& valueType, co::IType* descriptor )
 {
     assert( _invocation );
     
     Parameter* PBParam = _invocation->add_params();
-    valueToPBParam( valueType, PBParam );
+    valueToPBParam( valueType, descriptor, PBParam );
 }
 
 void ParameterPusher::pushReference( const ReferenceType& refType )
@@ -368,14 +328,14 @@ void Marshaller::marshalIntReturn( co::int32 value, outString msg )
     _message->Clear();
 }
 
-void Marshaller::marshalValueTypeReturn( const co::Any& valueAny, outString msg )
+void Marshaller::marshalValueTypeReturn( const co::Any& valueAny, co::IType* retType, outString msg )
 {
     assert( _msgClear );
     
     _message->set_type( Message::RETURN );
     
     Parameter* param = _message->mutable_ret_value();
-    valueToPBParam( valueAny, param );
+    valueToPBParam( valueAny, retType, param );
     
     _message->SerializeToString( &msg );
     _message->Clear();

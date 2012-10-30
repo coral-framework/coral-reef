@@ -13,5 +13,5 @@ interface IComplexTypes
 	
 	ChildStruct[] placeNatives( in ChildStruct[] childs, in StringNativeClass[] natives );
 	// This method expects to receive a MotherStruct array even though it receives an any[]
-	any[] extractChilds( in any[] mothers );
+	//any[] extractChilds( out any[] mothers );
 };

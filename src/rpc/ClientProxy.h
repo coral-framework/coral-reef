@@ -9,7 +9,6 @@
 #include <rpc/IConnector.h>
 #include <co/RefPtr.h>
 #include <co/IService.h>
-#include <co/RefVector.h>
 
 namespace rpc {
     
@@ -31,7 +30,7 @@ public:
     co::IPort* dynamicGetFacet( co::int32 dynFacetId );
     void dynamicGetField( co::int32 dynFacetId, co::IField* field, const co::Any& value );
     void dynamicInvoke( co::int32 dynFacetId, co::IMethod* method, 
-                                 co::Range<co::Any> args, const co::Any& result );
+                                 co::Slice<co::Any> args, const co::Any& result );
     co::int32 dynamicRegisterService( co::IService* dynamicServiceProxy );
     void dynamicSetField( co::int32 dynFacetId, co::IField* field, const co::Any& value );
     

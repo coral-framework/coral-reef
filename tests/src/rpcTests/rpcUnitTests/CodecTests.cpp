@@ -147,8 +147,8 @@ TEST( CodecTests, simpleTypesTest )
     co::Any stringArrayParam;
     puller.pullValue( stringArrayType, stringArrayParam );
     
-    const co::Range<const co::int32> intRange = intArrayParam.get<const co::Range<const co::int32> >();
-    const co::Range<const std::string> stringRange = stringArrayParam.get<const co::Range<const std::string> >();
+    co::TSlice<co::int32> intRange = intArrayParam.get<co::TSlice<co::int32> >();
+    co::TSlice<std::string> stringRange = stringArrayParam.get<co::TSlice<std::string> >();
     for( int i = 0; i < 10; i++ )
     {
         char letter[2];
@@ -190,8 +190,8 @@ TEST( CodecTests, simpleTypesTest )
 	demarshaller.demarshal( msg );
     demarshaller.getValueTypeReturn( stringArrayType, stringArrayValue );
 
-	const co::Range<const co::int32> intRange2 = intArrayValue.get<const co::Range<const co::int32> >();
-    const co::Range<const std::string> stringRange2 = stringArrayValue.get<const co::Range<const std::string> >();
+	co::TSlice<co::int32> intRange2 = intArrayValue.get<co::TSlice<co::int32> >();
+    co::TSlice<std::string> stringRange2 = stringArrayValue.get<co::TSlice<std::string> >();
     for( int i = 0; i < 10; i++ )
     {
         char letter[2];
