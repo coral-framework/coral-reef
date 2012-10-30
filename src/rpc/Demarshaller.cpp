@@ -60,11 +60,10 @@ static void PBParamWithTypeToAny( const Parameter& param, const co::Any& ret, co
     if( size == 0 ) // required for vector subscript out of range assertion
         return;
     
-    std::vector<T>& vec = ret.get<std::vector<T>&>();
-    vec.reserve( size );
+	ret.resize( size );
     for( int i = 0; i < size; i++ )
     {
-        vec.push_back( getPBContainerData<T>( param.container( i ) ) );
+        ret[i].put( getPBContainerData<T>( param.container( i ) ) );
     }
 }
     

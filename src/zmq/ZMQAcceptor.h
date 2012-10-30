@@ -20,7 +20,7 @@ public:
 
 	// ------ rpc.IAcceptor Methods ------ //
 
-	const std::string& getAddress() { return _address; }
+	std::string getAddress() { return _address; }
 
 	bool receive( std::string& msg );
 

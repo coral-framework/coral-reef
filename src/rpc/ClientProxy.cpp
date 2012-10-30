@@ -102,33 +102,6 @@ void ClientProxy::dynamicSetField( co::int32 dynFacetId, co::IField* field, cons
     _requestor->requestSetField( mo, field, value );
 }
 
-static void printRet( co::IRecordType* rt, const co::Any instance )
-{
-    co::IReflector* refl = rt->getReflector();
-    for( co::TSlice<co::IField*> fields = rt->getFields(); fields; fields.popFirst() )
-    {
-        co::IField* field = fields.getFirst();
-        co::IType* fieldType = field->getType();
-        
-        co::AnyValue av; co::Any fieldAny( av );
-        
-        refl->getField( instance, fields.getFirst(), fieldAny );
-        
-        CORAL_LOG(INFO) << "Field of type " << fieldType->getName() << " got value of type " << fieldAny.asIn().getType()->getName();
-        
-        if( fieldAny.getKind() == co::TK_ANY && fieldAny.asIn().getKind() == co::TK_INT32 )
-        {
-            CORAL_LOG(INFO) << "Int inside any has value of " << fieldAny.asIn().get<co::int32>();
-        }
-        
-        if( fieldAny.asIn().getKind() == co::TK_STRUCT )
-        {
-            CORAL_LOG(INFO) << "Recursively printing field struct";
-            printRet( co::cast<co::IRecordType>( fieldType ), fieldAny );
-        }
-    }
-}
-    
 void ClientProxy::dynamicInvoke( co::int32 dynFacetId, co::IMethod* method, 
                                            co::Slice<co::Any> args, const co::Any& result )
 {
@@ -143,16 +116,6 @@ void ClientProxy::dynamicInvoke( co::int32 dynFacetId, co::IMethod* method,
     else
         _requestor->requestSynchCall( mo, method, args, result );
     
-    CORAL_LOG(INFO) << "Returning a " << result.asIn().getType()->getName() << " of kind " << result.asIn().getKind();
-    
-    co::IType* elementsType = co::cast<co::IArray>( result.getType() )->getElementType();
-    co::int32 size = result.getCount();
-    for( int i = 0; i < size; i++ )
-    {
-        co::IRecordType* rt = co::cast<co::IRecordType>( elementsType );
-        CORAL_LOG(INFO) << "Printing " << result.getType()->getName() << " " << i;
-        printRet( rt, result[i] );
-    }
 }
 
 co::int32 ClientProxy::dynamicRegisterService( co::IService* dynamicServiceProxy )

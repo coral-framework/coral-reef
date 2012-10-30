@@ -23,7 +23,7 @@ public:
 
 	// ------ rpc.IConnector Methods ------ //
 
-	const std::string& getAddress() { return _address; }
+	std::string getAddress() { return _address; }
 
 	bool receiveReply( std::string& msg );
 
