@@ -7,8 +7,6 @@
 
 #include <co/Coral.h>
 #include <co/IObject.h>
-#include <co/RefPtr.h>
-#include <co/Range.h>
 #include <co/Any.h>
 #include <co/Log.h>
 #include <co/IllegalStateException.h>
@@ -69,7 +67,7 @@ public:
 
 	}
 
-	bool onSubscribed(  co::Range<co::int8> bytes, const std::string& modelName  )
+	bool onSubscribed(  co::Slice<co::int8> bytes, const std::string& modelName  )
 	{
 		ca::IModel* model = getModel( modelName ).get();
 
@@ -96,7 +94,7 @@ public:
 		return true;
 	}
 	
-	bool onPublish( co::Range<flow::NewObject> newObjects, co::Range<flow::ChangeSet> changes )
+	bool onPublish( co::Slice<flow::NewObject> newObjects, co::Slice<flow::ChangeSet> changes )
 	{
 		if( !ready )
 		{
@@ -108,7 +106,7 @@ public:
 			const std::string& script = "flow.SpaceSyncClient";
 			const std::string& function = "applyReceivedChanges";
 		
-			co::Range<co::Any> results;
+			co::Slice<co::Any> results;
 
 			co::Any args[3];
 			args[0] = _space.get();
@@ -141,7 +139,7 @@ private:
 			const std::string& script = "flow.SpaceSyncClient";
 			const std::string& function = "initializeIds";
 
-			co::Range<co::Any> results;
+			co::Slice<co::Any> results;
 
 			co::Any args[1];
 			args[0] = _space.get();
@@ -170,13 +168,13 @@ private:
 	}
 
 private:
-	co::RefPtr<co::IObject> _rootObject;
-	co::RefPtr<ca::ISpace> _space;
+	co::IObjectRef _rootObject;
+	ca::ISpaceRef _space;
 	
-	co::RefPtr<ca::IArchive> _archive;
-	co::RefPtr<co::IObject> _archiveObj;
+	ca::IArchiveRef _archive;
+	co::IObjectRef _archiveObj;
 
-	co::RefPtr<ca::IModel> _model;
+	ca::IModelRef _model;
 
 	bool ready;
 

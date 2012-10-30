@@ -1,8 +1,6 @@
 #include "Product_Base.h"
 #include <dom/IProduct.h>
 #include <dom/IEmployee.h>
-#include <co/RefVector.h>
-#include <co/RefPtr.h>
 
 namespace dom {
 
@@ -25,12 +23,12 @@ namespace dom {
 		double getValue() { return _earnings; }
 		void setValue( double earnings ) { _earnings = earnings; }
 
-		co::Range<IEmployee*> getDevelopers()
+		co::TSlice<IEmployee*> getDevelopers()
 		{
 			return _developers;
 		}
 
-		void setDevelopers( co::Range<IEmployee*> developers )
+		void setDevelopers( co::Slice<IEmployee*> developers )
 		{
 			co::assign( developers, _developers );
 		}
@@ -51,8 +49,8 @@ namespace dom {
 	private:
 		std::string _name;
 		double _earnings;
-		co::RefVector<IEmployee> _developers;
-		co::RefPtr<IEmployee> _leader;
+		std::vector<IEmployeeRef> _developers;
+		IEmployeeRef _leader;
 
 	};
 

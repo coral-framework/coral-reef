@@ -108,15 +108,15 @@ public:
 		const std::string& script = "flow.SpaceSyncServer";
 		const std::string& function = "processAllSpaceChanges";
 
-		co::Range<co::Any> results;
+		co::Slice<co::Any> results;
 
 		co::Any args[3];
 		args[0] = _space.get();
-		args[1] = co::Range<ca::IGraphChanges*>( _allChanges );
-		args[2] = co::Range<flow::ISpaceSubscriber*>( _subscribers );
+		args[1] = co::Slice<ca::IGraphChanges*>( _allChanges );
+		args[2] = co::Slice<flow::ISpaceSubscriber*>( _subscribers );
 		
 		co::getService<lua::IState>()->call( script, function,
-			co::Range<co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
+			co::Slice<co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
 			results );
 		
 		_allChanges.clear();
@@ -132,7 +132,7 @@ protected:
 
 private:
 
-	co::Range<co::int8> getPublishedSpaceData()
+	co::Slice<co::int8> getPublishedSpaceData()
 	{
 		if( !_space.isValid() )
 		{
@@ -154,22 +154,22 @@ private:
 		const std::string& script = "flow.SpaceSyncServer";
 		const std::string& function = "initializeIds";
 
-		co::Range<co::Any> results;
+		co::Slice<co::Any> results;
 
 		co::Any args[1];
 		args[0] = _space.get();
 
 		co::getService<lua::IState>()->call( script, function,
-			co::Range<co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
+			co::Slice<co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
 			results );
 	}
 private:
-	co::RefPtr<ca::ISpace> _space;
-	co::RefPtr<ca::IArchive> _archive;
-	co::RefPtr<co::IObject> _archiveObj;
-	co::RefVector<ca::IGraphChanges> _allChanges;
+	ca::ISpaceRef _space;
+	ca::IArchiveRef _archive;
+	co::IObjectRef _archiveObj;
+	std::vector<ca::IGraphChangesRef> _allChanges;
 	
-	co::RefVector<flow::ISpaceSubscriber> _subscribers;
+	std::vector<flow::ISpaceSubscriberRef> _subscribers;
 	std::vector<co::int8> data;
 };
 
