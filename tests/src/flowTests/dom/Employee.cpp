@@ -1,7 +1,5 @@
 #include "Employee_Base.h"
 #include <dom/IProject.h>
-#include <co/RefVector.h>
-#include <co/Range.h>
 
 namespace dom {
 
@@ -28,12 +26,12 @@ namespace dom {
 			_role = role;
 		}
 
-		co::Range<IProject*> getWorking()
+		co::TSlice<IProject*> getWorking()
 		{
 			return _working;
 		}
 
-		void setWorking( co::Range<IProject*> working )
+		void setWorking( co::Slice<IProject*> working )
 		{
 			co::assign( working, _working );
 		}
@@ -51,8 +49,8 @@ namespace dom {
 
 
 	private:
-		co::RefPtr<IProject> _leading;
-		co::RefVector<IProject> _working;
+		IProjectRef _leading;
+		std::vector<IProjectRef> _working;
 		std::string _name;
 		std::string _role;
 		co::int32 _salary;
