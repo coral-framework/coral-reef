@@ -5,6 +5,7 @@
 
 #include <co/Any.h>
 #include <co/Coral.h>
+#include <co/IType.h>
 #include <co/Exception.h>
 
 #include <string>
@@ -55,7 +56,7 @@ struct InvocationDetails
 class ParameterPusher
 {
 public:    
-    void pushValue( const co::Any& valueType );
+    void pushValue( const co::Any& valueType, co::IType* descriptor );
     void pushReference( const ReferenceType& refType );
     
     friend class Marshaller;
@@ -107,7 +108,7 @@ public:
     
     // Return values
     void marshalIntReturn( co::int32 value, outString msg );
-    void marshalValueTypeReturn( const co::Any& valueAny, outString msg );
+    void marshalValueTypeReturn( const co::Any& valueAny, co::IType* retType, outString msg );
     void marshalRefTypeReturn( const ReferenceType& refType, outString msg );
     
     // Exceptions

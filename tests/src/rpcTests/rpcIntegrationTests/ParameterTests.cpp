@@ -11,10 +11,10 @@
 #include <rpc/INode.h>
 #include <rpc/ITransport.h>
 
+#include <co/Log.h>
 #include <co/Coral.h>
 #include <co/RefPtr.h>
 #include <co/IObject.h>
-#include <co/RefVector.h>
 
 #define INT1 10
 #define INT2 20
@@ -24,7 +24,7 @@
 #define DOUBLE1 10.0
 #define STRING1 "string1"
 #define STRING2 "string2"
-#define TESTVECSIZE 10
+#define TESTVECSIZE 2
 #define CHAR1 65
 #define CHAR2 75
 #define CHAR3 85
@@ -58,15 +58,14 @@ TEST( ParameterTests, simpleTypesTest )
     EXPECT_STREQ( testString.c_str() , simple->getStoredString().c_str() );
     
     // ------ Simple values stored inside Any ------ //
-    co::Any d1; d1.set<double>( 4 );
-    const co::Any& dResult = simple->addDoublesFromAny( d1, d1 ); // Cannot pass different anys now
+    co::Any d1( 4.0 );
+    co::AnyValue dResult = simple->addDoublesFromAny( d1, d1 ); // Cannot pass different anys now
     EXPECT_DOUBLE_EQ( 8, dResult.get<double>() );
     
-    co::Any str1Any; 
-    std::string& str1 = str1Any.createString();
-    str1 = "test";
-    const co::Any& strResult = simple->concatenateFromAny( str1Any, str1Any );
-    EXPECT_STREQ( "testtest", strResult.get<const std::string&>().c_str() );
+    std::string str1( STRING1 );
+    co::Any str1Any( str1 );
+    co::AnyValue strResult( simple->concatenateFromAny( str1Any, str1Any ) );
+    EXPECT_STREQ( "string1string1", strResult.get<const std::string&>().c_str() );
     
     // ------ Simple value Types Arrays ------ //
     std::vector<co::int32> intVec;
@@ -85,11 +84,11 @@ TEST( ParameterTests, simpleTypesTest )
     simple->setStoredIntList( intVec );
     simple->setParentStringList( stringVec );
     
-    co::Range<const co::int32> intRange = simple->getStoredIntList();
+    co::TSlice<co::int32> intRange = simple->getStoredIntList();
     for( int i = 0; i < intVec.size(); i++ )
         EXPECT_EQ( intVec[i], intRange[i] );
     
-    co::Range<const double> doubleRange = simple->parentMergeLists( doubleVec, doubleVec );
+    co::TSlice<double> doubleRange = simple->parentMergeLists( doubleVec, doubleVec );
     int size = doubleRange.getSize();
 
     for( int i = 0; i < size; i++ )
@@ -99,7 +98,7 @@ TEST( ParameterTests, simpleTypesTest )
         EXPECT_DOUBLE_EQ( comparison, value );
     }
     
-    co::Range<const std::string> stringRange = simple->getParentStringList();
+    co::TSlice<std::string> stringRange = simple->getParentStringList();
     for( int i = 0; i < intVec.size(); i++ )
         EXPECT_STREQ( stringVec[i].c_str(), stringRange[i].c_str() );
     
@@ -207,7 +206,7 @@ TEST( ParameterTests, complexTypeParameterTest )
     cs.myNativeClass = native;
     cs.id = 2;
     cs.name = "setChild";
-    cs.anything.set<co::int32>( INT1 );
+    cs.anything.set( INT1 );
     ms.id = 1;
     ms.name = "setMother";
     ms.child = cs;
@@ -258,8 +257,8 @@ TEST( ParameterTests, complexTypeParameterTest )
     co::Any anyMother;
     anyMother.set<const stubs::MotherStruct&>( ms );
     
-    co::Any anyChild_ = rmtComplexTypes->getChild( anyMother );
-    stubs::ChildStruct cs3_ = anyChild_.get<const stubs::ChildStruct&>();
+    co::AnyValue anyChild_ = rmtComplexTypes->getChild( anyMother );
+    stubs::ChildStruct cs3_ = anyChild_.get<stubs::ChildStruct&>();
     EXPECT_EQ( cs3_.id, 5 );
     EXPECT_STREQ( cs3_.name.c_str(), "childAny" );
     
@@ -271,9 +270,9 @@ TEST( ParameterTests, complexTypeParameterTest )
     co::Any anyNative;
     anyNative.set<const stubs::StringNativeClass&>( native );
     
-    co::Any anyNative2_ = rmtComplexTypes->setNativeClassValue( anyNative, "nativeAny2" );
+    co::AnyValue anyNative2_ = rmtComplexTypes->setNativeClassValue( anyNative, "nativeAny2" );
     
-    stubs::StringNativeClass native4_ = anyNative2_.get<const stubs::StringNativeClass&>();
+    stubs::StringNativeClass native4_ = anyNative2_.get<stubs::StringNativeClass&>();
 
     EXPECT_STREQ( native4_.data.c_str(), "nativeAny2" );
     
@@ -316,7 +315,7 @@ TEST( ParameterTests, complexArrayTest )
         mss[i].child.id = INT1 + i;
         mss[i].child.name = std::string( testString );
         mss[i].child.myNativeClass.data = std::string( testString );
-        mss[i].child.anything.set<co::int32>( INT1 + i );
+        mss[i].child.anything.set( INT1 + i );
         
         testString[0] = CHAR2 + i;
         
@@ -324,15 +323,14 @@ TEST( ParameterTests, complexArrayTest )
         css[i].id = INT2 + i;
         css[i].name = std::string( testString );
         css[i].myNativeClass.data = std::string( testString );
-        css[i].anything.set<co::int32>( INT2 + i );
+        css[i].anything.set( INT2 + i );
         
         // Setting up the Native classes array
         testString[0] = CHAR3 + i;
         natives[i].data = std::string( testString );
     }
-    
     // Call the methods
-    co::Range<const stubs::MotherStruct> mss_ = remoteCT->placeChilds( mss, css );
+    co::TSlice<stubs::MotherStruct> mss_ = remoteCT->placeChilds( mss, css );
     testString[1] = '\0';
     for( int i = 0; i < TESTVECSIZE; i++ )
     {
@@ -346,7 +344,8 @@ TEST( ParameterTests, complexArrayTest )
         EXPECT_EQ( mss_[i].child.anything.get<co::int32>(), INT2 + i );
     }
     
-    co::Range<const stubs::ChildStruct> css_ = remoteCT->placeNatives( css, natives );
+   
+    co::TSlice<stubs::ChildStruct> css_ = remoteCT->placeNatives( css, natives );
     testString[1] = '\0';
     for( int i = 0; i < TESTVECSIZE; i++ )
     {

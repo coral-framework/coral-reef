@@ -34,7 +34,7 @@ enum MessageType
 class ParameterPuller
 {
 public:
-    void pullValue( co::IType* descriptor, co::Any& valueType );
+    void pullValue( co::IType* descriptor, const co::Any& ret );
     void pullReference( ReferenceType& refType );
     
     friend class Demarshaller;
@@ -70,7 +70,7 @@ public:
     ParameterPuller& getInvocation( outString requesterEndpoint, InvocationDetails& details );
     
     // If MessageType is Return, then this method retrives the return.
-    void getValueTypeReturn( co::IType* descriptor, co::Any& valueAny );
+    void getValueTypeReturn( co::IType* descriptor, const co::Any& ret );
     void getRefTypeReturn( ReferenceType& refType );
     co::int32 getIntReturn();
     

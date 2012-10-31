@@ -12,10 +12,10 @@
 #include <rpc/ITransport.h>
 #include <rpc/RemotingException.h>
 
+#include <co/Log.h>
 #include <co/Coral.h>
 #include <co/RefPtr.h>
 #include <co/IObject.h>
-#include <co/RefVector.h>
 
 namespace rpc {
 

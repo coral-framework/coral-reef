@@ -2,7 +2,6 @@
 #include <dom/IEmployee.h>
 #include <dom/IService.h>
 #include <dom/IProduct.h>
-#include <co/RefVector.h>
 
 namespace dom {
 
@@ -19,22 +18,22 @@ namespace dom {
 			// empty
 		}
 
-		co::Range<IEmployee* const> getEmployees()
+		co::TSlice<IEmployee*> getEmployees()
 		{
 			return _employees;
 		}
 
-		void setEmployees( co::Range<IEmployee* const> employees )
+		void setEmployees( co::Slice<IEmployee*> employees )
 		{
 			co::assign( employees, _employees );
 		}
 
-		co::Range<dom::IService* const> getServices()
+		co::TSlice<dom::IService*> getServices()
 		{
 			return _services;
 		}
 
-		void setServices( co::Range<dom::IService* const> services )
+		void setServices( co::Slice<dom::IService*> services )
 		{
 			co::assign( services, _services );
 
@@ -49,12 +48,12 @@ namespace dom {
 
 		}
 
-		co::Range<IProduct* const> getProducts()
+		co::TSlice<IProduct*> getProducts()
 		{
 			return _products;
 		}
 
-		void setProducts( co::Range<IProduct* const> products )
+		void setProducts( co::Slice<IProduct*> products )
 		{
 			co::assign( products, _products );
 
@@ -80,10 +79,10 @@ namespace dom {
 			_ceo = ceo;
 		}
 	private:
-		co::RefVector<IEmployee> _employees;
-		co::RefVector<dom::IService> _services;
-		co::RefVector<IProduct> _products;
-		co::RefPtr<IEmployee> _ceo;
+		std::vector<IEmployeeRef> _employees;
+		std::vector<dom::IServiceRef> _services;
+		std::vector<IProductRef> _products;
+		IEmployeeRef _ceo;
 	};
 
 	CORAL_EXPORT_COMPONENT( Company, Company )

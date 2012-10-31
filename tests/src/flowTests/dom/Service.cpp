@@ -1,8 +1,6 @@
 #include "Service_Base.h"
 #include <dom/IService.h>
 #include <dom/IEmployee.h>
-#include <co/RefVector.h>
-#include <co/RefPtr.h>
 
 namespace dom {
 
@@ -19,18 +17,18 @@ namespace dom {
 			// empty
 		}
 
-		const std::string& getName() { return _name; }
+		std::string getName() { return _name; }
 		void setName( const std::string& name ) { _name = name; }
 
 		double getMonthlyIncome() { return _earnings; }
 		void setMonthlyIncome( double earnings ) { _earnings = earnings; }
 
-		co::Range<IEmployee* const> getMantainers()
+		co::TSlice<IEmployee*> getMantainers()
 		{
 			return _developers;
 		}
 
-		void setMantainers( co::Range<IEmployee* const> developers )
+		void setMantainers( co::Slice<IEmployee*> developers )
 		{
 			co::assign( developers, _developers );
 		}
@@ -41,7 +39,7 @@ namespace dom {
 	private:
 		std::string _name;
 		double _earnings;
-		co::RefVector<IEmployee> _developers;
+		std::vector<IEmployeeRef> _developers;
 
 	};
 

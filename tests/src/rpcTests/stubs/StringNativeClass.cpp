@@ -8,7 +8,7 @@
 
 namespace stubs {
 
-const std::string& StringNativeClass_Adapter::getValue( stubs::StringNativeClass& instance )
+std::string StringNativeClass_Adapter::getValue( stubs::StringNativeClass& instance )
 {
 	return instance.data;
 }

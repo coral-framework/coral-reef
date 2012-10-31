@@ -4,10 +4,13 @@
 #include "Requestor.h"
 
 #include <rpc/IConnector.h>
+
+#include <co/Log.h>
 #include <co/IPort.h>
 #include <co/IField.h>
 #include <co/IMethod.h>
 #include <co/IReflector.h>
+#include <co/IRecordType.h>
 #include <co/IParameter.h>
 
 #include <map>
@@ -42,7 +45,7 @@ void ClientProxy::setComponent( co::IComponent* component )
 	_component = component;
     
 	// create proxy interfaces for our facets
-	co::Range<co::IPort* const> facets = _component->getFacets();
+	co::TSlice<co::IPort*> facets = _component->getFacets();
 	int numFacets = static_cast<int>( facets.getSize() );
     _facets = new co::IService*[numFacets];
     _interfaces = new co::IInterface*[numFacets];
@@ -81,14 +84,14 @@ co::IPort* ClientProxy::dynamicGetFacet( co::int32 cookie )
     return _component->getFacets()[cookie];
 }
         
-const co::Any& ClientProxy::dynamicGetField( co::int32 dynFacetId, co::IField* field )
+void ClientProxy::dynamicGetField( co::int32 dynFacetId, co::IField* field, 
+                                            const co::Any& value )
 {
     co::int32 depth = findDepth( _interfaces[dynFacetId], field->getOwner() );
 
     MemberOwner mo( _instanceID, dynFacetId, depth );
-    _requestor->requestGetField( mo, field, _resultBuffer );
     
-    return _resultBuffer;
+    _requestor->requestGetField( mo, field, value );
 }
     
 void ClientProxy::dynamicSetField( co::int32 dynFacetId, co::IField* field, const co::Any& value )
@@ -99,8 +102,8 @@ void ClientProxy::dynamicSetField( co::int32 dynFacetId, co::IField* field, cons
     _requestor->requestSetField( mo, field, value );
 }
 
-const co::Any& ClientProxy::dynamicInvoke( co::int32 dynFacetId, co::IMethod* method, 
-                                           co::Range<co::Any const> args )
+void ClientProxy::dynamicInvoke( co::int32 dynFacetId, co::IMethod* method, 
+                                           co::Slice<co::Any> args, const co::Any& result )
 {
     co::int32 depth = findDepth( _interfaces[dynFacetId], method->getOwner() );
     
@@ -111,12 +114,8 @@ const co::Any& ClientProxy::dynamicInvoke( co::int32 dynFacetId, co::IMethod* me
     if( !returnType )
         _requestor->requestAsynchCall( mo, method, args );
     else
-    {
-        _resultBuffer.clear();
-        _requestor->requestSynchCall( mo, method, args, _resultBuffer );
-    }
+        _requestor->requestSynchCall( mo, method, args, result );
     
-    return _resultBuffer;
 }
 
 co::int32 ClientProxy::dynamicRegisterService( co::IService* dynamicServiceProxy )
@@ -142,7 +141,7 @@ co::int32 ClientProxy::findDepth( co::IInterface* facet, co::ICompositeType* mem
     if( memberOwner == facet )
         return -1;
 
-    co::Range<co::IInterface* const> superTypes( facet->getSuperTypes() );
+    co::TSlice<co::IInterface*> superTypes( facet->getSuperTypes() );
     for( int i = 0; superTypes; superTypes.popFirst(), i++ )
     {
         if( superTypes.getFirst() == memberOwner )

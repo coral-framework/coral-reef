@@ -2,7 +2,7 @@
 #define __LOCAL_SPACE_OBSERVER__
 
 #include <co/Coral.h>
-#include <co/RefVector.h>
+
 #include <ca/IGraphChanges.h>
 #include <ca/IGraphObserver.h>
 
@@ -25,7 +25,7 @@ public:
 	
 
 private:
-	co::RefVector<ca::IGraphChanges> _lastChanges;
+	std::vector<ca::IGraphChangesRef> _lastChanges;
 		
 };
 

@@ -4,7 +4,6 @@
  */
 
 #include "CompanySpace.h"
-#include <co/RefVector.h>
 
 #include <co/Log.h>
 
@@ -108,7 +107,7 @@ co::IObject* CompanySpace::createCompanyGraph()
 	_dataMaintain->setName( "Software1.0 Maintenance" );
 	_dataMaintain->setMonthlyIncome( 50000 );
 
-	co::RefVector<dom::IEmployee> maintainers;
+	std::vector<dom::IEmployeeRef> maintainers;
 	maintainers.push_back( _developer1.get() );
 	maintainers.push_back( _developer4.get() );
 

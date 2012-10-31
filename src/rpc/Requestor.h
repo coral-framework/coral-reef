@@ -63,14 +63,14 @@ public:
     co::IObject* requestPublicInstance( const std::string& key, const std::string& componentName );
     
     void requestAsynchCall( MemberOwner& owner, co::IMethod* method,  
-                                 co::Range<co::Any const> args );
+                                 co::Slice<co::Any> args );
     
     void requestSynchCall( MemberOwner& owner, co::IMethod* method, 
-                                co::Range<co::Any const> args, co::Any& ret );
+                                co::Slice<co::Any> args, const co::Any& ret );
     
     void requestSetField( MemberOwner& owner, co::IField* field, const co::Any arg );
     
-    void requestGetField( MemberOwner& owner, co::IField* field, co::Any& ret );
+    void requestGetField( MemberOwner& owner, co::IField* field, const co::Any& ret );
     
     void requestLease( co::int32 instanceID, std::string lessee );
     
@@ -86,13 +86,13 @@ public:
     
 private:
     
-    void pushParameters( co::IMethod* method, co::Range<co::Any const> args, 
+    void pushParameters( co::IMethod* method, co::Slice<co::Any> args, 
                            ParameterPusher& pusher );
     
     // Extracts all the necessary info from \param param and saves it on \param refType.
     void getProviderInfo( co::IService* param, ReferenceType& refType );
     
-    void getReturn( const std::string& data, co::IType* returnedType, co::Any& ret );
+    void getReturn( const std::string& data, co::IType* returnedType, const co::Any& ret );
 
     void raiseReturnedException( Demarshaller& _demarshaller );
 private:
