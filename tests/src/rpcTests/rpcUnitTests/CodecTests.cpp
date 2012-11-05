@@ -83,13 +83,13 @@ TEST( CodecTests, simpleTypesTest )
     // ------ call value types TODO:Complex types
     
     // all the possible parameter types
-    co::AnyValue intAny = INT1;
-    co::AnyValue doubleAny = DOUBLE1;
+    co::AnyValue intAny( INT1 );
+    co::AnyValue doubleAny( DOUBLE1 );
     
-	std::string stringRef = STRING1;
+	std::string stringRef( STRING1 );
 
 	co::Any stringParam( stringRef );
-	co::AnyValue boolAny = BOOL1; 
+	co::AnyValue boolAny( BOOL1 );  
 
     std::vector<co::int32> intArray;
 	std::vector<std::string> stringArray;
