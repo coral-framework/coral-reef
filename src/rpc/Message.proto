@@ -20,9 +20,9 @@ message Message
 	
 	optional Invocation invocation = 3;
 	optional Request request = 4;
-	optional Parameter ret_value = 5;
-	optional int32 ret_int = 6;
-	optional Exception exception = 7;
+	optional int32 ret_int = 5;
+	optional Exception exception = 6;
+	repeated Parameter output = 7; // elem 0 is the returned value followed by out params respectively
 }
 
 message Request

@@ -3,6 +3,8 @@
 
 #include "Marshaller.h"
 
+#include "Message.pb.h"
+
 #include <co/Any.h>
 #include <co/Coral.h>
 
@@ -41,10 +43,10 @@ public:
 private:
     ParameterPuller();
     
-    void setInvocation( const Invocation* invocation );
+    void setParams( const ::google::protobuf::RepeatedPtrField< ::rpc::Parameter >* params );
     
     co::int32 _currentParam;
-    const Invocation* _invocation;
+    const ::google::protobuf::RepeatedPtrField< ::rpc::Parameter >* _params;
 };
   
 class Demarshaller
@@ -69,9 +71,7 @@ public:
     // If message type is Invocation, then this method gets the parameters
     ParameterPuller& getInvocation( outString requesterEndpoint, InvocationDetails& details );
     
-    // If MessageType is Return, then this method retrives the return.
-    void getValueTypeReturn( co::IType* descriptor, const co::Any& ret );
-    void getRefTypeReturn( ReferenceType& refType );
+	ParameterPuller& getOutput();
     co::int32 getIntReturn();
     
     ExceptionType getException( outString exTypeName, outString what );

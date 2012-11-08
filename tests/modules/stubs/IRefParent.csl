@@ -4,7 +4,8 @@
 
 interface IRefParent extends IGrandParent
 {
-	ISimpleTypes parentSimple;
+	void getParentSimple( out ISimpleTypes parentSimple );
+	void setParentSimple( in ISimpleTypes parentSimple );
 	
 	/*
 	Calls the increment int method on \a service passing \a number as parameter. Returns the result

@@ -112,9 +112,23 @@ void ClientProxy::dynamicInvoke( co::int32 dynFacetId, co::IMethod* method,
     co::IType* returnType = method->getReturnType();
     
     if( !returnType )
+	{
+		// Check for out parameters that make the method synchronous
+		for( co::TSlice<co::IParameter*> params = method->getParameters(); params; params.popFirst() )
+		{
+			if( params.getFirst()->getIsOut() )
+			{
+				_requestor->requestSynchCall( mo, method, args, result );
+				return;
+			}
+		}
+
         _requestor->requestAsynchCall( mo, method, args );
-    else
+	}
+	else
+	{
         _requestor->requestSynchCall( mo, method, args, result );
+	}
     
 }
 

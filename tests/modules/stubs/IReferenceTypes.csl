@@ -1,6 +1,7 @@
 interface IReferenceTypes extends IRefParent
 {
-	ISimpleTypes simple;
+	void getSimple( out ISimpleTypes simple );
+	void setSimple( in ISimpleTypes simple );
 	
 	int32 intFromSimple();
 	

@@ -233,7 +233,7 @@ void ParameterPuller::pullValue( co::IType* descriptor, const co::Any& ret )
 {
     try
     {
-        PBParamToValue( _invocation->params( _currentParam ), descriptor, ret );
+        PBParamToValue( _params->Get( _currentParam ), descriptor, ret );
         _currentParam++;
     }
     catch( std::string& e )
@@ -245,7 +245,7 @@ void ParameterPuller::pullValue( co::IType* descriptor, const co::Any& ret )
     
 void ParameterPuller::pullReference( ReferenceType& refType )
 {
-    const Parameter& param = _invocation->params( _currentParam );
+    const Parameter& param =  _params->Get( _currentParam );
     
     size_t paramSize = param.container().size();
     if( paramSize < 1 )
@@ -292,13 +292,13 @@ void ParameterPuller::pullReference( ReferenceType& refType )
     _currentParam++;
 }
  
-void ParameterPuller::setInvocation( const Invocation* invocation )
+void ParameterPuller::setParams( const ::google::protobuf::RepeatedPtrField< ::rpc::Parameter >* params )
 {
-    _invocation = invocation;
+    _params = params;
     _currentParam = 0;
 }
     
-ParameterPuller::ParameterPuller() : _currentParam( 0 ), _invocation( 0 )
+ParameterPuller::ParameterPuller() : _currentParam( 0 ), _params( 0 )
 {
 }
     
@@ -336,7 +336,7 @@ MessageType Demarshaller::demarshal( inString data )
         }
         case Message::RETURN:
         {
-            if( _message->has_ret_int() || _message->has_ret_value() )
+			if( _message->has_ret_int() || _message->output_size() > 0 )
                 _msgType = RETURN;
             
             break;
@@ -458,71 +458,20 @@ ParameterPuller& Demarshaller::getInvocation( outString requesterEndpoint,
     details.typeDepth = invocation.type_depth();
     details.hasReturn = invocation.synch();
     
-    _puller.setInvocation( &invocation );
+	_puller.setParams( &invocation.params() );
+    
+    return _puller;
+}
+ 
+ParameterPuller& Demarshaller::getOutput()
+{
+    assert( _msgType == RETURN );
+
+	_puller.setParams( &_message->output() );
     
     return _puller;
 }
 
-void Demarshaller::getValueTypeReturn( co::IType* descriptor, const co::Any& ret )
-{
-    assert( _msgType == RETURN );
-    
-    const Parameter& returnValue = _message->ret_value();
-
-    try
-    {
-        PBParamToValue( returnValue, descriptor, ret );
-    }
-    catch( std::string& e )
-    {
-        CORAL_THROW( RemotingException, "Error converting return value: " << e );        
-    }
-}
-    
-void Demarshaller::getRefTypeReturn( ReferenceType& refType )
-{    
-    assert( _msgType == RETURN );
-    
-    const Parameter& PBParam = _message->ret_value();
-    
-    size_t paramSize = PBParam.container().size();
-    if( paramSize < 1 )
-    {
-        CORAL_THROW( RemotingException, "Error converting return reference : Empty parameter" );
-    }
-    else if( paramSize > 1 )
-    {
-        CORAL_THROW( RemotingException, "Error converting return reference : Multiple references" );
-    }
-    
-    const Ref_Type& ref_type = PBParam.container( 0 ).ref_type();
-    
-    if( !ref_type.IsInitialized() )
-    {
-        CORAL_THROW( RemotingException, "Error converting return reference : Missing fields" );
-    }
-
-    refType.instanceID = ref_type.instance_id();
-    refType.facetIdx = ref_type.facet_idx();
-    
-    switch( ref_type.owner() )
-    {
-        case Ref_Type::OWNER_SENDER:
-            refType.owner = OWNER_SENDER;
-            refType.ownerEndpoint = ref_type.owner_endpoint();
-            refType.instanceType = ref_type.instance_type();
-            return;
-        case Ref_Type::OWNER_RECEIVER:
-            refType.owner = OWNER_RECEIVER;
-            return;
-        case Ref_Type::OWNER_ANOTHER:
-            refType.owner = OWNER_ANOTHER;
-            refType.ownerEndpoint = ref_type.owner_endpoint();
-            refType.instanceType = ref_type.instance_type();
-            return;
-    }
-}
- 
 co::int32 Demarshaller::getIntReturn()
 {
     assert( _msgType == RETURN );

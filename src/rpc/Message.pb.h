@@ -230,28 +230,32 @@ class Message : public ::google::protobuf::Message {
   inline ::rpc::Request* mutable_request();
   inline ::rpc::Request* release_request();
   
-  // optional .rpc.Parameter ret_value = 5;
-  inline bool has_ret_value() const;
-  inline void clear_ret_value();
-  static const int kRetValueFieldNumber = 5;
-  inline const ::rpc::Parameter& ret_value() const;
-  inline ::rpc::Parameter* mutable_ret_value();
-  inline ::rpc::Parameter* release_ret_value();
-  
-  // optional int32 ret_int = 6;
+  // optional int32 ret_int = 5;
   inline bool has_ret_int() const;
   inline void clear_ret_int();
-  static const int kRetIntFieldNumber = 6;
+  static const int kRetIntFieldNumber = 5;
   inline ::google::protobuf::int32 ret_int() const;
   inline void set_ret_int(::google::protobuf::int32 value);
   
-  // optional .rpc.Exception exception = 7;
+  // optional .rpc.Exception exception = 6;
   inline bool has_exception() const;
   inline void clear_exception();
-  static const int kExceptionFieldNumber = 7;
+  static const int kExceptionFieldNumber = 6;
   inline const ::rpc::Exception& exception() const;
   inline ::rpc::Exception* mutable_exception();
   inline ::rpc::Exception* release_exception();
+  
+  // repeated .rpc.Parameter output = 7;
+  inline int output_size() const;
+  inline void clear_output();
+  static const int kOutputFieldNumber = 7;
+  inline const ::rpc::Parameter& output(int index) const;
+  inline ::rpc::Parameter* mutable_output(int index);
+  inline ::rpc::Parameter* add_output();
+  inline const ::google::protobuf::RepeatedPtrField< ::rpc::Parameter >&
+      output() const;
+  inline ::google::protobuf::RepeatedPtrField< ::rpc::Parameter >*
+      mutable_output();
   
   // @@protoc_insertion_point(class_scope:rpc.Message)
  private:
@@ -263,8 +267,6 @@ class Message : public ::google::protobuf::Message {
   inline void clear_has_invocation();
   inline void set_has_request();
   inline void clear_has_request();
-  inline void set_has_ret_value();
-  inline void clear_has_ret_value();
   inline void set_has_ret_int();
   inline void clear_has_ret_int();
   inline void set_has_exception();
@@ -274,11 +276,11 @@ class Message : public ::google::protobuf::Message {
   
   ::std::string* requester_endpoint_;
   ::rpc::Invocation* invocation_;
-  ::rpc::Request* request_;
   int type_;
   ::google::protobuf::int32 ret_int_;
-  ::rpc::Parameter* ret_value_;
+  ::rpc::Request* request_;
   ::rpc::Exception* exception_;
+  ::google::protobuf::RepeatedPtrField< ::rpc::Parameter > output_;
   
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(7 + 31) / 32];
@@ -1388,44 +1390,15 @@ inline ::rpc::Request* Message::release_request() {
   return temp;
 }
 
-// optional .rpc.Parameter ret_value = 5;
-inline bool Message::has_ret_value() const {
+// optional int32 ret_int = 5;
+inline bool Message::has_ret_int() const {
   return (_has_bits_[0] & 0x00000010u) != 0;
 }
-inline void Message::set_has_ret_value() {
+inline void Message::set_has_ret_int() {
   _has_bits_[0] |= 0x00000010u;
 }
-inline void Message::clear_has_ret_value() {
-  _has_bits_[0] &= ~0x00000010u;
-}
-inline void Message::clear_ret_value() {
-  if (ret_value_ != NULL) ret_value_->::rpc::Parameter::Clear();
-  clear_has_ret_value();
-}
-inline const ::rpc::Parameter& Message::ret_value() const {
-  return ret_value_ != NULL ? *ret_value_ : *default_instance_->ret_value_;
-}
-inline ::rpc::Parameter* Message::mutable_ret_value() {
-  set_has_ret_value();
-  if (ret_value_ == NULL) ret_value_ = new ::rpc::Parameter;
-  return ret_value_;
-}
-inline ::rpc::Parameter* Message::release_ret_value() {
-  clear_has_ret_value();
-  ::rpc::Parameter* temp = ret_value_;
-  ret_value_ = NULL;
-  return temp;
-}
-
-// optional int32 ret_int = 6;
-inline bool Message::has_ret_int() const {
-  return (_has_bits_[0] & 0x00000020u) != 0;
-}
-inline void Message::set_has_ret_int() {
-  _has_bits_[0] |= 0x00000020u;
-}
 inline void Message::clear_has_ret_int() {
-  _has_bits_[0] &= ~0x00000020u;
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline void Message::clear_ret_int() {
   ret_int_ = 0;
@@ -1439,15 +1412,15 @@ inline void Message::set_ret_int(::google::protobuf::int32 value) {
   ret_int_ = value;
 }
 
-// optional .rpc.Exception exception = 7;
+// optional .rpc.Exception exception = 6;
 inline bool Message::has_exception() const {
-  return (_has_bits_[0] & 0x00000040u) != 0;
+  return (_has_bits_[0] & 0x00000020u) != 0;
 }
 inline void Message::set_has_exception() {
-  _has_bits_[0] |= 0x00000040u;
+  _has_bits_[0] |= 0x00000020u;
 }
 inline void Message::clear_has_exception() {
-  _has_bits_[0] &= ~0x00000040u;
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline void Message::clear_exception() {
   if (exception_ != NULL) exception_->::rpc::Exception::Clear();
@@ -1466,6 +1439,31 @@ inline ::rpc::Exception* Message::release_exception() {
   ::rpc::Exception* temp = exception_;
   exception_ = NULL;
   return temp;
+}
+
+// repeated .rpc.Parameter output = 7;
+inline int Message::output_size() const {
+  return output_.size();
+}
+inline void Message::clear_output() {
+  output_.Clear();
+}
+inline const ::rpc::Parameter& Message::output(int index) const {
+  return output_.Get(index);
+}
+inline ::rpc::Parameter* Message::mutable_output(int index) {
+  return output_.Mutable(index);
+}
+inline ::rpc::Parameter* Message::add_output() {
+  return output_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::rpc::Parameter >&
+Message::output() const {
+  return output_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::rpc::Parameter >*
+Message::mutable_output() {
+  return &output_;
 }
 
 // -------------------------------------------------------------------

@@ -28,15 +28,15 @@ function test()
 	EXPECT_EQ( refTypesServiceIn1:callDivideDouble( simpleTypesServiceIn2, 15, 5 ), 3 )
 	EXPECT_EQ( refTypesServiceIn1:concatenateString( simpleTypesServiceIn2, "aaa", "bbb" ), "aaabbb" )
 	
-	refTypesServiceIn1.simple = simpleTypesServiceIn2
-	refTypesServiceIn2.simple = simpleTypesServiceIn1
+	refTypesServiceIn1:setSimple( simpleTypesServiceIn2 )
+	refTypesServiceIn2:setSimple( simpleTypesServiceIn1 )
 	
-	EXPECT_EQ( refTypesServiceIn1.simple, simpleTypesServiceIn2 )
+	EXPECT_EQ( refTypesServiceIn1:getSimple(), simpleTypesServiceIn2 )
 	
 	local localInstanceIn1 = setup:getNode( 1 ):getInstance( 0 )
 	localInstanceIn1.simple.storedInt = 10
 	
-	EXPECT_EQ( refTypesServiceIn2.simple.storedInt, 10 )
+	EXPECT_EQ( refTypesServiceIn2:getSimple().storedInt, 10 )
 	
 	setup:tearDown()
 end

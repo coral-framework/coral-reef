@@ -125,14 +125,14 @@ public:
         _storedParentSimple = simple;
     }
     
-    stubs::ISimpleTypes* getSimple()
-    {
-        return _storedSimple.get();
+    void getSimple( stubs::ISimpleTypesRef& simple )
+	{
+        simple.set( _storedSimple.get() );
     }
     
-    stubs::ISimpleTypes* getParentSimple()
+    void getParentSimple( stubs::ISimpleTypesRef& parentSimple )
     {
-        return _storedParentSimple.get();
+       parentSimple.set( _storedParentSimple.get() );
     }
     
     co::int32 intFromSimple()
@@ -142,7 +142,10 @@ public:
     
     co::int32 intFromSimpleFromRef( IReferenceTypes* reference, ISimpleTypes* simple )
     {
-        return reference->getSimple()->getStoredInt() + reference->callIncrementInt( simple, 1 );
+		ISimpleTypesRef simpleRef;
+		reference->getSimple( simpleRef );
+		co::int32 refInt = simpleRef->getStoredInt();
+        return refInt + reference->callIncrementInt( simple, 1 );
     }
     
     co::int32 meth1( IReferenceTypes* ref2, IReferenceTypes* ref3, IReferenceTypes* ref4, 

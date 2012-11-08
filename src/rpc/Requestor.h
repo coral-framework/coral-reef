@@ -92,7 +92,7 @@ private:
     // Extracts all the necessary info from \param param and saves it on \param refType.
     void getProviderInfo( co::IService* param, ReferenceType& refType );
     
-    void getReturn( const std::string& data, co::IType* returnedType, const co::Any& ret );
+    void getReturn( ParameterPuller& puller, co::IType* type, const co::Any& ret );
 
     void raiseReturnedException( Demarshaller& _demarshaller );
 private:

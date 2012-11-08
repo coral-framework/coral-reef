@@ -1,6 +1,7 @@
 #ifndef __RPC_MARSHAL_H__
 #define __RPC_MARSHAL_H__
 
+#include "Message.pb.h"
 #include <rpc/RemotingException.h>
 
 #include <co/Any.h>
@@ -63,7 +64,7 @@ public:
 private:
     
     ParameterPusher();
-    Invocation* _invocation;
+    ::google::protobuf::RepeatedPtrField< ::rpc::Parameter >* _params;
 };
   
 enum ExceptionType
@@ -78,12 +79,10 @@ typedef const std::string& inString;
 typedef std::string& outString;
     
 /*
-    \brief Marshals and demarshals messages.
+    \brief Marshals messages.
  
     Works as a state machine. For marshalling, user needs to call any method that had "marshal" in 
     its name followed by a call to get method, which returns via parameter the marshalled message.
-    For demarshalling, the user needs to set a marshalled message by calling the "demarshal" method.
-    Then, call the appropriate "get" method based on the MessageType returned by "demarshal".
 */
 class Marshaller
 {
@@ -105,11 +104,12 @@ public:
     // Invocations for actual instances
     ParameterPusher& beginInvocation( inString requesterEndpoint, InvocationDetails details );
     void marshalInvocation( outString msg ); 
+
+	ParameterPusher& beginOutput();
+	void marshalOutput( outString msg );
     
     // Return values
     void marshalIntReturn( co::int32 value, outString msg );
-    void marshalValueTypeReturn( const co::Any& valueAny, co::IType* retType, outString msg );
-    void marshalRefTypeReturn( const ReferenceType& refType, outString msg );
     
     // Exceptions
     void marshalException( ExceptionType exType, inString exTypeName, inString what, outString msg );

@@ -164,37 +164,50 @@ TEST( CodecTests, simpleTypesTest )
 
 	// Test rogue values methods
 	co::AnyValue value;
-    marshaller.marshalValueTypeReturn( intAny, intType, msg );
+	ParameterPusher& pusher1 = marshaller.beginOutput();
+    pusher1.pushValue( intAny, intType );
+	marshaller.marshalOutput( msg );
 	demarshaller.demarshal( msg );
-    demarshaller.getValueTypeReturn( intType, value );
+    ParameterPuller& puller1 = demarshaller.getOutput();
+	puller1.pullValue( intType, value );
 	EXPECT_EQ( value.get<co::int32>(), INT1 );
 
-	marshaller.marshalValueTypeReturn( doubleAny, doubleType, msg );
+	ParameterPusher& pusher2 = marshaller.beginOutput();
+    pusher2.pushValue( doubleAny, doubleType );
+	marshaller.marshalOutput( msg );
 	demarshaller.demarshal( msg );
-    demarshaller.getValueTypeReturn( doubleType, value );
+    ParameterPuller& puller2 = demarshaller.getOutput();
+	puller2.pullValue( doubleType, value );
 	EXPECT_EQ( value.get<double>(), DOUBLE1 );
 
-	marshaller.marshalValueTypeReturn( stringParam, stringType, msg );
+	ParameterPusher& pusher3 = marshaller.beginOutput();
+    pusher3.pushValue( stringParam, stringType );
+	pusher3.pushValue( boolAny, boolType );
+	marshaller.marshalOutput( msg );
 	demarshaller.demarshal( msg );
-    demarshaller.getValueTypeReturn( stringType, value );
+    ParameterPuller& puller3 = demarshaller.getOutput();
+	puller3.pullValue( stringType, value );
 	EXPECT_STREQ( value.get<const std::string&>().c_str(), STRING1 );
-
-	marshaller.marshalValueTypeReturn( boolAny, boolType, msg );
-	demarshaller.demarshal( msg );
-    demarshaller.getValueTypeReturn( boolType, value );
+	puller3.pullValue( boolType, value );
 	EXPECT_EQ( param.get<bool>(), BOOL1 );
-
+	
 	co::AnyValue stringArrayValue;
 	stringArrayValue.create( stringArrayType );
-	marshaller.marshalValueTypeReturn( stringArrayAny, stringArrayType, msg );
+	ParameterPusher& pusher4 = marshaller.beginOutput();
+	pusher4.pushValue( stringArrayAny, stringArrayType );
+	marshaller.marshalOutput( msg );
 	demarshaller.demarshal( msg );
-	demarshaller.getValueTypeReturn( stringArrayType, stringArrayValue.getAny() );
+	ParameterPuller& puller4 = demarshaller.getOutput();
+	puller4.pullValue( stringArrayType, stringArrayValue.getAny() );
 
 	co::AnyValue intArrayValue;
 	intArrayValue.create( intArrayType );
-	marshaller.marshalValueTypeReturn( intArrayAny, intArrayType, msg );
+	ParameterPusher& pusher5 = marshaller.beginOutput();
+	pusher5.pushValue( intArrayAny, intArrayType );
+	marshaller.marshalOutput( msg );
 	demarshaller.demarshal( msg );
-	demarshaller.getValueTypeReturn( intArrayType, intArrayValue.getAny() );
+	ParameterPuller& puller5 = demarshaller.getOutput();
+	puller5.pullValue( intArrayType, intArrayValue.getAny() );
 
 	stringArrayResult = stringArrayValue.get<std::vector<std::string>>();
 	intArrayResult = intArrayValue.get<std::vector<co::int32>>();

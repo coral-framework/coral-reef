@@ -127,7 +127,23 @@ void Requestor::requestSynchCall( MemberOwner& owner, co::IMethod* method,
     _marshaller.marshalInvocation( msg );
 
     _handler->handleSynchRequest( msg, msg );
-    getReturn( msg, method->getReturnType(), ret );
+
+	MessageType msgType = _demarshaller.demarshal( msg );
+    
+    if( msgType == EXCEPTION )
+        raiseReturnedException( _demarshaller );
+    
+	ParameterPuller& puller = _demarshaller.getOutput();
+
+	if( method->getReturnType() )
+		getReturn( puller, method->getReturnType(), ret );
+
+	co::TSlice<co::IParameter*> params = method->getParameters();
+	for( int i = 0; i < params.getSize(); i++ )
+	{
+		if( params[i]->getIsOut() )
+			getReturn( puller, params[i]->getType(), args[i] );
+	}
 }
     
 void Requestor::requestSetField( MemberOwner& owner, co::IField* field, const co::Any arg )
@@ -169,7 +185,14 @@ void Requestor::requestGetField( MemberOwner& owner, co::IField* field, const co
     _marshaller.marshalInvocation( msg );
     _handler->handleSynchRequest( msg, msg );
     
-    getReturn( msg, field->getType(), ret );
+    MessageType msgType = _demarshaller.demarshal( msg );
+    
+    if( msgType == EXCEPTION )
+        raiseReturnedException( _demarshaller );
+    
+	ParameterPuller& puller = _demarshaller.getOutput();
+
+	getReturn( puller, field->getType(), ret );
 }
     
 void Requestor::requestLease( co::int32 instanceID, std::string lessee )
@@ -232,17 +255,20 @@ void Requestor::pushParameters( co::IMethod* method, co::Slice<co::Any> args,
     co::TSlice<co::IParameter*> params = method->getParameters();
     for( int i = 0; i < params.getSize(); i++ )
     {
-        co::IType* paramType = params[i]->getType();
-        if( paramType->getKind() != co::TK_INTERFACE )
-        {
-            pusher.pushValue( args[i], paramType );
-        }
-        else
-        {
-            ReferenceType refType;
-            getProviderInfo( args[i].get<co::IService*>(), refType );
-            pusher.pushReference( refType );
-        }
+		if( params[i]->getIsIn() )
+		{
+			co::IType* paramType = params[i]->getType();
+			if( paramType->getKind() != co::TK_INTERFACE )
+			{
+				pusher.pushValue( args[i], paramType );
+			}
+			else
+			{
+				ReferenceType refType;
+				getProviderInfo( args[i].get<co::IService*>(), refType );
+				pusher.pushReference( refType );
+			}
+		}
     }
 }
 
@@ -285,23 +311,17 @@ void Requestor::getProviderInfo( co::IService* param, ReferenceType& refType )
     }
 }
 
-void Requestor::getReturn( const std::string& data, co::IType* returnedType, const co::Any& ret )
+void Requestor::getReturn( ParameterPuller& puller, co::IType* type, const co::Any& ret )
 {
-    MessageType type = _demarshaller.demarshal( data );
-    
-    if( type == EXCEPTION )
-        raiseReturnedException( _demarshaller );
-    
-    
-    if( returnedType->getKind() != co::TK_INTERFACE && returnedType->getKind() != co::TK_EXCEPTION )
+    if( type->getKind() != co::TK_INTERFACE && type->getKind() != co::TK_EXCEPTION )
     {
-        _demarshaller.getValueTypeReturn( returnedType, ret );
+        puller.pullValue( type, ret );
         return;
     }
     
     ReferenceType refType;
     
-    _demarshaller.getRefTypeReturn( refType );
+	puller.pullReference( refType );
     co::IObject* instance;
     switch( refType.owner )
     {

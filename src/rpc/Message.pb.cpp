@@ -63,9 +63,9 @@ void protobuf_AssignDesc_Message_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, invocation_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, request_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, ret_value_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, ret_int_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, exception_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Message, output_),
   };
   Message_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -283,39 +283,39 @@ void protobuf_AddDesc_Message_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\rMessage.proto\022\003rpc\"\200\003\n\007Message\022\032\n\022requ"
+    "\n\rMessage.proto\022\003rpc\"\375\002\n\007Message\022\032\n\022requ"
     "ester_endpoint\030\001 \001(\t\022\037\n\004type\030\002 \002(\0162\021.rpc"
     ".Message.Type\022#\n\ninvocation\030\003 \001(\0132\017.rpc."
     "Invocation\022\035\n\007request\030\004 \001(\0132\014.rpc.Reques"
-    "t\022!\n\tret_value\030\005 \001(\0132\016.rpc.Parameter\022\017\n\007"
-    "ret_int\030\006 \001(\005\022!\n\texception\030\007 \001(\0132\016.rpc.E"
-    "xception\"\234\001\n\004Type\022\016\n\nINVOCATION\020\000\022\017\n\013REQ"
-    "UEST_NEW\020\001\022\022\n\016REQUEST_LOOKUP\020\002\022\021\n\rREQUES"
-    "T_LEASE\020\003\022\n\n\006RETURN\020\004\022\r\n\tEXCEPTION\020\005\022\016\n\n"
-    "BARRIER_UP\020\006\022\017\n\013BARRIER_HIT\020\007\022\020\n\014BARRIER"
-    "_DOWN\020\010\"O\n\007Request\022\025\n\rinstance_type\030\002 \001("
-    "\t\022\022\n\nlookup_key\030\003 \001(\t\022\031\n\021lease_instance_"
-    "id\030\004 \001(\r\"\206\001\n\tException\022!\n\004type\030\001 \002(\0162\023.r"
-    "pc.Exception.Type\022\021\n\ttype_name\030\002 \002(\t\022\014\n\004"
-    "what\030\003 \002(\t\"5\n\004Type\022\t\n\005CORAL\020\000\022\014\n\010REMOTIN"
-    "G\020\001\022\007\n\003STD\020\002\022\013\n\007UNKNOWN\020\003\"\213\001\n\nInvocation"
-    "\022\023\n\013instance_id\030\001 \002(\r\022\021\n\tfacet_idx\030\002 \002(\r"
-    "\022\022\n\nmember_idx\030\003 \002(\r\022\022\n\ntype_depth\030\004 \002(\005"
-    "\022\r\n\005synch\030\005 \002(\010\022\036\n\006params\030\006 \003(\0132\016.rpc.Pa"
-    "rameter\".\n\tParameter\022!\n\tcontainer\030\001 \003(\0132"
-    "\016.rpc.Container\"\245\001\n\tContainer\022\017\n\007boolean"
-    "\030\001 \001(\010\022\013\n\003str\030\002 \001(\t\022\017\n\007numeric\030\003 \001(\001\022\'\n\014"
-    "complex_type\030\004 \001(\0132\021.rpc.Complex_Type\022\037\n"
-    "\010any_type\030\005 \001(\0132\r.rpc.Any_Type\022\037\n\010ref_ty"
-    "pe\030\006 \001(\0132\r.rpc.Ref_Type\"E\n\010Any_Type\022\014\n\004k"
-    "ind\030\001 \002(\005\022\014\n\004type\030\002 \001(\t\022\035\n\005param\030\003 \001(\0132\016"
-    ".rpc.Parameter\"-\n\014Complex_Type\022\035\n\005field\030"
-    "\001 \003(\0132\016.rpc.Parameter\"\307\001\n\010Ref_Type\022\"\n\005ow"
-    "ner\030\001 \002(\0162\023.rpc.Ref_Type.Owner\022\023\n\013instan"
-    "ce_id\030\002 \002(\r\022\021\n\tfacet_idx\030\003 \002(\r\022\025\n\rinstan"
-    "ce_type\030\004 \001(\t\022\026\n\016owner_endpoint\030\005 \001(\t\"@\n"
-    "\005Owner\022\020\n\014OWNER_SENDER\020\000\022\022\n\016OWNER_RECEIV"
-    "ER\020\001\022\021\n\rOWNER_ANOTHER\020\002", 1303);
+    "t\022\017\n\007ret_int\030\005 \001(\005\022!\n\texception\030\006 \001(\0132\016."
+    "rpc.Exception\022\036\n\006output\030\007 \003(\0132\016.rpc.Para"
+    "meter\"\234\001\n\004Type\022\016\n\nINVOCATION\020\000\022\017\n\013REQUES"
+    "T_NEW\020\001\022\022\n\016REQUEST_LOOKUP\020\002\022\021\n\rREQUEST_L"
+    "EASE\020\003\022\n\n\006RETURN\020\004\022\r\n\tEXCEPTION\020\005\022\016\n\nBAR"
+    "RIER_UP\020\006\022\017\n\013BARRIER_HIT\020\007\022\020\n\014BARRIER_DO"
+    "WN\020\010\"O\n\007Request\022\025\n\rinstance_type\030\002 \001(\t\022\022"
+    "\n\nlookup_key\030\003 \001(\t\022\031\n\021lease_instance_id\030"
+    "\004 \001(\r\"\206\001\n\tException\022!\n\004type\030\001 \002(\0162\023.rpc."
+    "Exception.Type\022\021\n\ttype_name\030\002 \002(\t\022\014\n\004wha"
+    "t\030\003 \002(\t\"5\n\004Type\022\t\n\005CORAL\020\000\022\014\n\010REMOTING\020\001"
+    "\022\007\n\003STD\020\002\022\013\n\007UNKNOWN\020\003\"\213\001\n\nInvocation\022\023\n"
+    "\013instance_id\030\001 \002(\r\022\021\n\tfacet_idx\030\002 \002(\r\022\022\n"
+    "\nmember_idx\030\003 \002(\r\022\022\n\ntype_depth\030\004 \002(\005\022\r\n"
+    "\005synch\030\005 \002(\010\022\036\n\006params\030\006 \003(\0132\016.rpc.Param"
+    "eter\".\n\tParameter\022!\n\tcontainer\030\001 \003(\0132\016.r"
+    "pc.Container\"\245\001\n\tContainer\022\017\n\007boolean\030\001 "
+    "\001(\010\022\013\n\003str\030\002 \001(\t\022\017\n\007numeric\030\003 \001(\001\022\'\n\014com"
+    "plex_type\030\004 \001(\0132\021.rpc.Complex_Type\022\037\n\010an"
+    "y_type\030\005 \001(\0132\r.rpc.Any_Type\022\037\n\010ref_type\030"
+    "\006 \001(\0132\r.rpc.Ref_Type\"E\n\010Any_Type\022\014\n\004kind"
+    "\030\001 \002(\005\022\014\n\004type\030\002 \001(\t\022\035\n\005param\030\003 \001(\0132\016.rp"
+    "c.Parameter\"-\n\014Complex_Type\022\035\n\005field\030\001 \003"
+    "(\0132\016.rpc.Parameter\"\307\001\n\010Ref_Type\022\"\n\005owner"
+    "\030\001 \002(\0162\023.rpc.Ref_Type.Owner\022\023\n\013instance_"
+    "id\030\002 \002(\r\022\021\n\tfacet_idx\030\003 \002(\r\022\025\n\rinstance_"
+    "type\030\004 \001(\t\022\026\n\016owner_endpoint\030\005 \001(\t\"@\n\005Ow"
+    "ner\022\020\n\014OWNER_SENDER\020\000\022\022\n\016OWNER_RECEIVER\020"
+    "\001\022\021\n\rOWNER_ANOTHER\020\002", 1300);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "Message.proto", &protobuf_RegisterTypes);
   Message::default_instance_ = new Message();
@@ -389,9 +389,9 @@ const int Message::kRequesterEndpointFieldNumber;
 const int Message::kTypeFieldNumber;
 const int Message::kInvocationFieldNumber;
 const int Message::kRequestFieldNumber;
-const int Message::kRetValueFieldNumber;
 const int Message::kRetIntFieldNumber;
 const int Message::kExceptionFieldNumber;
+const int Message::kOutputFieldNumber;
 #endif  // !_MSC_VER
 
 Message::Message()
@@ -402,7 +402,6 @@ Message::Message()
 void Message::InitAsDefaultInstance() {
   invocation_ = const_cast< ::rpc::Invocation*>(&::rpc::Invocation::default_instance());
   request_ = const_cast< ::rpc::Request*>(&::rpc::Request::default_instance());
-  ret_value_ = const_cast< ::rpc::Parameter*>(&::rpc::Parameter::default_instance());
   exception_ = const_cast< ::rpc::Exception*>(&::rpc::Exception::default_instance());
 }
 
@@ -418,7 +417,6 @@ void Message::SharedCtor() {
   type_ = 0;
   invocation_ = NULL;
   request_ = NULL;
-  ret_value_ = NULL;
   ret_int_ = 0;
   exception_ = NULL;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -435,7 +433,6 @@ void Message::SharedDtor() {
   if (this != default_instance_) {
     delete invocation_;
     delete request_;
-    delete ret_value_;
     delete exception_;
   }
 }
@@ -474,14 +471,12 @@ void Message::Clear() {
     if (has_request()) {
       if (request_ != NULL) request_->::rpc::Request::Clear();
     }
-    if (has_ret_value()) {
-      if (ret_value_ != NULL) ret_value_->::rpc::Parameter::Clear();
-    }
     ret_int_ = 0;
     if (has_exception()) {
       if (exception_ != NULL) exception_->::rpc::Exception::Clear();
     }
   }
+  output_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
@@ -553,26 +548,12 @@ bool Message::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(42)) goto parse_ret_value;
+        if (input->ExpectTag(40)) goto parse_ret_int;
         break;
       }
       
-      // optional .rpc.Parameter ret_value = 5;
+      // optional int32 ret_int = 5;
       case 5: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-         parse_ret_value:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
-               input, mutable_ret_value()));
-        } else {
-          goto handle_uninterpreted;
-        }
-        if (input->ExpectTag(48)) goto parse_ret_int;
-        break;
-      }
-      
-      // optional int32 ret_int = 6;
-      case 6: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
          parse_ret_int:
@@ -583,12 +564,12 @@ bool Message::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(58)) goto parse_exception;
+        if (input->ExpectTag(50)) goto parse_exception;
         break;
       }
       
-      // optional .rpc.Exception exception = 7;
-      case 7: {
+      // optional .rpc.Exception exception = 6;
+      case 6: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
          parse_exception:
@@ -597,6 +578,21 @@ bool Message::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(58)) goto parse_output;
+        break;
+      }
+      
+      // repeated .rpc.Parameter output = 7;
+      case 7: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_output:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+                input, add_output()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(58)) goto parse_output;
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -646,21 +642,21 @@ void Message::SerializeWithCachedSizes(
       4, this->request(), output);
   }
   
-  // optional .rpc.Parameter ret_value = 5;
-  if (has_ret_value()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      5, this->ret_value(), output);
-  }
-  
-  // optional int32 ret_int = 6;
+  // optional int32 ret_int = 5;
   if (has_ret_int()) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(6, this->ret_int(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->ret_int(), output);
   }
   
-  // optional .rpc.Exception exception = 7;
+  // optional .rpc.Exception exception = 6;
   if (has_exception()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      7, this->exception(), output);
+      6, this->exception(), output);
+  }
+  
+  // repeated .rpc.Parameter output = 7;
+  for (int i = 0; i < this->output_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      7, this->output(i), output);
   }
   
   if (!unknown_fields().empty()) {
@@ -701,23 +697,23 @@ void Message::SerializeWithCachedSizes(
         4, this->request(), target);
   }
   
-  // optional .rpc.Parameter ret_value = 5;
-  if (has_ret_value()) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteMessageNoVirtualToArray(
-        5, this->ret_value(), target);
-  }
-  
-  // optional int32 ret_int = 6;
+  // optional int32 ret_int = 5;
   if (has_ret_int()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(6, this->ret_int(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->ret_int(), target);
   }
   
-  // optional .rpc.Exception exception = 7;
+  // optional .rpc.Exception exception = 6;
   if (has_exception()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
-        7, this->exception(), target);
+        6, this->exception(), target);
+  }
+  
+  // repeated .rpc.Parameter output = 7;
+  for (int i = 0; i < this->output_size(); i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        7, this->output(i), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -758,21 +754,14 @@ int Message::ByteSize() const {
           this->request());
     }
     
-    // optional .rpc.Parameter ret_value = 5;
-    if (has_ret_value()) {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-          this->ret_value());
-    }
-    
-    // optional int32 ret_int = 6;
+    // optional int32 ret_int = 5;
     if (has_ret_int()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::Int32Size(
           this->ret_int());
     }
     
-    // optional .rpc.Exception exception = 7;
+    // optional .rpc.Exception exception = 6;
     if (has_exception()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
@@ -780,6 +769,14 @@ int Message::ByteSize() const {
     }
     
   }
+  // repeated .rpc.Parameter output = 7;
+  total_size += 1 * this->output_size();
+  for (int i = 0; i < this->output_size(); i++) {
+    total_size +=
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        this->output(i));
+  }
+  
   if (!unknown_fields().empty()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
@@ -805,6 +802,7 @@ void Message::MergeFrom(const ::google::protobuf::Message& from) {
 
 void Message::MergeFrom(const Message& from) {
   GOOGLE_CHECK_NE(&from, this);
+  output_.MergeFrom(from.output_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_requester_endpoint()) {
       set_requester_endpoint(from.requester_endpoint());
@@ -817,9 +815,6 @@ void Message::MergeFrom(const Message& from) {
     }
     if (from.has_request()) {
       mutable_request()->::rpc::Request::MergeFrom(from.request());
-    }
-    if (from.has_ret_value()) {
-      mutable_ret_value()->::rpc::Parameter::MergeFrom(from.ret_value());
     }
     if (from.has_ret_int()) {
       set_ret_int(from.ret_int());
@@ -849,11 +844,11 @@ bool Message::IsInitialized() const {
   if (has_invocation()) {
     if (!this->invocation().IsInitialized()) return false;
   }
-  if (has_ret_value()) {
-    if (!this->ret_value().IsInitialized()) return false;
-  }
   if (has_exception()) {
     if (!this->exception().IsInitialized()) return false;
+  }
+  for (int i = 0; i < output_size(); i++) {
+    if (!this->output(i).IsInitialized()) return false;
   }
   return true;
 }
@@ -864,9 +859,9 @@ void Message::Swap(Message* other) {
     std::swap(type_, other->type_);
     std::swap(invocation_, other->invocation_);
     std::swap(request_, other->request_);
-    std::swap(ret_value_, other->ret_value_);
     std::swap(ret_int_, other->ret_int_);
     std::swap(exception_, other->exception_);
+    output_.Swap(&other->output_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

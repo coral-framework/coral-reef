@@ -159,7 +159,9 @@ TEST( ParameterTests, refTypeParameterTest )
     EXPECT_STREQ( refTypesServiceInA->concatenateString( simpleTypesServiceInB, "aaa", "bbb" ).c_str(), "aaabbb" );
     
     refTypesServiceInA->setSimple( simpleTypesServiceInB );
-    EXPECT_EQ( simpleTypesServiceInB, refTypesServiceInA->getSimple() );
+	stubs::ISimpleTypesRef simpleRef;
+	refTypesServiceInA->getSimple( simpleRef );
+    EXPECT_EQ( simpleTypesServiceInB, simpleRef.get() );
     
     stubs::ISimpleTypes* simple = serverB->getInstance( 0 )->getService<stubs::ISimpleTypes>();
     

@@ -40,13 +40,13 @@ Invoker::~Invoker()
 {
 }
 
-void Invoker::dispatchInvocation( const std::string& invocationData )
+void Invoker::dispatchInvocation( const std::string& inputStream )
 {    
     std::string returnValue;
     
     try
     {
-        MessageType msgType = _demarshaller.demarshal( invocationData );
+        MessageType msgType = _demarshaller.demarshal( inputStream );
         
         if( msgType != INVOCATION )
             invokeManagement( _demarshaller, msgType, returnValue );
@@ -83,7 +83,7 @@ void Invoker::hitBarrier()
 }
     
 void Invoker::invokeManagement( Demarshaller& demarshaller, MessageType msgType, 
-                            std::string& returnValue )
+                            std::string& outputStream )
 {
     co::int32 returnID;
     std::string requesterEndpoint;
@@ -160,10 +160,10 @@ void Invoker::invokeManagement( Demarshaller& demarshaller, MessageType msgType,
             assert( false );
     }
     
-    _marshaller.marshalIntReturn( returnID , returnValue );
+    _marshaller.marshalIntReturn( returnID , outputStream );
 }
     
-void Invoker::invokeInstance( Demarshaller& demarshaller, std::string& returnMsg )
+void Invoker::invokeInstance( Demarshaller& demarshaller, std::string& outputStream )
 {    
     // ------ Get invocation meta data and check for inconsistencies first ------ //
     std::string senderEndpoint;
@@ -207,19 +207,11 @@ void Invoker::invokeInstance( Demarshaller& demarshaller, std::string& returnMsg
     co::IMember* member = members[details.memberIdx];
     co::MemberKind kind = member->getKind();
     
-    // ------ Proceed to the actual invocation ------ //
-    co::AnyValue returnValue;
-    co::IType* returnType;
-    
     if( kind == co::MK_METHOD )
     {
         co::IMethod* method = co::cast<co::IMethod>( member );
-        onMethod( puller, facet, method, reflector, returnValue );
-        
-        if( !details.hasReturn )
-            return;
-        
-        returnType = method->getReturnType();
+        onMethod( puller, facet, method, reflector, senderEndpoint, outputStream );
+        return;
     }   
     else   
     {
@@ -231,26 +223,13 @@ void Invoker::invokeInstance( Demarshaller& demarshaller, std::string& returnMsg
         }
         else
         {
-            onGetField( facet, field, reflector, returnValue );
-            returnType = field->getType();
+            onGetField( facet, field, reflector, outputStream );
         }
-    }
-    
-    // Marshals the return from the call if applicable
-    if( returnValue.getKind() != co::TK_INTERFACE )
-    {
-        _marshaller.marshalValueTypeReturn( returnValue.getAny(), returnType, returnMsg );
-    }
-    else
-    {
-        ReferenceType refType;
-        getRefTypeInfo( returnValue.get<co::IService*>(), senderEndpoint, refType );
-        _marshaller.marshalRefTypeReturn( refType, returnMsg );
     }
 }
 
 void Invoker::onMethod( ParameterPuller& puller, co::IService* facet, co::IMethod* method, 
-                           co::IReflector* refl, const co::Any& returned )
+                           co::IReflector* refl, const std::string& senderEndpoint, std::string& outputStream )
 {    
     std::vector<co::AnyValue> anyValues;
     std::vector<co::Any> args;
@@ -267,32 +246,94 @@ void Invoker::onMethod( ParameterPuller& puller, co::IService* facet, co::IMetho
     for( int i = 0; i < size; i++ )
     {
         co::IType* paramType = params[i]->getType();
-        if( paramType->getKind() != co::TK_INTERFACE && paramType->getKind() != co::TK_EXCEPTION )
+		anyValues[i].create( paramType );
+        if( paramType->getKind() != co::TK_INTERFACE )
         {
-            anyValues[i].create( paramType );
-            puller.pullValue( paramType, anyValues[i].getAny() );
+            if( params[i]->getIsIn() )
+				puller.pullValue( paramType, anyValues[i].getAny() );
         }
         else
         {
             ReferenceType refTypeInfo;
-            puller.pullReference( refTypeInfo );
-            getRefType( refTypeInfo, anyValues[i] );
+			if( params[i]->getIsIn() )
+			{
+				puller.pullReference( refTypeInfo );
+				getRefType( refTypeInfo, anyValues[i] );
+			}
         }
     }
 
-    refl->invoke( facet, method, args, returned );
+	// ------ Proceed to the actual invocation ------ //
+    co::AnyValue returnValue;
+    refl->invoke( facet, method, args, returnValue );
     
     CORAL_DLOG( INFO ) << "Invoked method " << method->getName() << " of service "
     << facet->getInterface()->getName();
+
+	ParameterPusher& pusher = _marshaller.beginOutput();
+
+	co::IType* returnType = method->getReturnType();
+	if( returnType )
+	{
+		if( returnType->getKind() == co::TK_INTERFACE )
+			CORAL_THROW( RemotingException, "References can't be passed via return, must use out params" );
+
+		pusher.pushValue( returnValue.getAny().asIn(), returnType );
+	}
+
+	for( int i  = 0; i < params.getSize(); i++ )
+	{
+		if( params[i]->getIsOut() )
+		{
+			co::IType* paramType = params[i]->getType();
+			if( paramType->getKind() != co::TK_INTERFACE )
+			{
+				pusher.pushValue( args[i].asIn(), paramType );
+			}
+			else
+			{
+				ReferenceType refType;
+				getRefTypeInfo( args[i].get<co::IService*>(), senderEndpoint, refType );
+				pusher.pushReference( refType );
+			}
+		}
+	}
+
+	_marshaller.marshalOutput( outputStream );
 }
-    
+
 void Invoker::onGetField( co::IService* facet, co::IField* field, 
-                             co::IReflector* refl, const co::Any& returned )
+                             co::IReflector* refl, std::string& outputStream )
 {
-    refl->getField( facet, field, returned );
+	co::AnyValue returnValue;
+    refl->getField( facet, field, returnValue );
     
+	co::IType* fieldType = field->getType();
+	if( fieldType->getKind() == co::TK_INTERFACE )
+			CORAL_THROW( RemotingException, "References can't be passed via return, must use out params" );
+
+	ParameterPusher& pusher = _marshaller.beginOutput();
+	pusher.pushValue( returnValue.getAny().asIn(), fieldType );
+
+	_marshaller.marshalOutput( outputStream );
+
     CORAL_DLOG( INFO ) << "Got field " << field->getName() << " of service "
     << facet->getInterface()->getName();
+}
+
+void Invoker::handleOutput( ParameterPusher& pusher, const co::Any& output, 
+					 co::IType* outputType, const std::string& senderEndpoint )
+{
+	if( outputType->getKind() != co::TK_INTERFACE )
+	{
+		pusher.pushValue( output, outputType );
+	}
+	else
+	{
+		ReferenceType refType;
+		getRefTypeInfo( output.get<co::IService*>(), senderEndpoint, refType );
+		pusher.pushReference( refType );
+	}
 }
 
 void Invoker::onSetField( ParameterPuller& puller, co::IService* facet, co::IField* field, 
@@ -353,7 +394,7 @@ void Invoker::getRefType( ReferenceType& refTypeInfo, const co::Any& ret )
     ret.put( service );
 }
 
-void Invoker::getRefTypeInfo( co::IService* service, std::string& senderEndpoint, 
+void Invoker::getRefTypeInfo( co::IService* service, const std::string& senderEndpoint, 
                                   ReferenceType& refType )
 {
     co::IObject* provider = service->getProvider();

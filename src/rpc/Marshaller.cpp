@@ -210,17 +210,17 @@ ParameterPusher::ParameterPusher()
 
 void ParameterPusher::pushValue( const co::Any& valueType, co::IType* descriptor )
 {
-    assert( _invocation );
-    
-    Parameter* PBParam = _invocation->add_params();
+    assert( _params );
+
+    Parameter* PBParam = _params->Add();
     valueToPBParam( valueType, descriptor, PBParam );
 }
 
 void ParameterPusher::pushReference( const ReferenceType& refType )
 {
-    assert( _invocation );
+    assert( _params );
     
-    Parameter* PBParam = _invocation->add_params();
+    Parameter* PBParam = _params->Add();
     refToPBParam( refType, PBParam );
 }
 
@@ -293,23 +293,44 @@ ParameterPusher& Marshaller::beginInvocation( inString requesterEndpoint, Invoca
     invocation->set_type_depth( details.typeDepth );
     invocation->set_synch( details.hasReturn );
     
-    _paramPusher._invocation = invocation;
+	_paramPusher._params = invocation->mutable_params();
+	_msgClear = false;
     return _paramPusher;
-    
-    _msgClear = false;
 }
 
 void Marshaller::marshalInvocation( outString msg )
 {
-    assert( _paramPusher._invocation );
+    assert( _paramPusher._params && !_msgClear );
     
     _message->SerializeToString( &msg );
     _message->Clear();
     
-    _paramPusher._invocation = 0;
+    _paramPusher._params = 0;
     _msgClear = true;
 }
+ 
+ParameterPusher& Marshaller::beginOutput()
+{
+	assert( _msgClear );
+
+    _message->set_type( Message::RETURN );
     
+	_paramPusher._params = _message->mutable_output();
+	_msgClear = false;
+    return _paramPusher;
+}
+
+void Marshaller::marshalOutput( outString msg )
+{
+	 assert( _paramPusher._params && !_msgClear );
+    
+    _message->SerializeToString( &msg );
+    _message->Clear();
+    
+    _paramPusher._params = 0;
+    _msgClear = true;
+}
+   
 void Marshaller::marshalIntReturn( co::int32 value, outString msg )
 {
     assert( _msgClear );
@@ -317,32 +338,6 @@ void Marshaller::marshalIntReturn( co::int32 value, outString msg )
     _message->set_type( Message::RETURN );
     
     _message->set_ret_int( value );
-    _message->SerializeToString( &msg );
-    _message->Clear();
-}
-
-void Marshaller::marshalValueTypeReturn( const co::Any& valueAny, co::IType* retType, outString msg )
-{
-    assert( _msgClear );
-    
-    _message->set_type( Message::RETURN );
-    
-    Parameter* param = _message->mutable_ret_value();
-    valueToPBParam( valueAny, retType, param );
-    
-    _message->SerializeToString( &msg );
-    _message->Clear();
-}
-
-void Marshaller::marshalRefTypeReturn( const ReferenceType& refType, outString msg )
-{
-    assert( _msgClear );
-    
-    _message->set_type( Message::RETURN );
-    
-    Parameter* param = _message->mutable_ret_value();
-    refToPBParam( refType, param );
-    
     _message->SerializeToString( &msg );
     _message->Clear();
 }
