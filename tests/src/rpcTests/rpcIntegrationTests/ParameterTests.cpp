@@ -120,6 +120,14 @@ TEST( ParameterTests, simpleTypesTest )
     EXPECT_STREQ( stringRange2[0].c_str(), stringVec[2].c_str() );
     EXPECT_STREQ( stringRange2[1].c_str(), stringVec2[2].c_str() );
     
+	co::int32 two; co::int32 three; co::int32 four; co::int32 five;
+	co::int32 one = simple->get12345( two, three, four, five );
+	EXPECT_EQ( 1, one );
+	EXPECT_EQ( 2, two );
+	EXPECT_EQ( 3, three );
+	EXPECT_EQ( 4, four );
+	EXPECT_EQ( 5, five );
+
     setup->tearDown();
 }
 

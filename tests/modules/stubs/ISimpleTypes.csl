@@ -36,6 +36,8 @@ interface ISimpleTypes extends ISimpleParent
 	void setStrList( in string[] strList );
 	void setIntList( in int32[] intList );
 	
+	int32 get12345( out int32 two, out int32 three, out int32 four, out int32 five );
+	
 	any addDoublesFromAny( in any d1, in any d2 );
 	any concatenateFromAny( in any str1, in any str2 );
 	any mergeListsFromAny( in any l1, in any l2 );

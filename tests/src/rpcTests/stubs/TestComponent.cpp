@@ -303,6 +303,12 @@ public:
 		return dividend / divisor;
 	}
 
+	co::int32 get12345( co::int32& two, co::int32& three, co::int32& four, co::int32& five )
+	{
+		two = 2; three = 3; four = 4; five = 5;
+		return 1;
+	}
+
 	co::TSlice<co::int32> get10Ints()
 	{
 		_storedIntList.clear();
