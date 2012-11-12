@@ -313,13 +313,13 @@ public:
 
 		ASSERT_EQ( one->getAddedObjects().getSize(), another->getAddedObjects().getSize() );
 
-		compareAllNames( one->getAddedObjects(), another->getAddedObjects() );
+		compareAllNames( one->getAddedObjects().asSlice(), another->getAddedObjects().asSlice() );
 
 		ASSERT_EQ( one->getChangedObjects().getSize(), another->getChangedObjects().getSize() );
 		
 		ASSERT_EQ( one->getRemovedObjects().getSize(), another->getRemovedObjects().getSize() );
 
-		compareAllNames( one->getAddedObjects(), another->getAddedObjects() );
+		compareAllNames( one->getAddedObjects().asSlice(), another->getAddedObjects().asSlice() );
 	}
 
 };

@@ -79,7 +79,9 @@ public:
 		{
 			CORAL_THROW( co::IllegalStateException, "NULL space" );
 		}
-		subscriber->onSubscribed( getPublishedSpaceData(), _space->getUniverse()->getModel()->getName() );
+		calculateData();
+		co::Slice<co::int8> sliceData( data );
+		subscriber->onSubscribed( sliceData, _space->getUniverse()->getModel()->getName() );
 		_subscribers.push_back( subscriber );
 	}
 
@@ -132,7 +134,7 @@ protected:
 
 private:
 
-	co::Slice<co::int8> getPublishedSpaceData()
+	void calculateData()
 	{
 		if( !_space.isValid() )
 		{
@@ -146,7 +148,6 @@ private:
 		data.assign((std::istreambuf_iterator<char>(ifs)),
                  std::istreambuf_iterator<char>());
 		ifs.close();
-		return data;
 	}
 
 	void initializeIds()
