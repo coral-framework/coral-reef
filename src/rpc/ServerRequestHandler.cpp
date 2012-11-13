@@ -2,8 +2,6 @@
 
 #include "Invoker.h"
 
-#include <co/Any.h>
-
 namespace rpc {
 
 ServerRequestHandler::ServerRequestHandler( IAcceptor* link, const std::string& publicEndpoint ) 

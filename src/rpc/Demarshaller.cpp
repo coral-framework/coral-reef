@@ -199,11 +199,11 @@ void PBContainerToComplex( const Container& container, co::IType* descriptor,
     {
         co::IField* field = fields[i];
         const Parameter& fieldArg = complex.field( i );
-        co::AnyValue fieldAv; co::Any fieldAny( fieldAv );
+        co::AnyValue fieldAv;
         fieldAv.create( field->getType() );
-        PBParamToValue( fieldArg, field->getType(), fieldAny );
-        if( fieldAny.isValid() )
-            refl->setField( ret, field, fieldAny );
+        PBParamToValue( fieldArg, field->getType(), fieldAv.getAny() );
+        if( fieldAv.isValid() )
+            refl->setField( ret, field, fieldAv );
     }
 }
     

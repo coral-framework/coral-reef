@@ -265,6 +265,7 @@ void Invoker::onMethod( ParameterPuller& puller, co::IService* facet, co::IMetho
 
 	// ------ Proceed to the actual invocation ------ //
     co::AnyValue returnValue;
+	bool hasOutput = false;
     refl->invoke( facet, method, args, returnValue );
     
     CORAL_DLOG( INFO ) << "Invoked method " << method->getName() << " of service "
@@ -275,6 +276,7 @@ void Invoker::onMethod( ParameterPuller& puller, co::IService* facet, co::IMetho
 	co::IType* returnType = method->getReturnType();
 	if( returnType )
 	{
+		hasOutput = true;
 		if( returnType->getKind() == co::TK_INTERFACE )
 			CORAL_THROW( RemotingException, "References can't be passed via return, must use out params" );
 
@@ -296,10 +298,15 @@ void Invoker::onMethod( ParameterPuller& puller, co::IService* facet, co::IMetho
 				getRefTypeInfo( args[i].get<co::IService*>(), senderEndpoint, refType );
 				pusher.pushReference( refType );
 			}
+			hasOutput = true;
 		}
 	}
 
+	// needed even if there is no return in order to reset the marshaller internal state
 	_marshaller.marshalOutput( outputStream );
+	
+	if( !hasOutput )
+		outputStream = "";
 }
 
 void Invoker::onGetField( co::IService* facet, co::IField* field, 

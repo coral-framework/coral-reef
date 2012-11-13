@@ -156,7 +156,7 @@ void complexToPBParam( const co::Any& complex, co::IType* descriptor, Parameter*
 {
     if( descriptor->getKind() == co::TK_ARRAY )
     {
-        complexArrayToPBParam( complex, descriptor, complexParam );
+        complexArrayToPBParam( complex.asIn(), descriptor, complexParam );
         return;
     }
     
@@ -174,7 +174,7 @@ void complexToPBParam( const co::Any& complex, co::IType* descriptor, Parameter*
         co::AnyValue av; co::Any fieldAny( av );
         
         refl->getField( complex, fields.getFirst(), fieldAny );
-        valueToPBParam( fieldAny, fieldType, fieldArg );
+        valueToPBParam( fieldAny.asIn(), fieldType, fieldArg );
     }
 }
     
