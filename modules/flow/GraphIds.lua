@@ -16,7 +16,6 @@ function GraphIds:new( space )
 end
 
 function GraphIds:insertInMap( service )
-	print( service, self.currentId )
 	self.objectIdMap[service] = self.currentId
 	self.idObjectMap[self.currentId] = service
 	self.currentId = self.currentId + 1
