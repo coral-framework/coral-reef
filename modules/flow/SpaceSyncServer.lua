@@ -190,7 +190,9 @@ function createChange( space, member, value )
 	elseif member.type.kind == 'TK_ARRAY' and member.type.elementType.kind == 'TK_INTERFACE' then
 		local refVecStr = "#{"
 		for i, refVecService in ipairs( value ) do
-			refVecStr = refVecStr .. getCache( space ):getId( refVecService ) .. ","
+			if getCache( space ):getId( refVecService ) then
+				refVecStr = refVecStr .. getCache( space ):getId( refVecService ) .. ","
+			end
 		end
 		refVecStr = refVecStr .. "}"
 		change.newRefValue = refVecStr
