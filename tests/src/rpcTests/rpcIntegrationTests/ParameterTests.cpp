@@ -7,6 +7,7 @@
 #include <stubs/IReferenceTypes.h>
 #include <stubs/StringNativeClass.h>
 #include <stubs/ITestSetup.h>
+#include <stubs/DummyEnum.h>
 
 #include <rpc/INode.h>
 #include <rpc/ITransport.h>
@@ -67,6 +68,17 @@ TEST( ParameterTests, simpleTypesTest )
     co::AnyValue strResult( simple->concatenateFromAny( str1Any, str1Any ) );
     EXPECT_STREQ( "string1string1", strResult.get<const std::string&>().c_str() );
     
+	EXPECT_EQ( simple->getNextEnum( stubs::one ), stubs::two );
+
+	std::vector<stubs::DummyEnum> enumVec;
+	enumVec.push_back( stubs::one );
+	enumVec.push_back( stubs::two );
+	enumVec.push_back( stubs::three );
+	co::TSlice<stubs::DummyEnum> enumSlice = simple->removeLastEnum( enumVec );
+	EXPECT_EQ( enumSlice.getSize(), 2 );
+	EXPECT_EQ( enumSlice[0], stubs::one );
+	EXPECT_EQ( enumSlice[1], stubs::two );
+
     // ------ Simple value Types Arrays ------ //
     std::vector<co::int32> intVec;
     std::vector<double> doubleVec;

@@ -1,0 +1,6 @@
+enum DummyEnum
+{
+	one,
+	two,
+	three
+};

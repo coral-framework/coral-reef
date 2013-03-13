@@ -28,6 +28,8 @@ interface ISimpleTypes extends ISimpleParent
 	string concatenateString( in string str1, in string str2 );
 	string[] getThirdElements( in string[] list1, in string[] list2 );
 	double[] mergeLists( in double[] list1, in double[] list2 );
+	DummyEnum getNextEnum( in DummyEnum currentEnum );
+	DummyEnum[] removeLastEnum( in DummyEnum[] enumList );
 	
 	// asynchronous functions to test parameters (exactly like field setters for the fields above)
 	void setInt( in int32 number );

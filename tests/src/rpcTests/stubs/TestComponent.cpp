@@ -6,6 +6,7 @@
 
 #include "TestComponent_Base.h"
 #include <stubs/MotherStruct.h>
+#include <stubs/DummyEnum.h>
 
 #include <co/Log.h>
 #include <co/IReflector.h>
@@ -380,6 +381,22 @@ public:
 		return _storedDoubleList;
 	}
 
+	stubs::DummyEnum getNextEnum( DummyEnum currentEnum )
+	{
+		co::int32 enumValue = static_cast<co::int32>( currentEnum );
+		return static_cast<stubs::DummyEnum>( ( enumValue + 1 ) );
+	}
+
+	co::TSlice<stubs::DummyEnum> removeLastEnum( co::Slice<stubs::DummyEnum> list1 )
+	{
+		_storedEnumList.clear();
+
+		co::assign( list1, _storedEnumList );
+		_storedEnumList.pop_back();
+
+		return _storedEnumList;
+	}
+
     co::AnyValue addDoublesFromAny( const co::Any& d1, const co::Any& d2 )
 	{
         co::AnyValue av( d1.get<double>() + d2.get<double>() );
@@ -462,6 +479,7 @@ private:
     stubs::ChildStruct _childStruct;
 	co::int32 _dummy;
 	double _storedDouble;
+	std::vector<stubs::DummyEnum> _storedEnumList;
 	std::vector<double> _storedDoubleList;
     std::vector<double> _storedParentDoubleList;
 	co::int32 _storedInt;
