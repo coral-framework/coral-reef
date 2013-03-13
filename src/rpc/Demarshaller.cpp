@@ -139,6 +139,9 @@ void PBParamToValue( const Parameter& param, co::IType* descriptor, const co::An
         case co::TK_UINT32:
             PBParamWithTypeToAny<co::uint32>( param, ret, elementType );
             break;
+		case co::TK_ENUM:
+            PBParamWithTypeToAny<co::uint32>( param, ret, elementType );
+            break;
         case co::TK_FLOAT:
             PBParamWithTypeToAny<float>( param, ret, elementType );
             break;

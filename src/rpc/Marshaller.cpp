@@ -96,6 +96,9 @@ void valueToPBParam( const co::Any& any, co::IType* descriptor, Parameter* param
         case co::TK_UINT32:
             simpleToPBParam<co::uint32>( any, descriptor, param );
             break;
+		case co::TK_ENUM:
+            simpleToPBParam<co::uint32>( any, descriptor, param );
+            break;
         case co::TK_FLOAT:
             simpleToPBParam<float>( any, descriptor, param );
             break;
