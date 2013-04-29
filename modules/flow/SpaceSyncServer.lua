@@ -78,16 +78,18 @@ function generateValueForNewObjects( space, newObjects, resultChangesTable )
 	local newObjectResult = {}
 	
 	for newObject, _ in pairs( newObjects ) do
-		getCache( space ):objectId( newObject )
+		getCache( space ):objectId( newObject, true )
 		
 		local newObjectStruct = co.new "flow.NewObject"
 		local objectId = getCache( space ):getId( newObject )
 		newObjectStruct.newId = objectId
 		newObjectStruct.typeName = newObject.component.fullName
 		newObjectResult[ #newObjectResult + 1 ] = newObjectStruct
-		
+	end
+	for newObject, _ in pairs( newObjects ) do
 		getNewObjectChanges( space, newObject, resultChangesTable )
 	end
+	
 	
 	return newObjectResult
 end
@@ -199,6 +201,7 @@ function createChange( space, member, value )
 	else
 		change.newValue = value
 	end
+	
 	return change
 end
 
