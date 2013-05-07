@@ -3,6 +3,7 @@ interface ISpacePublisher
 	void setSpace( in ca.ISpace space );
 
 	void addSubscriber( in ISpaceSubscriber subscriber );
+	void removeSubscriber( in ISpaceSubscriber subscriber );
 	
 	void clearSubscribers();
 	

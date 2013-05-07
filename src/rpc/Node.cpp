@@ -16,6 +16,8 @@
 #include <cassert>
 #include <map>
 #include <set>
+#include <ctime>
+#include <sstream>
 
 namespace rpc {
     
@@ -48,14 +50,25 @@ co::IObject* Node::findRemoteInstance( const std::string& instanceType, const st
     return req->requestPublicInstance( key, instanceType );
 }
     
-void Node::raiseBarrier( co::int32 capacity )
+void Node::raiseBarrier( co::int32 capacity, co::uint32 timeout )
 {
     assert( _srh );
     
+	time_t tstart = time(0);
+	time_t current;
+
     _barrierMan->raiseBarrier( capacity );
     
     while( _barrierMan->isBarrierUp() )
+	{
+		current = time(0);
+
+        if( current - tstart > timeout )
+		{
+			CORAL_THROW( RemotingException, "Reply receiving timeout" );
+		}
         update();
+	}
 }
  
 void Node::hitBarrier()

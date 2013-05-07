@@ -29,6 +29,7 @@
 
 #include <map>
 #include <set>
+#include <algorithm>
 
 namespace flow {
 
@@ -80,9 +81,18 @@ public:
 			CORAL_THROW( co::IllegalStateException, "NULL space" );
 		}
 		calculateData();
-		co::Slice<co::int8> sliceData( data );
+		co::Slice<co::int8> sliceData( _data );
 		subscriber->onSubscribed( sliceData, _space->getUniverse()->getModel()->getName() );
 		_subscribers.push_back( subscriber );
+	}
+
+	void removeSubscriber( flow::ISpaceSubscriber* subscriber )
+	{
+		std::vector<flow::ISpaceSubscriberRef>::iterator position = std::find( _subscribers.begin(), _subscribers.end(), subscriber );
+		if( position != _subscribers.end() )
+		{
+			_subscribers.erase( position );
+		}
 	}
 
 	void clearSubscribers()
@@ -122,7 +132,6 @@ public:
 			results );
 		
 		_allChanges.clear();
-
 	}
 	
 protected:
@@ -145,7 +154,7 @@ private:
 
 		std::ifstream ifs( "serverTmp.lua" );
 
-		data.assign((std::istreambuf_iterator<char>(ifs)),
+		_data.assign((std::istreambuf_iterator<char>(ifs)),
                  std::istreambuf_iterator<char>());
 		ifs.close();
 	}
@@ -171,7 +180,7 @@ private:
 	std::vector<ca::IGraphChangesRef> _allChanges;
 	
 	std::vector<flow::ISpaceSubscriberRef> _subscribers;
-	std::vector<co::int8> data;
+	std::vector<co::int8> _data;
 };
 
 CORAL_EXPORT_COMPONENT( SpacePublisher, SpacePublisher );

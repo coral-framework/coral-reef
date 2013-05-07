@@ -38,7 +38,7 @@ public:
     co::IObject* findRemoteInstance( const std::string& instanceType, const std::string& key, 
                                     const std::string& address );
 
-    void raiseBarrier( co::int32 capacity );
+    void raiseBarrier( co::int32 capacity, co::uint32 timeout );
     void hitBarrier();
     
     void start( const std::string& boundAddress );

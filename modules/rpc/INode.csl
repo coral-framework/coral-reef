@@ -34,7 +34,7 @@ interface INode
 		has proxies for and blocks until the barrier is down. \a capacity the number of nodes 
 		needed to hit the barrier down. Currently, only one barrier exists in a network at a given time.
 	*/
-	void raiseBarrier( in int32 capacity );
+	void raiseBarrier( in int32 capacity, in uint32 timeout );
 	
 	/*
 		Enters the barrier, blocks until the barrier height has been reached.
