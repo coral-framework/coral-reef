@@ -6,6 +6,7 @@ namespace zmq {
 
 ZMQConnector::ZMQConnector( zmq::context_t& context ) : _socket( context, ZMQ_DEALER )
 {
+	_socket.setsockopt( ZMQ_LINGER, 0, sizeof( int ) );
 }
 
 ZMQConnector::ZMQConnector() : _socket( *((zmq::context_t*)0), ZMQ_DEALER )
