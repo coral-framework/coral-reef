@@ -39,14 +39,14 @@ std::string Node::getPublicAddress()
 co::IObject* Node::newRemoteInstance( const std::string& instanceType, 
                                            const std::string& address )
 {
-    Requestor* req = _requestorMan->getOrCreateRequestor( address );
+    co::RefPtr<Requestor> req = _requestorMan->getOrCreateRequestor( address );
     return req->requestNewInstance( instanceType );
 }
 
 co::IObject* Node::findRemoteInstance( const std::string& instanceType, const std::string& key, 
                                       const std::string& address )
 {
-    Requestor* req = _requestorMan->getOrCreateRequestor( address );
+    co::RefPtr<Requestor> req = _requestorMan->getOrCreateRequestor( address );
     return req->requestPublicInstance( key, instanceType );
 }
     
@@ -78,9 +78,7 @@ void Node::hitBarrier()
     
 void Node::start( const std::string&  boundAddress )
 {
-    _publicEndpoint = boundAddress;
-    
-    _srh = new ServerRequestHandler( _transport->bind( boundAddress ), _publicEndpoint );
+    _srh = new ServerRequestHandler( _transport->bind( boundAddress ), boundAddress );
 
     _instanceMan = new InstanceManager();
  
@@ -90,6 +88,7 @@ void Node::start( const std::string&  boundAddress )
     
     _invoker = new Invoker( _instanceMan, _barrierMan, _srh, _requestorMan );
     _srh->setInvoker( _invoker );
+	_publicEndpoint = boundAddress;
 }
     
 void Node::update()
