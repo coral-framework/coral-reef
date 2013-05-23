@@ -67,7 +67,7 @@ public:
 
 	}
 
-	bool onSubscribed(  co::Slice<co::int8> bytes, const std::string& modelName  )
+	void onSubscribed(  co::Slice<co::int8> bytes, const std::string& modelName  )
 	{
 		ca::IModel* model = getModel( modelName ).get();
 
@@ -90,15 +90,13 @@ public:
 		_rootObject = _archive->restore();
 
 		initializeIds();
-
-		return true;
 	}
 	
-	bool onPublish( co::Slice<flow::NewObject> newObjects, co::Slice<flow::ChangeSet> changes )
+	void onPublish( co::Slice<flow::NewObject> newObjects, co::Slice<flow::ChangeSet> changes )
 	{
 		if( !ready )
 		{
-			return false;	
+			CORAL_THROW( co::IllegalStateException, "Subscriber not ready" );
 		}
 
 		try
@@ -120,9 +118,8 @@ public:
 		catch( std::exception& e )
 		{
 			CORAL_LOG(ERROR) << e.what();
-			return false;
+			throw;
 		}
-		return true;
 	}
 
 private:
