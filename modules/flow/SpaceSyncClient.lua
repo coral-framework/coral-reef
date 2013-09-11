@@ -11,6 +11,10 @@ function getCache( space )
 	return cache[space]
 end
 
+function M.removeFromCache( space )
+	cache[space] = nil
+end
+
 function M.applyReceivedChanges( graph, newObjects, changeSets )
 	newObjectIds = {}
 	applyReceivedNewObjects( graph, newObjects )

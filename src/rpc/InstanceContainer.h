@@ -17,12 +17,12 @@ public:
     // Get the (cacheable) service
     co::IService* getService( co::int32 facetIdx );
     
-    inline co::IObject* getInstance(){ return _instance.get(); }
+    inline co::IObject* getInstance(){ return _instance; }
     
     inline co::IComponent* getComponent(){ return _component; }
     
 private:
-    co::RefPtr<co::IObject> _instance;
+    co::IObject* _instance;
     
     co::int32 _refCount;
     
