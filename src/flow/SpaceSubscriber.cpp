@@ -42,22 +42,8 @@ public:
 	virtual ~SpaceSubscriber()
 	{
 		_rootObject = 0;
-
-		const std::string& script = "flow.SpaceSyncClient";
-		const std::string& function = "removeFromCache";
-		
-		co::Slice<co::Any> results;
-
-		co::Any args[1];
-		args[0] = _space.get();
-
-		co::getService<lua::IState>()->call( script, function,
-			args,
-			results );
-
+		removeFromCache();
 		_space = 0;
-		co::getService<lua::IState>()->collectGarbage();
-
 	}
 	
 	co::IObject* getRootObject()
@@ -72,6 +58,7 @@ public:
 		{
 			CORAL_THROW( co::IllegalArgumentException, "NULL space" );
 		}
+		removeFromCache();
 		_space = space;
 		initializeIds();
 
@@ -160,6 +147,26 @@ private:
 			ready = true;
 		}
 	}
+
+	void removeFromCache()
+	{
+		if( _space.isValid() )
+		{
+			const std::string& script = "flow.SpaceSyncClient";
+			const std::string& function = "removeFromCache";
+		
+			co::Slice<co::Any> results;
+
+			co::Any args[1];
+			args[0] = _space;
+
+			co::getService<lua::IState>()->call( script, function,
+				args,
+				results );
+			co::getService<lua::IState>()->collectGarbage();
+		}
+	}
+
 
 	ca::IModelRef getModel( const std::string& modelName )
 	{

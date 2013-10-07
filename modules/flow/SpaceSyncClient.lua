@@ -46,6 +46,7 @@ function applyReceivedChangeSet( graph, changeSets )
 		end
 	end
 	graph:notifyChanges()
+	newObjectIds = {}
 end
 
 function applyReceivedNewObjects( graph, newObjects )
