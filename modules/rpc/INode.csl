@@ -39,7 +39,7 @@ interface INode
 	/*
 		Enters the barrier, blocks until the barrier height has been reached.
 	*/
-	void hitBarrier();
+	void hitBarrier( in uint32 timeout );
 	
 	/*
 		Starts a local server which answer remote requests in the provided port.

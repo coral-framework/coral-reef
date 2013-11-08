@@ -71,9 +71,9 @@ void Node::raiseBarrier( co::int32 capacity, co::uint32 timeout )
 	}
 }
  
-void Node::hitBarrier()
+void Node::hitBarrier( co::uint32 timeout )
 {
-    _invoker->hitBarrier();
+    _invoker->hitBarrier( timeout );
 }
     
 void Node::start( const std::string&  boundAddress )

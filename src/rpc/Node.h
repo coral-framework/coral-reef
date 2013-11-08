@@ -39,7 +39,7 @@ public:
                                     const std::string& address );
 
     void raiseBarrier( co::int32 capacity, co::uint32 timeout );
-    void hitBarrier();
+    void hitBarrier( co::uint32 timeout );
     
     void start( const std::string& boundAddress );
     

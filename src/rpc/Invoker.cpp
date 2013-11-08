@@ -26,6 +26,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <ctime>
 
 namespace rpc {
 
@@ -71,15 +72,40 @@ void Invoker::dispatchInvocation( const std::string& inputStream )
         _srh->reply( returnValue );
 }
 
-void Invoker::hitBarrier()
+void Invoker::hitBarrier( co::uint32 timeout )
 {
-    while( !_barrierUp ) // tried to enter the barrier before its raising
-        _srh->react();
+	time_t tstart = time(0);
+	time_t current;
+	current = time(0);
+
+    if( current - tstart > timeout )
+	{
+		CORAL_THROW( RemotingException, "Reply receiving timeout" );
+	}
+
+    while( !_barrierUp )
+	{ // tried to enter the barrier before its raising
+		current = time(0);
+		_srh->react();
+
+		if( current - tstart > timeout )
+		{
+			CORAL_THROW( RemotingException, "Reply receiving timeout" );
+		}
+	}
     
     _barrierCreator->requestBarrierHit();
     
     while( _barrierUp )
-        _srh->react();
+	{
+		current = time(0);
+		_srh->react();
+
+		if( current - tstart > timeout )
+		{
+			CORAL_THROW( RemotingException, "Reply receiving timeout" );
+		}
+	}
 }
     
 void Invoker::invokeManagement( Demarshaller& demarshaller, MessageType msgType, 

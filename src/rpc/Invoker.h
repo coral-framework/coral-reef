@@ -38,7 +38,7 @@ public:
     void dispatchInvocation( const std::string& inputStream );
     
     // Waits for other node to raise a barrier if it is still not risen, blocks until barrier is down
-    void hitBarrier();
+    void hitBarrier( co::uint32 timeout );
     
 private:
     

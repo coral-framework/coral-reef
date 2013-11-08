@@ -33,7 +33,7 @@ public:
 
 	void incrementSync()
 	{
-		_nodeService->hitBarrier();
+		_nodeService->hitBarrier( 1 );
         _numberOne++;
 	}
 
