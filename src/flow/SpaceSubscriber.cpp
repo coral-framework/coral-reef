@@ -64,7 +64,7 @@ public:
 
 	}
 
-	void onSubscribed(  co::Slice<co::int8> bytes, const std::string& modelName  )
+	void onSubscribed(  const std::string& bytes, const std::string& modelName  )
 	{
 		ca::IModelRef model = getModel( modelName );
 
@@ -75,10 +75,7 @@ public:
 
 		std::ofstream of ( "tmp.lua" );
 
-		for( int i = 0; i < bytes.getSize(); i++ )
-		{
-			of << bytes[i];
-		}
+		of << bytes;
 		
 		of.close();
 

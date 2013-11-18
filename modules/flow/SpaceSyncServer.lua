@@ -19,6 +19,9 @@ local function getModel( space )
 	return space.universe.model
 end
 
+function M.removeFromCache( space )
+	cache[space] = nil
+end
 
 function M.processAllSpaceChanges( space, allSpaceChanges, observers )
 	if #observers == 0 then

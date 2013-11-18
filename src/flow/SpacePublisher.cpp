@@ -69,6 +69,7 @@ public:
 			_space->removeGraphObserver( this );
 		}
 		
+		removeFromCache();
 		_space = space;
 		_space->addGraphObserver( this );
 		initializeIds();
@@ -81,9 +82,9 @@ public:
 			CORAL_THROW( co::IllegalStateException, "NULL space" );
 		}
 		calculateData();
-		co::Slice<co::int8> sliceData( _data );
-		subscriber->onSubscribed( sliceData, _space->getUniverse()->getModel()->getName() );
+		subscriber->onSubscribed( _data, _space->getUniverse()->getModel()->getName() );
 		_subscribers.push_back( subscriber );
+		_data.clear();
 	}
 
 	void removeSubscriber( flow::ISpaceSubscriber* subscriber )
@@ -173,6 +174,26 @@ private:
 			co::Slice<co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
 			results );
 	}
+
+	void removeFromCache()
+	{
+		if( _space.isValid() )
+		{
+			const std::string& script = "flow.SpaceSyncServer";
+			const std::string& function = "removeFromCache";
+		
+			co::Slice<co::Any> results;
+
+			co::Any args[1];
+			args[0] = _space;
+
+			co::getService<lua::IState>()->call( script, function,
+				args,
+				results );
+			co::getService<lua::IState>()->collectGarbage();
+		}
+	}
+
 private:
 	ca::ISpaceRef _space;
 	ca::IArchiveRef _archive;
@@ -180,7 +201,7 @@ private:
 	std::vector<ca::IGraphChangesRef> _allChanges;
 	
 	std::vector<flow::ISpaceSubscriberRef> _subscribers;
-	std::vector<co::int8> _data;
+	std::string _data;
 };
 
 CORAL_EXPORT_COMPONENT( SpacePublisher, SpacePublisher );

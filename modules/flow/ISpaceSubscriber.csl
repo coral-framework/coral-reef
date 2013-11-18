@@ -4,7 +4,7 @@ interface ISpaceSubscriber
 
 	readonly co.IObject rootObject;
 	
-	void onSubscribed( in int8[] bytes, in string modelName );
+	void onSubscribed( in string bytes, in string modelName );
 	
 	void onPublish( in NewObject[] newObjects, in ChangeSet[] changes );
 };

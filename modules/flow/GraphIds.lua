@@ -3,8 +3,6 @@ local GraphIdsMT = { __index = GraphIds }
 
 function GraphIds:new( space )
 	self = {}
-	self.space = space
-	
 	self.model = space.universe.model
 	
 	self.objectIdMap = {}
