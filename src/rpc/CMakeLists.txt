@@ -42,6 +42,13 @@ INSTALL( FILES "${CMAKE_BINARY_DIR}/modules/rpc/rpc_debug.pdb"
 	OPTIONAL
 )
 
+INSTALL( FILES "${CMAKE_BINARY_DIR}/modules/rpc/rpc.pdb"
+	DESTINATION "modules/rpc"
+	CONFIGURATIONS RelWithDebInfo
+	COMPONENT "RPC Module"
+	OPTIONAL
+)
+
 # install module files
 INSTALL( DIRECTORY ${CMAKE_SOURCE_DIR}/modules/rpc
 	DESTINATION "modules"

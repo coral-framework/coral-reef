@@ -41,6 +41,13 @@ INSTALL( FILES "${CMAKE_BINARY_DIR}/modules/flow/flow_debug.pdb"
 	OPTIONAL
 )
 
+INSTALL( FILES "${CMAKE_BINARY_DIR}/modules/flow/flow.pdb"
+	DESTINATION "modules/flow"
+	CONFIGURATIONS RelWithDebInfo
+	COMPONENT "FLOW Module"
+	OPTIONAL
+)
+
 # install module files
 INSTALL( DIRECTORY ${CMAKE_SOURCE_DIR}/modules/flow
 	DESTINATION "modules"

@@ -41,6 +41,13 @@ INSTALL( FILES "${CMAKE_BINARY_DIR}/modules/zmq/zmq_debug.pdb"
 	OPTIONAL
 )
 
+INSTALL( FILES "${CMAKE_BINARY_DIR}/modules/zmq/zmq.pdb"
+	DESTINATION "modules/zmq"
+	CONFIGURATIONS RelWithDebInfo
+	COMPONENT "zmq Module"
+	OPTIONAL
+)
+
 # install module files
 INSTALL( DIRECTORY ${CMAKE_SOURCE_DIR}/modules/zmq
 	DESTINATION "modules"
