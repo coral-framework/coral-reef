@@ -8,7 +8,14 @@ if( RPC_ONLY STREQUAL "OFF" )
 	add_subdirectory( flow )
 endif()
 
-set( BUILD_ZMQ "OFF" CACHE BOOL "ZMQ transport layer" )
+find_package( zmq REQUIRED )
+
+if( ZMQ_FOUND )
+	set( BUILD_ZMQ "ON" CACHE BOOL "ZMQ transport layer" )
+else()
+	set( BUILD_ZMQ "OFF" CACHE BOOL "ZMQ transport layer" )
+endif()
+
 if( BUILD_ZMQ STREQUAL "ON" )
 	message( "ZMQ is meant only for production, should not be used for testing and development" )
 	add_subdirectory( zmq )

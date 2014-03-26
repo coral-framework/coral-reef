@@ -3,8 +3,6 @@
 ################################################################################
 CORAL_GENERATE_MODULE( _GENERATED_FILES zmq )
 
-find_package( zmq REQUIRED )
-
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/generated ${ZMQ_INCLUDE_DIR} )
 
 file( GLOB _SOURCES *.cpp )
