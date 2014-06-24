@@ -40,9 +40,13 @@ TEST( ParameterTests, simpleTypesTest )
     setup->initTest( 2 );
     
     rpc::INode* client = setup->getNode( 1 );
+	rpc::INode* server = setup->getNode( 2 );
+
+	co::IObjectRef originalObject = co::newInstance( "stubs.TestComponent" );
     
-    co::RefPtr<co::IObject> remoteInstance = client->newRemoteInstance( "stubs.TestComponent",
-                                                            "address2" );
+	server->publishInstance( originalObject.get(), "remoteInstance" );
+
+    co::RefPtr<co::IObject> remoteInstance = client->findRemoteInstance( "stubs.TestComponent", "remoteInstance", "address2" );
     stubs::ISimpleTypes* simple = remoteInstance->getService<stubs::ISimpleTypes>();
     
     // ------ Simple value types ------
@@ -149,16 +153,21 @@ TEST( ParameterTests, refTypeParameterTest )
     stubs::ITestSetup* setup = testSetup->getService<stubs::ITestSetup>();
     setup->initTest( 3 );
     
+	rpc::INode* serverA = setup->getNode( 1 );
     rpc::INode* serverB = setup->getNode( 2 );
     rpc::INode* client = setup->getNode( 3 );
 
-    co::RefPtr<co::IObject> instanceInA = client->newRemoteInstance( "stubs.TestComponent",
-                                                                "address1" );
+	co::IObjectRef instanceInAOrig = co::newInstance( "stubs.TestComponent" );
+	serverA->publishInstance(  instanceInAOrig.get(), "instanceInA" );
+
+    co::RefPtr<co::IObject> instanceInA = client->findRemoteInstance( "stubs.TestComponent", "instanceInA", "address1" );
     stubs::IReferenceTypes* refTypesServiceInA = instanceInA->getService<stubs::IReferenceTypes>();
     stubs::ISimpleTypes* simpleTypesServiceInA = instanceInA->getService<stubs::ISimpleTypes>();
     
-    co::RefPtr<co::IObject> instanceInB = client->newRemoteInstance( "stubs.TestComponent",
-                                                                    "address2" );
+	co::IObjectRef instanceInBOrig = co::newInstance( "stubs.TestComponent" );
+	serverB->publishInstance(  instanceInBOrig.get(), "instanceInB" );
+	co::RefPtr<co::IObject> instanceInB = client->findRemoteInstance( "stubs.TestComponent", "instanceInB", "address2" );
+
     stubs::ISimpleTypes* simpleTypesServiceInB = instanceInB->getService<stubs::ISimpleTypes>();
 
     

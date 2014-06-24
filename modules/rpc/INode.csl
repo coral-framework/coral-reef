@@ -17,14 +17,6 @@ interface INode
 	readonly string publicAddress;
 
 	/*
-		Creates a new remote instance for a component of type named \a componentTypeName
-		at \a specified address.
-		\throws ConnectionFailureExpection for failure in connection
-		\throws TypeUnknownToHostException if the provided type is not recognized by the host
-	 */
-	co.IObject newRemoteInstance( in string componentTypeName, in string address );
-
-	/*
 		Finds an instance in \a address published with \a key. Returns null if not found.
 	*/
 	co.IObject findRemoteInstance( in string componentTypeName, in string key, in string address );
