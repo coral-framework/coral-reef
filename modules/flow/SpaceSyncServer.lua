@@ -2,13 +2,23 @@ local M = {}
 
 local cache = {}
 
-
 require "flow.GraphIds"
 
 require "table"
 
 function M.initializeIds( space )
 	cache[space] = GraphIds:new( space )
+	
+	local ids = cache[space]:getOrderedIds( space.rootObject )
+	
+	local idsStr = "{"
+	
+	for _, id in ipairs( ids ) do
+		idsStr = idsStr .. id ..","
+	end
+	idsStr = idsStr .. "}"
+	print( 'return list ', idsStr )
+	return idsStr
 end
 
 local function getCache( space )

@@ -1,7 +1,7 @@
 GraphIds = {}
 local GraphIdsMT = { __index = GraphIds }
 
-function GraphIds:new( space )
+function GraphIds:new( space, givenIds )
 	self = {}
 	self.model = space.universe.model
 	
@@ -9,7 +9,11 @@ function GraphIds:new( space )
 	self.idObjectMap = {}
 	self.currentId = 1
 	setmetatable( self, GraphIdsMT )
-	self:objectId( space.rootObject )
+	if givenIds then
+		self:giveExternalIds( space.rootObject, givenIds )
+	else
+		self:objectId( space.rootObject )
+	end
 	return self;
 end
 
@@ -21,6 +25,8 @@ function GraphIds:insertInMap( service, givenId )
 	end
 	self.objectIdMap[service] = givenId
 	self.idObjectMap[givenId] = service
+	
+	print( 'giving id ', self:getService( 1 ), service, givenId )
 end
 
 function GraphIds:hasId( service )
@@ -50,19 +56,27 @@ function GraphIds:removeObject( object )
 	end
 end
 
-local function generateId( self, item, shallow )
-	if not self:hasId( item ) then
-		self:insertInMap( item )
-		return false
-	else
+local function generateId( self, item, referenceObject )
+	
+	print( 'generating id ', self:getService( 1 ), item, referenceObject ) 
+	if item.component ~= nil and item ~= referenceObject then
 		return true
 	end
-	return shallow
+	
+	if not self:hasId( item ) then
+		self:insertInMap( item )
+	end
 end
 
 local function giveId( self, item, givenIds )
+	
 	if not self:hasId( item ) then
+		print( 'givenId', givenIds, #givenIds )
 		local givenId = table.remove( givenIds, 1 )
+		
+		for k, v in pairs( givenIds ) do
+			print( k, v )
+		end
 		self:insertInMap( item, givenId )
 	end
 	return false
@@ -79,25 +93,32 @@ local function getId( self, item )
 	return false
 end
 
-function GraphIds:getOrderedIds( object, givenIds )
+function GraphIds:getOrderedIds( object )
 	idList = {}
 	marked = {}
-	self:genericGraphWalk( object, getId, givenIds )
+	self:genericGraphWalk( object, getId )
 	return idList
 end
 
 function GraphIds:giveExternalIds( object, givenIds )
+	print( 'givenIdsTable ', givenIds )
 	self:genericGraphWalk( object, giveId, givenIds )
 end
 
-function GraphIds:objectId( object, shallow )
-	self:genericGraphWalk( object, generateId, shallow )
+function GraphIds:objectId( object, shallow, givenId )
+	if givenId then
+		self.currentId = givenId
+	end
+	if shallow then
+		self:genericGraphWalk( object, generateId, object )
+	else
+		self:genericGraphWalk( object, generateId )
+	end
 end
 
 function GraphIds:genericGraphWalk( item, callback, ... )
 	local stop = false
 	stop = callback( self, item, ... )
-	
 	if stop then
 		return
 	end
@@ -122,12 +143,12 @@ function GraphIds:genericGraphWalk( item, callback, ... )
 			fieldName = field.name
 			if kind == 'TK_INTERFACE' then
 				if service[fieldName] ~= nil then
-					self:genericGraphWalk( service[fieldName].provider, callback, arg )
+					self:genericGraphWalk( service[fieldName].provider, callback, ... )
 				end
 			elseif kind == 'TK_ARRAY' and field.type.elementType.kind == 'TK_INTERFACE' then
 				local refs = service[fieldName]
 				for i, ref in ipairs( refs ) do
-					self:genericGraphWalk( ref.provider, callback, arg )
+					self:genericGraphWalk( ref.provider, callback, ... )
 				end
 			end
 		end	

@@ -82,7 +82,7 @@ public:
 			CORAL_THROW( co::IllegalStateException, "NULL space" );
 		}
 		calculateData();
-		subscriber->onSubscribed( _data, _space->getUniverse()->getModel()->getName() );
+		subscriber->onSubscribed( _data, _ids, _space->getUniverse()->getModel()->getName() );
 		_subscribers.push_back( subscriber );
 		_data.clear();
 	}
@@ -165,7 +165,11 @@ private:
 		const std::string& script = "flow.SpaceSyncServer";
 		const std::string& function = "initializeIds";
 
-		co::Slice<co::Any> results;
+		co::AnyValue result;
+		co::Any results[] = 
+		{
+			result
+		};
 
 		co::Any args[1];
 		args[0] = _space.get();
@@ -173,6 +177,12 @@ private:
 		co::getService<lua::IState>()->call( script, function,
 			co::Slice<co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
 			results );
+
+		co::TypeKind tk = results[0].getKind();
+
+		CORAL_DLOG( INFO ) << results[0].getKind();
+		_ids = results[0].get<std::string>();
+		CORAL_DLOG( INFO ) << _ids;
 	}
 
 	void removeFromCache()
@@ -202,6 +212,7 @@ private:
 	
 	std::vector<flow::ISpaceSubscriberRef> _subscribers;
 	std::string _data;
+	std::string _ids;
 };
 
 CORAL_EXPORT_COMPONENT( SpacePublisher, SpacePublisher );

@@ -3,8 +3,15 @@ local cache = {}
 local newObjectIds = {}
 require "flow.GraphIds"
 
-function M.initializeIds( space )
-	cache[space] = GraphIds:new( space )
+function M.initializeIds( space, ids )
+	if ids == nil or ids == '' then
+		cache[space] = GraphIds:new( space )
+	else
+		local idListFunc = load( "return " .. ids )
+		print( 'idListFunc', ids )
+		local idList = idListFunc()
+		cache[space] = GraphIds:new( space, idList )
+	end
 end
 
 function getCache( space )
@@ -52,8 +59,9 @@ end
 function applyReceivedNewObjects( graph, newObjects )
 	for i, newObject in ipairs( newObjects ) do
 		local newObjectCoral = co.new( newObject.typeName )
-		getCache( graph ):objectId( newObjectCoral, true )
+		getCache( graph ):objectId( newObjectCoral, newObject.newId, true )
 		newObjectIds[ newObjectCoral ] = true
+		
 		if newObject.newId ~= getCache( graph ):getId( newObjectCoral ) then
 			error( "graph inconsistent" )
 		end
