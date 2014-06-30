@@ -58,14 +58,10 @@ function GraphIds:removeObject( object )
 	end
 end
 
-local function generateId( self, item, shallow )
+local function generateId( self, item, referenceObject )
 	if not self:hasId( item ) then
 		self:insertInMap( item )
-		return false
-	else
-		return true
 	end
-	return shallow
 end
 
 local function giveId( self, item, givenIds )
@@ -98,8 +94,20 @@ function GraphIds:giveExternalIds( object, givenIds )
 	self:genericGraphWalk( object, giveId, givenIds )
 end
 
-function GraphIds:objectId( object, shallow )
-	self:genericGraphWalk( object, generateId, shallow )
+function GraphIds:shallowObjectId( object, externalId )
+	self:insertInMap( object, externalId )
+	local ports = self.model:getPorts( object.component )
+			
+	for i, port in ipairs( ports ) do
+		local service = object[port.name]
+		if service ~= nil then
+			self:insertInMap( service )
+		end
+	end
+end
+
+function GraphIds:objectId( object )
+	self:genericGraphWalk( object, generateId )
 end
 
 function GraphIds:genericGraphWalk( item, callback, ... )

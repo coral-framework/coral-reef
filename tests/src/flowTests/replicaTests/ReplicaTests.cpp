@@ -507,5 +507,81 @@ TEST_F( ReplicaTests, multipleClientsInitializeFromServerTests )
 	}
 
 	
+}
 
+TEST_F( ReplicaTests, multipleClientsLateInitializeTests )
+{
+
+	co::IObject* spacePublisherObj = co::newInstance( "flow.SpacePublisher" );
+	
+	flow::ISpacePublisher* spacePublisher = spacePublisherObj->getService<flow::ISpacePublisher>();
+	spacePublisher->setSpace( _space.get() );
+
+	co::IObjectRef replicaObj[2];
+	std::stringstream ss;
+
+	std::vector<ca::ISpaceRef> localSpaces;
+
+	for( int i = 0; i < 2; i++ )
+	{	
+		replicaObj[i] = co::newInstance( "flow.SpaceSubscriber" );
+		
+		ss << "client_" << i;
+		std::string clientKey = ss.str();
+		ss.str("");
+		ss.clear();
+		co::RefPtr<flow::ISpaceSubscriber> replica = replicaObj[i]->getService<flow::ISpaceSubscriber>();
+
+		localSpaces.push_back( createLocalSpace( "dom" ) );
+		flow::ISpaceSubscriber* spaceSubscriber = replicaObj[i]->getService<flow::ISpaceSubscriber>();
+		spaceSubscriber->setSpace( localSpaces[i].get() );
+	}
+
+	flow::ISpaceSubscriber* subscriberInit = replicaObj[0]->getService<flow::ISpaceSubscriber>();
+	flow::ISpaceSubscriber* subscriberLate = replicaObj[1]->getService<flow::ISpaceSubscriber>();
+
+
+	ASSERT_NO_THROW( spacePublisher->addSubscriber( subscriberInit )  );
+
+	// initial copy test
+	for( int i = 0; i < 1; i++ )
+	{
+		checkInitialSpace( replicaObj[i]->getService<flow::ISpaceSubscriber>()->getRootObject() );
+	}
+	
+
+	//============================================= changes to server space
+	applyChanges( _space.get() );
+
+	ASSERT_NO_THROW( spacePublisher->publish() ); 
+
+	//======================================================
+	//client after change
+	for( int i = 0; i < 1; i++ )
+	{
+		checkSpaceAfterChange( localSpaces[i]->getRootObject() );
+	}
+
+		//=== remove and return
+	removeAndReturnObject( _space.get() );
+	spacePublisher->publish();
+
+	ASSERT_NO_THROW( spacePublisher->addSubscriber( subscriberLate ) );
+
+
+	//it shouldn't change at all
+	for( int i = 0; i < 2; i++ )
+	{
+		checkSpaceAfterChange( localSpaces[i]->getRootObject()  );
+	}
+
+	applyChangeOnNewObject( _space.get() );
+	spacePublisher->publish();
+
+	for( int i = 0; i < 2; i++ )
+	{
+		dom::IEmployee* ceo = co::cast<dom::IEmployee>( localSpaces[i]->getRootObject()->getService( "ceo" ) );
+		EXPECT_EQ( 200000, ceo->getSalary() );
+		EXPECT_EQ( "newCEO Super", ceo->getName() );
+	}
 }

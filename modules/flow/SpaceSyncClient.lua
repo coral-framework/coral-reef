@@ -58,7 +58,7 @@ end
 function applyReceivedNewObjects( graph, newObjects )
 	for i, newObject in ipairs( newObjects ) do
 		local newObjectCoral = co.new( newObject.typeName )
-		getCache( graph ):objectId( newObjectCoral, newObject.newId, true )
+		getCache( graph ):shallowObjectId( newObjectCoral, newObject.newId )
 		newObjectIds[ newObjectCoral ] = true
 		
 		if newObject.newId ~= getCache( graph ):getId( newObjectCoral ) then

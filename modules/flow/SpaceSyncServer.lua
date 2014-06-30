@@ -9,6 +9,9 @@ require "table"
 function M.initializeIds( space )
 	cache[space] = GraphIds:new( space )
 	
+end
+
+function M.getOrderedIds( space )
 	local ids = cache[space]:getOrderedIds( space.rootObject )
 	
 	local idsStr = "{"
@@ -90,7 +93,7 @@ function generateValueForNewObjects( space, newObjects, resultChangesTable )
 	local newObjectResult = {}
 	
 	for newObject, _ in pairs( newObjects ) do
-		getCache( space ):objectId( newObject, true )
+		getCache( space ):shallowObjectId( newObject )
 		
 		local newObjectStruct = co.new "flow.NewObject"
 		local objectId = getCache( space ):getId( newObject )
