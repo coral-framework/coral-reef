@@ -33,11 +33,13 @@
 
 namespace flow {
 
+
 class SpacePublisher : public SpacePublisher_Base
 {
 public:
 	SpacePublisher()
 	{
+
 		_archiveObj = co::newInstance( "ca.LuaArchive" );
 		_archiveObj->getService<ca::INamed>()->setName( "serverTmp.lua" );
 
@@ -70,7 +72,13 @@ public:
 		}
 		
 		removeFromCache();
+
 		_space = space;
+
+		_args.push_back( _space );
+		_args.push_back( _allChanges );
+		_args.push_back( _subscribers );
+
 		_space->addGraphObserver( this );
 		initializeIds();
 	}
@@ -118,20 +126,10 @@ public:
 		{
 			return;
 		}
-
-		const std::string& script = "flow.SpaceSyncServer";
-		const std::string& function = "processAllSpaceChanges";
-
+		
 		co::Slice<co::Any> results;
 
-		co::Any args[3];
-		args[0] = _space.get();
-		args[1] = co::Slice<ca::IGraphChanges*>( _allChanges );
-		args[2] = co::Slice<flow::ISpaceSubscriber*>( _subscribers );
-		
-		co::getService<lua::IState>()->call( script, function,
-			co::Slice<co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
-			results );
+		callLuaFunction( "processAllSpaceChanges", results );
 		
 		_allChanges.clear();
 	}
@@ -161,62 +159,37 @@ private:
 		ifs.close();
 	}
 
+	void callLuaFunction( const std::string& function, co::Slice<co::Any> results )
+	{
+		co::getService<lua::IState>()->call( "flow.SpaceSyncServer", function, _args, results );
+	}
+
 	void getOrderedIds()
 	{
-		const std::string& script = "flow.SpaceSyncServer";
-		const std::string& function = "getOrderedIds";
-
 		co::AnyValue result;
 		co::Any results[] = 
 		{
 			result
 		};
 
-		co::Any args[1];
-		args[0] = _space.get();
-
-		co::getService<lua::IState>()->call( script, function,
-			co::Slice<co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
-			results );
+		callLuaFunction( "getOrderedIds", results );
 
 		_ids = results[0].get<std::string>();
 	}
 
 	void initializeIds()
 	{
-		const std::string& script = "flow.SpaceSyncServer";
-		const std::string& function = "initializeIds";
-
-		co::Slice<co::Any> results;
-
-		co::Any args[1];
-		args[0] = _space.get();
-
-		co::getService<lua::IState>()->call( script, function,
-			co::Slice<co::Any>( args, CORAL_ARRAY_LENGTH( args ) ),
-			results );
-
+		callLuaFunction( "initializeIds", co::Slice<co::Any>() );
 	}
 
 	void removeFromCache()
 	{
 		if( _space.isValid() )
 		{
-			const std::string& script = "flow.SpaceSyncServer";
-			const std::string& function = "removeFromCache";
-		
-			co::Slice<co::Any> results;
-
-			co::Any args[1];
-			args[0] = _space;
-
-			co::getService<lua::IState>()->call( script, function,
-				args,
-				results );
+			callLuaFunction( "removeFromCache", co::Slice<co::Any>() );
 			co::getService<lua::IState>()->collectGarbage();
 		}
 	}
-
 private:
 	ca::ISpaceRef _space;
 	ca::IArchiveRef _archive;
@@ -226,7 +199,9 @@ private:
 	std::vector<flow::ISpaceSubscriberRef> _subscribers;
 	std::string _data;
 	std::string _ids;
+	std::vector<co::Any> _args;
 };
+
 
 CORAL_EXPORT_COMPONENT( SpacePublisher, SpacePublisher );
 
