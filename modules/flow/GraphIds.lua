@@ -1,23 +1,31 @@
 GraphIds = {}
 local GraphIdsMT = { __index = GraphIds }
 
-function GraphIds:new( space )
+function GraphIds:new( space, givenIds )
 	self = {}
 	self.model = space.universe.model
 	
 	self.objectIdMap = {}
 	self.idObjectMap = {}
-	self.currentId = 1
+	self.currentId = 0
 	setmetatable( self, GraphIdsMT )
-	self:objectId( space.rootObject )
+	if givenIds then
+		self:giveExternalIds( space.rootObject, givenIds )
+	else
+		self:objectId( space.rootObject )
+	end
 	return self;
 end
 
 function GraphIds:insertInMap( service, givenId )
 	if givenId == nil then
 		--generated
-		givenId = self.currentId
 		self.currentId = self.currentId + 1
+		givenId = self.currentId
+	else
+		if givenId > self.currentId then
+			self.currentId = givenId 
+		end
 	end
 	self.objectIdMap[service] = givenId
 	self.idObjectMap[givenId] = service
@@ -96,6 +104,7 @@ end
 
 function GraphIds:genericGraphWalk( item, callback, ... )
 	local stop = false
+	local arg = {...}
 	stop = callback( self, item, ... )
 	
 	if stop then
@@ -122,12 +131,12 @@ function GraphIds:genericGraphWalk( item, callback, ... )
 			fieldName = field.name
 			if kind == 'TK_INTERFACE' then
 				if service[fieldName] ~= nil then
-					self:genericGraphWalk( service[fieldName].provider, callback, arg )
+					self:genericGraphWalk( service[fieldName].provider, callback, ... )
 				end
 			elseif kind == 'TK_ARRAY' and field.type.elementType.kind == 'TK_INTERFACE' then
 				local refs = service[fieldName]
 				for i, ref in ipairs( refs ) do
-					self:genericGraphWalk( ref.provider, callback, arg )
+					self:genericGraphWalk( ref.provider, callback, ... )
 				end
 			end
 		end	

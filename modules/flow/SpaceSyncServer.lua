@@ -17,7 +17,6 @@ function M.initializeIds( space )
 		idsStr = idsStr .. id ..","
 	end
 	idsStr = idsStr .. "}"
-	print( 'return list ', idsStr )
 	return idsStr
 end
 

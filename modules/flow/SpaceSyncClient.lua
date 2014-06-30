@@ -8,7 +8,6 @@ function M.initializeIds( space, ids )
 		cache[space] = GraphIds:new( space )
 	else
 		local idListFunc = load( "return " .. ids )
-		print( 'idListFunc', ids )
 		local idList = idListFunc()
 		cache[space] = GraphIds:new( space, idList )
 	end
