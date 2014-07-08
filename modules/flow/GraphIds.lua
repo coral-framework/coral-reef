@@ -76,7 +76,15 @@ local idList = {}
 local marked = {}
 
 local function getId( self, item )
-	if self:hasId( item ) and not marked[item] then
+	if not self:hasId( item ) then 
+		if item.component ~= nil then
+			self:objectId( item )
+		else
+			self:objectId( item.provider )
+		end
+	end
+	
+	if not marked[item] then
 		idList[ #idList + 1 ] = self:getId( item )
 		marked[item] = true
 	end
@@ -97,11 +105,20 @@ end
 function GraphIds:shallowObjectId( object, externalId )
 	self:insertInMap( object, externalId )
 	local ports = self.model:getPorts( object.component )
+	
+	if externalId then
+		externalId = externalId + 1
+	end
 			
 	for i, port in ipairs( ports ) do
-		local service = object[port.name]
-		if service ~= nil then
-			self:insertInMap( service )
+		if port.isFacet then
+			local service = object[port.name]
+			if service ~= nil then
+				self:insertInMap( service, externalId )
+				if externalId then
+					externalId = externalId + 1
+				end
+			end
 		end
 	end
 end
@@ -112,7 +129,6 @@ end
 
 function GraphIds:genericGraphWalk( item, callback, ... )
 	local stop = false
-	local arg = {...}
 	stop = callback( self, item, ... )
 	
 	if stop then
@@ -125,7 +141,11 @@ function GraphIds:genericGraphWalk( item, callback, ... )
 		for i, port in ipairs( ports ) do
 			local service = item[port.name]
 			if service ~= nil then
-				self:genericGraphWalk( service, callback, ... )
+				if port.isFacet then
+					self:genericGraphWalk( service, callback, ... )
+				else
+					self:genericGraphWalk( service.provider, callback, ... )
+				end
 			end
 		end
 	elseif item.interface ~= nil then

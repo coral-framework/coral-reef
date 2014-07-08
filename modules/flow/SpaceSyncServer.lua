@@ -58,7 +58,6 @@ function M.processAllSpaceChanges( space, allSpaceChanges, observers )
 		local changeSet = co.new "flow.ChangeSet"
 		changeSet.serviceId = i
 		changeSet.changes = changes
-		
 		changeSetArray[ #changeSetArray + 1 ] = changeSet
 	end
 	

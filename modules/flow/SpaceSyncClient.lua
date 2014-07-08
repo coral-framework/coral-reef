@@ -2,6 +2,7 @@ local M = {}
 local cache = {}
 local newObjectIds = {}
 require "flow.GraphIds"
+local coLog = co.log
 
 function M.initializeIds( space, ids )
 	if ids == nil or ids == '' then
@@ -35,16 +36,20 @@ function applyReceivedChangeSet( graph, changeSets )
 	local service
 	for i, changeSet in ipairs( changeSets ) do
 		service = getCache( graph ):getService( changeSet.serviceId )
-		for i, change in ipairs( changeSet.changes ) do
-			if change.newRefValue == nil or change.newRefValue == "" then
-				service[ change.name ] = change.newValue
-			else
-				local str = change.newRefValue
-				applyRefChange( graph, service, change.name, str )
+		if service then
+			for i, change in ipairs( changeSet.changes ) do
+				if change.newRefValue == nil or change.newRefValue == "" then
+					service[ change.name ] = change.newValue
+				else
+					local str = change.newRefValue
+					applyRefChange( graph, service, change.name, str )
+				end
 			end
+		else
+			coLog( 'WARNING', 'service with id ' .. changeSet.serviceId .. ' not found' )
 		end
 	end
-	
+		
 	for i, changeSet in ipairs( changeSets ) do
 		service = getCache( graph ):getService( changeSet.serviceId )
 		if not checkNewInGraph( service ) then
@@ -57,6 +62,7 @@ end
 
 function applyReceivedNewObjects( graph, newObjects )
 	for i, newObject in ipairs( newObjects ) do
+		
 		local newObjectCoral = co.new( newObject.typeName )
 		getCache( graph ):shallowObjectId( newObjectCoral, newObject.newId )
 		newObjectIds[ newObjectCoral ] = true
