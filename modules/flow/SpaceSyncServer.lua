@@ -2,13 +2,25 @@ local M = {}
 
 local cache = {}
 
-
 require "flow.GraphIds"
 
 require "table"
 
 function M.initializeIds( space )
 	cache[space] = GraphIds:new( space )
+	
+end
+
+function M.getOrderedIds( space )
+	local ids = cache[space]:getOrderedIds( space.rootObject )
+	
+	local idsStr = "{"
+	
+	for _, id in ipairs( ids ) do
+		idsStr = idsStr .. id ..","
+	end
+	idsStr = idsStr .. "}"
+	return idsStr
 end
 
 local function getCache( space )
@@ -46,7 +58,6 @@ function M.processAllSpaceChanges( space, allSpaceChanges, observers )
 		local changeSet = co.new "flow.ChangeSet"
 		changeSet.serviceId = i
 		changeSet.changes = changes
-		
 		changeSetArray[ #changeSetArray + 1 ] = changeSet
 	end
 	
@@ -81,7 +92,7 @@ function generateValueForNewObjects( space, newObjects, resultChangesTable )
 	local newObjectResult = {}
 	
 	for newObject, _ in pairs( newObjects ) do
-		getCache( space ):objectId( newObject, true )
+		getCache( space ):shallowObjectId( newObject )
 		
 		local newObjectStruct = co.new "flow.NewObject"
 		local objectId = getCache( space ):getId( newObject )

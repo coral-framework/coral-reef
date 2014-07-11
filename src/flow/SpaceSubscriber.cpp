@@ -37,6 +37,7 @@ public:
 	SpaceSubscriber()
 	{
 		ready = false;
+		_ids = "";
 	}
 
 	virtual ~SpaceSubscriber()
@@ -64,7 +65,7 @@ public:
 
 	}
 
-	void onSubscribed(  const std::string& bytes, const std::string& modelName  )
+	void onSubscribed(  const std::string& bytes,  const std::string& ids, const std::string& modelName  )
 	{
 		ca::IModelRef model = getModel( modelName );
 
@@ -85,7 +86,7 @@ public:
 		archiveObj->setService( "model", model.get() );
 
 		_rootObject = archiveObj->getService<ca::IArchive>()->restore();
-
+		_ids = ids;
 		initializeIds();
 	}
 	
@@ -135,8 +136,9 @@ private:
 
 			co::Slice<co::Any> results;
 
-			co::Any args[1];
+			co::Any args[2];
 			args[0] = _space.get();
+			args[1] = _ids;
 
 			co::getService<lua::IState>()->call( script, function,
 				args,
@@ -183,6 +185,7 @@ private:
 private:
 	co::IObjectRef _rootObject;
 	ca::ISpaceRef _space;
+	std::string _ids;
 
 	bool ready;
 
