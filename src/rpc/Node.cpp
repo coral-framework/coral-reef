@@ -36,13 +36,6 @@ std::string Node::getPublicAddress()
 	return _publicEndpoint;
 }
 
-co::IObject* Node::newRemoteInstance( const std::string& instanceType, 
-                                           const std::string& address )
-{
-    co::RefPtr<Requestor> req = _requestorMan->getOrCreateRequestor( address );
-    return req->requestNewInstance( instanceType );
-}
-
 co::IObject* Node::findRemoteInstance( const std::string& instanceType, const std::string& key, 
                                       const std::string& address )
 {
