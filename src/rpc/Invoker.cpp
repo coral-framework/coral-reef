@@ -44,6 +44,7 @@ Invoker::~Invoker()
 void Invoker::dispatchInvocation( const std::string& inputStream )
 {    
     std::string returnValue;
+	bool synch = false;
     
     try
     {
@@ -52,20 +53,37 @@ void Invoker::dispatchInvocation( const std::string& inputStream )
         if( msgType != INVOCATION )
             invokeManagement( _demarshaller, msgType, returnValue );
         else
-            invokeInstance( _demarshaller, returnValue );
+		{
+			    // ------ Get invocation meta data and check for inconsistencies first ------ //
+			std::string senderEndpoint;
+			InvocationDetails details;
+    
+			ParameterPuller& puller = _demarshaller.getInvocation( senderEndpoint, details );
+			synch = details.hasReturn;
+            invokeInstance( puller, senderEndpoint, details, returnValue );
+		}
     }
     catch( RemotingException& e )
     {
         CORAL_LOG( ERROR ) << "Request triggered a remoting exception: " << e.what();
-        _marshaller.marshalException( EX_REMOTING, e.getTypeName(), e.what(), returnValue );
+		if( synch )
+			_marshaller.marshalException( EX_REMOTING, e.getTypeName(), e.what(), returnValue );
+		else
+			throw e;
     }
     catch( co::Exception& e )
     {
-        _marshaller.marshalException( EX_CORAL, e.getTypeName(), e.what(), returnValue );
+		if( synch )
+			_marshaller.marshalException( EX_CORAL, e.getTypeName(), e.what(), returnValue );
+		else
+			throw e;
     }
     catch( std::exception& e )
     {
-        _marshaller.marshalException( EX_STD, "std", e.what(), returnValue );
+		if( synch )
+			_marshaller.marshalException( EX_STD, "std", e.what(), returnValue );
+		else
+			throw e;
     }
     
     if( !returnValue.empty() )
@@ -189,14 +207,9 @@ void Invoker::invokeManagement( Demarshaller& demarshaller, MessageType msgType,
     _marshaller.marshalIntReturn( returnID , outputStream );
 }
     
-void Invoker::invokeInstance( Demarshaller& demarshaller, std::string& outputStream )
+void Invoker::invokeInstance( ParameterPuller& puller, const std::string& senderEndpoint,
+    const InvocationDetails& details, std::string& outputStream )
 {    
-    // ------ Get invocation meta data and check for inconsistencies first ------ //
-    std::string senderEndpoint;
-    InvocationDetails details;
-    
-    ParameterPuller& puller = demarshaller.getInvocation( senderEndpoint, details );
-    
     InstanceContainer* container = _instanceMan->getInstance( details.instanceID );
     
     CORAL_DLOG( INFO ) << "Received an invocation from " << senderEndpoint << " for instance " 
@@ -465,6 +478,7 @@ void Invoker::getRefTypeInfo( co::IService* service, const std::string& senderEn
         }
     }
 }
+
 
 } // namespace rpc
 

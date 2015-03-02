@@ -51,7 +51,7 @@ private:
      \param demarshaller An demarshaller with a call request already set ofr demarshalling.
      \param returned What the invocation returned. Already marshalled and ready to send.     
      */
-    void invokeInstance( Demarshaller& demarshaller, std::string& outputStream );
+    void invokeInstance( ParameterPuller& puller, const std::string& senderEndpoint, const InvocationDetails& details, std::string& outputStream );
     
     void onMethod( ParameterPuller& puller, co::IService* facet, co::IMethod* method, 
                   co::IReflector* refl, const std::string& senderEndpoint, std::string& outputStream );
