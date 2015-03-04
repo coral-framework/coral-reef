@@ -8,7 +8,6 @@ require "table"
 
 function M.initializeIds( space )
 	cache[space] = GraphIds:new( space )
-	
 end
 
 function M.getOrderedIds( space )
@@ -60,15 +59,16 @@ function M.processAllSpaceChanges( space, allSpaceChanges, observers )
 		changeSet.changes = changes
 		changeSetArray[ #changeSetArray + 1 ] = changeSet
 	end
+
+	if #newObjectStructs > 0 then
+		table.sort( newObjectStructs, function( x, y ) return x.newId < y.newId end )
+	end
+	
+	if #changeSetArray > 0 then
+		table.sort( changeSetArray, function( x, y ) return x.serviceId < y.serviceId end )
+	end
 	
 	for _, observer in ipairs( observers ) do
-		if #newObjectStructs > 0 then
-			table.sort( newObjectStructs, function( x, y ) return x.newId < y.newId end )
-		end
-		
-		if #changeSetArray > 0 then
-			table.sort( changeSetArray, function( x, y ) return x.serviceId < y.serviceId end )
-		end
 		observer:onPublish( newObjectStructs, changeSetArray )
 	end
 end

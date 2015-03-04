@@ -1,0 +1,16 @@
+interface IServiceIdMap
+{
+	void init( in ca.ISpace space );
+	void initWithIds( in ca.ISpace space, in int32[] ids );
+	
+	void insertInMap( in co.IService service, in int32 id );
+	int32 getId( in co.IService service );
+	bool hasId( in co.IService service );
+	co.IService getService( in int32 id );
+	
+	int32[] getOrderedIds( in co.IObject root );
+	
+	void objectId( in co.IService object );
+	void shallowGivenObjectId( in co.IObject object, in int32 id );
+	void shallowObjectId( in co.IObject object );
+};
