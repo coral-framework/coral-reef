@@ -85,7 +85,6 @@ public:
 		_graphIds = co::newInstance( "flow.ServiceIdMap" )->getService<flow::IServiceIdMap>();
 
 		_space->addGraphObserver( this );
-		CORAL_LOG( WARNING ) << "publisher";
 		_graphIds->init( _space.get() );
 
 	}
@@ -100,7 +99,6 @@ public:
 		calculateData();
 		
 		getOrderedIds();
-		CORAL_LOG( WARNING ) << serializeStringIds();
 		subscriber->onSubscribed( _data, serializeStringIds(), _space->getUniverse()->getModel()->getName() );
 		_subscribers.push_back( subscriber );
 		_data.clear();
@@ -266,6 +264,7 @@ private:
 		
 		auto& allChanges = resultChangesTable[serviceId];
 
+
 		for( auto changedValues = serviceChanges->getChangedValueFields(); changedValues; changedValues.popFirst() )
 		{
 			auto changedValue = changedValues.getFirst();
@@ -300,7 +299,7 @@ private:
 			co::IObject* current = removedObjects.getFirst();
 			if( !newObjectsSet.erase( current ) )
 			{
-				//GraphIds remove
+				_graphIds->removeObject( current );
 			}
 		}
 	}
@@ -363,9 +362,10 @@ private:
 		for( auto it = fields.begin(); it != fields.end(); it++ )
 		{
 			co::AnyValue fieldValue; 
-			newService->getInterface()->getReflector()->getField( newService, (*it).get(), fieldValue );
+			auto field = (*it).get();
+			field->getOwner()->getReflector()->getField( newService, field, fieldValue );
 			
-			fieldChanges.push_back( createChange( (*it).get(), fieldValue.getAny().asIn() ) );
+			fieldChanges.push_back( createChange( field, fieldValue.getAny().asIn() ) );
 		}
 
 	}

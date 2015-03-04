@@ -18,7 +18,7 @@
 #include <ca/IUniverse.h>
 
 #include <algorithm>
-#include <unordered_map>
+#include <map>
 #include <functional>
 #include <set>
 
@@ -84,7 +84,7 @@ public:
 		if( it == _idObjectMap.end() )
 			return nullptr;
 		
-		return it->second;
+		return it->second.get();
 	}
 
 	bool hasId( co::IService* service )
@@ -122,7 +122,6 @@ public:
 
 	void insertInMap( co::IService* service, co::int32 id )
 	{
-		CORAL_LOG( WARNING ) << "add id " << service << " " << service->getInterface()->getFullName() << " " << id;
 		_idObjectMap.insert( IdObjectMap::value_type( id, service ) );
 		_objectIdMap.insert( ObjectIdMap::value_type( service, id ) );
 	}
@@ -139,6 +138,23 @@ public:
 				return false;
 			}
 		);
+	}
+
+	void removeObject( co::IObject* toRemove )
+	{
+		if( hasId( toRemove ) )
+		{
+			forEachPort( toRemove, [&] ( co::IPortRef port )
+			{
+				co::IService* service = toRemove->getServiceAt( port.get() );
+				
+				if( service )
+					_objectIdMap.erase( service );
+			}
+			);
+
+			_objectIdMap.erase( toRemove );
+		}
 	}
 
 	void shallowGivenObjectId( co::IObject* object, co::int32 id )
@@ -262,8 +278,8 @@ private:
 	}
 
 private:
-	typedef std::unordered_map<co::int32, co::IService*> IdObjectMap;
-	typedef std::unordered_map<co::IService*, co::int32> ObjectIdMap;
+	typedef std::map<co::int32, co::IServiceRef> IdObjectMap;
+	typedef std::map<co::IServiceRef, co::int32> ObjectIdMap;
 
 private:
 	co::uint32 _currentId;

@@ -67,7 +67,6 @@ public:
 		}
 		
 		_space = space;
-		CORAL_LOG( WARNING ) << "Subscriber";
 		initializeIds();
 	}
 
@@ -79,8 +78,6 @@ public:
 		{
 			CORAL_THROW( co::IllegalStateException, "Space's model different from the publisher" );
 		}
-
-		CORAL_LOG( WARNING ) << "subscriber " << _ids;
 
 		std::ofstream of ( "tmp.lua" );
 
@@ -247,10 +244,12 @@ private:
 				for( int i = 0; i < numbers.size(); i++ )
 				{
 					co::IService* serviceRef = _graphIds->getService( numbers[i] );
+					if( !serviceRef )
+						CORAL_THROW( co::Exception, "service id " << numbers[i] << " not found" );
 					returnValue.getAny()[i].put( serviceRef );
 				}
 
-				serviceReflector->setField( service, refVecField, returnValue );
+				refVecField->getOwner()->getReflector()->setField( service, refVecField, returnValue );
 			}
 			else
 			{
@@ -288,7 +287,7 @@ private:
 		{
 			co::IInterface* serviceInterface = service->getInterface();
 			co::IField* field = co::cast<co::IField>( serviceInterface->getMember( name ) );
-			serviceInterface->getReflector()->setField( service, field, value );
+			field->getOwner()->getReflector()->setField( service, field, value );
 		}
 	}
 
