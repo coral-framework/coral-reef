@@ -169,8 +169,7 @@ private:
 
 	void getOrderedIds()
 	{
-		co::TSlice<co::int32> temp = _graphIds->getOrderedIds( _space->getRootObject() );
-		_ids = std::vector<co::int32>( temp.begin(), temp.end() );
+		_graphIds->getOrderedIds( _space->getRootObject(), _ids );
 	}
 
 private:

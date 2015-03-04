@@ -8,7 +8,7 @@ interface IServiceIdMap
 	bool hasId( in co.IService service );
 	co.IService getService( in int32 id );
 	
-	int32[] getOrderedIds( in co.IObject root );
+	void getOrderedIds( in co.IObject root, out int32[] ids );
 	
 	void objectId( in co.IService object );
 	void shallowGivenObjectId( in co.IObject object, in int32 id );

@@ -239,7 +239,9 @@ private:
 				co::AnyValue returnValue;
 				returnValue.create( fieldType );
 
-				service->getInterface()->getReflector()->getField( service, refVecField, returnValue );
+				co::IReflector* serviceReflector = service->getInterface()->getReflector();
+
+				serviceReflector->getField( service, refVecField, returnValue );
 
 				returnValue.getAny().resize( numbers.size() );
 				for( int i = 0; i < numbers.size(); i++ )
@@ -248,7 +250,7 @@ private:
 					returnValue.getAny()[i].put( serviceRef );
 				}
 
-				refVecField->getOwner()->getReflector()->setField( service, refVecField, returnValue );
+				serviceReflector->setField( service, refVecField, returnValue );
 			}
 			else
 			{

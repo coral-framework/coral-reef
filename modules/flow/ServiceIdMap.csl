@@ -1,4 +1,3 @@
-@lua.Scripted( "flow.ServiceIdMap" )
 component ServiceIdMap
 {
 	provides IServiceIdMap map;
