@@ -14,7 +14,7 @@ project( REEF )
 if( NOT CORAL_ROOT )
 	file( TO_CMAKE_PATH "$ENV{CORAL_ROOT}" CORAL_ROOT )
 endif()
-set( CMAKE_MODULE_PATH ${CORAL_ROOT}/cmake ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH} )
+set( CMAKE_MODULE_PATH ${CORAL_ROOT}/cmake ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/../reef/cmake )
 find_package( Coral REQUIRED )
 
 set( CORAL_PATH
@@ -29,7 +29,9 @@ if( WIN32 )
 	set( CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/optional ${CMAKE_MODULE_PATH} )
 endif()
 
-find_package( Protobuf REQUIRED )
+find_package( NugetTools )
+
+find_nuget ( protobuf 2.5 )
 
 include_directories( ${CORAL_INCLUDE_DIRS} ${ZMQ_INCLUDE_DIRS} ${PROTOBUF_INCLUDE_DIRS} )
 
