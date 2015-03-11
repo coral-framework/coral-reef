@@ -24,16 +24,16 @@ set( CORAL_PATH
 )
 
 # FindPROTOBUF.cmake looks for PROTOBUF_SRC_ROOT_FOLDER cmake variable instead of an ENV var
-if( WIN32 )
-	file( TO_CMAKE_PATH "$ENV{PROTOBUF_ROOT}" PROTOBUF_SRC_ROOT_FOLDER )
-	set( CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/optional ${CMAKE_MODULE_PATH} )
-endif()
+# if( WIN32 )
+	# file( TO_CMAKE_PATH "$ENV{PROTOBUF_ROOT}" PROTOBUF_SRC_ROOT_FOLDER )
+	# set( CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/optional ${CMAKE_MODULE_PATH} )
+# endif()
 
 find_package( NugetTools )
 
-find_nuget ( protobuf 2.5 )
+find_nuget ( protobuf )
 
-include_directories( ${CORAL_INCLUDE_DIRS} ${ZMQ_INCLUDE_DIRS} ${PROTOBUF_INCLUDE_DIRS} )
+include_directories( ${CORAL_INCLUDE_DIRS} ${PROTOBUF_INCLUDE_DIRS} )
 
 ################################################################################
 # Packaging
