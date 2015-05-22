@@ -174,9 +174,13 @@ void PBParamToAny( const Parameter& param, const co::Any& ret )
         return;
     
     co::IType* internalType;
-    if( internalKind == co::TK_STRUCT || internalKind == co::TK_NATIVECLASS )
+	if( internalKind == co::TK_STRUCT || internalKind == co::TK_NATIVECLASS )
         internalType = co::getType( any_type.type() );
-    else
+	else if( internalKind == co::TK_ARRAY )
+	{
+		internalType = co::getType( any_type.type() );
+	}
+	else
         internalType = kind2Type( internalKind );
     
     ret.get<co::AnyValue&>().create( internalType );
@@ -203,7 +207,13 @@ void PBContainerToComplex( const Container& container, co::IType* descriptor,
         co::IField* field = fields[i];
         const Parameter& fieldArg = complex.field( i );
         co::AnyValue fieldAv;
-        fieldAv.create( field->getType() );
+		if( field->getType()->getKind() == co::TK_ANY )
+		{
+			const std::string& type = fieldArg.container(0).any_type().type();
+			fieldAv.create( co::getType( type ) ) ;
+		}
+		else
+			fieldAv.create( field->getType() );
         PBParamToValue( fieldArg, field->getType(), fieldAv.getAny() );
         if( fieldAv.isValid() )
             refl->setField( ret, field, fieldAv );
@@ -218,7 +228,9 @@ void PBParamToComplex( const Parameter& param, co::IType* descriptor, const co::
         return;
     }
     
-    co::IType* elementType = co::cast<co::IArray>( descriptor )->getElementType();
+	co::IType* elementType = co::cast<co::IArray>( descriptor )->getElementType();
+
+	CORAL_DLOG( INFO ) << "PBParamToComplex array " << elementType->getFullName() << " " << elementType->getKind();
     
     co::int32 size = param.container().size();
     
@@ -231,7 +243,24 @@ void PBParamToComplex( const Parameter& param, co::IType* descriptor, const co::
         ret[i].put( elementAv );
     }
 }
-    
+
+void ParameterPuller::pullAny( co::IType* descriptor, co::AnyValue& ret )
+{
+    try
+    {
+		const rpc::Parameter& param = _params->Get( _currentParam );
+		CORAL_DLOG( INFO ) << "creating any " <<param.container( 0 ).any_type().type();
+		ret.create( co::getType( param.container( 0 ).any_type().type() ) );
+        PBParamToValue( param, descriptor, ret );
+        _currentParam++;
+    }
+    catch( std::string& e )
+    {
+        CORAL_THROW( RemotingException, "Error in Invocation in the reading of parameter " << 
+                    _currentParam << ": " << e );        
+    }
+}
+
 void ParameterPuller::pullValue( co::IType* descriptor, const co::Any& ret )
 {
     try

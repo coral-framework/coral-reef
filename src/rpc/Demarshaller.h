@@ -38,6 +38,7 @@ class ParameterPuller
 public:
     void pullValue( co::IType* descriptor, const co::Any& ret );
     void pullReference( ReferenceType& refType );
+	void pullAny( co::IType* descriptor, co::AnyValue& toCreate );
     
     friend class Demarshaller;
 private:
