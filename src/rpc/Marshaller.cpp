@@ -62,7 +62,6 @@ void anyToPBParam( const co::Any& any, co::IType* descriptor, Parameter* param )
 // Converts an any containing a vlue type to a protobuf Parameter
 void valueToPBParam( const co::Any& any, co::IType* descriptor, Parameter* param )
 {
-	CORAL_DLOG( INFO ) << "valueToPBParam " << descriptor->getFullName() << " " << descriptor->getKind();
     co::TypeKind kind = descriptor->getKind();
     
     if( kind == co::TK_ARRAY )
@@ -72,8 +71,6 @@ void valueToPBParam( const co::Any& any, co::IType* descriptor, Parameter* param
         
         if( kind == co::TK_ANY )
             CORAL_THROW( RemotingException, "Arrays of co.Any not supported yet" );
-
-		CORAL_DLOG( INFO ) << "valueToPBParam array " << elementType->getFullName() << " " << kind;
     }
     
     switch( kind )
@@ -131,23 +128,17 @@ void anyToPBParam( const co::Any& any, co::IType* descriptor, Parameter* param )
     co::Any asIn = any.asIn();
     
     co::TypeKind internalKind = asIn.getKind();
-
-	CORAL_DLOG( INFO ) << "any asIn getKind " << asIn.getKind();
     
     if( internalKind == co::TK_INTERFACE )
         CORAL_THROW( RemotingException, "interfaces inside anys nyi" );
     
-	CORAL_DLOG( INFO ) << "internalKind marshaller " << internalKind;
     any_type->set_kind( internalKind );
     
-	if( internalKind == co::TK_STRUCT || internalKind == co::TK_NATIVECLASS || internalKind == co::TK_ARRAY )
+    if( internalKind == co::TK_STRUCT || internalKind == co::TK_NATIVECLASS )
         any_type->set_type( asIn.getType()->getFullName() );
         
     if( internalKind != co::TK_NULL )
-	{
-		CORAL_DLOG( INFO ) << "from any";
         valueToPBParam( asIn, asIn.getType(), any_type->mutable_param() );
-	}
 }
  
 void complexToPBParam( const co::Any& complex, co::IType* descriptor, Parameter* complexParam );

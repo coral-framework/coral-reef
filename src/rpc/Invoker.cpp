@@ -285,31 +285,21 @@ void Invoker::onMethod( ParameterPuller& puller, co::IService* facet, co::IMetho
     for( int i = 0; i < size; i++ )
     {
         co::IType* paramType = params[i]->getType();
-
-		CORAL_DLOG( INFO ) << "paramType " << paramType->getFullName();
-		if( paramType->getKind() == co::TK_ANY )
-		{
-			puller.pullAny( paramType, anyValues[i] );
-
-		}
-		else
-		{
-			anyValues[i].create( paramType );
-			if( paramType->getKind() != co::TK_INTERFACE )
+		anyValues[i].create( paramType );
+        if( paramType->getKind() != co::TK_INTERFACE )
+        {
+            if( params[i]->getIsIn() )
+				puller.pullValue( paramType, anyValues[i].getAny() );
+        }
+        else
+        {
+            ReferenceType refTypeInfo;
+			if( params[i]->getIsIn() )
 			{
-				if( params[i]->getIsIn() )
-					puller.pullValue( paramType, anyValues[i].getAny() );
+				puller.pullReference( refTypeInfo );
+				getRefType( refTypeInfo, anyValues[i] );
 			}
-			else
-			{
-				ReferenceType refTypeInfo;
-				if( params[i]->getIsIn() )
-				{
-					puller.pullReference( refTypeInfo );
-					getRefType( refTypeInfo, anyValues[i] );
-				}
-			}
-		}
+        }
     }
 
 	// ------ Proceed to the actual invocation ------ //
