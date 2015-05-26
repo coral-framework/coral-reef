@@ -241,6 +241,13 @@ TEST( ParameterTests, complexTypeParameterTest )
     ms.id = 1;
     ms.name = "setMother";
     ms.child = cs;
+
+	std::vector<double> doubles( TESTVECSIZE );
+	doubles.resize( TESTVECSIZE );
+	doubles[0] = 4.56;
+	doubles[1] = 6.54;
+
+	ms.doubles = doubles;
     
     rmtComplexTypes->setMotherStruct( ms );
     
@@ -273,6 +280,15 @@ TEST( ParameterTests, complexTypeParameterTest )
     EXPECT_STREQ( ms2_.name.c_str(), "getMother" );
     EXPECT_EQ( cs2_.id, 4 );
     EXPECT_STREQ( cs2_.name.c_str(), "getChild" );
+
+	ASSERT_EQ( ms2_.doubles.getKind(), co::TK_ARRAY );
+
+	co::Slice<double> returnedDoubles;
+	ASSERT_NO_THROW( returnedDoubles = ms2_.doubles.get<co::Slice<double>>() );
+	ASSERT_EQ( returnedDoubles.getSize(), 2 );
+
+	EXPECT_EQ( returnedDoubles[0], 4.56 );
+	EXPECT_EQ( returnedDoubles[1], 6.54 );
     
     stubs::StringNativeClass native2_ = cs2_.myNativeClass;
     
