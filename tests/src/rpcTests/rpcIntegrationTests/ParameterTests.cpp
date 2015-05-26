@@ -241,6 +241,13 @@ TEST( ParameterTests, complexTypeParameterTest )
     ms.id = 1;
     ms.name = "setMother";
     ms.child = cs;
+
+	std::vector<double> doubles( TESTVECSIZE );
+	doubles.resize( TESTVECSIZE );
+	doubles[0] = 4.56;
+	doubles[1] = 6.54;
+
+	ms.doubles = doubles;
     
     rmtComplexTypes->setMotherStruct( ms );
     
@@ -273,6 +280,15 @@ TEST( ParameterTests, complexTypeParameterTest )
     EXPECT_STREQ( ms2_.name.c_str(), "getMother" );
     EXPECT_EQ( cs2_.id, 4 );
     EXPECT_STREQ( cs2_.name.c_str(), "getChild" );
+
+	ASSERT_EQ( ms2_.doubles.getKind(), co::TK_ARRAY );
+
+	co::Slice<double> returnedDoubles;
+	ASSERT_NO_THROW( returnedDoubles = ms2_.doubles.get<co::Slice<double>>() );
+	ASSERT_EQ( returnedDoubles.getSize(), 2 );
+
+	EXPECT_EQ( returnedDoubles[0], 4.56 );
+	EXPECT_EQ( returnedDoubles[1], 6.54 );
     
     stubs::StringNativeClass native2_ = cs2_.myNativeClass;
     
@@ -336,6 +352,8 @@ TEST( ParameterTests, complexArrayTest )
     // Fill the arrays with testable data
     char testString[2];
     testString[1] = '\0';
+	std::vector<double> doubles;
+	doubles.reserve( TESTVECSIZE );
     for( int i = 0; i < TESTVECSIZE; i++ )
     {
         testString[0] = CHAR1 + i;
@@ -347,6 +365,9 @@ TEST( ParameterTests, complexArrayTest )
         mss[i].child.name = std::string( testString );
         mss[i].child.myNativeClass.data = std::string( testString );
         mss[i].child.anything.set( INT1 + i );
+
+		doubles.push_back( i );
+		mss[i].doubles = doubles;
         
         testString[0] = CHAR2 + i;
         
@@ -373,8 +394,14 @@ TEST( ParameterTests, complexArrayTest )
         EXPECT_STREQ( mss_[i].child.name.c_str(), testString );
         EXPECT_STREQ( mss_[i].child.myNativeClass.data.c_str(), testString );
         EXPECT_EQ( mss_[i].child.anything.get<co::int32>(), INT2 + i );
+
+		co::Slice<double> returnedDoubles = mss_[i].doubles.get<co::Slice<double>>();
+
+		for( unsigned int j = 0; j < returnedDoubles.getSize(); j++ )
+		{
+			EXPECT_DOUBLE_EQ( returnedDoubles[j], j );
+		}
     }
-    
    
     co::TSlice<stubs::ChildStruct> css_ = remoteCT->placeNatives( css, natives );
     testString[1] = '\0';

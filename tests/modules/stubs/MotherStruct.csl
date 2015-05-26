@@ -2,5 +2,6 @@ struct MotherStruct
 {
 	int32 id;
 	string name;
+	any doubles;
 	ChildStruct child; 
 };

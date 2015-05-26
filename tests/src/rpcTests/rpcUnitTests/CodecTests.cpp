@@ -44,6 +44,10 @@ TEST( CodecTests, simpleTypesTest )
     co::IType* intArrayType = co::getType( "int32[]" );
     co::IType* stringArrayType = co::getType( "string[]" );
 
+	EXPECT_TRUE( stringArrayType->getKind() == co::TK_ARRAY );
+	EXPECT_TRUE( co::isA<co::IArray>( stringArrayType ) );
+	EXPECT_TRUE( co::cast<co::IArray>( stringArrayType )->getElementType()->getKind() == co::TK_STRING );
+
     Demarshaller demarshaller;
     Marshaller marshaller;
     

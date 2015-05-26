@@ -134,8 +134,11 @@ void anyToPBParam( const co::Any& any, co::IType* descriptor, Parameter* param )
     
     any_type->set_kind( internalKind );
     
-    if( internalKind == co::TK_STRUCT || internalKind == co::TK_NATIVECLASS )
+	if( internalKind == co::TK_STRUCT || internalKind == co::TK_NATIVECLASS || internalKind == co::TK_ARRAY || internalKind == co::TK_ANY )
+	{
+		CORAL_DLOG( INFO ) << "Filling type " << internalKind << " " << asIn.getType()->getFullName();
         any_type->set_type( asIn.getType()->getFullName() );
+	}
         
     if( internalKind != co::TK_NULL )
         valueToPBParam( asIn, asIn.getType(), any_type->mutable_param() );
@@ -163,6 +166,8 @@ void complexToPBParam( const co::Any& complex, co::IType* descriptor, Parameter*
         return;
     }
     
+	CORAL_DLOG( INFO ) << "Complex Type " << descriptor->getFullName();
+
     co::IRecordType* rt = co::cast<co::IRecordType>( descriptor );
     co::IReflector* refl = rt->getReflector();
     Container* container = complexParam->add_container();
@@ -177,7 +182,13 @@ void complexToPBParam( const co::Any& complex, co::IType* descriptor, Parameter*
         co::AnyValue av; co::Any fieldAny( av );
         
         refl->getField( complex, fields.getFirst(), fieldAny );
-        valueToPBParam( fieldAny.asIn(), fieldType, fieldArg );
+
+		CORAL_DLOG( INFO ) << field->getName();
+
+		if( fieldType->getKind() == co::TK_ANY )
+			anyToPBParam( fieldAny.asIn(), fieldType, fieldArg );
+		else
+			valueToPBParam( fieldAny.asIn(), fieldType, fieldArg );
     }
 }
     

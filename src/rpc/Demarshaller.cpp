@@ -59,6 +59,11 @@ static void PBParamWithTypeToAny( const Parameter& param, const co::Any& ret, co
     if( size == 0 ) // required for vector subscript out of range assertion
         return;
     
+	CORAL_DLOG( INFO ) << ret.getKind();
+
+	if( ret.getKind() == co::TK_ANY )
+		CORAL_LOG( INFO ) << "fuu";
+
 	ret.resize( size );
     for( int i = 0; i < size; i++ )
     {
@@ -92,13 +97,16 @@ co::IType* kind2Type( co::TypeKind kind )
         case co::TK_STRING:
             return co::getType( "string" );
         default:
+			CORAL_DLOG( INFO ) << "Failing on" << kind;
             assert( false );
+		break;
     }
     return 0;
 }
 
 void PBParamToComplex( const Parameter& param, co::IType* descriptor, const co::Any& ret );
-void PBParamToAny( const Parameter& param, const co::Any& ret );
+void PBParamToAny( const Parameter& param, co::AnyValue& ret );
+void PBParamCreateAny( const Parameter& param, co::AnyValue& ret );
 
 void PBParamToValue( const Parameter& param, co::IType* descriptor, const co::Any& ret )
 {
@@ -156,7 +164,7 @@ void PBParamToValue( const Parameter& param, co::IType* descriptor, const co::An
             PBParamToComplex( param, descriptor, ret );
             break;
         case co::TK_ANY:
-            PBParamToAny( param, ret );
+			PBParamToAny( param, ret.get<co::AnyValue&>() );
         default:
         {
             if( elementType )
@@ -164,25 +172,33 @@ void PBParamToValue( const Parameter& param, co::IType* descriptor, const co::An
         }
     }
 }
-    
-void PBParamToAny( const Parameter& param, const co::Any& ret )
+
+void PBParamToAny( const Parameter& param, co::AnyValue& ret )
 {
     const Any_Type& any_type = param.container( 0 ).any_type();
     co::TypeKind internalKind = static_cast<co::TypeKind>( any_type.kind() );
     
     if( internalKind == co::TK_NULL )
         return;
+		
+	CORAL_DLOG( INFO ) << "PBParam to any type " << any_type.type() << " " << internalKind;
     
+
     co::IType* internalType;
-    if( internalKind == co::TK_STRUCT || internalKind == co::TK_NATIVECLASS )
+	if( internalKind == co::TK_STRUCT || internalKind == co::TK_NATIVECLASS || internalKind == co::TK_ARRAY )
+	{
+		CORAL_DLOG( INFO ) << "Reading from PBParam '" << any_type.type() << "' " << internalKind;
         internalType = co::getType( any_type.type() );
+	}
     else
         internalType = kind2Type( internalKind );
     
-    ret.get<co::AnyValue&>().create( internalType );
-    PBParamToValue( any_type.param(), internalType, ret );
+	CORAL_DLOG( INFO ) << "creating " << internalType->getFullName();
+    ret.create( internalType );
+
+	PBParamToValue( any_type.param(), internalType, ret.getAny() );
 }
-    
+
 void PBContainerToComplex( const Container& container, co::IType* descriptor, 
                                           const co::Any& ret )
 {
@@ -202,10 +218,21 @@ void PBContainerToComplex( const Container& container, co::IType* descriptor,
     {
         co::IField* field = fields[i];
         const Parameter& fieldArg = complex.field( i );
-        co::AnyValue fieldAv;
-        fieldAv.create( field->getType() );
-        PBParamToValue( fieldArg, field->getType(), fieldAv.getAny() );
-        if( fieldAv.isValid() )
+
+		
+		co::AnyValue fieldAv;
+		if( field->getType()->getKind() == co::TK_ANY )
+		{
+			PBParamToAny( fieldArg, fieldAv );
+		}
+		else
+		{
+			CORAL_DLOG( INFO ) << "creating " << field->getType()->getFullName();
+			fieldAv.create( field->getType() );
+			PBParamToValue( fieldArg, field->getType(), fieldAv.getAny() );
+		}
+		
+		if( fieldAv.isValid() )
             refl->setField( ret, field, fieldAv );
     }
 }
@@ -222,11 +249,14 @@ void PBParamToComplex( const Parameter& param, co::IType* descriptor, const co::
     
     co::int32 size = param.container().size();
     
+	CORAL_DLOG( INFO ) << ret.getKind();
+
     ret.resize( size );
     for( co::int32 i = 0; i < size; i++ )
     {
         co::AnyValue elementAv;
         elementAv.create( elementType );
+		CORAL_DLOG( INFO ) << "creating " << elementType->getFullName();
         PBContainerToComplex( param.container( i ), elementType, elementAv );
         ret[i].put( elementAv );
     }
