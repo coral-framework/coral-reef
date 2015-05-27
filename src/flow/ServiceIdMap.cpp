@@ -212,7 +212,7 @@ private:
 					else
 					{
 						co::IService* receptacleService = object->getServiceAt( port.get() );
-						CORAL_LOG( INFO ) << object->getComponent()->getFullName() << " port " << port->getName() << " " << receptacleService; 
+						
 						if( receptacleService )
 							genericGraphWalk( receptacleService->getProvider(), callback );
 					}
