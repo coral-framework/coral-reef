@@ -4,15 +4,23 @@ local dns = (require "socket").dns
 
 function M.resolveAddress( address )
 	
+    if address == nil or address == "" then
+        co.raise( "co.IllegalArgumentException", 'empty ip' )
+    end
+    
 	local regexBeforePort = "([^:]*)"
 	local regexPort = ":(%d+)"
 	
 	local nameOrIp = address:match( regexBeforePort )
 	local port = address:match( regexPort )
 	
+    if nameOrIp == "0.0.0.0" then
+        co.raise( "co.IllegalArgumentException", 'invalid ip' )
+    end
+    
 	local resolveHostNameToIp = false
-	if nameOrIp == nil or nameOrIp == "" or nameOrIp == "*" then
-		nameOrIp = dns.tohostname( '127.0.0.1' )
+	if nameOrIp == "*" then
+		nameOrIp = dns.gethostname()
 		resolveHostNameToIp = true
 	else
 		-- try to match ip
