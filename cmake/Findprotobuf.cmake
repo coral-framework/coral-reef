@@ -67,8 +67,8 @@
 # (To distribute this file outside of CMake, substitute the full
 #  License text for the above reference.)
 
-function(PROTOBUF_GENERATE_CPP SRCS HDRS)
-  if(NOT ARGN)
+FUNCTION( PROTOBUF_GENERATE_CPP SRCS HDRS )
+  if( NOT ARGN )
     message(SEND_ERROR "Error: PROTOBUF_GENERATE_CPP() called without any proto files")
     return()
   endif(NOT ARGN)
@@ -112,94 +112,97 @@ function(PROTOBUF_GENERATE_CPP SRCS HDRS)
 endfunction()
 
 # Internal function: search for normal library as well as a debug one
-#    if the debug one is specified also include debug/optimized keywords
-#    in *_LIBRARIES variable
-function(_protobuf_find_libraries name filename)
-   find_library(${name}_LIBRARY
-       NAMES ${filename}
-       PATHS ${PROTOBUF_SRC_ROOT_FOLDER}/vsprojects/Release 
-	   NO_DEFAULT_PATH
-	   )
-   mark_as_advanced(${name}_LIBRARY)
+# if the debug one is specified also include debug/optimized keywords in *_LIBRARIES variable
+FUNCTION( _protobuf_find_libraries name filename )
+	FIND_LIBRARY( ${name}_LIBRARY
+       NAMES 
+			${filename}
+       PATHS 
+			${PROTOBUF_SRC_ROOT_FOLDER}/vsprojects/Release
+			${PROTOBUF_SRC_ROOT_FOLDER}/lib/release
+			${PROTOBUF_SRC_ROOT_FOLDER}/lib
+			NO_DEFAULT_PATH
+	)
+   MARK_AS_ADVANCED( ${name}_LIBRARY )
 
-   find_library(${name}_LIBRARY_DEBUG
-       NAMES ${filename}
-       PATHS ${PROTOBUF_SRC_ROOT_FOLDER}/vsprojects/Debug 
-	   NO_DEFAULT_PATH
-	   )
-   mark_as_advanced(${name}_LIBRARY_DEBUG)
+   FIND_LIBRARY( ${name}_LIBRARY_DEBUG
+       NAMES 
+			${filename}
+       PATHS 
+			${PROTOBUF_SRC_ROOT_FOLDER}/vsprojects/Debug
+			${PROTOBUF_SRC_ROOT_FOLDER}/lib/debug
+			${PROTOBUF_SRC_ROOT_FOLDER}/lib
+			NO_DEFAULT_PATH
+	)
+	MARK_AS_ADVANCED( ${name}_LIBRARY_DEBUG )
+	
+	IF( NOT ${name}_LIBRARY_DEBUG )
+		# There is no debug library
+		SET( ${name}_LIBRARY_DEBUG ${${name}_LIBRARY} PARENT_SCOPE )
+		SET( ${name}_LIBRARIES     ${${name}_LIBRARY} PARENT_SCOPE )
+	ELSE()
+		# There IS a debug library
+		SET( ${name}_LIBRARIES
+			optimized ${${name}_LIBRARY}
+			debug     ${${name}_LIBRARY_DEBUG}
+			PARENT_SCOPE
+		)
+	ENDIF()
+ENDFUNCTION()
 
-   if(NOT ${name}_LIBRARY_DEBUG)
-      # There is no debug library
-      set(${name}_LIBRARY_DEBUG ${${name}_LIBRARY} PARENT_SCOPE)
-      set(${name}_LIBRARIES     ${${name}_LIBRARY} PARENT_SCOPE)
-   else()
-      # There IS a debug library
-      set(${name}_LIBRARIES
-          optimized ${${name}_LIBRARY}
-          debug     ${${name}_LIBRARY_DEBUG}
-          PARENT_SCOPE
-      )
-   endif()
-endfunction()
-
-#
+#######################################
 # Main.
-#
+#######################################
 
-# By default have PROTOBUF_GENERATE_CPP macro pass -I to protoc
-# for each directory where a proto file is referenced.
-if(NOT DEFINED PROTOBUF_GENERATE_CPP_APPEND_PATH)
-  set(PROTOBUF_GENERATE_CPP_APPEND_PATH TRUE)
-endif()
+# By default have PROTOBUF_GENERATE_CPP macro pass -I to protoc for each directory where a proto file is referenced.
+IF( NOT DEFINED PROTOBUF_GENERATE_CPP_APPEND_PATH )
+  SET( PROTOBUF_GENERATE_CPP_APPEND_PATH TRUE )
+ENDIF()
 
+# Google's provided vcproj files generate libraries with a "lib" prefix on Windows
+IF( MSVC )
+    SET( PROTOBUF_ORIG_FIND_LIBRARY_PREFIXES "${CMAKE_FIND_LIBRARY_PREFIXES}" )
+    SET( CMAKE_FIND_LIBRARY_PREFIXES "lib" "" )
 
-# Google's provided vcproj files generate libraries with a "lib"
-# prefix on Windows
-if(MSVC)
-    set(PROTOBUF_ORIG_FIND_LIBRARY_PREFIXES "${CMAKE_FIND_LIBRARY_PREFIXES}")
-    set(CMAKE_FIND_LIBRARY_PREFIXES "lib" "")
-
-    find_path(PROTOBUF_SRC_ROOT_FOLDER protobuf.pc.in)
-endif()
+    SET( PROTOBUF_SRC_ROOT_FOLDER $ENV{PROTOBUF_ROOT} )
+ENDIF()
 
 # The Protobuf library
-_protobuf_find_libraries(PROTOBUF protobuf)
-#DOC "The Google Protocol Buffers RELEASE Library"
-
-_protobuf_find_libraries(PROTOBUF_LITE protobuf-lite)
-
-# The Protobuf Protoc Library
-_protobuf_find_libraries(PROTOBUF_PROTOC protoc)
+_protobuf_find_libraries( PROTOBUF protobuf )
+_protobuf_find_libraries( PROTOBUF_LITE protobuf-lite )
+_protobuf_find_libraries( PROTOBUF_PROTOC protoc )
 
 # Restore original find library prefixes
-if(MSVC)
-    set(CMAKE_FIND_LIBRARY_PREFIXES "${PROTOBUF_ORIG_FIND_LIBRARY_PREFIXES}")
-endif()
-
+IF( MSVC )
+    SET( CMAKE_FIND_LIBRARY_PREFIXES "${PROTOBUF_ORIG_FIND_LIBRARY_PREFIXES}" )
+ENDIF()
 
 # Find the include directory
-find_path(PROTOBUF_INCLUDE_DIR
-    google/protobuf/service.h
-    PATHS ${PROTOBUF_SRC_ROOT_FOLDER}/src
+FIND_PATH( PROTOBUF_INCLUDE_DIR
+	NAMES
+		google/protobuf/service.h
+    PATHS 
+		${PROTOBUF_SRC_ROOT_FOLDER}/src
+		${PROTOBUF_SRC_ROOT_FOLDER}/include
 )
-mark_as_advanced(PROTOBUF_INCLUDE_DIR)
+MARK_AS_ADVANCED( PROTOBUF_INCLUDE_DIR )
 
 # Find the protoc Executable
-find_program(PROTOBUF_PROTOC_EXECUTABLE
-    NAMES protoc
-    DOC "The Google Protocol Buffers Compiler"
+FIND_PROGRAM( PROTOBUF_PROTOC_EXECUTABLE
+    NAMES 
+		protoc
+    DOC 
+		"The Google Protocol Buffers Compiler"
     PATHS
-    ${PROTOBUF_SRC_ROOT_FOLDER}/vsprojects/Release
-    ${PROTOBUF_SRC_ROOT_FOLDER}/vsprojects/Debug
+		${PROTOBUF_SRC_ROOT_FOLDER}/vsprojects/Release
+		${PROTOBUF_SRC_ROOT_FOLDER}/vsprojects/Debug
+		${PROTOBUF_SRC_ROOT_FOLDER}/bin
 )
-mark_as_advanced(PROTOBUF_PROTOC_EXECUTABLE)
+MARK_AS_ADVANCED( PROTOBUF_PROTOC_EXECUTABLE )
 
+FIND_PACKAGE( PackageHandleStandardArgs REQUIRED )
+FIND_PACKAGE_HANDLE_STANDARD_ARGS( PROTOBUF REQUIRED_VARS PROTOBUF_INCLUDE_DIR PROTOBUF_LIBRARY )
 
-include(${CMAKE_CURRENT_LIST_DIR}/FindPackageHandleStandardArgs.cmake)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(PROTOBUF DEFAULT_MSG
-    PROTOBUF_LIBRARY PROTOBUF_INCLUDE_DIR)
-
-if(PROTOBUF_FOUND)
-    set(PROTOBUF_INCLUDE_DIRS ${PROTOBUF_INCLUDE_DIR})
-endif()
+IF( PROTOBUF_FOUND )
+    SET( PROTOBUF_INCLUDE_DIRS ${PROTOBUF_INCLUDE_DIR} )
+ENDIF()
