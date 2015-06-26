@@ -144,7 +144,7 @@ public:
 	{
 		if( hasId( toRemove ) )
 		{
-			forEachPort( toRemove, [&] ( co::IPortRef port )
+			forEachPort( toRemove, [this, toRemove] ( co::IPortRef port )
 			{
 				co::IService* service = toRemove->getServiceAt( port.get() );
 				
@@ -160,7 +160,7 @@ public:
 	void shallowGivenObjectId( co::IObject* object, co::int32 id )
 	{
 		insertInMap( object, id );
-		forEachPort( object, [&]( co::IPortRef port )
+		forEachPort( object, [this,object,&id]( co::IPortRef port )
 			{
 				if( port->getIsFacet() )
 				{
@@ -174,7 +174,7 @@ public:
 	{
 		insertInMap( object );
 		
-		forEachPort( object, [&]( co::IPortRef port )
+		forEachPort( object, [this, object]( co::IPortRef port )
 			{
 				if( port->getIsFacet() )
 				{
