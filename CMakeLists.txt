@@ -37,11 +37,11 @@ include_directories( ${CORAL_INCLUDE_DIRS} ${ZMQ_INCLUDE_DIRS} ${PROTOBUF_INCLUD
 # Packaging
 ################################################################################
 
-set( CPACK_PACKAGE_NAME					"coral-reef" )
+set( CPACK_PACKAGE_NAME					"coral-flow" )
 set( CPACK_PACKAGE_VERSION_MAJOR		"0" )
 set( CPACK_PACKAGE_VERSION_MINOR		"1" )
 set( CPACK_PACKAGE_VERSION_PATCH		"0" )
-set( CPACK_PACKAGE_DESCRIPTION_SUMMARY	"Reef is a networking module that provides an API to search/access remote objects (component instantiation)" )
+set( CPACK_PACKAGE_DESCRIPTION_SUMMARY	"Flow is a networking module that provides an API to search/access remote objects (component instantiation)" )
 
 if( WIN32 )
 	set( CPACK_GENERATOR "ZIP" )
