@@ -29,9 +29,9 @@ if( WIN32 )
 	set( CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/optional ${CMAKE_MODULE_PATH} )
 endif()
 
-find_package( Protobuf REQUIRED )
+find_package( protobuf REQUIRED )
 
-include_directories( ${CORAL_INCLUDE_DIRS} ${ZMQ_INCLUDE_DIRS} ${PROTOBUF_INCLUDE_DIRS} )
+include_directories( ${CORAL_INCLUDE_DIRS} ${ZEROMQ_INCLUDE_DIRS} ${PROTOBUF_INCLUDE_DIRS} )
 
 ################################################################################
 # Packaging
