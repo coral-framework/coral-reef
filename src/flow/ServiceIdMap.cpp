@@ -17,6 +17,8 @@
 #include <ca/IModel.h>
 #include <ca/IUniverse.h>
 
+#include <co/IllegalArgumentException.h>
+
 #include <algorithm>
 #include <map>
 #include <functional>
@@ -55,7 +57,7 @@ public:
 		std::set<co::IService*> marked;
 
 		genericGraphWalk( root, 
-			[&]( co::IService* service ) -> bool 
+			[&marked,&ids,this]( co::IService* service ) -> bool 
 			{
 				if( !hasId( service ) )
 				{
@@ -106,7 +108,7 @@ public:
 		_model = space->getUniverse()->getModel();
 
 		genericGraphWalk( space->getRootObject(), 
-			[&]( co::IService* service ) -> bool 
+			[&ids,this]( co::IService* service ) -> bool 
 			{
 				if( !hasId( service ) )
 				{
@@ -129,7 +131,7 @@ public:
 	void objectId( co::IService* object )
 	{
 		genericGraphWalk( object, 
-			[&]( co::IService* service ) -> bool 
+			[this]( co::IService* service ) -> bool 
 			{
 				if( !hasId( service ) )
 				{
@@ -202,7 +204,7 @@ private:
 		{
 			co::IObject* object = co::cast<co::IObject>( service );
 
-			forEachPort( object, [&]( co::IPortRef port )
+			forEachPort( object, [&object,&callback,this]( co::IPortRef port )
 				{
 
 					if( port->getIsFacet() )

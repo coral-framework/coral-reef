@@ -155,7 +155,7 @@ private:
 	void applyReceivedChangeSet( co::Slice<flow::ChangeSet> changes, const std::set<co::IService*>& newObjsCoral )
 	{
 
-		std::for_each( changes.begin(), changes.end(), [=] (const ChangeSet& changeSet)
+		std::for_each( changes.begin(), changes.end(), [this] (const ChangeSet& changeSet)
 		
 			{
 				co::IService* service = _graphIds->getService( changeSet.serviceId );
@@ -177,26 +177,6 @@ private:
 				}
 			} );
 
-		/*for( flow::ChangeSet changeSet = changes.getFirst();changes; changes.popFirst() )
-		{
-			co::IService* service = _graphIds->getService( changeSet.serviceId );
-			if( service )
-			{
-				const std::vector<flow::Change>& changeList = changeSet.changes;
-				for( int i = 0; i < changeList.size(); i++ )
-				{
-					const Change& currentChange = changeList[i];
-					if( currentChange.newRefValue == "" )
-					{
-						setField( service, currentChange.name, currentChange.newValue );
-					}
-					else
-					{
-						applyRefChange( space, service, currentChange.name, currentChange.newRefValue );
-					}
-				}
-			}
-		}*/
 		
 		for( ;changes; changes.popFirst() )
 		{

@@ -420,7 +420,9 @@ private:
 				{
 					co::IService* service = value.at( i ).get<co::IService*>();
 					co::uint32 id = _graphIds->getId( service );
-					ss << id << ",";
+
+					if( id )
+						ss << id << ",";
 
 				}
 
