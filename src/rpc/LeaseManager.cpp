@@ -78,7 +78,7 @@ bool LeaseManager::removeLease( co::int32 lessorID, const std::string lesseeEndp
     if( !lessor->removeLease( lessee ) )
     {
         CORAL_THROW( RemotingException, lessor << " requested a removal of an inexistant lease for id: "  
-                    << lessee; )
+                    << lessee )
     }
     
     // Check if lessor is empty, if true, remove the lessor and return true
