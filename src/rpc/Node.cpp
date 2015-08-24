@@ -8,20 +8,24 @@
 #include "InstanceContainer.h"
 #include "ServerRequestHandler.h"
 
+#include <rpc/INetworkNode.h>
 #include <rpc/IConnector.h>
 #include <rpc/IAcceptor.h>
 #include <co/Exception.h>
 
-#include <iostream>
-#include <cassert>
 #include <map>
 #include <set>
 #include <ctime>
+#include <cassert>
 #include <sstream>
+#include <iostream>
 
 namespace rpc {
-    
-Node::Node() : _srh( 0 )
+
+const double AUTO_DISCOVERY_RESEND_SIGNAL_INTERVAL = 5;
+const std::string AUTO_DISCOVERY_PORT = ":8955";
+
+Node::Node() : _srh(0), _autoDiscovery( false )
 {
 }
     
@@ -36,11 +40,25 @@ std::string Node::getPublicAddress()
 	return _publicEndpoint;
 }
 
-co::IObject* Node::findRemoteInstance( const std::string& instanceType, const std::string& key, 
+co::IObject* Node::getRemoteInstance( const std::string& instanceType, const std::string& key, 
                                       const std::string& address )
 {
     co::RefPtr<Requestor> req = _requestorMan->getOrCreateRequestor( address );
     return req->requestPublicInstance( key, instanceType );
+}
+
+void Node::discoverRemoteInstances(const std::string& componentTypeName, const std::string& key,
+	co::uint32 timeout, std::vector<co::IObjectRef>& instances, std::vector<rpc::INetworkNodeRef>& instancesInfo)
+{
+	_transport->discoverRemoteInstances( instancesInfo, timeout );
+	
+	// get discoverd instances and connect to it
+	for (int i = 0; i < instancesInfo.size(); ++i)
+	{
+		auto* remoteInstance = getRemoteInstance(componentTypeName, key, instancesInfo[i]->getAddress());
+		if (remoteInstance)
+			instances.push_back(remoteInstance);
+	}
 }
     
 void Node::raiseBarrier( co::int32 capacity, co::uint32 timeout )
@@ -68,10 +86,21 @@ void Node::hitBarrier( co::uint32 timeout )
 {
     _invoker->hitBarrier( timeout );
 }
-    
+
 void Node::start( const std::string&  boundAddress )
 {
-    _srh = new ServerRequestHandler( _transport->bind( boundAddress ), boundAddress );
+	std::string finalAddr = boundAddress;
+	if (boundAddress == "autodiscover")
+	{
+		_autoDiscovery = true;
+		std::vector<std::string> ips;
+		_transport->getIpAddresses( ips );
+		finalAddr = "tcp://" + ips[0] + AUTO_DISCOVERY_PORT;
+	}
+	else
+		_autoDiscovery = false;
+
+	_srh = new ServerRequestHandler(_transport->bind(finalAddr), finalAddr);
 
     _instanceMan = new InstanceManager();
  
@@ -81,13 +110,18 @@ void Node::start( const std::string&  boundAddress )
     
     _invoker = new Invoker( _instanceMan, _barrierMan, _srh, _requestorMan );
     _srh->setInvoker( _invoker );
-	_publicEndpoint = boundAddress;
+	_publicEndpoint = finalAddr;
 }
     
 void Node::update()
 {
     assert( _srh );
-        
+       
+	if (_autoDiscovery && _timer.elapsed() > AUTO_DISCOVERY_RESEND_SIGNAL_INTERVAL )
+	{
+		_transport->sendAutoDiscoverSignal();
+	}
+
 	_srh->react();
 }
 

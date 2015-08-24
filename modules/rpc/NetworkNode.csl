@@ -1,0 +1,4 @@
+component NetworkNode
+{
+	provides rpc.INetworkNode node;
+};

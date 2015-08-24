@@ -9,4 +9,15 @@ interface ITransport
 
 	// Opens a link for receiving messages and sending replies
 	IAcceptor bind( in string addressToListen );
+	
+	// Sends autodiscover signal over network containing ip of all discoverable interfaces of this instance.
+	// Retrieves whether the signal was successfully sent.
+	bool sendAutoDiscoverSignal();
+	
+	// Attepmts to discover remote instance for during the given timeout time.
+	// Retrieves true if the discover attempt was successfull (even though no instances were found).
+	bool discoverRemoteInstances( inout rpc.INetworkNode[] instances, in uint32 timeout );
+	
+	// Retrieves all available ip addresses of all available network interfaces.
+	void getIpAddresses( inout string[] addresses );
 };

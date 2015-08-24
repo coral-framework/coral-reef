@@ -24,8 +24,18 @@ public:
     
     rpc::IConnector* connect( const std::string& addressToConnect );
 
+	bool sendAutoDiscoverSignal();
+
+	bool discoverRemoteInstances( std::vector<rpc::INetworkNodeRef>& instances, co::uint32 timeout );
+
+	void getIpAddresses( std::vector<std::string>& addresses );
+
+private:
+	void initWinSock();
+
 private:
     zmq::context_t _context;
+	static bool _s_winsockInitialized;
 };
     
 } // namespace zmq

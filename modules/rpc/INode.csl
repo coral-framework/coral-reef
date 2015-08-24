@@ -19,7 +19,16 @@ interface INode
 	/*
 		Finds an instance in \a address published with \a key. Returns null if not found.
 	*/
-	co.IObject findRemoteInstance( in string componentTypeName, in string key, in string address );
+	co.IObject getRemoteInstance( in string componentTypeName, in string key, in string address );
+	
+	/*
+		Autodiscovers instances set to be autodiscoverrd with a \a key 
+		over a local area network. It will try to discover instance for timeout time in milliseconds,
+		after that time, it will return with discovered instances.
+	*/
+	void discoverRemoteInstances( in string componentTypeName, in string key, in uint32 timeout,
+		inout co.IObject[] instances, inout rpc.INetworkNode[] networNodes );
+	
 	
 	/*
 		Blocking. Starts the barrier that will be available for all the nodes which this node
@@ -35,7 +44,11 @@ interface INode
 	
 	/*
 		Starts a local server which answer remote requests in the provided port.
-		\throws ConnectionFailureExpection if Port is not available
+		If boundAddress is set to "autodiscover", then this node is enable as auto discovered
+		node and send location info using multicast on local network. Autodiscovery mode allows
+		method discoverRemoteInstances() to be used.
+		\throws ConnectionFailureException if Port is not available or if server has already been
+		started. 
 	*/
 	void start( in string boundAddress );
 	

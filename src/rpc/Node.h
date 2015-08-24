@@ -2,6 +2,7 @@
 #define __RPC_NODE_H__
 
 #include "Node_Base.h"
+#include "Timer.h"
 
 #include "Invoker.h"
 #include "Demarshaller.h"
@@ -35,8 +36,11 @@ public:
 
     co::IObject* newRemoteInstance( const std::string& instanceType, const std::string& address );
      
-    co::IObject* findRemoteInstance( const std::string& instanceType, const std::string& key, 
+    co::IObject* getRemoteInstance( const std::string& instanceType, const std::string& key, 
                                     const std::string& address );
+
+	void discoverRemoteInstances(const std::string& componentTypeName, const std::string& key, 
+		co::uint32 timeout, std::vector<co::IObjectRef>& instances, std::vector<rpc::INetworkNodeRef>& instancesInfo);
 
     void raiseBarrier( co::int32 capacity, co::uint32 timeout );
     void hitBarrier( co::uint32 timeout );
@@ -44,7 +48,7 @@ public:
     void start( const std::string& boundAddress );
     
 	void update();
-
+	
     void stop();
 
 	co::IObject* getInstance( co::int32 instanceId );
@@ -54,7 +58,7 @@ public:
     void unpublishInstance( const std::string& key );
     
 protected: // receptacles
-    rpc::ITransport* getTransportService();
+    rpc::ITransport* getTransportService();	
     
 	void setTransportService( rpc::ITransport* transport );
 
@@ -66,8 +70,10 @@ public:
     
     
 private:
+	bool _autoDiscovery;
     RequestorManager* _requestorMan;
     
+	Timer _timer;
     InstanceManager* _instanceMan;
     BarrierManager* _barrierMan;
     Invoker* _invoker;

@@ -46,7 +46,7 @@ TEST( ParameterTests, simpleTypesTest )
     
 	server->publishInstance( originalObject.get(), "remoteInstance" );
 
-    co::RefPtr<co::IObject> remoteInstance = client->findRemoteInstance( "stubs.TestComponent", "remoteInstance", "address2" );
+    co::RefPtr<co::IObject> remoteInstance = client->getRemoteInstance( "stubs.TestComponent", "remoteInstance", "address2" );
     stubs::ISimpleTypes* simple = remoteInstance->getService<stubs::ISimpleTypes>();
     
     // ------ Simple value types ------
@@ -160,13 +160,13 @@ TEST( ParameterTests, refTypeParameterTest )
 	co::IObjectRef instanceInAOrig = co::newInstance( "stubs.TestComponent" );
 	serverA->publishInstance(  instanceInAOrig.get(), "instanceInA" );
 
-    co::RefPtr<co::IObject> instanceInA = client->findRemoteInstance( "stubs.TestComponent", "instanceInA", "address1" );
+	co::RefPtr<co::IObject> instanceInA = client->getRemoteInstance("stubs.TestComponent", "instanceInA", "address1");
     stubs::IReferenceTypes* refTypesServiceInA = instanceInA->getService<stubs::IReferenceTypes>();
     stubs::ISimpleTypes* simpleTypesServiceInA = instanceInA->getService<stubs::ISimpleTypes>();
     
 	co::IObjectRef instanceInBOrig = co::newInstance( "stubs.TestComponent" );
 	serverB->publishInstance(  instanceInBOrig.get(), "instanceInB" );
-	co::RefPtr<co::IObject> instanceInB = client->findRemoteInstance( "stubs.TestComponent", "instanceInB", "address2" );
+	co::RefPtr<co::IObject> instanceInB = client->getRemoteInstance("stubs.TestComponent", "instanceInB", "address2");
 
     stubs::ISimpleTypes* simpleTypesServiceInB = instanceInB->getService<stubs::ISimpleTypes>();
 
@@ -218,12 +218,12 @@ TEST( ParameterTests, complexTypeParameterTest )
     
 	// non-published key
 	co::RefPtr<co::IObject> rmtInstance;
-	EXPECT_NO_THROW( rmtInstance = client->findRemoteInstance( "stubs.TestComponent", 
+	EXPECT_NO_THROW(rmtInstance = client->getRemoteInstance("stubs.TestComponent",
                                                                      "notAnInstance", "address1" ) );
 
 	EXPECT_FALSE( rmtInstance.isValid() );
 
-    rmtInstance = client->findRemoteInstance( "stubs.TestComponent", 
+	rmtInstance = client->getRemoteInstance("stubs.TestComponent",
                                                                      "instance", "address1" );
     
     stubs::IComplexTypes* rmtComplexTypes = rmtInstance->getService<stubs::IComplexTypes>();
@@ -338,7 +338,7 @@ TEST( ParameterTests, complexArrayTest )
     co::RefPtr<co::IObject> instance = co::newInstance( "stubs.TestComponent" );
     server->publishInstance( instance.get(), "instance" );
     
-    co::RefPtr<co::IObject> rmtInstance = client->findRemoteInstance( "stubs.TestComponent", 
+	co::RefPtr<co::IObject> rmtInstance = client->getRemoteInstance("stubs.TestComponent",
                                                                      "instance", "address1" );
     
     stubs::IComplexTypes* remoteCT = rmtInstance->getService<stubs::IComplexTypes>();
