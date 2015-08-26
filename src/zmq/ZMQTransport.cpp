@@ -5,8 +5,13 @@
 
 #include <rpc/IConnector.h>
 #include <rpc/IAcceptor.h>
+#include <rpc/INetworkNode.h>
 
 #include <zmq_utils.h>
+
+#include <unordered_set>
+
+#include <co/Coral.h>
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -139,6 +144,8 @@ bool ZMQTransport::discoverRemoteInstances(std::vector<rpc::INetworkNodeRef>& in
 		return false;
 	}
 
+	std::unordered_multiset<std::string> foundIps;
+
 	void* watch = 0;
 	int elapsed = 0;
 	do
@@ -157,13 +164,19 @@ bool ZMQTransport::discoverRemoteInstances(std::vector<rpc::INetworkNodeRef>& in
 			size_t size = recvfrom(fdSocket, recvBuf, PING_MSG_SIZE, 0, (sockaddr*)&saListen, &saSize);
 			{
 				std::string ip(inet_ntoa(saListen.sin_addr));
+				if (foundIps.find(ip) != foundIps.end())
+					continue;
 
-				// handle new networknode			
+				foundIps.insert(ip);
+				auto* node = co::newInstance("rpc.NetworkNode")->getService<rpc::INetworkNode>();
+				node->setAddress(ip);				
+				instances.push_back(node);
+				
 			}
 		}
 		elapsed += zmq_stopwatch_stop( watch );
 
-	} while( elapsed < timeout );
+	} while( elapsed < timeout * 1000 );
 
 	closesocket(fdSocket);
 }

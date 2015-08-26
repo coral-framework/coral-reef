@@ -70,6 +70,8 @@ public:
     
     
 private:
+	double _elapsedSinceLastAutoDiscoverySignal;
+	bool _started;
 	bool _autoDiscovery;
     RequestorManager* _requestorMan;
     

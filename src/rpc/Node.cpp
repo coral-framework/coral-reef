@@ -23,9 +23,10 @@
 namespace rpc {
 
 const double AUTO_DISCOVERY_RESEND_SIGNAL_INTERVAL = 5;
-const std::string AUTO_DISCOVERY_PORT = ":8955";
+const std::string AUTO_DISCOVERY_LISTEN_PORT = ":8955";
+const std::string AUTO_DISCOVERY_TALK_PORT = ":8956";
 
-Node::Node() : _srh(0), _autoDiscovery( false )
+Node::Node() : _srh(0), _autoDiscovery(false), _started( false ),_elapsedSinceLastAutoDiscoverySignal(0)
 {
 }
     
@@ -50,12 +51,19 @@ co::IObject* Node::getRemoteInstance( const std::string& instanceType, const std
 void Node::discoverRemoteInstances(const std::string& componentTypeName, const std::string& key,
 	co::uint32 timeout, std::vector<co::IObjectRef>& instances, std::vector<rpc::INetworkNodeRef>& instancesInfo)
 {
+	if (!_started)
+	{
+		std::vector<std::string> ips;
+		_transport->getIpAddresses(ips);
+		start( "tcp://" + ips[0] + AUTO_DISCOVERY_TALK_PORT );
+	}
+	
 	_transport->discoverRemoteInstances( instancesInfo, timeout );
 	
 	// get discoverd instances and connect to it
 	for (int i = 0; i < instancesInfo.size(); ++i)
-	{
-		auto* remoteInstance = getRemoteInstance(componentTypeName, key, instancesInfo[i]->getAddress());
+	{		
+		auto* remoteInstance = getRemoteInstance(componentTypeName, key, "tcp://" + instancesInfo[i]->getAddress() + AUTO_DISCOVERY_LISTEN_PORT);
 		if (remoteInstance)
 			instances.push_back(remoteInstance);
 	}
@@ -95,7 +103,7 @@ void Node::start( const std::string&  boundAddress )
 		_autoDiscovery = true;
 		std::vector<std::string> ips;
 		_transport->getIpAddresses( ips );
-		finalAddr = "tcp://" + ips[0] + AUTO_DISCOVERY_PORT;
+		finalAddr = "tcp://" + ips[0] + AUTO_DISCOVERY_LISTEN_PORT;
 	}
 	else
 		_autoDiscovery = false;
@@ -111,15 +119,18 @@ void Node::start( const std::string&  boundAddress )
     _invoker = new Invoker( _instanceMan, _barrierMan, _srh, _requestorMan );
     _srh->setInvoker( _invoker );
 	_publicEndpoint = finalAddr;
+	_started = true;
 }
     
 void Node::update()
 {
     assert( _srh );
        
-	if (_autoDiscovery && _timer.elapsed() > AUTO_DISCOVERY_RESEND_SIGNAL_INTERVAL )
+	_elapsedSinceLastAutoDiscoverySignal += _timer.elapsed();
+	 if (_autoDiscovery &&  _elapsedSinceLastAutoDiscoverySignal > AUTO_DISCOVERY_RESEND_SIGNAL_INTERVAL)
 	{
 		_transport->sendAutoDiscoverSignal();
+		_elapsedSinceLastAutoDiscoverySignal = 0;
 	}
 
 	_srh->react();

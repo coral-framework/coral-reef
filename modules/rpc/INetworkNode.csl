@@ -1,5 +1,5 @@
 interface INetworkNode
 {
-	readonly int32 port;
-	readonly string address;
+	int32 port;
+	string address;
 };
