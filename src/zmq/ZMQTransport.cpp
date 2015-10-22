@@ -20,7 +20,7 @@ namespace zmq {
 const int PING_PORT_NUMBER = 9123;
 const int SOCKET_POLL_TIMEOUT = 3000;
 const int PING_MSG_SIZE = 2;
-const int PING_INTERVAL = 500;
+const int PING_INTERVAL = 200;
 
 bool ZMQTransport::_s_winsockInitialized = false;
 
