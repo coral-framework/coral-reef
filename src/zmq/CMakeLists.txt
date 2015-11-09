@@ -3,9 +3,11 @@
 ################################################################################
 CORAL_GENERATE_MODULE( _GENERATED_FILES zmq )
 
+find_nuget( siviep_zeromq )
+
 include_directories( 
 	${CMAKE_CURRENT_BINARY_DIR}/generated 
-	${SIVIEP_ZEROMQ_INCLUDE_DIR}
+	${SIVIEP_ZEROMQ_INCLUDE_DIRS}
 )
 
 file( GLOB _SOURCES *.cpp )
