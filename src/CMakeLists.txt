@@ -8,9 +8,10 @@ if( RPC_ONLY STREQUAL "OFF" )
 	add_subdirectory( flow )
 endif()
 
-find_package( ZEROMQ REQUIRED )
+# find_package( ZEROMQ REQUIRED )
+find_nuget( siviep_zeromq )
 
-if( ZEROMQ_FOUND )
+if( SIVIEP_ZEROMQ_FOUND )
 	set( BUILD_ZMQ "ON" CACHE BOOL "ZMQ transport layer" )
 else()
 	set( BUILD_ZMQ "OFF" CACHE BOOL "ZMQ transport layer" )

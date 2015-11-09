@@ -5,7 +5,7 @@ CORAL_GENERATE_MODULE( _GENERATED_FILES zmq )
 
 include_directories( 
 	${CMAKE_CURRENT_BINARY_DIR}/generated 
-	${ZEROMQ_INCLUDE_DIR}
+	${SIVIEP_ZEROMQ_INCLUDE_DIR}
 )
 
 file( GLOB _SOURCES *.cpp )
@@ -16,7 +16,7 @@ add_dependencies( zmq rpc )
 
 CORAL_MODULE_TARGET( "zmq" zmq )
 
-target_link_libraries( zmq ${CORAL_LIBRARIES} ${ZEROMQ_LIBRARIES} )
+target_link_libraries( zmq ${CORAL_LIBRARIES} ${SIVIEP_ZEROMQ_LIBRARIES} )
 
 ################################################################################
 # Source Groups

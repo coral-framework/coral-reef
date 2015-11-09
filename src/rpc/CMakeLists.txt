@@ -12,6 +12,10 @@ include_directories(
 file( GLOB _SOURCES *.cpp )
 file( GLOB _HEADERS *.h )
 
+find_nuget( siviep_protobuf )
+
+include_directories( ${SIVIEP_PROTOBUF_INCLUDE_DIRS} )
+
 PROTOBUF_GENERATE_CPP( MESSAGE_SRCS MESSAGE_HEADERS Message.proto )
 SET( _HEADERS ${_HEADERS} ${MESSAGE_HEADERS} )
 SET( _SOURCES ${_SOURCES} ${MESSAGE_SRCS} )
@@ -23,7 +27,7 @@ SET_TARGET_PROPERTIES( rpc PROPERTIES
 
 CORAL_MODULE_TARGET( "rpc" rpc )
 
-target_link_libraries( rpc ${CORAL_LIBRARIES} ${PROTOBUF_LIBRARIES} ${PROTOBUF_LIBRARY_DEBUG} )
+target_link_libraries( rpc ${CORAL_LIBRARIES} ${SIVIEP_PROTOBUF_LIBRARIES} ) # ${PROTOBUF_LIBRARY_DEBUG} )
 
 ################################################################################
 # Source Groups

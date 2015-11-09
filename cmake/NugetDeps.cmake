@@ -1,0 +1,1 @@
+declare_nuget_dep( siviep_zeromq 2.1.11 )
