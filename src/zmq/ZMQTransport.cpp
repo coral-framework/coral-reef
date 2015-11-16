@@ -169,7 +169,7 @@ bool ZMQTransport::discoverRemoteInstances(std::vector<rpc::INetworkNodeRef>& in
 
 				foundIps.insert(ip);
 				auto* node = co::newInstance("rpc.NetworkNode")->getService<rpc::INetworkNode>();
-				node->setAddress(ip);				
+				node->setAddress(ip);	
 				instances.push_back(node);
 				
 			}
