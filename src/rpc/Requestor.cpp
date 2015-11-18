@@ -235,6 +235,11 @@ void Requestor::requestBarrierDown()
     _marshaller.marshalBarrierDown( _publicEndpoint, msg );
     _handler->handleAsynchRequest( msg );
 }
+
+ClientRequestHandler* Requestor::getClientRequestHandler()
+{
+	return _handler;
+}
     
 ClientProxy* Requestor::getOrCreateProxy( co::int32 instanceID, const std::string& componentName )
 {

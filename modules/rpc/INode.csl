@@ -59,6 +59,9 @@ interface INode
 	*/
 	void update();
 	
+	// Time after which any synchronous method invocation will be aborted with an exception.
+	void setInvokingTimeout( in int32 seconds );
+	
 	/*
 		Exposes a local instance to remote access through \a key key and returns the ID.
 	*/

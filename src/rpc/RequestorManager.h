@@ -27,9 +27,11 @@ public:
     void broadcastBarrierUp();
     
     void broadcastBarrierDown();
+
+	void setClientRequestTimeout( int seconds );
     
     inline InstanceManager* getInstanceManager() { return _instanceMan; }
-private:
+private:	
     InstanceManager* _instanceMan;
     ITransport* _transport;
     ServerRequestHandler* _srh;

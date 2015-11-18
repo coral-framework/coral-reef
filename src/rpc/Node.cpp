@@ -126,14 +126,13 @@ void Node::update()
 {
     assert( _srh );
        
-	//_elapsedSinceLastAutoDiscoverySignal += _timer.elapsed();
-	// if (_autoDiscovery &&  _elapsedSinceLastAutoDiscoverySignal > AUTO_DISCOVERY_RESEND_SIGNAL_INTERVAL)
-	//{
-	//	_transport->sendAutoDiscoverSignal();
-	//	_elapsedSinceLastAutoDiscoverySignal = 0;
-	//}
-
 	_srh->react();
+}
+
+void Node::setInvokingTimeout( co::int32 seconds )
+{
+	if( _requestorMan )
+		_requestorMan->setClientRequestTimeout( seconds );
 }
 
 void Node::stop()

@@ -11,7 +11,7 @@
 namespace rpc {
 
 ClientRequestHandler::ClientRequestHandler( IConnector* link, ServerRequestHandler* srh ) : 
-			_link( link ), _srh( srh ), _endpoint( link->getAddress() ), _timeout( 120 )
+			_link( link ), _srh( srh ), _endpoint( link->getAddress() ), _timeout( 5 )
 {}
 
 // Low level API used by the ClientProxies

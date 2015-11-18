@@ -43,6 +43,14 @@ void RequestorManager::broadcastBarrierDown()
         it->second->requestBarrierDown();
     }
 }
+
+void RequestorManager::setClientRequestTimeout( int seconds )
+{
+	for( auto it = _requestors.begin(); _requestors.end() != it; ++it )
+	{
+		it->second->getClientRequestHandler()->setTimeout( seconds );
+	}
+}
     
 Requestor* RequestorManager::getOrCreateRequestor( const std::string& endpoint )
 {

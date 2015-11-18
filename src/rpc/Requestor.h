@@ -79,6 +79,8 @@ public:
     void requestBarrierHit();
     
     void requestBarrierDown();
+
+	ClientRequestHandler* getClientRequestHandler();
     
     ClientProxy* getOrCreateProxy( co::int32 instanceID, const std::string& componentName );
     

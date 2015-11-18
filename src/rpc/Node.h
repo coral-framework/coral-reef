@@ -48,6 +48,8 @@ public:
     void start( const std::string& boundAddress );
     
 	void update();
+
+	void setInvokingTimeout( co:: int32 seconds );
 	
     void stop();
 
