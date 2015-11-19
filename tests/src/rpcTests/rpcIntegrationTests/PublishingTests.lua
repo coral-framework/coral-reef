@@ -15,9 +15,9 @@ function publishTest()
 	simpleTypes.storedInt = 5
 	
 	-- Gets the published instance proxy in the clients
-	EXPECT_FALSE( clientA:findRemoteInstance( "stubs.TestComponent", "wrongkey", "address3" ) )
-	local instanceTCinA = clientA:findRemoteInstance( "stubs.TestComponent", "key", "address3" )
-	local instanceTCinB = clientB:findRemoteInstance( "stubs.TestComponent", "key", "address3" )
+	EXPECT_FALSE( clientA:getRemoteInstance( "stubs.TestComponent", "wrongkey", "address3" ) )
+	local instanceTCinA = clientA:getRemoteInstance( "stubs.TestComponent", "key", "address3" )
+	local instanceTCinB = clientB:getRemoteInstance( "stubs.TestComponent", "key", "address3" )
 	
 	-- tests if the value matches in client A and changes it
 	ASSERT_TRUE( instanceTCinA and instanceTCinB )

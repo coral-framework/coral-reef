@@ -10,14 +10,14 @@ function test()
 	local instanceIn1Orig = co.new( "stubs.TestComponent" )
 	serverA:publishInstance( instanceIn1Orig, "instanceIn1" )
 	
-	local instanceIn1 = client:findRemoteInstance( "stubs.TestComponent", "instanceIn1", "address1" )
+	local instanceIn1 = client:getRemoteInstance( "stubs.TestComponent", "instanceIn1", "address1" )
 	local refTypesServiceIn1 = instanceIn1.reference
 	local simpleTypesServiceIn1 = instanceIn1.simple
 	
 	local instanceIn2Orig = co.new( "stubs.TestComponent" )
 	serverB:publishInstance( instanceIn1Orig, "instanceIn2" )
 	
-	local instanceIn2 = client:findRemoteInstance( "stubs.TestComponent", "instanceIn2", "address2" )
+	local instanceIn2 = client:getRemoteInstance( "stubs.TestComponent", "instanceIn2", "address2" )
 	local simpleTypesServiceIn2 = instanceIn2.simple
 	local refTypesServiceIn2 = instanceIn2.reference
 	
