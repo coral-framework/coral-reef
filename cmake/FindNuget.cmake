@@ -26,8 +26,8 @@ ENDIF()
 
 SET (_NUGET_INCLUDED 1)
 
-SET (NUGET_SERVER "http://taruma/nuget/" CACHE INTERNAL "Online Nuget repository.")
-SET (NUGET_DEBUG  FALSE                  CACHE INTERNAL "Print debug messages?")
+SET (NUGET_SERVER "http://taruma/api/odata/" CACHE INTERNAL "Online Nuget repository.")
+SET (NUGET_DEBUG  FALSE                      CACHE INTERNAL "Print debug messages?")
 
 FUNCTION (_nt_message P_MODE)
 	SET (_OPTIONS FATAL_ERROR WARNING STATUS)
