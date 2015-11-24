@@ -1,13 +1,16 @@
 # Locate the GTest Framework.
-find_package( GTest )
+find_nuget ( siviep_gtest )
+
+MESSAGE( STATUS "${SIVIEP_GTEST_LIBRARIES}" )
+MESSAGE( STATUS "${SIVIEP_GTEST_INCLUDE_DIRS}" )
 
 # We can only add the test projects if GTest is available.
-if( GTEST_FOUND )
+if( SIVIEP_GTEST_FOUND )
 
 	# On UNIX, GTest generally depends on pthreads, but CMake does not
-	# add pthreads to GTEST_LIBRARIES. So we do it...
+	# add pthreads to SIVIEP_GTEST_LIBRARIES. So we do it...
 	if( UNIX )
-		LIST( APPEND GTEST_LIBRARIES pthread )
+		LIST( APPEND SIVIEP_GTEST_LIBRARIES pthread )
 	endif()
 
 	# Check if Valgrind is available for the memory check tests
@@ -15,7 +18,7 @@ if( GTEST_FOUND )
 	if( NOT VALGRIND_COMMAND )
 		MESSAGE( "WARNING: valgrind not found - all memory tests have been disabled!" )
 	endif()
-
+	
 	add_subdirectory( src )
 
 else()

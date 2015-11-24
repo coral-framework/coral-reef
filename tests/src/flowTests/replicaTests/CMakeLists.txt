@@ -21,7 +21,7 @@ set_property( DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS "CORAL_PATH=\"${CORA
 ################################################################################
 
 include_directories(
-	${GTEST_INCLUDE_DIRS}
+	${SIVIEP_GTEST_INCLUDE_DIRS}
 	${CMAKE_CURRENT_BINARY_DIR}/generated
 	${CMAKE_BINARY_DIR}/src/rpc/generated
 	${CMAKE_SOURCE_DIR}/src/rpc
@@ -46,7 +46,7 @@ set_target_properties( replicaTests PROPERTIES
 	FOLDER "flowTests"
 )
 
-target_link_libraries( replicaTests ${GTEST_LIBRARIES} ${CORAL_LIBRARIES} ${CALCIUM_LIBRARIES} ${_LIBRARIES} )
+target_link_libraries( replicaTests ${SIVIEP_GTEST_LIBRARIES} ${CORAL_LIBRARIES} ${CALCIUM_LIBRARIES} ${_LIBRARIES} )
 
 source_group( "@Generated" FILES ${_GENERATED_FILES} )
 

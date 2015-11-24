@@ -5,7 +5,7 @@
 project( SERVERTESTS )
 
 include_directories(
-	${GTEST_INCLUDE_DIRS}
+	${SIVIEP_GTEST_INCLUDE_DIRS}
 	${dom_BINARY_DIR}/generated
 	${stubs_BINARY_DIR}/generated
 	${CMAKE_BINARY_DIR}/src/rpc/generated
@@ -28,4 +28,4 @@ set_target_properties( manual_server PROPERTIES
 	FOLDER "manualTests"
 )
 
-target_link_libraries( manual_server ${CORAL_LIBRARIES} ${GTEST_LIBRARIES} ${ZMQ_LIBRARIES} ${PROTOBUF_LIBRARIES} ${PROTOBUF_LIBRARY_DEBUG} ${PROTOBUF_PROTOC_LIBRARY_DEBUG} ${PROTOBUF_PROTOC_LIBRARIES} )
+target_link_libraries( manual_server ${CORAL_LIBRARIES} ${SIVIEP_GTEST_LIBRARIES} ${ZMQ_LIBRARIES} ${PROTOBUF_LIBRARIES} ${PROTOBUF_LIBRARY_DEBUG} ${PROTOBUF_PROTOC_LIBRARY_DEBUG} ${PROTOBUF_PROTOC_LIBRARIES} )

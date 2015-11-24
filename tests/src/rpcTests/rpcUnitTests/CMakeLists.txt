@@ -8,8 +8,11 @@ CORAL_GENERATE_MAPPINGS( _GENERATED_MAPPINGS "stubs.ITestSetup" "stubs.ISimpleTy
 "stubs.IComplexTypes" "stubs.IGrandParent" "stubs.IReferenceTypes" "stubs.IRefParent" 
 "stubs.ISimpleParent" "stubs.IFakeLink" )
 
+find_nuget ( siviep_protobuf )
+
 include_directories(
-	${GTEST_INCLUDE_DIRS}
+	${SIVIEP_GTEST_INCLUDE_DIRS}
+	${SIVIEP_PROTOBUF_INCLUDE_DIRS}
 	${CMAKE_SOURCE_DIR}/src/rpc
 	${CMAKE_CURRENT_BINARY_DIR}/generated
 )
@@ -19,7 +22,8 @@ file( GLOB _HEADERS *.h )
 file( GLOB _SOURCES *.cpp )
 
 #  sources replicated here for testing
-file( GLOB _REPLICATED_MODULE_FILES	${CMAKE_SOURCE_DIR}/src/rpc/*.cpp )
+file( GLOB _REPLICATED_MODULE_FILES	${CMAKE_SOURCE_DIR}/src/rpc/*.cpp ${CMAKE_SOURCE_DIR}/src/rpc/*.cc )
+
 list( REMOVE_ITEM _GENERATED_RPC_FILES "${CMAKE_CURRENT_BINARY_DIR}/generated/__Bootstrap.cpp" )
 
 add_executable( rpcUnitTests EXCLUDE_FROM_ALL ${_REPLICATED_MODULE_FILES} ${_HEADERS} ${_SOURCES} ${_GENERATED_RPC_FILES} ${_GENERATED_MAPPINGS} )
@@ -32,7 +36,7 @@ set_target_properties( rpcUnitTests PROPERTIES
 	FOLDER "rpcTests"
 )
 
-target_link_libraries( rpcUnitTests ${CORAL_LIBRARIES} ${GTEST_LIBRARIES} ${ZMQ_LIBRARIES} ${PROTOBUF_LIBRARIES} ${PROTOBUF_LIBRARY_DEBUG} )
+target_link_libraries( rpcUnitTests ${CORAL_LIBRARIES} ${SIVIEP_GTEST_LIBRARIES} ${SIVIEP_PROTOBUF_LIBRARIES} )
 
 ################################################################################
 # Register the test

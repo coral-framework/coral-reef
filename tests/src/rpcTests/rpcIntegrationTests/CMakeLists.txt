@@ -9,7 +9,7 @@ CORAL_GENERATE_MAPPINGS( _GENERATED_MAPPINGS "stubs.ITestSetup" "stubs.ISimpleTy
 "stubs.ISimpleParent" "stubs.IFakeLink" )
 
 include_directories(
-	${GTEST_INCLUDE_DIRS}
+	${SIVIEP_GTEST_INCLUDE_DIRS}
 	${CMAKE_BINARY_DIR}/src/rpc/generated
 	${CMAKE_SOURCE_DIR}/src/rpc
 	${CMAKE_CURRENT_BINARY_DIR}/generated
@@ -29,7 +29,7 @@ set_target_properties( rpcIntegrationTests PROPERTIES
 	FOLDER "rpcTests"
 )
 
-target_link_libraries( rpcIntegrationTests ${CORAL_LIBRARIES} ${GTEST_LIBRARIES} )
+target_link_libraries( rpcIntegrationTests ${CORAL_LIBRARIES} ${SIVIEP_GTEST_LIBRARIES} )
 
 ################################################################################
 # Register the test
