@@ -1,9 +1,6 @@
 # Locate the GTest Framework.
 find_nuget ( siviep_gtest )
 
-MESSAGE( STATUS "${SIVIEP_GTEST_LIBRARIES}" )
-MESSAGE( STATUS "${SIVIEP_GTEST_INCLUDE_DIRS}" )
-
 # We can only add the test projects if GTest is available.
 if( SIVIEP_GTEST_FOUND )
 

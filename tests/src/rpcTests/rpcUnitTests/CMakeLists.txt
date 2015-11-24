@@ -14,6 +14,7 @@ include_directories(
 	${SIVIEP_GTEST_INCLUDE_DIRS}
 	${SIVIEP_PROTOBUF_INCLUDE_DIRS}
 	${CMAKE_SOURCE_DIR}/src/rpc
+	${CMAKE_BINARY_DIR}/src/rpc
 	${CMAKE_CURRENT_BINARY_DIR}/generated
 )
 
@@ -22,11 +23,13 @@ file( GLOB _HEADERS *.h )
 file( GLOB _SOURCES *.cpp )
 
 #  sources replicated here for testing
-file( GLOB _REPLICATED_MODULE_FILES	${CMAKE_SOURCE_DIR}/src/rpc/*.cpp ${CMAKE_SOURCE_DIR}/src/rpc/*.cc )
+file( GLOB _REPLICATED_MODULE_FILES	${CMAKE_SOURCE_DIR}/src/rpc/*.cpp )
+
+file( GLOB _MESSAGE_PB_CC ${CMAKE_BINARY_DIR}/src/rpc/*.cc )
 
 list( REMOVE_ITEM _GENERATED_RPC_FILES "${CMAKE_CURRENT_BINARY_DIR}/generated/__Bootstrap.cpp" )
 
-add_executable( rpcUnitTests EXCLUDE_FROM_ALL ${_REPLICATED_MODULE_FILES} ${_HEADERS} ${_SOURCES} ${_GENERATED_RPC_FILES} ${_GENERATED_MAPPINGS} )
+add_executable( rpcUnitTests EXCLUDE_FROM_ALL ${_REPLICATED_MODULE_FILES} ${_HEADERS} ${_SOURCES} ${_GENERATED_RPC_FILES} ${_GENERATED_MAPPINGS} ${_MESSAGE_PB_CC} )
 add_dependencies( rpcUnitTests stubs )
 
 CORAL_TARGET( rpcUnitTests )
