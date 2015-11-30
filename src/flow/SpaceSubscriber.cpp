@@ -147,24 +147,28 @@ private:
 private:
 	void applyReceivedChanges( co::Slice<flow::NewObject> newObjects, co::Slice<flow::ChangeSet> changes )
 	{
-		std::set<co::IService*> newObjsCoral;
+		std::set<co::IServiceRef> newObjsCoral;
 		applyReceivedNewObjects( newObjects, newObjsCoral );
 		applyReceivedChangeSet( changes, newObjsCoral );
 	}
 
-	void applyReceivedChangeSet( co::Slice<flow::ChangeSet> changes, const std::set<co::IService*>& newObjsCoral )
+	void applyReceivedChangeSet( co::Slice<flow::ChangeSet> changes, const std::set<co::IServiceRef>& newObjsCoral )
 	{
 
 		std::for_each( changes.begin(), changes.end(), [this] (const ChangeSet& changeSet)
 		
 			{
 				co::IService* service = _graphIds->getService( changeSet.serviceId );
+
+				CORAL_DLOG( INFO ) << "Processing changes received for service id=" << changeSet.serviceId;
+
 				if( service )
 				{
 					const std::vector<flow::Change>& changeList = changeSet.changes;
 					for( int i = 0; i < changeList.size(); i++ )
 					{
 						const Change& currentChange = changeList[i];
+						CORAL_DLOG( INFO ) << currentChange.name << " " << currentChange.newRefValue << " " << currentChange.newValue;
 						if( currentChange.newRefValue == "" )
 						{
 							setField( service, currentChange.name, currentChange.newValue );
@@ -241,17 +245,20 @@ private:
 
 	}
 
-	void applyReceivedNewObjects( co::Slice<flow::NewObject> newObjects, std::set<co::IService*>& newObjsCoral )
+	void applyReceivedNewObjects( co::Slice<flow::NewObject> newObjects, std::set<co::IServiceRef>& newObjsCoral )
 	{
 		for(;newObjects; newObjects.popFirst() )
 		{
 			flow::NewObject newObj = newObjects.getFirst();
-			co::IObject* newObjCoral = co::newInstance( newObj.typeName );
-			newObjsCoral.insert( newObjCoral );
+			CORAL_DLOG( INFO ) << "Creating an object " << newObj.typeName << " with id " << newObj.newId;
 
-			_graphIds->shallowGivenObjectId( newObjCoral, newObj.newId );
+			co::IObjectRef newObjCoral = co::newInstance( newObj.typeName );
+			newObjsCoral.insert( newObjCoral.get() );
 
-			assert( _graphIds->getId( newObjCoral ) == newObj.newId );
+			_graphIds->shallowGivenObjectId( newObjCoral.get(), newObj.newId );
+			
+			assert( _graphIds->getId( newObjCoral.get() ) == newObj.newId );
+				//CORAL_THROW( co::IllegalStateException, "Graph inconsistent: failure to create a " << newObj.typeName << " with id " << newObj.newId );
 
 		}
 	}
