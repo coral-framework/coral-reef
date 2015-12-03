@@ -19,7 +19,6 @@ namespace zmq {
     
 const int PING_PORT_NUMBER = 9123;
 const int SOCKET_POLL_TIMEOUT = 3000;
-const int PING_MSG_SIZE = 2;
 const int PING_INTERVAL = 200;
 
 bool ZMQTransport::_s_winsockInitialized = false;
@@ -65,7 +64,7 @@ void ZMQTransport::initWinSock()
 	}
 }
 
-bool ZMQTransport::sendAutoDiscoverSignal()
+bool ZMQTransport::sendAutoDiscoverSignal( const std::string& ipmask, int port )
 {
 	int nOptOffVal = 0;
 	int nOptOnVal = 1;
@@ -94,13 +93,15 @@ bool ZMQTransport::sendAutoDiscoverSignal()
 	saBroadcast.sin_family = AF_INET;
 	saBroadcast.sin_port = htons(PING_PORT_NUMBER);
 	saBroadcast.sin_addr.s_addr = htonl(INADDR_BROADCAST);
+	int size = sizeof(saBroadcast);
+	if( !WSAStringToAddress( (LPSTR)ipmask.c_str( ), AF_INET, NULL, (struct sockaddr *)&saBroadcast, &size) == 0 )
+		return false;
 	
-	// Broadcast 5 beacon messages
+		// Broadcast 5 beacon messages
 	for (int i = 0; i < 5; i++)
 	{
-		char buffer[PING_MSG_SIZE] = { 0 };
-		strcpy(&buffer[0], "!");
-		int bytes = sendto(fdSocket, buffer, PING_MSG_SIZE, 0, (sockaddr*)&saBroadcast, sizeof(struct sockaddr_in));
+		std::string portStr = std::to_string( (long long)port );
+		int bytes = sendto( fdSocket, portStr.c_str( ), portStr.size(), 0, (sockaddr*)&saBroadcast, sizeof(struct sockaddr_in) );
 		if (bytes == SOCKET_ERROR)
 		{
 			return false;
@@ -113,7 +114,7 @@ bool ZMQTransport::sendAutoDiscoverSignal()
 	return true;
 }
 
-bool ZMQTransport::discoverRemoteInstances(std::vector<rpc::INetworkNodeRef>& instances, co::uint32 timeout)
+bool ZMQTransport::discoverRemoteInstances( std::vector<rpc::INetworkNodeRef>& instances, co::uint32 timeout )
 {
 	int nResult = 0;
 	int nOptOffVal = 0;
@@ -159,50 +160,35 @@ bool ZMQTransport::discoverRemoteInstances(std::vector<rpc::INetworkNodeRef>& in
 		//  If we get a message, print the contents
 		if (items[0].revents & ZMQ_POLLIN)
 		{
-			char recvBuf[PING_MSG_SIZE] = { 0 };
-			int saSize = sizeof(struct sockaddr_in);
-			size_t size = recvfrom(fdSocket, recvBuf, PING_MSG_SIZE, 0, (sockaddr*)&saListen, &saSize);
-			{
-				std::string ip(inet_ntoa(saListen.sin_addr));
-				if (foundIps.find(ip) != foundIps.end())
-					continue;
+			std::string portStr;
+			portStr.resize( 10 );
 
-				foundIps.insert(ip);
-				auto* node = co::newInstance("rpc.NetworkNode")->getService<rpc::INetworkNode>();
-				node->setAddress(ip);	
-				instances.push_back(node);
-				
-			}
+			int saSize = sizeof(struct sockaddr_in);
+			size_t size = recvfrom( fdSocket, &portStr[0], 10, 0, (sockaddr*)&saListen, &saSize );
+			
+			portStr.resize( size );
+
+			std::string ip(inet_ntoa(saListen.sin_addr));
+			if (foundIps.find(ip) != foundIps.end())
+				continue;
+
+			foundIps.insert(ip);
+			auto* node = co::newInstance("rpc.NetworkNode")->getService<rpc::INetworkNode>();
+			node->setAddress(ip);	
+
+			int port = std::stoi( portStr );
+			node->setPort( port );
+			instances.push_back(node);				
+			
 		}
 		elapsed += zmq_stopwatch_stop( watch );
 
 	} while( elapsed < timeout * 1000 );
 
 	closesocket(fdSocket);
+
+	return !foundIps.empty();
 }
-
-void ZMQTransport::getIpAddresses( std::vector<std::string>& addresses )
-{
-	char ac[80];
-	if (gethostname(ac, sizeof(ac)) == SOCKET_ERROR)
-	{
-		return;
-	}
-
-	struct hostent *phe = gethostbyname(ac);
-	if (phe == 0)
-	{
-		return;
-	}
-
-	for (int i = 0; phe->h_addr_list[i] != 0; ++i) 
-	{
-		struct in_addr addr;
-		memcpy(&addr, phe->h_addr_list[i], sizeof(struct in_addr));
-		addresses.push_back(inet_ntoa(addr));
-	}
-}
-
      
 CORAL_EXPORT_COMPONENT( ZMQTransport, ZMQTransport );
     

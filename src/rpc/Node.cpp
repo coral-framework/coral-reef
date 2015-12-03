@@ -23,7 +23,6 @@
 namespace rpc {
 
 const double AUTO_DISCOVERY_RESEND_SIGNAL_INTERVAL = 5;
-const std::string AUTO_DISCOVERY_LISTEN_PORT = ":8955";
 const std::string AUTO_DISCOVERY_TALK_PORT = ":8956";
 
 Node::Node() : _srh(0), _autoDiscovery(false), _started( false ),_elapsedSinceLastAutoDiscoverySignal(0)
@@ -53,17 +52,18 @@ void Node::discoverRemoteInstances(const std::string& componentTypeName, const s
 {
 	if (!_started)
 	{
-		std::vector<std::string> ips;
-		_transport->getIpAddresses(ips);
-		start( "tcp://" + ips[0] + AUTO_DISCOVERY_TALK_PORT );
+		std::vector<std::string> ips;		
+		start( "tcp://localhost" + AUTO_DISCOVERY_TALK_PORT );
 	}
 	
 	_transport->discoverRemoteInstances( instancesInfo, timeout );
 	
 	// get discoverd instances and connect to it
 	for (int i = 0; i < instancesInfo.size(); ++i)
-	{		
-		auto* remoteInstance = getRemoteInstance(componentTypeName, key, "tcp://" + instancesInfo[i]->getAddress() + AUTO_DISCOVERY_LISTEN_PORT);
+	{	
+		
+		auto* remoteInstance = getRemoteInstance( componentTypeName, key, "tcp://"
+			+ instancesInfo[i]->getAddress( ) + ":" + std::to_string( (long long)instancesInfo[i]->getPort() ) );
 		if (remoteInstance)
 			instances.push_back(remoteInstance);
 	}
@@ -97,18 +97,7 @@ void Node::hitBarrier( co::uint32 timeout )
 
 void Node::start( const std::string&  boundAddress )
 {
-	std::string finalAddr = boundAddress;
-	if (boundAddress == "autodiscover")
-	{
-		_autoDiscovery = true;
-		std::vector<std::string> ips;
-		_transport->getIpAddresses( ips );
-		finalAddr = "tcp://" + ips[0] + AUTO_DISCOVERY_LISTEN_PORT;
-	}
-	else
-		_autoDiscovery = false;
-
-	_srh = new ServerRequestHandler(_transport->bind(finalAddr), finalAddr);
+	_srh = new ServerRequestHandler( _transport->bind( boundAddress ), boundAddress );
 
     _instanceMan = new InstanceManager();
  
@@ -118,7 +107,7 @@ void Node::start( const std::string&  boundAddress )
     
     _invoker = new Invoker( _instanceMan, _barrierMan, _srh, _requestorMan );
     _srh->setInvoker( _invoker );
-	_publicEndpoint = finalAddr;
+	_publicEndpoint = boundAddress;
 	_started = true;
 }
     

@@ -24,7 +24,7 @@ public:
     
     rpc::IConnector* connect( const std::string& addressToConnect );
 
-	bool sendAutoDiscoverSignal();
+	bool sendAutoDiscoverSignal( const std::string& ipmask, int port );
 
 	bool discoverRemoteInstances( std::vector<rpc::INetworkNodeRef>& instances, co::uint32 timeout );
 
