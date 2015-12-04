@@ -24,16 +24,22 @@ public:
     
     rpc::IConnector* connect( const std::string& addressToConnect );
 
-	bool sendAutoDiscoverSignal( const std::string& ipmask, int port );
+	bool sendAutoDiscoverSignal( const std::string& ipmask, const std::string& netmask, int port );
 
-	bool discoverRemoteInstances( std::vector<rpc::INetworkNodeRef>& instances, co::uint32 timeout );
+	bool discoverRemoteInstances( const std::string& localIp, std::vector<rpc::INetworkNodeRef>& instances, co::uint32 timeout );
 
 	void getIpAddresses( std::vector<std::string>& addresses );
 
 private:
 	void initWinSock();
-
+	void createSendUDPSocket();
+	void createReceiveUDPSocket( const std::string& bindAddress );
+	
 private:
+	bool _sendUDPInitialized;
+	bool _receiveUDPInitialized;
+	SOCKET _sendUDPSocket;
+	SOCKET _receiveUDPSocket;
     zmq::context_t _context;
 	static bool _s_winsockInitialized;
 };

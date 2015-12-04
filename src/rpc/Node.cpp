@@ -47,7 +47,7 @@ co::IObject* Node::getRemoteInstance( const std::string& instanceType, const std
     return req->requestPublicInstance( key, instanceType );
 }
 
-void Node::discoverRemoteInstances(const std::string& componentTypeName, const std::string& key,
+void Node::discoverRemoteInstances( const std::string& localip, const std::string& componentTypeName, const std::string& key,
 	co::uint32 timeout, std::vector<co::IObjectRef>& instances, std::vector<rpc::INetworkNodeRef>& instancesInfo)
 {
 	if (!_started)
@@ -56,7 +56,7 @@ void Node::discoverRemoteInstances(const std::string& componentTypeName, const s
 		start( "tcp://localhost" + AUTO_DISCOVERY_TALK_PORT );
 	}
 	
-	_transport->discoverRemoteInstances( instancesInfo, timeout );
+	_transport->discoverRemoteInstances( localip, instancesInfo, timeout );
 	
 	// get discoverd instances and connect to it
 	for (int i = 0; i < instancesInfo.size(); ++i)

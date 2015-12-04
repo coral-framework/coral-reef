@@ -15,9 +15,9 @@ interface ITransport
 		is an UDP ping containing the ip of source machine (the machine sending the signal);
 		Retrieves whether the signal was successfully sent.
 	 */
-	bool sendAutoDiscoverSignal( in string ip, in int32 port );
+	bool sendAutoDiscoverSignal( in string ip, in string netmask, in int32 port );
 	
 	// Attempts to discover remote instances in all newtwork interfaces. It aborts the operation after timeout milliseconds.
 	// Retrieves true if the discover attempt was successfull (even though no instances were found).
-	bool discoverRemoteInstances( inout rpc.INetworkNode[] instances, in uint32 timeout );	
+	bool discoverRemoteInstances( in string localip, inout rpc.INetworkNode[] instances, in uint32 timeout );	
 };

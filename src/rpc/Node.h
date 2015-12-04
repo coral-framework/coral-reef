@@ -39,7 +39,7 @@ public:
     co::IObject* getRemoteInstance( const std::string& instanceType, const std::string& key, 
                                     const std::string& address );
 
-	void discoverRemoteInstances(const std::string& componentTypeName, const std::string& key, 
+	void discoverRemoteInstances( const std::string& localIp, const std::string& componentTypeName, const std::string& key,
 		co::uint32 timeout, std::vector<co::IObjectRef>& instances, std::vector<rpc::INetworkNodeRef>& instancesInfo);
 
     void raiseBarrier( co::int32 capacity, co::uint32 timeout );

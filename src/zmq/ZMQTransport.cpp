@@ -13,6 +13,9 @@
 
 #include <co/Coral.h>
 
+#include <Ws2tcpip.h>
+#include <mswsock.h>
+
 #pragma comment(lib, "Ws2_32.lib")
 
 namespace zmq {
@@ -25,12 +28,20 @@ bool ZMQTransport::_s_winsockInitialized = false;
 
 ZMQTransport::ZMQTransport() : _context( 1 )
 {
-    // empty constructor
+	_sendUDPInitialized = false;
+	_receiveUDPInitialized = false;
 }
 
 ZMQTransport::~ZMQTransport()
 {
-    // empty destructor
+	if( _sendUDPInitialized )
+	{
+		closesocket( _sendUDPSocket );
+	}
+	if( _receiveUDPInitialized )
+	{
+		closesocket( _receiveUDPSocket );
+	}
 }
 
 // ------ rpc.ITransport Methods ------ //
@@ -64,88 +75,99 @@ void ZMQTransport::initWinSock()
 	}
 }
 
-bool ZMQTransport::sendAutoDiscoverSignal( const std::string& ipmask, int port )
+void ZMQTransport::createSendUDPSocket()
 {
-	int nOptOffVal = 0;
-	int nOptOnVal = 1;
-	int nOptLen = sizeof(int);
+	if( _sendUDPInitialized )
+		return;
 
 	// Initialize Winsock
-	initWinSock();
+	initWinSock( );
 
 	// Create UDP socket
 	SOCKET fdSocket;
 	fdSocket = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
-	if (fdSocket == INVALID_SOCKET)
+	if( fdSocket == INVALID_SOCKET )
 	{
-		return false;
+		return;
 	}
-
-	// Ask operating system to let us do broadcasts from socket
-	int nResult = setsockopt(fdSocket, SOL_SOCKET, SO_BROADCAST, (char *)&nOptOnVal, nOptLen);
-	if (nResult != NO_ERROR)
-	{
-		return false;
-	}
-
-	// Set up the sockaddr structure
-	struct sockaddr_in saBroadcast = { 0 };
-	saBroadcast.sin_family = AF_INET;
-	saBroadcast.sin_port = htons(PING_PORT_NUMBER);
-	saBroadcast.sin_addr.s_addr = htonl(INADDR_BROADCAST);
-	int size = sizeof(saBroadcast);
-	if( !WSAStringToAddress( (LPSTR)ipmask.c_str( ), AF_INET, NULL, (struct sockaddr *)&saBroadcast, &size) == 0 )
-		return false;
-	
-		// Broadcast 5 beacon messages
-	for (int i = 0; i < 5; i++)
-	{
-		std::string portStr = std::to_string( (long long)port );
-		int bytes = sendto( fdSocket, portStr.c_str( ), portStr.size(), 0, (sockaddr*)&saBroadcast, sizeof(struct sockaddr_in) );
-		if (bytes == SOCKET_ERROR)
-		{
-			return false;
-		}
-		Sleep(PING_INTERVAL);
-	}
-
-	closesocket(fdSocket);
-
-	return true;
-}
-
-bool ZMQTransport::discoverRemoteInstances( std::vector<rpc::INetworkNodeRef>& instances, co::uint32 timeout )
-{
-	int nResult = 0;
-	int nOptOffVal = 0;
+		
 	int nOptOnVal = 1;
 	int nOptLen = sizeof(int);
+	int nResult = setsockopt( fdSocket, SOL_SOCKET, SO_BROADCAST, (char *)&nOptOnVal, nOptLen );
+	if( nResult != NO_ERROR )
+	{
+		return;
+	}
 	
-	// Initialize Winsock
-	initWinSock();
+	_sendUDPInitialized = true;
+	_sendUDPSocket = fdSocket;
+}
+
+void ZMQTransport::createReceiveUDPSocket( const std::string& bindAddress )
+{
+	if( _receiveUDPInitialized )
+	{
+		return;
+	}
+
+	initWinSock( );
 
 	//  Create UDP socket
 	SOCKET fdSocket;
-	fdSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (fdSocket == INVALID_SOCKET)
+	fdSocket = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
+	if( fdSocket == INVALID_SOCKET )
 	{
-		return false;
+		return;
 	}
 
 	// Set up the sockaddr structure
 	struct sockaddr_in saListen = { 0 };
 	saListen.sin_family = AF_INET;
-	saListen.sin_port = htons(PING_PORT_NUMBER);
-	saListen.sin_addr.s_addr = htonl(INADDR_ANY);
+	saListen.sin_port = htons( PING_PORT_NUMBER );
+	saListen.sin_addr.s_addr = inet_addr( bindAddress.c_str() );
 
 	//  Bind the socket
-	nResult = ::bind(fdSocket, (sockaddr*)&saListen, sizeof(saListen));
-	if (nResult != NO_ERROR)
+	int nResult = ::bind( fdSocket, (sockaddr*)&saListen, sizeof(saListen) );
+	if( nResult != NO_ERROR )
+	{
+		return;
+	}
+
+	_receiveUDPInitialized = true;
+	_receiveUDPSocket = fdSocket;
+}
+
+bool ZMQTransport::sendAutoDiscoverSignal( const std::string& ip, const std::string& netmask, int port )
+{
+	createSendUDPSocket();
+
+	// Set up the sockaddr structure
+	struct sockaddr_in saBroadcast = { 0 };
+	saBroadcast.sin_family = AF_INET;
+	saBroadcast.sin_port = htons(PING_PORT_NUMBER);
+	saBroadcast.sin_addr.s_addr = inet_addr( ip.c_str() ) | ~inet_addr( netmask.c_str( ) );
+			
+	std::string portStr = std::to_string( (long long)port );
+	int bytes = sendto( _sendUDPSocket, portStr.c_str( ), portStr.size(), 0, (sockaddr*)&saBroadcast, sizeof(struct sockaddr_in) );
+	if( bytes == SOCKET_ERROR )
 	{
 		return false;
 	}
+	
+	return true;
+}
 
-	std::unordered_multiset<std::string> foundIps;
+bool ZMQTransport::discoverRemoteInstances( const std::string& localIp, std::vector<rpc::INetworkNodeRef>& instances, co::uint32 timeout )
+{
+	createReceiveUDPSocket( localIp );
+
+	// Set up the sockaddr structure
+	struct sockaddr_in saListen = { 0 };
+	saListen.sin_family = AF_INET;
+	saListen.sin_port = htons(PING_PORT_NUMBER);
+	saListen.sin_addr.s_addr = inet_addr( localIp.c_str() );
+
+	std::unordered_set<std::string> foundIps;
 
 	void* watch = 0;
 	int elapsed = 0;
@@ -154,7 +176,7 @@ bool ZMQTransport::discoverRemoteInstances( std::vector<rpc::INetworkNodeRef>& i
 		watch = zmq_stopwatch_start();
 
 		//  Poll socket for a message
-		zmq::pollitem_t items[] = { NULL, fdSocket, ZMQ_POLLIN, 0 };
+		zmq::pollitem_t items[] = { NULL, _receiveUDPSocket, ZMQ_POLLIN, 0 };
 		zmq::poll(&items[0], 1, SOCKET_POLL_TIMEOUT);
 
 		//  If we get a message, print the contents
@@ -164,28 +186,25 @@ bool ZMQTransport::discoverRemoteInstances( std::vector<rpc::INetworkNodeRef>& i
 			portStr.resize( 10 );
 
 			int saSize = sizeof(struct sockaddr_in);
-			size_t size = recvfrom( fdSocket, &portStr[0], 10, 0, (sockaddr*)&saListen, &saSize );
+			size_t size = recvfrom( _receiveUDPSocket, &portStr[0], 10, 0, (sockaddr*)&saListen, &saSize );
 			
 			portStr.resize( size );
 
-			std::string ip(inet_ntoa(saListen.sin_addr));
-			if (foundIps.find(ip) != foundIps.end())
-				continue;
+			std::string ip( inet_ntoa(saListen.sin_addr) );
+			if( foundIps.find( ip ) == foundIps.end() )
+			{
+				foundIps.insert( ip );
+				auto* node = co::newInstance( "rpc.NetworkNode" )->getService<rpc::INetworkNode>( );
+				node->setAddress( ip );
 
-			foundIps.insert(ip);
-			auto* node = co::newInstance("rpc.NetworkNode")->getService<rpc::INetworkNode>();
-			node->setAddress(ip);	
-
-			int port = std::stoi( portStr );
-			node->setPort( port );
-			instances.push_back(node);				
-			
+				int port = std::stoi( portStr );
+				node->setPort( port );
+				instances.push_back( node );
+			}
 		}
 		elapsed += zmq_stopwatch_stop( watch );
 
 	} while( elapsed < timeout * 1000 );
-
-	closesocket(fdSocket);
 
 	return !foundIps.empty();
 }

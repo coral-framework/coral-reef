@@ -26,7 +26,7 @@ interface INode
 		over a local area network. It will try to discover instance for timeout time in milliseconds,
 		after that time, it will return with discovered instances.
 	*/
-	void discoverRemoteInstances( in string componentTypeName, in string key, in uint32 timeout,
+	void discoverRemoteInstances( in string localip, in string componentTypeName, in string key, in uint32 timeout,
 		inout co.IObject[] instances, inout rpc.INetworkNode[] networNodes );
 	
 	
