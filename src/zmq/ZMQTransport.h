@@ -30,16 +30,23 @@ public:
 
 	void getIpAddresses( std::vector<std::string>& addresses );
 
+	void shutdown();
+
 private:
 	void initWinSock();
 	void createSendUDPSocket();
+	void closeSendUDPSocket( );
+	void closeReceiveUDPSocket();
 	void createReceiveUDPSocket( const std::string& bindAddress );
+	void recreateReceiveUDPSocket( const std::string& bindAddress );
 	
 private:
 	bool _sendUDPInitialized;
 	bool _receiveUDPInitialized;
 	SOCKET _sendUDPSocket;
 	SOCKET _receiveUDPSocket;
+	std::string _currentAutoDiscoveryListenIp;
+
     zmq::context_t _context;
 	static bool _s_winsockInitialized;
 };

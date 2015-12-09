@@ -20,4 +20,7 @@ interface ITransport
 	// Attempts to discover remote instances in all newtwork interfaces. It aborts the operation after timeout milliseconds.
 	// Retrieves true if the discover attempt was successfull (even though no instances were found).
 	bool discoverRemoteInstances( in string localip, inout rpc.INetworkNode[] instances, in uint32 timeout );	
+	
+	// This should be called to force an imediate shutdown of network state.
+	void shutdown();
 };

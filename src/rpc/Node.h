@@ -72,10 +72,10 @@ public:
     
     
 private:
-	double _elapsedSinceLastAutoDiscoverySignal;
 	bool _started;
 	bool _autoDiscovery;
     RequestorManager* _requestorMan;
+	double _elapsedSinceLastAutoDiscoverySignal;
     
 	Timer _timer;
     InstanceManager* _instanceMan;

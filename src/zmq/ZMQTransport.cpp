@@ -26,7 +26,7 @@ const int PING_INTERVAL = 200;
 
 bool ZMQTransport::_s_winsockInitialized = false;
 
-ZMQTransport::ZMQTransport() : _context( 1 )
+ZMQTransport::ZMQTransport( ) : _context( 1 ), _sendUDPSocket( INVALID_SOCKET ), _receiveUDPSocket( INVALID_SOCKET )
 {
 	_sendUDPInitialized = false;
 	_receiveUDPInitialized = false;
@@ -34,14 +34,7 @@ ZMQTransport::ZMQTransport() : _context( 1 )
 
 ZMQTransport::~ZMQTransport()
 {
-	if( _sendUDPInitialized )
-	{
-		closesocket( _sendUDPSocket );
-	}
-	if( _receiveUDPInitialized )
-	{
-		closesocket( _receiveUDPSocket );
-	}
+	this->shutdown();
 }
 
 // ------ rpc.ITransport Methods ------ //
@@ -119,7 +112,7 @@ void ZMQTransport::createReceiveUDPSocket( const std::string& bindAddress )
 	{
 		return;
 	}
-
+	
 	// Set up the sockaddr structure
 	struct sockaddr_in saListen = { 0 };
 	saListen.sin_family = AF_INET;
@@ -135,6 +128,14 @@ void ZMQTransport::createReceiveUDPSocket( const std::string& bindAddress )
 
 	_receiveUDPInitialized = true;
 	_receiveUDPSocket = fdSocket;
+}
+
+void ZMQTransport::recreateReceiveUDPSocket( const std::string& bindAddress )
+{
+	_receiveUDPInitialized = false;
+	closeReceiveUDPSocket();
+	createReceiveUDPSocket( bindAddress );
+	_currentAutoDiscoveryListenIp = bindAddress;
 }
 
 bool ZMQTransport::sendAutoDiscoverSignal( const std::string& ip, const std::string& netmask, int port )
@@ -159,7 +160,10 @@ bool ZMQTransport::sendAutoDiscoverSignal( const std::string& ip, const std::str
 
 bool ZMQTransport::discoverRemoteInstances( const std::string& localIp, std::vector<rpc::INetworkNodeRef>& instances, co::uint32 timeout )
 {
-	createReceiveUDPSocket( localIp );
+	if( localIp != _currentAutoDiscoveryListenIp )
+	{
+		recreateReceiveUDPSocket( localIp );
+	}
 
 	// Set up the sockaddr structure
 	struct sockaddr_in saListen = { 0 };
@@ -207,6 +211,30 @@ bool ZMQTransport::discoverRemoteInstances( const std::string& localIp, std::vec
 	} while( elapsed < timeout * 1000 );
 
 	return !foundIps.empty();
+}
+
+void ZMQTransport::closeSendUDPSocket()
+{
+	if( _sendUDPSocket != INVALID_SOCKET )
+	{
+		closesocket( _sendUDPSocket );
+		_sendUDPSocket = INVALID_SOCKET;
+	}
+}
+
+void ZMQTransport::closeReceiveUDPSocket( )
+{
+	if( _receiveUDPSocket != INVALID_SOCKET )
+	{		
+		closesocket( _receiveUDPSocket );
+		_receiveUDPSocket = INVALID_SOCKET;
+	}
+}
+
+void ZMQTransport::shutdown( )
+{
+	//closeSendUDPSocket();
+	//closeReceiveUDPSocket();
 }
      
 CORAL_EXPORT_COMPONENT( ZMQTransport, ZMQTransport );
